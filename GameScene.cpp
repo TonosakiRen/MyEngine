@@ -44,7 +44,7 @@ void GameScene::Initialize() {
 	material_.uvTransform_ = MakeAffineMatrix(texTransfrom.scale, texTransfrom.rotate, texTransfrom.translate);
 	material_.UpdateMaterial();
 
-	textureHandle_ = TextureManager::Load("uvChecker.png");
+	textureHandle_ = ShaderResourceManager::Load("uvChecker.png");
 
 	spritePosition_ = { 0.0f,0.0f };
 	spriteScale_ = { 100.0f,100.0f };

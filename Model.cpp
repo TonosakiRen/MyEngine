@@ -16,11 +16,12 @@ UINT Model::sDescriptorHandleIncrementSize = 0;
 ID3D12GraphicsCommandList* Model::sCommandList = nullptr;
 ComPtr<ID3D12RootSignature> Model::sRootSignature;
 ComPtr<ID3D12PipelineState> Model::sPipelineState;
+ComPtr<ID3D12PipelineState> Model::sShadowPipelineState;
 
 void Model::StaticInitialize(int window_width, int window_height) {
     sDirectXCommon = DirectXCommon::GetInstance();
     // パイプライン初期化
-    InitializeGraphicsPipeline();
+    InitializeGraphicsPipelines();
 }
 
 void Model::PreDraw(ID3D12GraphicsCommandList* commandList) {
@@ -54,57 +55,22 @@ Model* Model::Create() {
     return object3d;
 }
 
-void Model::InitializeGraphicsPipeline() {
+void Model::InitializeGraphicsPipelines() {
+    InitializeRootSignature();
+    InitializeDefaultGraphicsPipelines();
+    InitializeShadowGraphicsPipelines();
+}
+
+void Model::InitializeDefaultGraphicsPipelines() {
     HRESULT result = S_FALSE;
     ComPtr<IDxcBlob> vsBlob;    // 頂点シェーダオブジェクト
     ComPtr<IDxcBlob> psBlob;    // ピクセルシェーダオブジェクト
-    ComPtr<ID3DBlob> errorBlob; // エラーオブジェクト
 
-    vsBlob = sDirectXCommon->CompileShader(L"BasicVS.hlsl",L"vs_6_0");
+    vsBlob = sDirectXCommon->CompileShader(L"BasicVS.hlsl", L"vs_6_0");
     assert(vsBlob != nullptr);
-
-    //// 頂点シェーダの読み込みとコンパイル
-    //result = D3DCompileFromFile(
-    //    L"BasicVS.hlsl", // シェーダファイル名
-    //    nullptr,
-    //    D3D_COMPILE_STANDARD_FILE_INCLUDE, // インクルード可能にする
-    //    "main", "vs_5_0", // エントリーポイント名、シェーダーモデル指定
-    //    D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION, // デバッグ用設定
-    //    0, &vsBlob, &errorBlob);
-    //if (FAILED(result)) {
-    //    // errorBlobからエラー内容をstring型にコピー
-    //    std::string errstr;
-    //    errstr.resize(errorBlob->GetBufferSize());
-
-    //    std::copy_n((char*)errorBlob->GetBufferPointer(), errorBlob->GetBufferSize(), errstr.begin());
-    //    errstr += "\n";
-    //    // エラー内容を出力ウィンドウに表示
-    //    OutputDebugStringA(errstr.c_str());
-    //    exit(1);
-    //}
 
     psBlob = sDirectXCommon->CompileShader(L"BasicPS.hlsl", L"ps_6_0");
     assert(psBlob != nullptr);
-
-    //// ピクセルシェーダの読み込みとコンパイル
-    //result = D3DCompileFromFile(
-    //    L"BasicPS.hlsl", // シェーダファイル名
-    //    nullptr,
-    //    D3D_COMPILE_STANDARD_FILE_INCLUDE, // インクルード可能にする
-    //    "main", "ps_5_0", // エントリーポイント名、シェーダーモデル指定
-    //    D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION, // デバッグ用設定
-    //    0, &psBlob, &errorBlob);
-    //if (FAILED(result)) {
-    //    // errorBlobからエラー内容をstring型にコピー
-    //    std::string errstr;
-    //    errstr.resize(errorBlob->GetBufferSize());
-
-    //    std::copy_n((char*)errorBlob->GetBufferPointer(), errorBlob->GetBufferSize(), errstr.begin());
-    //    errstr += "\n";
-    //    // エラー内容を出力ウィンドウに表示
-    //    OutputDebugStringA(errstr.c_str());
-    //    exit(1);
-    //}
 
     // 頂点レイアウト
     D3D12_INPUT_ELEMENT_DESC inputLayout[] = {
@@ -161,7 +127,84 @@ void Model::InitializeGraphicsPipeline() {
     gpipeline.NumRenderTargets = 1;                            // 描画対象は1つ
     gpipeline.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB; // 0～255指定のRGBA
     gpipeline.SampleDesc.Count = 1; // 1ピクセルにつき1回サンプリング
+    
 
+    gpipeline.pRootSignature = sRootSignature.Get();
+
+    // グラフィックスパイプラインの生成
+    result = sDirectXCommon->GetDevice()->CreateGraphicsPipelineState(&gpipeline, IID_PPV_ARGS(&sPipelineState));
+    assert(SUCCEEDED(result));
+}
+void Model::InitializeShadowGraphicsPipelines() {
+    HRESULT result = S_FALSE;
+    ComPtr<IDxcBlob> vsBlob;    // 頂点シェーダオブジェクト
+    ComPtr<IDxcBlob> psBlob;    // ピクセルシェーダオブジェクト
+
+    vsBlob = sDirectXCommon->CompileShader(L"ShadowVS.hlsl", L"vs_6_0");
+    assert(vsBlob != nullptr);
+
+    psBlob = sDirectXCommon->CompileShader(L"ShadowPS.hlsl", L"ps_6_0");
+    assert(psBlob != nullptr);
+
+    // 頂点レイアウト
+    D3D12_INPUT_ELEMENT_DESC inputLayout[] = {
+      {// xy座標(1行で書いたほうが見やすい)
+       "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT,
+       D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
+    };
+
+    // グラフィックスパイプラインの流れを設定
+    D3D12_GRAPHICS_PIPELINE_STATE_DESC gpipeline{};
+    gpipeline.VS = CD3DX12_SHADER_BYTECODE(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize());
+    gpipeline.PS = CD3DX12_SHADER_BYTECODE(psBlob->GetBufferPointer(), psBlob->GetBufferSize());
+
+    // サンプルマスク
+    gpipeline.SampleMask = D3D12_DEFAULT_SAMPLE_MASK; // 標準設定
+    // ラスタライザステート
+    gpipeline.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+    // gpipeline.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
+    // gpipeline.RasterizerState.FillMode = D3D12_FILL_MODE_WIREFRAME;
+    //  デプスステンシルステート
+    gpipeline.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
+
+    // レンダーターゲットのブレンド設定
+    D3D12_RENDER_TARGET_BLEND_DESC blenddesc{};
+    blenddesc.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL; // RBGA全てのチャンネルを描画
+    blenddesc.BlendEnable = true;
+    blenddesc.BlendOp = D3D12_BLEND_OP_ADD;
+    blenddesc.SrcBlend = D3D12_BLEND_SRC_ALPHA;
+    blenddesc.DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
+
+    blenddesc.BlendOpAlpha = D3D12_BLEND_OP_ADD;
+    blenddesc.SrcBlendAlpha = D3D12_BLEND_ONE;
+    blenddesc.DestBlendAlpha = D3D12_BLEND_ZERO;
+
+    // ブレンドステートの設定
+    gpipeline.BlendState.RenderTarget[0] = blenddesc;
+
+    // 深度バッファのフォーマット
+    gpipeline.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+
+    // 頂点レイアウトの設定
+    gpipeline.InputLayout.pInputElementDescs = inputLayout;
+    gpipeline.InputLayout.NumElements = _countof(inputLayout);
+
+    // 図形の形状設定（三角形）
+    gpipeline.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+
+    gpipeline.NumRenderTargets = 1;                            // 描画対象は1つ
+    gpipeline.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM; // 0～255指定のRGBA
+    gpipeline.SampleDesc.Count = 1; // 1ピクセルにつき1回サンプリング
+
+    gpipeline.pRootSignature = sRootSignature.Get();
+
+    // グラフィックスパイプラインの生成
+    result = sDirectXCommon->GetDevice()->CreateGraphicsPipelineState(&gpipeline, IID_PPV_ARGS(&sShadowPipelineState));
+    assert(SUCCEEDED(result));
+}
+void Model::InitializeRootSignature() {
+    HRESULT result = S_FALSE;
+    ComPtr<ID3DBlob> errorBlob; // エラーオブジェクト
     // デスクリプタレンジ
     CD3DX12_DESCRIPTOR_RANGE descRangeSRV;
     descRangeSRV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0); // t0 レジスタ
@@ -193,13 +236,8 @@ void Model::InitializeGraphicsPipeline() {
         0, rootSigBlob->GetBufferPointer(), rootSigBlob->GetBufferSize(),
         IID_PPV_ARGS(&sRootSignature));
     assert(SUCCEEDED(result));
-
-    gpipeline.pRootSignature = sRootSignature.Get();
-
-    // グラフィックスパイプラインの生成
-    result = sDirectXCommon->GetDevice()->CreateGraphicsPipelineState(&gpipeline, IID_PPV_ARGS(&sPipelineState));
-    assert(SUCCEEDED(result));
 }
+
 
 void Model::CreateMesh() {
     HRESULT result = S_FALSE;
@@ -343,7 +381,7 @@ void Model::Draw(const WorldTransform& worldTransform, const ViewProjection& vie
     sCommandList->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kMaterial), material.constBuff_->GetGPUVirtualAddress());
 
     // SRVをセット
-    TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(sCommandList, static_cast<UINT>(RootParameter::kTexture), textureHadle);
+    ShaderResourceManager::GetInstance()->SetGraphicsRootDescriptorTable(sCommandList, static_cast<UINT>(RootParameter::kTexture), textureHadle);
 
     // 描画コマンド
     sCommandList->DrawIndexedInstanced(static_cast<UINT>(indices_.size()), 1, 0, 0, 0);

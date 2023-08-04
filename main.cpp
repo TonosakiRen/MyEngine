@@ -1,7 +1,7 @@
 #include <Windows.h>
 #include "WinApp.h"
 #include "DirectXCommon.h"
-#include "TextureManager.h"
+#include "ShaderResourceManager.h"
 #include "GameScene.h"
 #include "ImGuiManager.h"
 // Windowsアプリでのエントリーポイント(main関数)
@@ -27,8 +27,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	imguiManager = ImGuiManager::GetInstance();
 	imguiManager->Initialize(win, dxCommon);
 	// テクスチャマネージャの初期化
-	TextureManager::GetInstance()->Initialize();
-	TextureManager::Load("white1x1.png");
+	ShaderResourceManager::GetInstance()->Initialize();
+	ShaderResourceManager::Load("white1x1.png");
 
 	// 3Dオブジェクト静的初期化
 	Model::StaticInitialize(WinApp::kWindowWidth, WinApp::kWindowHeight);

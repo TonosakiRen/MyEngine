@@ -9,11 +9,11 @@
 /// <summary>
 /// テクスチャマネージャー
 /// </summary>
-class TextureManager
+class ShaderResourceManager
 {
 public:
 	//デスクリプターの数
-	static const size_t kNumDescriptors = 256;
+	static const size_t kNumTextures = 255;
 
 	struct Texture {
 		//テクスチャリソース
@@ -24,6 +24,12 @@ public:
 		CD3DX12_GPU_DESCRIPTOR_HANDLE gpuDescHandleSRV;
 		// 名前
 		std::string name;
+	};
+
+	enum DescriptorHeapLayout {
+		ShadowMapSrv,
+		TextureSrvStart,
+		NumDescriptors = TextureSrvStart + kNumTextures
 	};
 
 	/// <summary>
@@ -37,7 +43,7 @@ public:
 	/// シングルトンインスタンスの取得
 	/// </summary>
 	/// <returns>シングルトンインスタンス</returns>
-	static TextureManager* GetInstance();
+	static ShaderResourceManager* GetInstance();
 
 	/// <summary>
 	/// システム初期化
@@ -66,11 +72,29 @@ public:
 	void SetGraphicsRootDescriptorTable(
 		ID3D12GraphicsCommandList* commandList, UINT rootParamIndex, uint32_t textureHandle);
 
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <returns></returns>
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> GetDescriptorHeap() {
+		return descriptorHeap_;
+	}
+
+	
+	CD3DX12_CPU_DESCRIPTOR_HANDLE GetShadowMapCPUDescriptorHandle() {
+		return CD3DX12_CPU_DESCRIPTOR_HANDLE(descriptorHeap_->GetCPUDescriptorHandleForHeapStart(), ShadowMapSrv, sDescriptorHandleIncrementSize_);
+	}
+
+	CD3DX12_GPU_DESCRIPTOR_HANDLE GetShadowMapGPUDescriptorHandle() {
+		return CD3DX12_GPU_DESCRIPTOR_HANDLE(descriptorHeap_->GetGPUDescriptorHandleForHeapStart(), ShadowMapSrv, sDescriptorHandleIncrementSize_);
+	}
+
+
 private:
-	TextureManager() = default;
-	~TextureManager() = default;
-	TextureManager(const TextureManager&) = delete;
-	TextureManager& operator=(const TextureManager&) = delete;
+	ShaderResourceManager() = default;
+	~ShaderResourceManager() = default;
+	ShaderResourceManager(const ShaderResourceManager&) = delete;
+	ShaderResourceManager& operator=(const ShaderResourceManager&) = delete;
 
 	// デバイス
 	ID3D12Device* device_;
@@ -83,7 +107,7 @@ private:
 	// 次に使うデスクリプタヒープの番号
 	uint32_t indexNextDescriptorHeap_ = 0u;
 	// テクスチャコンテナ
-	std::array<Texture, kNumDescriptors> textures_;
+	std::array<Texture, kNumTextures> textures_;
 
 	/// <summary>
 	/// 読み込み

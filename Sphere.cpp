@@ -374,7 +374,7 @@ void Sphere::Draw(const WorldTransform& worldTransform, const ViewProjection& vi
     sCommandList->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kMaterial), material.constBuff_->GetGPUVirtualAddress());
 
     // SRVをセット
-    TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(sCommandList, static_cast<UINT>(RootParameter::kTexture), textureHadle);
+    ShaderResourceManager::GetInstance()->SetGraphicsRootDescriptorTable(sCommandList, static_cast<UINT>(RootParameter::kTexture), textureHadle);
 
     // 描画コマンド
     sCommandList->DrawIndexedInstanced(static_cast<UINT>(indices_.size()), 1, 0, 0, 0);

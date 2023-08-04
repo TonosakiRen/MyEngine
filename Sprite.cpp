@@ -1,5 +1,5 @@
 #include "Sprite.h"
-#include "TextureManager.h"
+#include "ShaderResourceManager.h"
 #include <cassert>
 #include <d3dcompiler.h>
 #include "externals/DirectXTex/d3dx12.h"
@@ -208,7 +208,7 @@ Sprite* Sprite::Create(
 	{
 		// テクスチャ情報取得
 		const D3D12_RESOURCE_DESC& resDesc =
-			TextureManager::GetInstance()->GetResoureDesc(textureHandle);
+			ShaderResourceManager::GetInstance()->GetResoureDesc(textureHandle);
 		// スプライトのサイズをテクスチャのサイズに設定
 		size = { (float)resDesc.Width, (float)resDesc.Height };
 	}
@@ -252,7 +252,7 @@ bool Sprite::Initialize() {
 
 	HRESULT result = S_FALSE;
 
-	resourceDesc_ = TextureManager::GetInstance()->GetResoureDesc(textureHandle_);
+	resourceDesc_ = ShaderResourceManager::GetInstance()->GetResoureDesc(textureHandle_);
 
 	{
 		// ヒーププロパティ
@@ -303,7 +303,7 @@ bool Sprite::Initialize() {
 
 void Sprite::SetTextureHandle(uint32_t textureHandle) {
 	textureHandle_ = textureHandle;
-	resourceDesc_ = TextureManager::GetInstance()->GetResoureDesc(textureHandle_);
+	resourceDesc_ = ShaderResourceManager::GetInstance()->GetResoureDesc(textureHandle_);
 }
 
 void Sprite::SetRotation(float rotation) {
@@ -372,7 +372,7 @@ void Sprite::Draw() {
 	// 定数バッファビューをセット
 	sCommandList->SetGraphicsRootConstantBufferView(0, constBuff_->GetGPUVirtualAddress());
 	// シェーダリソースビューをセット
-	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(sCommandList, 1, textureHandle_);
+	ShaderResourceManager::GetInstance()->SetGraphicsRootDescriptorTable(sCommandList, 1, textureHandle_);
 	// 描画コマンド
 	sCommandList->DrawInstanced(4, 1, 0, 0);
 }

@@ -1,5 +1,5 @@
 #pragma once
-#include "TextureManager.h"
+#include "ShaderResourceManager.h"
 #include "ViewProjection.h"
 #include "WorldTransform.h"
 #include <Windows.h>
@@ -33,6 +33,11 @@ public: // サブクラス
 		Vector3 pos;    // xyz座標
 		Vector3 normal; // 法線ベクトル
 		Vector2 uv;     // uv座標
+	};
+
+	enum RenderPass {
+		DefaultPass,
+		ShadowPass
 	};
 
 public: // 静的メンバ関数
@@ -72,12 +77,18 @@ private: // 静的メンバ変数
 	static Microsoft::WRL::ComPtr<ID3D12RootSignature> sRootSignature;
 	// パイプラインステートオブジェクト
 	static Microsoft::WRL::ComPtr<ID3D12PipelineState> sPipelineState;
+	// パイプラインステートオブジェクト
+	static Microsoft::WRL::ComPtr<ID3D12PipelineState> sShadowPipelineState;
+	// 
 
 private: // 静的メンバ関数
 	/// <summary>
 	/// グラフィックパイプライン生成
 	/// </summary>
-	static void InitializeGraphicsPipeline();
+	static void InitializeGraphicsPipelines();
+	static void InitializeRootSignature();
+	static void InitializeDefaultGraphicsPipelines();
+	static void InitializeShadowGraphicsPipelines();
 
 public: // メンバ関数
 

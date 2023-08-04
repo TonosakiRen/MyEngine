@@ -13,6 +13,21 @@
 class DirectXCommon
 {
 public:
+
+	static const uint32_t kNumFrameBuffers = 2;
+
+	enum RTVLayout {
+		FrameBufferStart,
+		ShadowMapBuffer = FrameBufferStart + kNumFrameBuffers,
+		NumRTV,
+	};
+
+	enum DSVLayout {
+		DefaultDepthBuffer,
+		ShadowDepthBuffer,
+		NumDSV
+	};
+
 	static DirectXCommon* GetInstance();
 	void Initialize(int32_t backBufferWidth = 1280, int32_t backBufferHeight = 720);
 	/// <summary>

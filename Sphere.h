@@ -1,6 +1,6 @@
 #pragma once
 #pragma once
-#include "TextureManager.h"
+#include "ShaderResourceManager.h"
 #include "ViewProjection.h"
 #include "WorldTransform.h"
 #include <Windows.h>
