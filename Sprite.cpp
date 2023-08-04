@@ -37,49 +37,8 @@ void Sprite::StaticInitialize( int window_width, int window_height) {
 	vsBlob = sDirectXCommon->CompileShader(L"SpriteVS.hlsl", L"vs_6_0");
 	assert(vsBlob != nullptr);
 
-	//// 頂点シェーダの読み込みとコンパイル
-	//result = D3DCompileFromFile(
-	//    L"BasicVS.hlsl", // シェーダファイル名
-	//    nullptr,
-	//    D3D_COMPILE_STANDARD_FILE_INCLUDE, // インクルード可能にする
-	//    "main", "vs_5_0", // エントリーポイント名、シェーダーモデル指定
-	//    D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION, // デバッグ用設定
-	//    0, &vsBlob, &errorBlob);
-	//if (FAILED(result)) {
-	//    // errorBlobからエラー内容をstring型にコピー
-	//    std::string errstr;
-	//    errstr.resize(errorBlob->GetBufferSize());
-
-	//    std::copy_n((char*)errorBlob->GetBufferPointer(), errorBlob->GetBufferSize(), errstr.begin());
-	//    errstr += "\n";
-	//    // エラー内容を出力ウィンドウに表示
-	//    OutputDebugStringA(errstr.c_str());
-	//    exit(1);
-	//}
-
 	psBlob = sDirectXCommon->CompileShader(L"SpritePS.hlsl", L"ps_6_0");
 	assert(psBlob != nullptr);
-
-	//// ピクセルシェーダの読み込みとコンパイル
-	//result = D3DCompileFromFile(
-	//    L"BasicPS.hlsl", // シェーダファイル名
-	//    nullptr,
-	//    D3D_COMPILE_STANDARD_FILE_INCLUDE, // インクルード可能にする
-	//    "main", "ps_5_0", // エントリーポイント名、シェーダーモデル指定
-	//    D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION, // デバッグ用設定
-	//    0, &psBlob, &errorBlob);
-	//if (FAILED(result)) {
-	//    // errorBlobからエラー内容をstring型にコピー
-	//    std::string errstr;
-	//    errstr.resize(errorBlob->GetBufferSize());
-
-	//    std::copy_n((char*)errorBlob->GetBufferPointer(), errorBlob->GetBufferSize(), errstr.begin());
-	//    errstr += "\n";
-	//    // エラー内容を出力ウィンドウに表示
-	//    OutputDebugStringA(errstr.c_str());
-	//    exit(1);
-	//}
-
 
 	// 頂点レイアウト
 	D3D12_INPUT_ELEMENT_DESC inputLayout[] = {
