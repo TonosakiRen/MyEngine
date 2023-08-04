@@ -70,7 +70,8 @@ public:
 
 
 	// バックバッファの数を取得
-	size_t GetBackBufferCount() const { return backBuffers_.size(); }
+	size_t GetFrameBufferCount() const { return frameBuffers_.size(); }
+
 
 private:
 	// ウィンドウズアプリケーション管理
@@ -87,7 +88,7 @@ private:
 	Microsoft::WRL::ComPtr<IDxcUtils> dxcUtils_;
 	Microsoft::WRL::ComPtr<IDxcIncludeHandler> includeHandler_;
 	Microsoft::WRL::ComPtr<IDXGISwapChain4> swapChain_;
-	std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> backBuffers_;
+	std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> frameBuffers_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> depthBuffer_;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvHeap_;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvHeap_;

@@ -45,7 +45,7 @@ void DirectXCommon::PreDraw() {
 	//Noneにしておく
 	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 	//バリアを張る対象のリソース。現在のバックバッファに対して行う 
-	barrier.Transition.pResource = backBuffers_[bbIndex].Get();
+	barrier.Transition.pResource = frameBuffers_[bbIndex].Get();
 	//遷移前(現在)のResorceState
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
 	//遷移後のResourceState
@@ -84,7 +84,7 @@ void DirectXCommon::PostDraw() {
 	// リソースバリアを変更（描画対象→表示状態）
 	UINT bbIndex = swapChain_->GetCurrentBackBufferIndex();
 	CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
-		backBuffers_[bbIndex].Get(), D3D12_RESOURCE_STATE_RENDER_TARGET,
+		frameBuffers_[bbIndex].Get(), D3D12_RESOURCE_STATE_RENDER_TARGET,
 		D3D12_RESOURCE_STATE_PRESENT);
 	commandList_->ResourceBarrier(1, &barrier);
 
@@ -379,11 +379,11 @@ void DirectXCommon::CreateSwapChain() {
 	assert(SUCCEEDED(hr));
 
 	//SwapChainからResourceを引っ張てくる
-	backBuffers_.resize(swapChainDesc.BufferCount);
-	hr = swapChain_->GetBuffer(0, IID_PPV_ARGS(&backBuffers_[FrameBufferStart]));
+	frameBuffers_.resize(swapChainDesc.BufferCount);
+	hr = swapChain_->GetBuffer(0, IID_PPV_ARGS(&frameBuffers_[FrameBufferStart]));
 	//うまく取得できなければ起動できない
 	assert(SUCCEEDED(hr));
-	hr = swapChain_->GetBuffer(1, IID_PPV_ARGS(&backBuffers_[FrameBufferStart + 1]));
+	hr = swapChain_->GetBuffer(1, IID_PPV_ARGS(&frameBuffers_[FrameBufferStart + 1]));
 	assert(SUCCEEDED(hr));
 
 }
@@ -399,11 +399,11 @@ void DirectXCommon::CreateFinalRenderTargets() {
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[kNumFrameBuffers];
 	//まず一つ目を作る１つ目は最初のところに作る。作る場所をこちらで指定してあげる必要がある
 	rtvHandles[FrameBufferStart] = rtvStartHandle;
-	device_->CreateRenderTargetView(backBuffers_[FrameBufferStart].Get(), &rtvDesc, rtvHandles[FrameBufferStart]);
+	device_->CreateRenderTargetView(frameBuffers_[FrameBufferStart].Get(), &rtvDesc, rtvHandles[FrameBufferStart]);
 	//２つ目のディスクリプタハンドルを得る(自力で)
 	rtvHandles[FrameBufferStart + 1].ptr = rtvHandles[FrameBufferStart].ptr + device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	//２つ目を作る
-	device_->CreateRenderTargetView(backBuffers_[FrameBufferStart + 1].Get(), &rtvDesc, rtvHandles[FrameBufferStart + 1]);
+	device_->CreateRenderTargetView(frameBuffers_[FrameBufferStart + 1].Get(), &rtvDesc, rtvHandles[FrameBufferStart + 1]);
 
 }
 void DirectXCommon::CreateDepthBuffer() {

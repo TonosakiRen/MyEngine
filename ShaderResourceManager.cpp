@@ -67,7 +67,7 @@ void ShaderResourceManager::SetGraphicsRootDescriptorTable(ID3D12GraphicsCommand
 
 uint32_t ShaderResourceManager::LoadInternal(const std::string& fileName) {
 
-	assert(indexNextDescriptorHeap_ < kNumDescriptors);
+	assert(indexNextDescriptorHeap_ < kNumTextures);
 	uint32_t handle = indexNextDescriptorHeap_;
 
 	// 読み込み済みテクスチャを検索

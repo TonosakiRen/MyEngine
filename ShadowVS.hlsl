@@ -16,10 +16,10 @@ struct VSOutput {
 
 struct VSInput {
 	float32_t3 pos : POSITION;
-}
+};
 
 VSOutput main(VSInput input) {
 	VSOutput output; // ピクセルシェーダーに渡す値
-	output.svpos = mul(input.pos, mul(gWorldTransform.world, mul(gViewProjection.view, gViewProjection.projection)));
+	output.svpos = mul(float32_t4(input.pos.xyz,1.0f), mul(gWorldTransform.world, mul(gViewProjection.view, gViewProjection.projection)));
 	return output;
 }
