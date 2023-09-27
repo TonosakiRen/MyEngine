@@ -19,12 +19,15 @@ public: // 列挙子
 	/// <summary>
 	/// ルートパラメータ番号
 	/// </summary>
-	enum class RootParameter {
+	enum RootParameter {
 		kWorldTransform, // ワールド変換行列
 		kViewProjection, // ビュープロジェクション変換行列
 		kTexture,        // テクスチャ
 		kDirectionalLight, // ライト
 		kMaterial, // ライト
+		kShadowMap, //シャドウマップ
+		kShadowViewProjection,//シャドウコンスト
+		kRootParameterNum
 	};
 
 public: // サブクラス
@@ -37,7 +40,9 @@ public: // サブクラス
 
 	enum RenderPass {
 		DefaultPass,
-		ShadowPass
+		ShadowPass,
+
+		NonePass
 	};
 
 public: // 静的メンバ関数
@@ -47,18 +52,18 @@ public: // 静的メンバ関数
 	/// <param name="device">デバイス</param>
 	/// <param name="window_width">画面幅</param>
 	/// <param name="window_height">画面高さ</param>
-	static void StaticInitialize(int window_width, int window_height);
+	static void StaticInitialize(uint32_t shadowMap_width = 1024, uint32_t shadowMap_height = 1024);
 
 	/// <summary>
 	/// 描画前処理
 	/// </summary>
 	/// <param name="commandList">描画コマンドリスト</param>
-	static void PreDraw(ID3D12GraphicsCommandList* commandList);
+	static void BeginPass(ID3D12GraphicsCommandList* commandList, RenderPass pass);
 
 	/// <summary>
 	/// 描画後処理
 	/// </summary>
-	static void PostDraw();
+	static void EndPass();
 
 	/// <summary>
 	/// 3Dモデル生成
@@ -79,7 +84,13 @@ private: // 静的メンバ変数
 	static Microsoft::WRL::ComPtr<ID3D12PipelineState> sPipelineState;
 	// パイプラインステートオブジェクト
 	static Microsoft::WRL::ComPtr<ID3D12PipelineState> sShadowPipelineState;
-	// 
+	// ShadowMap用Resorce
+	static Microsoft::WRL::ComPtr<ID3D12Resource> sShadowMapRenderTargetResource;
+	static Microsoft::WRL::ComPtr<ID3D12Resource> sShadowMapDepthStencilResource;
+	//shadowMapWidthHeight
+	static uint32_t shadowMapWidth;
+	static uint32_t shadowMapHeight;
+	static RenderPass currentRenderPass;
 
 private: // 静的メンバ関数
 	/// <summary>
@@ -89,7 +100,8 @@ private: // 静的メンバ関数
 	static void InitializeRootSignature();
 	static void InitializeDefaultGraphicsPipelines();
 	static void InitializeShadowGraphicsPipelines();
-
+	static void CreateShadowMapRenderTarget();
+	static void CreateShadowMapDepthStencil();
 public: // メンバ関数
 
 	/// <summary>
@@ -100,12 +112,18 @@ public: // メンバ関数
 	/// <summary>
 	/// 描画
 	/// </summary>
-	void Draw(const WorldTransform& worldTransform, const ViewProjection& viewProjection, const DirectionalLight& directionalLight, const Material& material,uint32_t textureHadle = 0);
+	void Draw(const WorldTransform& worldTransform, const ViewProjection& viewProjection, const DirectionalLight& directionalLight, const Material& material,const ViewProjection& shadowViewProjection , uint32_t textureHadle = 0);
+	void DrawShadow(const WorldTransform& worldTransform, const ViewProjection& viewProjection);
 
 	/// <summary>
 	/// メッシュデータ生成
 	/// </summary>
 	void CreateMesh();
+
+	/// <summary>
+	/// shadow
+	/// </summary>
+	
 
 private: // メンバ変数
 	// 頂点バッファビュー
@@ -120,5 +138,6 @@ private: // メンバ変数
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertBuff_;
 	// インデックスバッファ
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexBuff_;
+
 };
 

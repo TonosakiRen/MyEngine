@@ -52,16 +52,22 @@ private: //　メンバ変数
 
 	Model model_;
 	WorldTransform modelTransform_;
+
+	Model model2_;
+	WorldTransform model2Transform_;
+
+	ViewProjection shadowCamera;
+	Matrix4x4 shadowViewMat;
+	Matrix4x4 shadowProjectionMat;
+	Vector3 lightPos;
+
 	Sprite sprite_;
 	Vector2 spritePosition_;
 	Vector2 spriteScale_;
 	float spriteRotate_;
 	WorldTransform spriteTransform_;
-	Triangle triangle_;
-	WorldTransform triangleTransform_;
-	Triangle triangle2_;
-	WorldTransform triangleTransform2_;
-	Sphere sphere_;
-	WorldTransform sphereTransform_;
+	/*Sphere sphere_;
+	WorldTransform sphereTransform_;*/
+
 };
 

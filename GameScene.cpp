@@ -2,6 +2,8 @@
 #include "externals/imgui/imgui.h"
 #include <cassert>
 
+#include "ImGuiManager.h"
+
 using namespace DirectX;
 
 GameScene::GameScene() {};
@@ -17,20 +19,15 @@ void GameScene::Initialize() {
 	modelTransform_.translation_ = { 0.0f,0.0f,0.0f };
 	modelTransform_.UpdateMatrix();
 
-	triangle_.Initialize();
-	triangleTransform_.Initialize(dxCommon_->GetDevice());
-	triangleTransform_.translation_ = { 0.0f,0.0f,0.0f };
-	triangleTransform_.UpdateMatrix();
+	model2_.Initialize();
+	model2Transform_.Initialize(dxCommon_->GetDevice());
+	model2Transform_.translation_ = { 0.0f,0.0f,0.0f };
+	model2Transform_.UpdateMatrix();
 
-	triangle2_.Initialize();
-	triangleTransform2_.Initialize(dxCommon_->GetDevice());
-	triangleTransform2_.translation_ = { 0.0f,0.0f,0.0f };
-	triangleTransform2_.UpdateMatrix();
-
-	sphere_.Initialize();
+	/*sphere_.Initialize();
 	sphereTransform_.Initialize(dxCommon_->GetDevice());
 	sphereTransform_.translation_ = { 0.0f,0.0f,0.0f };
-	sphereTransform_.UpdateMatrix();
+	sphereTransform_.UpdateMatrix();*/
 
 	viewProjection_.Initialize(dxCommon_->GetDevice());
 
@@ -51,7 +48,10 @@ void GameScene::Initialize() {
 	spriteRotate_ = 0.0f;
 	sprite_ = *Sprite::Create(textureHandle_,{0.0f,0.0f});
 
-
+	shadowCamera.Initialize(dxCommon_->GetDevice());
+	lightPos = -directionalLight_.direction_ * 100;
+	shadowCamera.constMap->view = Inverse(MakeLookRotation(directionalLight_.direction_) * MakeTranslateMatrix(lightPos));
+	shadowCamera.constMap->projection = MakePerspectiveFovMatrix(0.785398f, 1.0f, 1.0f, 1000.0f);
 }
 
 void GameScene::Update(){
@@ -63,6 +63,12 @@ void GameScene::Update(){
 	ImGui::DragFloat3("light", &directionalLight_.direction_.x, 0.01f);
 	ImGui::DragFloat4("lightcolor", &directionalLight_.color_.x, 0.01f);
 	directionalLight_.UpdateDirectionalLight();
+	//shadowLight
+	ImGui::DragFloat3("slight", &lightPos.x, 0.01f);
+	lightPos = Normalize( -directionalLight_.direction_) * 100;
+	shadowCamera.constMap->view = Inverse(MakeLookRotation(directionalLight_.direction_) * MakeTranslateMatrix(lightPos));
+	shadowCamera.constMap->projection = MakePerspectiveFovMatrix(0.785398f, 1.0f, 1.0f, 1000.0f);
+
 	// texture
 	ImGui::DragFloat2("texScale", &texTransfrom.scale.x, 0.01f, -10.0f, 10.0f);
 	ImGui::DragFloat("texRotate", &texTransfrom.rotate.z, 0.01f);
@@ -78,29 +84,24 @@ void GameScene::Update(){
 	ImGui::DragFloat3("modelRotate", &modelTransform_.rotation_.x, 0.01f);
 	ImGui::DragFloat3("modelScale", &modelTransform_.scale_.x, 0.01f);
 	modelTransform_.UpdateMatrix();
-	// triangle
-	ImGui::DragFloat3("triangleTransform", &triangleTransform_.translation_.x, 0.01f);
-	ImGui::DragFloat3("triangleRotate", &triangleTransform_.rotation_.x, 0.01f);
-	ImGui::DragFloat3("triangleScale", &triangleTransform_.scale_.x, 0.01f);
-	triangleTransform_.UpdateMatrix();
-	// triangle2
-	ImGui::DragFloat3("triangle2Transform", &triangleTransform2_.translation_.x, 0.01f);
-	ImGui::DragFloat3("triangle2Rotate", &triangleTransform2_.rotation_.x, 0.01f);
-	ImGui::DragFloat3("triangle2Scale", &triangleTransform2_.scale_.x, 0.01f);
-	triangleTransform_.UpdateMatrix();
+
+	// model
+	ImGui::DragFloat3("model2Transform", &model2Transform_.translation_.x, 0.01f);
+	ImGui::DragFloat3("model2Rotate", &model2Transform_.rotation_.x, 0.01f);
+	ImGui::DragFloat3("model2Scale", &model2Transform_.scale_.x, 0.01f);
+	model2Transform_.UpdateMatrix();
+
+	ImGui::Begin("shadow");
+	ImTextureID shadowID = reinterpret_cast<ImTextureID>(ShaderResourceManager::GetInstance()->GetGPUDescriptorHandle(ShaderResourceManager::ShadowMapSrv).ptr);
+	ImGui::Image(shadowID, { 300.0f,300.0f });
+	ImGui::End();
 
 	// sphere
-	ImGui::DragFloat3("sphereTransform", &sphereTransform_.translation_.x, 0.01f);
-	ImGui::DragFloat3("sphereRotate", &sphereTransform_.rotation_.x, 0.01f);
-	ImGui::DragFloat3("sphereScale", &sphereTransform_.scale_.x, 0.01f);
-	sphereTransform_.UpdateMatrix();
+	//ImGui::DragFloat3("sphereTransform", &sphereTransform_.translation_.x, 0.01f);
+	//ImGui::DragFloat3("sphereRotate", &sphereTransform_.rotation_.x, 0.01f);
+	//ImGui::DragFloat3("sphereScale", &sphereTransform_.scale_.x, 0.01f);
+	//sphereTransform_.UpdateMatrix();
 
-	ImGui::DragFloat2("spriteTransform", &spritePosition_.x, 1.0f);
-	ImGui::DragFloat("spriteRotate", &spriteRotate_, 1.0f);
-	ImGui::DragFloat2("spriteScale", &spriteScale_.x, 1.0f);
-	sprite_.SetPosition(spritePosition_);
-	sprite_.SetRotation(spriteRotate_);
-	sprite_.SetSize(spriteScale_);
 	
 }
 
@@ -108,13 +109,52 @@ void GameScene::Draw() {
 	// コマンドリストの取得
 	ID3D12GraphicsCommandList* commandList = dxCommon_->GetCommandList();
 
+	//3Dオブジェクト描画前処理
+	Model::BeginPass(commandList, Model::ShadowPass);
+
+	model_.DrawShadow(modelTransform_, shadowCamera);
+
+	//3Dオブジェクト描画後処理
+	Model::EndPass();
+
+	////3Dオブジェクト描画前処理
+	Sphere::BeginPass(commandList, Sphere::ShadowPass);
+
+	//sphere_.DrawShadow(sphereTransform_, shadowCamera);
+
+	////3Dオブジェクト描画後処理
+	Sphere::EndPass();
+
+	
+	
+
+	// 描画開始
+	dxCommon_->PreDraw();
+
+	//3Dオブジェクト描画前処理
+	Model::BeginPass(commandList, Model::DefaultPass);
+
+	model_.Draw(modelTransform_,viewProjection_,directionalLight_,material_,shadowCamera);
+	model2_.Draw(model2Transform_, viewProjection_, directionalLight_, material_, shadowCamera);
+
+	//3Dオブジェクト描画後処理
+	Model::EndPass();
+
+	////3Dオブジェクト描画前処理
+	//Sphere::BeginPass(commandList, Sphere::DefaultPass);
+
+	//sphere_.Draw(sphereTransform_, viewProjection_, directionalLight_, material_, shadowCamera);
+
+	////3Dオブジェクト描画後処理
+	//Sphere::EndPass();
+
 	// 背景スプライト描画前処理
 	Sprite::PreDraw(commandList);
 
 	/// <summary>
 	/// ここに背景スプライトの描画処理を追加できる
 	/// 
-	sprite_.Draw();
+	
 
 	/// </summary>
 
@@ -124,18 +164,8 @@ void GameScene::Draw() {
 	//深度バッファクリア
 	dxCommon_->ClearDepthBuffer();
 
-	//3Dオブジェクト描画前処理
-	Triangle::PreDraw(commandList);
-	Model::PreDraw(commandList);
-	Sphere::PreDraw(commandList);
-
-	model_.Draw(modelTransform_, viewProjection_, directionalLight_, material_, textureHandle_);
-	triangle_.Draw(triangleTransform_, viewProjection_, directionalLight_, material_, textureHandle_);
-	triangle2_.Draw(triangleTransform2_, viewProjection_, directionalLight_, material_, textureHandle_);
-	sphere_.Draw(sphereTransform_, viewProjection_, directionalLight_, material_, textureHandle_);
-
-	//3Dオブジェクト描画後処理
-	Model::PostDraw();
-	Triangle::PostDraw();
-	Sphere::PostDraw();
+	// ImGui描画
+	ImGuiManager::GetInstance()->Draw();
+	// 描画終了
+	dxCommon_->PostDraw();
 }

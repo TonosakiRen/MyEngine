@@ -72,6 +72,17 @@ public:
 	// バックバッファの数を取得
 	size_t GetFrameBufferCount() const { return frameBuffers_.size(); }
 
+	D3D12_CPU_DESCRIPTOR_HANDLE GetShadowMapRtvHandle() {
+		D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = rtvHeap_->GetCPUDescriptorHandleForHeapStart();
+		rtvHandle.ptr = rtvHandle.ptr + device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV) * ShadowMapBuffer;
+		return rtvHandle;
+	}
+	D3D12_CPU_DESCRIPTOR_HANDLE GetShadowMapDsvHandle() {
+		D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvHeap_->GetCPUDescriptorHandleForHeapStart();
+		dsvHandle.ptr = dsvHandle.ptr + device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV) * ShadowDepthBuffer;
+		return dsvHandle;
+	}
+
 
 private:
 	// ウィンドウズアプリケーション管理

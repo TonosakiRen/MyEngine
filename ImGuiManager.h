@@ -3,6 +3,7 @@
 #include "DirectXCommon.h"
 #include "WinApp.h"
 #include "externals/imgui/imgui.h"
+#include "ShaderResourceManager.h"
 class ImGuiManager
 {
 public:
@@ -10,7 +11,7 @@ public:
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	void Initialize(WinApp* winApp, DirectXCommon* dxCommon);
+	void Initialize(WinApp* winApp);
 
 	/// <summary>
 	/// 終了
@@ -35,8 +36,7 @@ public:
 private:
 	// DirectX基盤インスタンス（借りてくる）
 	DirectXCommon* dxCommon_ = nullptr;
-	// SRV用ヒープ
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvHeap_;
+	ShaderResourceManager* shaderResourceManager_ = nullptr;
 
 private:
 	ImGuiManager() = default;

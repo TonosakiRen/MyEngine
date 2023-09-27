@@ -13,7 +13,7 @@ class ShaderResourceManager
 {
 public:
 	//デスクリプターの数
-	static const size_t kNumTextures = 255;
+	static const size_t kNumTextures = 254;
 
 	struct Texture {
 		//テクスチャリソース
@@ -27,6 +27,7 @@ public:
 	};
 
 	enum DescriptorHeapLayout {
+		ImGuiSrv,
 		ShadowMapSrv,
 		TextureSrvStart,
 		NumDescriptors = TextureSrvStart + kNumTextures
@@ -80,14 +81,15 @@ public:
 		return descriptorHeap_;
 	}
 
-	
-	CD3DX12_CPU_DESCRIPTOR_HANDLE GetShadowMapCPUDescriptorHandle() {
-		return CD3DX12_CPU_DESCRIPTOR_HANDLE(descriptorHeap_->GetCPUDescriptorHandleForHeapStart(), ShadowMapSrv, sDescriptorHandleIncrementSize_);
+	CD3DX12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(DescriptorHeapLayout descriptorHandle) {
+		return CD3DX12_CPU_DESCRIPTOR_HANDLE(descriptorHeap_->GetCPUDescriptorHandleForHeapStart(), descriptorHandle, sDescriptorHandleIncrementSize_);
 	}
 
-	CD3DX12_GPU_DESCRIPTOR_HANDLE GetShadowMapGPUDescriptorHandle() {
-		return CD3DX12_GPU_DESCRIPTOR_HANDLE(descriptorHeap_->GetGPUDescriptorHandleForHeapStart(), ShadowMapSrv, sDescriptorHandleIncrementSize_);
+	CD3DX12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(DescriptorHeapLayout descriptorHandle) {
+		return CD3DX12_GPU_DESCRIPTOR_HANDLE(descriptorHeap_->GetGPUDescriptorHandleForHeapStart(), descriptorHandle, sDescriptorHandleIncrementSize_);
 	}
+
+
 
 
 private:

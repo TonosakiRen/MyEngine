@@ -6,21 +6,10 @@ ImGuiManager* ImGuiManager::GetInstance() {
 	return &instance;
 }
 
-void ImGuiManager::Initialize(WinApp* winApp, DirectXCommon* dxCommon) {
+void ImGuiManager::Initialize(WinApp* winApp) {
 
-	HRESULT result;
-
-	dxCommon_ = dxCommon;
-
-	// デスクリプタヒープ設定
-	D3D12_DESCRIPTOR_HEAP_DESC desc = {};
-	desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-	desc.NumDescriptors = 1;
-	desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-	// デスクリプタヒープ生成
-	result = dxCommon_->GetDevice()->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&srvHeap_));
-	assert(SUCCEEDED(result));
-	srvHeap_->SetName(L"ImGui_DescriptorHeap");
+	shaderResourceManager_ = ShaderResourceManager::GetInstance();
+	dxCommon_ = DirectXCommon::GetInstance();
 
 	// ImGuiのコンテキストを生成
 	ImGui::CreateContext();
@@ -30,9 +19,9 @@ void ImGuiManager::Initialize(WinApp* winApp, DirectXCommon* dxCommon) {
 	ImGui_ImplWin32_Init(winApp->GetHwnd());
 	ImGui_ImplDX12_Init(
 		dxCommon_->GetDevice(), static_cast<int>(dxCommon_->GetFrameBufferCount()),
-		DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, srvHeap_.Get(),
-		srvHeap_->GetCPUDescriptorHandleForHeapStart(),
-		srvHeap_->GetGPUDescriptorHandleForHeapStart());
+		DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, shaderResourceManager_->GetDescriptorHeap().Get(),
+		shaderResourceManager_->GetCPUDescriptorHandle(ShaderResourceManager::ImGuiSrv),
+		shaderResourceManager_->GetGPUDescriptorHandle(ShaderResourceManager::ImGuiSrv));
 
 	ImGuiIO& io = ImGui::GetIO();
 	// 標準フォントを追加する
@@ -45,8 +34,6 @@ void ImGuiManager::Finalize() {
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
 
-	// デスクリプタヒープを解放
-	srvHeap_.Reset();
 }
 
 void ImGuiManager::Begin() {
@@ -67,7 +54,7 @@ void ImGuiManager::Draw() {
 	ID3D12GraphicsCommandList* commandList = dxCommon_->GetCommandList();
 
 	// デスクリプタヒープの配列をセットするコマンド
-	ID3D12DescriptorHeap* ppHeaps[] = { srvHeap_.Get() };
+	ID3D12DescriptorHeap* ppHeaps[] = { shaderResourceManager_->GetDescriptorHeap().Get()};
 	commandList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
 	// 描画コマンドを発行
 	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList);

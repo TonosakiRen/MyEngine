@@ -24,16 +24,17 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	input = Input::GetInstance();
 	input->Initialize(win->GetHInstance(), win->GetHwnd());
 
-	imguiManager = ImGuiManager::GetInstance();
-	imguiManager->Initialize(win, dxCommon);
 	// テクスチャマネージャの初期化
 	ShaderResourceManager::GetInstance()->Initialize();
 	ShaderResourceManager::Load("white1x1.png");
 
+	imguiManager = ImGuiManager::GetInstance();
+	imguiManager->Initialize(win);
+
 	// 3Dオブジェクト静的初期化
-	Model::StaticInitialize(WinApp::kWindowWidth, WinApp::kWindowHeight);
+	Model::StaticInitialize();
 	// 3Dオブジェクト静的初期化
-	Triangle::StaticInitialize(WinApp::kWindowWidth, WinApp::kWindowHeight);
+	/*Triangle::StaticInitialize(WinApp::kWindowWidth, WinApp::kWindowHeight);*/
 
 	//　スプライト静的初期化
 	Sprite::StaticInitialize(WinApp::kWindowWidth, WinApp::kWindowHeight);
@@ -46,9 +47,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	// ゲームシーンの初期化
 	gameScene = new GameScene();
 	gameScene->Initialize();
-
-
-
 
 
 	// メインループ
@@ -69,14 +67,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		imguiManager->End();
 
 
-		// 描画開始
-		dxCommon->PreDraw();
 		// ゲームシーンの描画
 		gameScene->Draw();
-		// ImGui描画
-		imguiManager->Draw();
-		// 描画終了
-		dxCommon->PostDraw();
 	}
 
 
