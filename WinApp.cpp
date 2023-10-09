@@ -3,7 +3,7 @@
 #include "externals/imgui/imgui.h"
 #include "externals/imgui/imgui_impl_dx12.h"
 #include "externals/imgui/imgui_impl_win32.h"
-#include "ConvertString.h"
+#include "Helper.h"
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 const wchar_t WinApp::kWindowClassName[] = L"DirectXGame";
@@ -32,7 +32,7 @@ LRESULT CALLBACK WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM l
 	return DefWindowProc(hwnd, msg, wparam, lparam);
 }
 
-void WinApp::CreateGameWindow(const char* title) {
+void WinApp::Initialize(const char* title, uint32_t clientWidth, uint32_t clientHeight) {
 	// ウィンドウプロシージャ
 	wndClass_.lpfnWndProc = WindowProc;
 	// ウィンドウクラス名(何でもよい)
@@ -46,13 +46,15 @@ void WinApp::CreateGameWindow(const char* title) {
 	RegisterClass(&wndClass_);
 
 	//ウィンドウサイズを表す構造体にクライアント領域を入れる
-	windowRect_ = { 0,0,kWindowWidth,kWindowHeight };
+	windowRect_ = { 0,0,static_cast<LONG>(clientWidth),static_cast<LONG>(clientHeight) };
+	this->clientWidth = clientWidth;
+	this->clientHeight = clientHeight;
 
 	//クライアント領域をもとに実際のサイズにwrcを変更してもらう
 	AdjustWindowRect(&windowRect_, WS_OVERLAPPEDWINDOW, false);
 
 	// ウィンドウタイトルをwchar_tに変換
-	std::wstring titleWString = ConvertString(title);
+	std::wstring titleWString = Helper::ConvertString(title);
 
 	hwnd_ = CreateWindow(
 		wndClass_.lpszClassName,		//利用するクラス名
@@ -89,7 +91,7 @@ bool WinApp::ProcessMessage() {
 	return false;
 }
 
-void WinApp::TerminateGameWindow() {
+void WinApp::Shutdown() {
 	// ウィンドウクラスを登録解除
 	UnregisterClass(wndClass_.lpszClassName, wndClass_.hInstance);
 }

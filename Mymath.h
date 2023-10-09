@@ -45,6 +45,8 @@ struct transform {
 	Vector3 translate;
 };
 
+
+
 #pragma region Vector3
 
 inline Vector3 GetXAxis(Matrix4x4 m){
@@ -489,7 +491,7 @@ inline Matrix4x4 MakeScaleMatrix(const Vector3& scale) {
 
 	return tmp;
 }
-inline Vector3 Transform(const Vector3& vector, const Matrix4x4& matrix) {
+inline Vector3 TransformVector(const Vector3& vector, const Matrix4x4& matrix) {
 	Vector3 result;
 	result.x = vector.x * matrix.m[0][0] + vector.y * matrix.m[1][0] + vector.z * matrix.m[2][0] + 1.0f * matrix.m[3][0];
 	result.y = vector.x * matrix.m[0][1] + vector.y * matrix.m[1][1] + vector.z * matrix.m[2][1] + 1.0f * matrix.m[3][1];
@@ -689,6 +691,29 @@ inline Matrix4x4 MakeOrthograohicmatrix(float left, float top, float right, floa
 	tmp.m[2][3] = 0;
 	tmp.m[3][0] = (left + right) / (left - right);
 	tmp.m[3][1] = (top + bottom) / (bottom - top);
+	tmp.m[3][2] = nearClip / (nearClip - farClip);
+	tmp.m[3][3] = 1.0f;
+
+	return tmp;
+
+}
+//正射影行列
+inline Matrix4x4 MakeOrthograohicmatrix(float width, float height, float nearClip, float farClip) {
+	Matrix4x4 tmp;
+	tmp.m[0][0] = 2.0f / width;
+	tmp.m[0][1] = 0;
+	tmp.m[0][2] = 0;
+	tmp.m[0][3] = 0;
+	tmp.m[1][0] = 0;
+	tmp.m[1][1] = 2.0f / height;
+	tmp.m[1][2] = 0;
+	tmp.m[1][3] = 0;
+	tmp.m[2][0] = 0;
+	tmp.m[2][1] = 0;
+	tmp.m[2][2] = 1.0f / (farClip - nearClip);
+	tmp.m[2][3] = 0;
+	tmp.m[3][0] = 0.0f;
+	tmp.m[3][1] = 0.0f;
 	tmp.m[3][2] = nearClip / (nearClip - farClip);
 	tmp.m[3][3] = 1.0f;
 
