@@ -41,6 +41,10 @@ void Graphics::Shutdown() {
     commandQueue_.WaitForGPU();
 }
 
+DescriptorHandle Graphics::AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE type) {
+    return descriptorHeaps_[type].Allocate();
+}
+
 void Graphics::CreateDevice() {
 #ifdef _DEBUG
     ComPtr<ID3D12Debug1> debugController;
