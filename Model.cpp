@@ -2,8 +2,10 @@
 #include "externals/DirectXTex/DirectXTex.h"
 #include <d3dcompiler.h>
 #include "DirectXCommon.h"
-
+#include <fstream>
+#include <sstream>
 #pragma comment(lib, "d3dcompiler.lib")
+#include "TextureManager.h"
 
 using namespace DirectX;
 using namespace Microsoft::WRL;
@@ -54,6 +56,17 @@ Model* Model::Create() {
     return object3d;
 }
 
+Model* Model::Create(std::string name) {
+    // 3Dオブジェクトのインスタンスを生成
+    Model* object3d = new Model();
+    assert(object3d);
+
+    // 初期化
+    object3d->Initialize(name);
+
+    return object3d;
+}
+
 void Model::InitializeGraphicsPipeline() {
     HRESULT result = S_FALSE;
     ComPtr<IDxcBlob> vsBlob;    // 頂点シェーダオブジェクト
@@ -63,48 +76,9 @@ void Model::InitializeGraphicsPipeline() {
     vsBlob = sDirectXCommon->CompileShader(L"BasicVS.hlsl",L"vs_6_0");
     assert(vsBlob != nullptr);
 
-    //// 頂点シェーダの読み込みとコンパイル
-    //result = D3DCompileFromFile(
-    //    L"BasicVS.hlsl", // シェーダファイル名
-    //    nullptr,
-    //    D3D_COMPILE_STANDARD_FILE_INCLUDE, // インクルード可能にする
-    //    "main", "vs_5_0", // エントリーポイント名、シェーダーモデル指定
-    //    D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION, // デバッグ用設定
-    //    0, &vsBlob, &errorBlob);
-    //if (FAILED(result)) {
-    //    // errorBlobからエラー内容をstring型にコピー
-    //    std::string errstr;
-    //    errstr.resize(errorBlob->GetBufferSize());
-
-    //    std::copy_n((char*)errorBlob->GetBufferPointer(), errorBlob->GetBufferSize(), errstr.begin());
-    //    errstr += "\n";
-    //    // エラー内容を出力ウィンドウに表示
-    //    OutputDebugStringA(errstr.c_str());
-    //    exit(1);
-    //}
-
     psBlob = sDirectXCommon->CompileShader(L"BasicPS.hlsl", L"ps_6_0");
     assert(psBlob != nullptr);
 
-    //// ピクセルシェーダの読み込みとコンパイル
-    //result = D3DCompileFromFile(
-    //    L"BasicPS.hlsl", // シェーダファイル名
-    //    nullptr,
-    //    D3D_COMPILE_STANDARD_FILE_INCLUDE, // インクルード可能にする
-    //    "main", "ps_5_0", // エントリーポイント名、シェーダーモデル指定
-    //    D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION, // デバッグ用設定
-    //    0, &psBlob, &errorBlob);
-    //if (FAILED(result)) {
-    //    // errorBlobからエラー内容をstring型にコピー
-    //    std::string errstr;
-    //    errstr.resize(errorBlob->GetBufferSize());
-
-    //    std::copy_n((char*)errorBlob->GetBufferPointer(), errorBlob->GetBufferSize(), errstr.begin());
-    //    errstr += "\n";
-    //    // エラー内容を出力ウィンドウに表示
-    //    OutputDebugStringA(errstr.c_str());
-    //    exit(1);
-    //}
 
     // 頂点レイアウト
     D3D12_INPUT_ELEMENT_DESC inputLayout[] = {
@@ -203,56 +177,146 @@ void Model::InitializeGraphicsPipeline() {
 
 void Model::CreateMesh() {
     HRESULT result = S_FALSE;
+    if (isModelLoad_) {
+        std::string line;//ファイルから読んだ1行を格納するもの
+        std::vector<Vector3> positions;//位置
+        std::vector<Vector3> normals;//法線
+        std::vector<Vector2> texcoords;//テクスチャ座標
+        std::ifstream file("Resources/" + name_ + ".obj"); //ファイルを開く
+        assert(file.is_open());//とりあえず開けなったら止める
 
-    vertices_ = {
-        //  x      y      z       nx     ny    nz       u     v
-        // 前
-          {{-1.0f, -1.0f, -1.0f}, {0.0f, 0.0f, -1.0f}, {0.0f, 1.0f}}, // 左下
-          {{-1.0f, +1.0f, -1.0f}, {0.0f, 0.0f, -1.0f}, {0.0f, 0.0f}}, // 左上
-          {{+1.0f, -1.0f, -1.0f}, {0.0f, 0.0f, -1.0f}, {1.0f, 1.0f}}, // 右下
-          {{+1.0f, +1.0f, -1.0f}, {0.0f, 0.0f, -1.0f}, {1.0f, 0.0f}}, // 右上
-          // 後(前面とZ座標の符号が逆)
-          {{+1.0f, -1.0f, +1.0f}, {0.0f, 0.0f, +1.0f}, {0.0f, 1.0f}}, // 左下
-          {{+1.0f, +1.0f, +1.0f}, {0.0f, 0.0f, +1.0f}, {0.0f, 0.0f}}, // 左上
-          {{-1.0f, -1.0f, +1.0f}, {0.0f, 0.0f, +1.0f}, {1.0f, 1.0f}}, // 右下
-          {{-1.0f, +1.0f, +1.0f}, {0.0f, 0.0f, +1.0f}, {1.0f, 0.0f}}, // 右上
-          // 左
-          {{-1.0f, -1.0f, +1.0f}, {-1.0f, 0.0f, 0.0f}, {0.0f, 1.0f}}, // 左下
-          {{-1.0f, +1.0f, +1.0f}, {-1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}}, // 左上
-          {{-1.0f, -1.0f, -1.0f}, {-1.0f, 0.0f, 0.0f}, {1.0f, 1.0f}}, // 右下
-          {{-1.0f, +1.0f, -1.0f}, {-1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}}, // 右上
-          // 右（左面とX座標の符号が逆）
-          {{+1.0f, -1.0f, -1.0f}, {+1.0f, 0.0f, 0.0f}, {0.0f, 1.0f}}, // 左下
-          {{+1.0f, +1.0f, -1.0f}, {+1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}}, // 左上
-          {{+1.0f, -1.0f, +1.0f}, {+1.0f, 0.0f, 0.0f}, {1.0f, 1.0f}}, // 右下
-          {{+1.0f, +1.0f, +1.0f}, {+1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}}, // 右上
-          // 下
-          {{+1.0f, -1.0f, -1.0f}, {0.0f, -1.0f, 0.0f}, {0.0f, 1.0f}}, // 左下
-          {{+1.0f, -1.0f, +1.0f}, {0.0f, -1.0f, 0.0f}, {0.0f, 0.0f}}, // 左上
-          {{-1.0f, -1.0f, -1.0f}, {0.0f, -1.0f, 0.0f}, {1.0f, 1.0f}}, // 右下
-          {{-1.0f, -1.0f, +1.0f}, {0.0f, -1.0f, 0.0f}, {1.0f, 0.0f}}, // 右上
-          // 上（下面とY座標の符号が逆）
-          {{-1.0f, +1.0f, -1.0f}, {0.0f, +1.0f, 0.0f}, {0.0f, 1.0f}}, // 左下
-          {{-1.0f, +1.0f, +1.0f}, {0.0f, +1.0f, 0.0f}, {0.0f, 0.0f}}, // 左上
-          {{+1.0f, +1.0f, -1.0f}, {0.0f, +1.0f, 0.0f}, {1.0f, 1.0f}}, // 右下
-          {{+1.0f, +1.0f, +1.0f}, {0.0f, +1.0f, 0.0f}, {1.0f, 0.0f}}, // 右上
-    };
+        while (std::getline(file, line)) {
+            std::string identifier;
+            std::istringstream s(line);
+            s >> identifier;//先頭の識別子を読む
 
-    // 頂点インデックスの設定
-    indices_ = { 0,  1,  3,  3,  2,  0,
+            if (identifier == "v") {
+                Vector3 position;
+                s >> position.x >> position.y >> position.z;
+                position.z *= -1.0f;
+                /*position.w = 1.0f;*/
+                positions.push_back(position);
+            }
+            else if (identifier == "vt") {
+                Vector2 texcoord;
+                s >> texcoord.x >> texcoord.y;
+                texcoord.y = 1.0f - texcoord.y;
+                texcoords.push_back(texcoord);
+            }
+            else if (identifier == "vn") {
+                Vector3 normal;
+                s >> normal.x >> normal.y >> normal.z;
+                normal.z *= -1.0f;
+                normals.push_back(normal);
+            }
+            else if (identifier == "f") {
+                VertexData triangle[3];
+                //面は三角形限定。その他は未対応
+                for (int32_t faceVertex = 0; faceVertex < 3; ++faceVertex) {
+                    std::string vertexDefinition;
+                    s >> vertexDefinition;
+                    //頂点の要素へのIndexは[位置/UV/法線]で格納されているので、分解してIndexを取得する
+                    std::istringstream v(vertexDefinition);
+                    uint32_t elementIndices[3];
+                    for (int32_t element = 0; element < 3; ++element) {
+                        std::string index;
+                        std::getline(v, index, '/');//区切りでインデックスを読んでいく
+                        elementIndices[element] = std::stoi(index);
+                    }
+                    //要素へのIndexから、実際の要素の要素の値
+                    Vector3 position = positions[elementIndices[0] - 1];
+                    Vector2 texcoord = texcoords[elementIndices[1] - 1];
+                    Vector3 normal = normals[elementIndices[2] - 1];
 
-                4,  5,  7,  7,  6,  4,
+                    /*VertexData vertex = { position,texcoord,normal };
+                    modelData.vertices.push_back(vertex);*/
+                    //頂点を逆順で登録することで、回り順を逆にする
+                    triangle[faceVertex] = { position,normal,texcoord };
 
-                8,  9,  11, 11, 10, 8,
+                }
+                //頂点を逆順で登録することで、周り順を逆にする
+                vertices_.push_back(triangle[2]);
+                vertices_.push_back(triangle[1]);
+                vertices_.push_back(triangle[0]);
+            }
+            else if (identifier == "mtllib") {
+                //materialTemplateLibraryファイルの名前を取得する
+                std::string materialFilename;
+                s >> materialFilename;
+                //基本的にobjファイルと同一階層にmtlは存在させるので,ディレクトリ名とファイル名を渡す
 
-                12, 13, 15, 15, 14, 12,
+                std::string uvFilePass;//構築するMaterialData
+                std::string line;//fileから読んだ１行を格納するもの
+                std::ifstream file("Resources/" + name_ + ".mtl"); //ファイルを開く
+                assert(file.is_open());//とりあえず開けなかったら止める
+                while (std::getline(file, line)) {
+                    std::string identifier;
+                    std::istringstream s(line);
+                    s >> identifier;
+                    //identifierに応じた処理
+                    if (identifier == "map_Kd") {
+                        std::string textureFilename;
+                        s >> textureFilename;
+                        //連結してファイルパスにする
+                        uvFilePass = textureFilename;
+                    }
+                }
+                uvHandle_ = TextureManager::Load(uvFilePass);
+            }
+        }
+    }
+    else {
+        vertices_ = {
+            //  x      y      z       nx     ny    nz       u     v
+            // 前
+              {{-1.0f, -1.0f, -1.0f}, {0.0f, 0.0f, -1.0f}, {0.0f, 1.0f}}, // 左下
+              {{-1.0f, +1.0f, -1.0f}, {0.0f, 0.0f, -1.0f}, {0.0f, 0.0f}}, // 左上
+              {{+1.0f, -1.0f, -1.0f}, {0.0f, 0.0f, -1.0f}, {1.0f, 1.0f}}, // 右下
+              {{+1.0f, +1.0f, -1.0f}, {0.0f, 0.0f, -1.0f}, {1.0f, 0.0f}}, // 右上
+              // 後(前面とZ座標の符号が逆)
+              {{+1.0f, -1.0f, +1.0f}, {0.0f, 0.0f, +1.0f}, {0.0f, 1.0f}}, // 左下
+              {{+1.0f, +1.0f, +1.0f}, {0.0f, 0.0f, +1.0f}, {0.0f, 0.0f}}, // 左上
+              {{-1.0f, -1.0f, +1.0f}, {0.0f, 0.0f, +1.0f}, {1.0f, 1.0f}}, // 右下
+              {{-1.0f, +1.0f, +1.0f}, {0.0f, 0.0f, +1.0f}, {1.0f, 0.0f}}, // 右上
+              // 左
+              {{-1.0f, -1.0f, +1.0f}, {-1.0f, 0.0f, 0.0f}, {0.0f, 1.0f}}, // 左下
+              {{-1.0f, +1.0f, +1.0f}, {-1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}}, // 左上
+              {{-1.0f, -1.0f, -1.0f}, {-1.0f, 0.0f, 0.0f}, {1.0f, 1.0f}}, // 右下
+              {{-1.0f, +1.0f, -1.0f}, {-1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}}, // 右上
+              // 右（左面とX座標の符号が逆）
+              {{+1.0f, -1.0f, -1.0f}, {+1.0f, 0.0f, 0.0f}, {0.0f, 1.0f}}, // 左下
+              {{+1.0f, +1.0f, -1.0f}, {+1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}}, // 左上
+              {{+1.0f, -1.0f, +1.0f}, {+1.0f, 0.0f, 0.0f}, {1.0f, 1.0f}}, // 右下
+              {{+1.0f, +1.0f, +1.0f}, {+1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}}, // 右上
+              // 下
+              {{+1.0f, -1.0f, -1.0f}, {0.0f, -1.0f, 0.0f}, {0.0f, 1.0f}}, // 左下
+              {{+1.0f, -1.0f, +1.0f}, {0.0f, -1.0f, 0.0f}, {0.0f, 0.0f}}, // 左上
+              {{-1.0f, -1.0f, -1.0f}, {0.0f, -1.0f, 0.0f}, {1.0f, 1.0f}}, // 右下
+              {{-1.0f, -1.0f, +1.0f}, {0.0f, -1.0f, 0.0f}, {1.0f, 0.0f}}, // 右上
+              // 上（下面とY座標の符号が逆）
+              {{-1.0f, +1.0f, -1.0f}, {0.0f, +1.0f, 0.0f}, {0.0f, 1.0f}}, // 左下
+              {{-1.0f, +1.0f, +1.0f}, {0.0f, +1.0f, 0.0f}, {0.0f, 0.0f}}, // 左上
+              {{+1.0f, +1.0f, -1.0f}, {0.0f, +1.0f, 0.0f}, {1.0f, 1.0f}}, // 右下
+              {{+1.0f, +1.0f, +1.0f}, {0.0f, +1.0f, 0.0f}, {1.0f, 0.0f}}, // 右上
+        };
 
-                16, 17, 19, 19, 18, 16,
+        // 頂点インデックスの設定
+        indices_ = { 0,  1,  3,  3,  2,  0,
 
-                20, 21, 23, 23, 22, 20 };
+                    4,  5,  7,  7,  6,  4,
 
+                    8,  9,  11, 11, 10, 8,
+
+                    12, 13, 15, 15, 14, 12,
+
+                    16, 17, 19, 19, 18, 16,
+
+                    20, 21, 23, 23, 22, 20 };
+
+    }
+    
     // 頂点データのサイズ
-    UINT sizeVB = static_cast<UINT>(sizeof(VertexPosNormalUv) * vertices_.size());
+    UINT sizeVB = static_cast<UINT>(sizeof(VertexData) * vertices_.size());
 
     {
         // ヒーププロパティ
@@ -267,37 +331,12 @@ void Model::CreateMesh() {
         assert(SUCCEEDED(result));
     }
 
-    // インデックスデータのサイズ
-    UINT sizeIB = static_cast<UINT>(sizeof(uint16_t) * indices_.size());
-
-    {
-        // ヒーププロパティ
-        CD3DX12_HEAP_PROPERTIES heapProps = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
-        // リソース設定
-        CD3DX12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(sizeIB);
-
-        // インデックスバッファ生成
-        result = sDirectXCommon->GetDevice()->CreateCommittedResource(
-            &heapProps, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr,
-            IID_PPV_ARGS(&indexBuff_));
-        assert(SUCCEEDED(result));
-    }
-
     // 頂点バッファへのデータ転送
-    VertexPosNormalUv* vertMap = nullptr;
+    VertexData* vertMap = nullptr;
     result = vertBuff_->Map(0, nullptr, (void**)&vertMap);
     if (SUCCEEDED(result)) {
         std::copy(vertices_.begin(), vertices_.end(), vertMap);
         vertBuff_->Unmap(0, nullptr);
-    }
-
-    // インデックスバッファへのデータ転送
-    uint16_t* indexMap = nullptr;
-    result = indexBuff_->Map(0, nullptr, (void**)&indexMap);
-    if (SUCCEEDED(result)) {
-        std::copy(indices_.begin(), indices_.end(), indexMap);
-
-        indexBuff_->Unmap(0, nullptr);
     }
 
     // 頂点バッファビューの作成
@@ -305,15 +344,54 @@ void Model::CreateMesh() {
     vbView_.SizeInBytes = sizeVB;
     vbView_.StrideInBytes = sizeof(vertices_[0]);
 
-    // インデックスバッファビューの作成
-    ibView_.BufferLocation = indexBuff_->GetGPUVirtualAddress();
-    ibView_.Format = DXGI_FORMAT_R16_UINT;
-    ibView_.SizeInBytes = sizeIB;
+    if (isModelLoad_ == false) {
+        // インデックスデータのサイズ
+        UINT sizeIB = static_cast<UINT>(sizeof(uint16_t) * indices_.size());
+
+        {
+            // ヒーププロパティ
+            CD3DX12_HEAP_PROPERTIES heapProps = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
+            // リソース設定
+            CD3DX12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(sizeIB);
+
+            // インデックスバッファ生成
+            result = sDirectXCommon->GetDevice()->CreateCommittedResource(
+                &heapProps, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr,
+                IID_PPV_ARGS(&indexBuff_));
+            assert(SUCCEEDED(result));
+        }
+
+        // インデックスバッファへのデータ転送
+        uint16_t* indexMap = nullptr;
+        result = indexBuff_->Map(0, nullptr, (void**)&indexMap);
+        if (SUCCEEDED(result)) {
+            std::copy(indices_.begin(), indices_.end(), indexMap);
+
+            indexBuff_->Unmap(0, nullptr);
+        }
+
+        // インデックスバッファビューの作成
+        ibView_.BufferLocation = indexBuff_->GetGPUVirtualAddress();
+        ibView_.Format = DXGI_FORMAT_R16_UINT;
+        ibView_.SizeInBytes = sizeIB;
+    }
+
 }
 
 void Model::Initialize() {
     // nullptrチェック
     assert(sDirectXCommon->GetDevice());
+
+    // メッシュ生成
+    CreateMesh();
+}
+
+void Model::Initialize(std::string name) {
+    // nullptrチェック
+    assert(sDirectXCommon->GetDevice());
+
+    isModelLoad_ = true;
+    name_ = name;
 
     // メッシュ生成
     CreateMesh();
@@ -327,6 +405,7 @@ void Model::Draw(const WorldTransform& worldTransform, const ViewProjection& vie
 
     // 頂点バッファの設定
     sCommandList->IASetVertexBuffers(0, 1, &vbView_);
+
     // インデックスバッファの設定
     sCommandList->IASetIndexBuffer(&ibView_);
 
@@ -347,4 +426,32 @@ void Model::Draw(const WorldTransform& worldTransform, const ViewProjection& vie
 
     // 描画コマンド
     sCommandList->DrawIndexedInstanced(static_cast<UINT>(indices_.size()), 1, 0, 0, 0);
+}
+
+void Model::Draw(const WorldTransform& worldTransform, const ViewProjection& viewProjection, const DirectionalLight& directionalLight, const Material& material) {
+    // nullptrチェック
+    assert(sDirectXCommon->GetDevice());
+    assert(sCommandList);
+    assert(worldTransform.constBuff_.Get());
+
+    // 頂点バッファの設定
+    sCommandList->IASetVertexBuffers(0, 1, &vbView_);
+
+    // CBVをセット（ワールド行列）
+    sCommandList->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kWorldTransform), worldTransform.constBuff_->GetGPUVirtualAddress());
+
+    // CBVをセット（ビュープロジェクション行列）
+    sCommandList->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kViewProjection), viewProjection.constBuff_->GetGPUVirtualAddress());
+
+    // CBVをセット（ライト）
+    sCommandList->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kDirectionalLight), directionalLight.constBuff_->GetGPUVirtualAddress());
+
+    // CBVをセット（マテリアル）
+    sCommandList->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kMaterial), material.constBuff_->GetGPUVirtualAddress());
+
+    // SRVをセット
+    TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(sCommandList, static_cast<UINT>(RootParameter::kTexture), uvHandle_);
+
+    // 描画コマンド
+    sCommandList->DrawInstanced(static_cast<UINT>(vertices_.size()), 1, 0, 0);
 }

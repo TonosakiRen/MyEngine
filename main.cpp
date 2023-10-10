@@ -47,10 +47,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	gameScene = new GameScene();
 	gameScene->Initialize();
 
-
-
-
-
 	// メインループ
 	while (true) {
 		// メッセージ処理

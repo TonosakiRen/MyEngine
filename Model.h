@@ -10,6 +10,7 @@
 #include "Mymath.h"
 #include "DirectionalLight.h"
 #include "Material.h"
+#include <string>
 
 class DirectXCommon;
 
@@ -29,7 +30,7 @@ public: // 列挙子
 
 public: // サブクラス
 	// 頂点データ構造体
-	struct VertexPosNormalUv {
+	struct VertexData {
 		Vector3 pos;    // xyz座標
 		Vector3 normal; // 法線ベクトル
 		Vector2 uv;     // uv座標
@@ -61,6 +62,12 @@ public: // 静的メンバ関数
 	/// <returns></returns>
 	static Model* Create();
 
+	/// <summary>
+	/// 3Dモデル生成
+	/// </summary>
+	/// <returns></returns>
+	static Model* Create(std::string name);
+
 private: // 静的メンバ変数
 	// デバイス
 	static DirectXCommon* sDirectXCommon;
@@ -87,9 +94,19 @@ public: // メンバ関数
 	void Initialize();
 
 	/// <summary>
+	/// 初期化
+	/// </summary>
+	void Initialize(std::string name);
+
+	/// <summary>
 	/// 描画
 	/// </summary>
-	void Draw(const WorldTransform& worldTransform, const ViewProjection& viewProjection, const DirectionalLight& directionalLight, const Material& material,uint32_t textureHadle = 0);
+	void Draw(const WorldTransform& worldTransform, const ViewProjection& viewProjection, const DirectionalLight& directionalLight, const Material& material,uint32_t textureHadle);
+
+	/// <summary>
+	/// 描画
+	/// </summary>
+	void Draw(const WorldTransform& worldTransform, const ViewProjection& viewProjection, const DirectionalLight& directionalLight, const Material& material);
 
 	/// <summary>
 	/// メッシュデータ生成
@@ -102,12 +119,18 @@ private: // メンバ変数
 	// インデックスバッファビュー
 	D3D12_INDEX_BUFFER_VIEW ibView_{};
 	// 頂点データ配列
-	std::vector<VertexPosNormalUv> vertices_;
+	std::vector<VertexData> vertices_;
 	// 頂点インデックス配列
 	std::vector<uint16_t> indices_;
 	// 頂点バッファ
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertBuff_;
 	// インデックスバッファ
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexBuff_;
+	//ModelをLoadするか
+	bool isModelLoad_ = false;
+	// uvHandle
+	uint32_t uvHandle_;
+	// fileName
+	std::string name_;
 };
 

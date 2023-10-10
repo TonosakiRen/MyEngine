@@ -63,5 +63,8 @@ private: //　メンバ変数
 	WorldTransform triangleTransform2_;
 	Sphere sphere_;
 	WorldTransform sphereTransform_;
+
+	Model axis_;
+	WorldTransform axisTransform_;
 };
 

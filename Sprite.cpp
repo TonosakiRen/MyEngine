@@ -134,8 +134,6 @@ void Sprite::StaticInitialize( int window_width, int window_height) {
 
 	// 射影行列計算
 	sMatProjection = MakeOrthograohicmatrix(0.0f, 0.0f, (float)window_width, (float)window_height,  0.0f, 1.0f);
-	/*sMatProjection = XMMatrixOrthographicOffCenterLH(
-		0.0f, (float)window_width, (float)window_height, 0.0f, 0.0f, 1.0f);*/
 }
 
 void Sprite::PreDraw(ID3D12GraphicsCommandList* commandList) {

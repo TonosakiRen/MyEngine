@@ -51,7 +51,10 @@ void GameScene::Initialize() {
 	spriteRotate_ = 0.0f;
 	sprite_ = *Sprite::Create(textureHandle_,{0.0f,0.0f});
 
-
+	axis_.Initialize("axis");
+	axisTransform_.Initialize(dxCommon_->GetDevice());
+	axisTransform_.translation_ = { 0.0f,0.0f,0.0f };
+	axisTransform_.UpdateMatrix();
 }
 
 void GameScene::Update(){
@@ -95,6 +98,12 @@ void GameScene::Update(){
 	ImGui::DragFloat3("sphereScale", &sphereTransform_.scale_.x, 0.01f);
 	sphereTransform_.UpdateMatrix();
 
+	// axis
+	ImGui::DragFloat3("axisTransform", &axisTransform_.translation_.x, 0.01f);
+	ImGui::DragFloat3("axisRotate", &axisTransform_.rotation_.x, 0.01f);
+	ImGui::DragFloat3("axisScale", &axisTransform_.scale_.x, 0.01f);
+	axisTransform_.UpdateMatrix();
+
 	ImGui::DragFloat2("spriteTransform", &spritePosition_.x, 1.0f);
 	ImGui::DragFloat("spriteRotate", &spriteRotate_, 1.0f);
 	ImGui::DragFloat2("spriteScale", &spriteScale_.x, 1.0f);
@@ -129,10 +138,11 @@ void GameScene::Draw() {
 	Model::PreDraw(commandList);
 	Sphere::PreDraw(commandList);
 
-	model_.Draw(modelTransform_, viewProjection_, directionalLight_, material_, textureHandle_);
+	axis_.Draw(axisTransform_, viewProjection_, directionalLight_, material_);
+	/*model_.Draw(modelTransform_, viewProjection_, directionalLight_, material_, textureHandle_);
 	triangle_.Draw(triangleTransform_, viewProjection_, directionalLight_, material_, textureHandle_);
 	triangle2_.Draw(triangleTransform2_, viewProjection_, directionalLight_, material_, textureHandle_);
-	sphere_.Draw(sphereTransform_, viewProjection_, directionalLight_, material_, textureHandle_);
+	sphere_.Draw(sphereTransform_, viewProjection_, directionalLight_, material_, textureHandle_);*/
 
 	//3Dオブジェクト描画後処理
 	Model::PostDraw();
