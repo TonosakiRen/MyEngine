@@ -4,40 +4,35 @@
 #include <wrl.h>
 #include "Mymath.h"
 
-//定数バッファ用データ構造体
 struct ConstBufferDataMaterial {
 	Vector4 color;
 	Matrix4x4 uvTransform;
+	bool enableLighting;
 };
 
-/// <summary>
-/// ワールド変換データ
-/// </summary>
-struct Material
-{
-	//定数バッファ
-	Microsoft::WRL::ComPtr<ID3D12Resource> constBuff_;
-	//マッピング済みアドレス
-	ConstBufferDataMaterial* constMap = nullptr;
-	//ローカルスケール
-	Vector4 color_ = { 1.0f, 1.0f, 1.0f,1.0f };
-	Matrix4x4 uvTransform_;
 
-	/// <summary>
-	/// 初期化
-	/// </summary>
-	void Initialize(ID3D12Device* device);
-	/// <summary>
-	/// 定数バッファ生成
-	/// </summary>
-	void CreateConstBuffer(ID3D12Device* device);
-	/// <summary>
-	/// マッピングする
-	/// </summary>
-	void Map();
-	/// <summary>
-	/// 行列を更新する
-	/// </summary>
+class Material
+{
+public:
+	void Initialize();
 	void UpdateMaterial();
+
+	D3D12_GPU_VIRTUAL_ADDRESS GetGPUVirtualAddress() const {
+		return constBuff_->GetGPUVirtualAddress();
+	}
+public:
+	Vector4 color_ = { 1.0f, 1.0f, 1.0f,1.0f };
+	Vector3 scale_ = { 1.0f,1.0f,1.0f };
+	Vector3 rotation_ = { 0.0f,0.0f,0.0f };
+	Vector3 translation_ = { 0.0f,0.0f,0.0f };
+	bool enableLighting_ = true;
+private:
+	void CreateConstBuffer();
+	void Map();
+private:
+	Matrix4x4 uvTransform_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> constBuff_;
+	ConstBufferDataMaterial* constMap = nullptr;
+
 };
 

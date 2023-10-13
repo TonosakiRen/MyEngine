@@ -1,19 +1,14 @@
 #pragma once
 #include <Windows.h>
 #include <cstdint>
-/// <summary>
-/// ウィンドウズアプリケーション
-/// </summary>
+
 class WinApp
 {
 public:
-	// ウィンドウサイズ
-	static const int kWindowWidth = 1280; // 横幅
-	static const int kWindowHeight = 720; // 縦幅
-	// ウィンドウクラス名
+	static const int kWindowWidth = 1280; 
+	static const int kWindowHeight = 720; 
 	static const wchar_t kWindowClassName[];
 
-	//Windous関係
 	RECT windowRect_;
 	HWND hwnd_ = nullptr;
 	WNDCLASS wndClass_{};
@@ -24,13 +19,10 @@ public:
 	void CreateGameWindow(const char* title = "DirextXGame");
 	bool ProcessMessage();
 	void TerminateGameWindow();
-	/// <summary>
-	/// ウィンドウハンドルの取得
-	/// </summary>
-	/// <returns></returns>
+	
 	HWND GetHwnd() const { return hwnd_; }
 	HINSTANCE GetHInstance() const { return wndClass_.hInstance; }
-private: // シングルトン
+private: 
 	WinApp() = default;
 	~WinApp() = default;
 	WinApp(const WinApp&) = delete;

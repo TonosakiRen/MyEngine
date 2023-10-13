@@ -10,43 +10,32 @@
 using namespace DirectX;
 using namespace Microsoft::WRL;
 
-/// <summary>
-/// 静的メンバ変数の実体
-/// </summary>
 DirectXCommon* Model::sDirectXCommon = nullptr;
 UINT Model::sDescriptorHandleIncrementSize = 0;
 ID3D12GraphicsCommandList* Model::sCommandList = nullptr;
 ComPtr<ID3D12RootSignature> Model::sRootSignature;
 ComPtr<ID3D12PipelineState> Model::sPipelineState;
 
-void Model::StaticInitialize(int window_width, int window_height) {
+void Model::StaticInitialize() {
     sDirectXCommon = DirectXCommon::GetInstance();
-    // パイプライン初期化
     InitializeGraphicsPipeline();
 }
 
 void Model::PreDraw(ID3D12GraphicsCommandList* commandList) {
-    // PreDrawとPostDrawがペアで呼ばれていなければエラー
     assert(Model::sCommandList == nullptr);
 
-    // コマンドリストをセット
     sCommandList = commandList;
 
-    // パイプラインステートの設定
     commandList->SetPipelineState(sPipelineState.Get());
-    // ルートシグネチャの設定
     commandList->SetGraphicsRootSignature(sRootSignature.Get());
-    // プリミティブ形状を設定
     commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 
 void Model::PostDraw() {
-    // コマンドリストを解除
     sCommandList = nullptr;
 }
 
 Model* Model::Create() {
-    // 3Dオブジェクトのインスタンスを生成
     Model* object3d = new Model();
     assert(object3d);
 
@@ -57,11 +46,9 @@ Model* Model::Create() {
 }
 
 Model* Model::Create(std::string name) {
-    // 3Dオブジェクトのインスタンスを生成
     Model* object3d = new Model();
     assert(object3d);
 
-    // 初期化
     object3d->Initialize(name);
 
     return object3d;
@@ -69,9 +56,9 @@ Model* Model::Create(std::string name) {
 
 void Model::InitializeGraphicsPipeline() {
     HRESULT result = S_FALSE;
-    ComPtr<IDxcBlob> vsBlob;    // 頂点シェーダオブジェクト
-    ComPtr<IDxcBlob> psBlob;    // ピクセルシェーダオブジェクト
-    ComPtr<ID3DBlob> errorBlob; // エラーオブジェクト
+    ComPtr<IDxcBlob> vsBlob;    
+    ComPtr<IDxcBlob> psBlob;    
+    ComPtr<ID3DBlob> errorBlob; 
 
     vsBlob = sDirectXCommon->CompileShader(L"BasicVS.hlsl",L"vs_6_0");
     assert(vsBlob != nullptr);
@@ -80,15 +67,15 @@ void Model::InitializeGraphicsPipeline() {
     assert(psBlob != nullptr);
 
 
-    // 頂点レイアウト
+    
     D3D12_INPUT_ELEMENT_DESC inputLayout[] = {
-      {// xy座標(1行で書いたほうが見やすい)
+      {
        "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT,
        D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-      {// 法線ベクトル(1行で書いたほうが見やすい)
+      {
        "NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT,
        D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-      {// uv座標(1行で書いたほうが見やすい)
+      {
        "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,    0, D3D12_APPEND_ALIGNED_ELEMENT,
        D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
     };
@@ -102,14 +89,12 @@ void Model::InitializeGraphicsPipeline() {
     gpipeline.SampleMask = D3D12_DEFAULT_SAMPLE_MASK; // 標準設定
     // ラスタライザステート
     gpipeline.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-    // gpipeline.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
-    // gpipeline.RasterizerState.FillMode = D3D12_FILL_MODE_WIREFRAME;
     //  デプスステンシルステート
     gpipeline.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
 
     // レンダーターゲットのブレンド設定
     D3D12_RENDER_TARGET_BLEND_DESC blenddesc{};
-    blenddesc.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL; // RBGA全てのチャンネルを描画
+    blenddesc.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL; 
     blenddesc.BlendEnable = true;
     blenddesc.BlendOp = D3D12_BLEND_OP_ADD;
     blenddesc.SrcBlend = D3D12_BLEND_SRC_ALPHA;
@@ -182,7 +167,9 @@ void Model::CreateMesh() {
         std::vector<Vector3> positions;//位置
         std::vector<Vector3> normals;//法線
         std::vector<Vector2> texcoords;//テクスチャ座標
-        std::ifstream file("Resources/" + name_ + ".obj"); //ファイルを開く
+        std::string directoryPath = "Resources/models/" + name_ + "/";
+        std::ifstream file( directoryPath + name_ +".obj"); //ファイルを開く
+        uvHandle_ = 0; //とりあえず1x1White
         assert(file.is_open());//とりあえず開けなったら止める
 
         while (std::getline(file, line)) {
@@ -228,8 +215,6 @@ void Model::CreateMesh() {
                     Vector2 texcoord = texcoords[elementIndices[1] - 1];
                     Vector3 normal = normals[elementIndices[2] - 1];
 
-                    /*VertexData vertex = { position,texcoord,normal };
-                    modelData.vertices.push_back(vertex);*/
                     //頂点を逆順で登録することで、回り順を逆にする
                     triangle[faceVertex] = { position,normal,texcoord };
 
@@ -247,7 +232,7 @@ void Model::CreateMesh() {
 
                 std::string uvFilePass;//構築するMaterialData
                 std::string line;//fileから読んだ１行を格納するもの
-                std::ifstream file("Resources/" + name_ + ".mtl"); //ファイルを開く
+                std::ifstream file("Resources/models/" + name_ + "/" + name_ + ".mtl"); //ファイルを開く
                 assert(file.is_open());//とりあえず開けなかったら止める
                 while (std::getline(file, line)) {
                     std::string identifier;
@@ -258,10 +243,10 @@ void Model::CreateMesh() {
                         std::string textureFilename;
                         s >> textureFilename;
                         //連結してファイルパスにする
-                        uvFilePass = textureFilename;
+                        uvFilePass = directoryPath + textureFilename;
+                        uvHandle_ = TextureManager::LoadUv(textureFilename, uvFilePass);
                     }
                 }
-                uvHandle_ = TextureManager::Load(uvFilePass);
             }
         }
     }
@@ -398,10 +383,6 @@ void Model::Initialize(std::string name) {
 }
 
 void Model::Draw(const WorldTransform& worldTransform, const ViewProjection& viewProjection,const DirectionalLight& directionalLight, const Material& material,uint32_t textureHadle) {
-    // nullptrチェック
-    assert(sDirectXCommon->GetDevice());
-    assert(sCommandList);
-    assert(worldTransform.constBuff_.Get());
 
     // 頂点バッファの設定
     sCommandList->IASetVertexBuffers(0, 1, &vbView_);
@@ -410,16 +391,16 @@ void Model::Draw(const WorldTransform& worldTransform, const ViewProjection& vie
     sCommandList->IASetIndexBuffer(&ibView_);
 
     // CBVをセット（ワールド行列）
-    sCommandList->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kWorldTransform),worldTransform.constBuff_->GetGPUVirtualAddress());
+    sCommandList->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kWorldTransform),worldTransform.GetGPUVirtualAddress());
 
     // CBVをセット（ビュープロジェクション行列）
-    sCommandList->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kViewProjection),viewProjection.constBuff_->GetGPUVirtualAddress());
+    sCommandList->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kViewProjection),viewProjection.GetGPUVirtualAddress());
 
     // CBVをセット（ライト）
-    sCommandList->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kDirectionalLight), directionalLight.constBuff_->GetGPUVirtualAddress());
+    sCommandList->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kDirectionalLight), directionalLight.GetGPUVirtualAddress());
 
     // CBVをセット（マテリアル）
-    sCommandList->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kMaterial), material.constBuff_->GetGPUVirtualAddress());
+    sCommandList->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kMaterial), material.GetGPUVirtualAddress());
 
     // SRVをセット
     TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(sCommandList, static_cast<UINT>(RootParameter::kTexture), textureHadle);
@@ -432,22 +413,21 @@ void Model::Draw(const WorldTransform& worldTransform, const ViewProjection& vie
     // nullptrチェック
     assert(sDirectXCommon->GetDevice());
     assert(sCommandList);
-    assert(worldTransform.constBuff_.Get());
 
     // 頂点バッファの設定
     sCommandList->IASetVertexBuffers(0, 1, &vbView_);
 
     // CBVをセット（ワールド行列）
-    sCommandList->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kWorldTransform), worldTransform.constBuff_->GetGPUVirtualAddress());
+    sCommandList->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kWorldTransform), worldTransform.GetGPUVirtualAddress());
 
     // CBVをセット（ビュープロジェクション行列）
-    sCommandList->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kViewProjection), viewProjection.constBuff_->GetGPUVirtualAddress());
+    sCommandList->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
 
     // CBVをセット（ライト）
-    sCommandList->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kDirectionalLight), directionalLight.constBuff_->GetGPUVirtualAddress());
+    sCommandList->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kDirectionalLight), directionalLight.GetGPUVirtualAddress());
 
     // CBVをセット（マテリアル）
-    sCommandList->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kMaterial), material.constBuff_->GetGPUVirtualAddress());
+    sCommandList->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kMaterial), material.GetGPUVirtualAddress());
 
     // SRVをセット
     TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(sCommandList, static_cast<UINT>(RootParameter::kTexture), uvHandle_);

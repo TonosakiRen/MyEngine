@@ -55,16 +55,16 @@ void WinApp::CreateGameWindow(const char* title) {
 	std::wstring titleWString = ConvertString(title);
 
 	hwnd_ = CreateWindow(
-		wndClass_.lpszClassName,		//利用するクラス名
+		wndClass_.lpszClassName,//利用するクラス名
 		titleWString.c_str(),	//タイトルバーの文字
 		WS_OVERLAPPEDWINDOW,	//よく見るウィンドウスタイル
-		CW_USEDEFAULT,			//表示X座標(Windowに任せる)
-		CW_USEDEFAULT,			//表示Y座標(WindoOSに任せる)
+		CW_USEDEFAULT,			//表示X座標
+		CW_USEDEFAULT,			//表示Y座標
 		windowRect_.right - windowRect_.left,	//ウィンドウ横幅
 		windowRect_.bottom - windowRect_.top,	//ウィンドウ縦幅
 		nullptr,				//親ウィンドウハンドル
 		nullptr,				//メニューハンドル
-		wndClass_.hInstance,			//インスタンスハンドル
+		wndClass_.hInstance,	//インスタンスハンドル
 		nullptr					//オプション
 	);
 

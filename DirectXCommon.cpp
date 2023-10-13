@@ -14,7 +14,6 @@ DirectXCommon* DirectXCommon::GetInstance() {
 
 void DirectXCommon::Initialize(int32_t backBufferWidth, int32_t backBufferHeight) {
 
-	// nullptrチェック
 	assert(4 <= backBufferWidth && backBufferWidth <= 4096);
 	assert(4 <= backBufferHeight && backBufferHeight <= 4096);
 
@@ -29,9 +28,8 @@ void DirectXCommon::Initialize(int32_t backBufferWidth, int32_t backBufferHeight
 	CreateSwapChain();
 	CreateFinalRenderTargets();
 	CreateDepthBuffer();
+	CreateSrvHeap();
 	
-	//ディスクリプタヒープ
-	//srvHeap_ = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 128, true);
 }
 
 void DirectXCommon::PreDraw() {
@@ -76,6 +74,10 @@ void DirectXCommon::PreDraw() {
 	// シザリング矩形の設定
 	CD3DX12_RECT rect = CD3DX12_RECT(0, 0, backBufferWidth_, backBufferHeight_);
 	commandList_->RSSetScissorRects(1, &rect);
+
+	//デスクリプターヒープを設定する
+	ID3D12DescriptorHeap* ppHeaps[] = { srvHeap_.Get()};
+	commandList_->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
 }
 
 void DirectXCommon::PostDraw() {
@@ -217,7 +219,6 @@ void DirectXCommon::InitializeDXGIDevice() {
 	const uint32_t desriptorSizeRTV = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	const uint32_t desriptorSizeDSV = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
-
 	ComPtr<ID3D12InfoQueue> infoQueue = nullptr;
 	if (SUCCEEDED(device_->QueryInterface(IID_PPV_ARGS(&infoQueue)))) {
 		//やばいエラー前に止まる
@@ -303,11 +304,13 @@ ComPtr<IDxcBlob> DirectXCommon::CompileShader(
 	//Compilerに使用するprofile
 	const wchar_t* profile
 	) {
+
+	std::wstring directionary = L"./Resources/shaders/" + filePath;
 	//これからシェーダーをコンパイルする旨をログに出す
 	Log(ConvertString(std::format(L"Begin CompileShader,path:{},profile:{}\n", filePath, profile)));
 	//hlslファイルを読む
 	IDxcBlobEncoding* shaderSource = nullptr;
-	HRESULT hr = dxcUtils_->LoadFile(filePath.c_str(), nullptr, &shaderSource);
+	HRESULT hr = dxcUtils_->LoadFile(directionary.c_str(), nullptr, & shaderSource);
 	//読めなかったら止める
 	assert(SUCCEEDED(hr));
 	//読み込んだファイルの内容を設定する
@@ -421,17 +424,21 @@ void DirectXCommon::CreateDepthBuffer() {
 	device_->CreateDepthStencilView(depthBuffer_.Get(), &dsvDesc, dsvHeap_->GetCPUDescriptorHandleForHeapStart());
 }
 
+void DirectXCommon::CreateSrvHeap() {
+	srvHeap_ = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, kSrvHeapDescritorNum, true);
+}
+
 
 ComPtr<ID3D12Resource> DirectXCommon::CreateDepthStencilTextureResource() {
 	D3D12_RESOURCE_DESC resourceDesc{};
 	resourceDesc.Width = backBufferWidth_;//Textureの幅
 	resourceDesc.Height = backBufferHeight_;//Textureの高さ
 	resourceDesc.MipLevels = 1;//mipmapの数
-	resourceDesc.DepthOrArraySize = 1;//奥行き or 配列Textureの配列数
+	resourceDesc.DepthOrArraySize = 1;//配列Textureの配列数
 	resourceDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;//DepthStencilとして利用可能なフォーマット
 	resourceDesc.SampleDesc.Count = 1;//DepthStencilとして利用可能なフォーマット
 	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;//2次元
-	resourceDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;//DepthStencilとして使う通知
+	resourceDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;//DepthStencilとして使う
 
 	//利用するHeapの設定
 	D3D12_HEAP_PROPERTIES heapProperties{};

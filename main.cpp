@@ -4,6 +4,7 @@
 #include "TextureManager.h"
 #include "GameScene.h"
 #include "ImGuiManager.h"
+#include "Particle.h"
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	WinApp* win = nullptr;
@@ -31,15 +32,13 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	TextureManager::Load("white1x1.png");
 
 	// 3Dオブジェクト静的初期化
-	Model::StaticInitialize(WinApp::kWindowWidth, WinApp::kWindowHeight);
+	Model::StaticInitialize();
+
 	// 3Dオブジェクト静的初期化
-	Triangle::StaticInitialize(WinApp::kWindowWidth, WinApp::kWindowHeight);
+	Particle::StaticInitialize();
 
 	//　スプライト静的初期化
-	Sprite::StaticInitialize(WinApp::kWindowWidth, WinApp::kWindowHeight);
-
-	//　スプライト静的初期化
-	Sphere::StaticInitialize(WinApp::kWindowWidth, WinApp::kWindowHeight);
+	Sprite::StaticInitialize();
 
 #pragma endregion
 

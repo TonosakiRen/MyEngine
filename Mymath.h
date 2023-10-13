@@ -45,6 +45,11 @@ struct transform {
 	Vector3 translate;
 };
 
+struct TranformationMatrix {
+	Matrix4x4 WVP;
+	Matrix4x4 World;
+};
+
 #pragma region Vector3
 
 inline Vector3 GetXAxis(Matrix4x4 m){

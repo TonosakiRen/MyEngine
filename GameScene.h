@@ -5,66 +5,44 @@
 #include "WorldTransform.h"
 #include "Input.h"
 #include "Sprite.h"
-#include "Triangle.h"
 #include "DirectionalLight.h"
-#include "Sphere.h"
-/// <summary>
-/// ゲームシーン
-/// </summary>
+#include "Particle.h"
+#include "GameObject.h"
+#include "Skydome.h"
+#include "Floor.h"
 class GameScene
 {
 
 public:
-	/// <summary>
-	/// コンストラクタ
-	/// </summary>
 	GameScene();
-
-	/// <summary>
-	/// デストラクタ
-	/// </summary>
 	~GameScene();
 
-	/// <summary>
-	/// 初期化
-	/// </summary>
 	void Initialize();
-
-	/// <summary>
-	/// 毎フレーム処理
-	/// </summary>
 	void Update();
-
-	/// <summary>
-	/// 描画
-	/// </summary>
+	void ModelDraw();
+	void ParticleDraw();
+	void PreSpriteDraw();
+	void PostSpriteDraw();
 	void Draw();
 
-private: //　メンバ変数
+
+private: 
 	DirectXCommon* dxCommon_ = nullptr;
 	Input* input_ = nullptr;
-	//ヴュープロジェクション
+	
 	ViewProjection viewProjection_;
 	DirectionalLight directionalLight_;
-	Material material_;
-	transform texTransfrom;
+
 	uint32_t textureHandle_;
 
-	Model model_;
-	WorldTransform modelTransform_;
-	Sprite sprite_;
-	Vector2 spritePosition_;
-	Vector2 spriteScale_;
-	float spriteRotate_;
+	std::unique_ptr<Sprite>sprite_;
 	WorldTransform spriteTransform_;
-	Triangle triangle_;
-	WorldTransform triangleTransform_;
-	Triangle triangle2_;
-	WorldTransform triangleTransform2_;
-	Sphere sphere_;
-	WorldTransform sphereTransform_;
 
-	Model axis_;
-	WorldTransform axisTransform_;
+	std::unique_ptr<Skydome> skydome_;
+	std::unique_ptr<Floor> floor_;
+	std::unique_ptr<GameObject> sphere_;
+
+
+	std::unique_ptr<Particle> particle_;
 };
 

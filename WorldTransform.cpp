@@ -1,24 +1,23 @@
 #include "WorldTransform.h"
 #include <cassert>
 #include "externals/DirectXTex/d3dx12.h"
-
+#include "DirectXCommon.h"
 
 using namespace DirectX;
 
-void WorldTransform::Initialize(ID3D12Device* device) {
-	CreateConstBuffer(device);
+void WorldTransform::Initialize() {
+	CreateConstBuffer();
 	Map();
 	UpdateMatrix();
 }
 
-void WorldTransform::CreateConstBuffer(ID3D12Device* device) {
+void WorldTransform::CreateConstBuffer() {
     HRESULT result;
-
+    ID3D12Device* device = DirectXCommon::GetInstance()->GetDevice();
     // ヒーププロパティ
     CD3DX12_HEAP_PROPERTIES heapProps = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
     // リソース設定
-    CD3DX12_RESOURCE_DESC resourceDesc =
-        CD3DX12_RESOURCE_DESC::Buffer((sizeof(ConstBufferDataWorldTransform) + 0xff) & ~0xff);
+    CD3DX12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Buffer((sizeof(ConstBufferDataWorldTransform) + 0xff) & ~0xff);
 
     // 定数バッファの生成
     result = device->CreateCommittedResource(
@@ -46,10 +45,10 @@ void WorldTransform::UpdateMatrix() {
     matTrans = MakeTranslateMatrix(translation_);
 
     // ワールド行列の合成
-    matWorld_ = MakeIdentity4x4(); // 変形をリセット
-    matWorld_ *= matScale;          // ワールド行列にスケーリングを反映
-    matWorld_ *= matRot;            // ワールド行列に回転を反映
-    matWorld_ *= matTrans;          // ワールド行列に平行移動を反映
+    matWorld_ = MakeIdentity4x4(); 
+    matWorld_ *= matScale;          
+    matWorld_ *= matRot;            
+    matWorld_ *= matTrans;          
 
     // 親行列の指定がある場合は、掛け算する
     if (parent_) {

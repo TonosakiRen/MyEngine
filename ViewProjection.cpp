@@ -3,19 +3,20 @@
 #include <cassert>
 #include "externals/DirectXTex/d3dx12.h"
 #include "Input.h"
-
+#include "DirectXCommon.h"
+#include "ImGuiManager.h"
 
 using namespace DirectX;
 
-void ViewProjection::Initialize(ID3D12Device* device) {
-	CreateConstBuffer(device);
+void ViewProjection::Initialize() {
+	CreateConstBuffer();
 	Map();
 	UpdateMatrix();
 }
 
-void ViewProjection::CreateConstBuffer(ID3D12Device* device) {
+void ViewProjection::CreateConstBuffer() {
     HRESULT result;
-
+    ID3D12Device* device = DirectXCommon::GetInstance()->GetDevice();
     // ヒーププロパティ
     CD3DX12_HEAP_PROPERTIES heapProps = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
     // リソース設定
@@ -46,6 +47,7 @@ void ViewProjection::UpdateMatrix() {
     // 定数バッファに書き込み
     constMap->view = matView;
     constMap->projection = matProjection;
+    constMap->viewPosition = translation_;
 }
 
 void ViewProjection::DebugMove() {
@@ -53,6 +55,11 @@ void ViewProjection::DebugMove() {
 
     Vector2 mouseMove = input->GetMouseMove();
     float wheel = input->GetWheel();
+
+    ImGui::Begin("Camera");
+    ImGui::DragFloat3("target", &target_.x, 0.01f);
+    ImGui::DragFloat3("translation", &translation_.x, 0.01f);
+    ImGui::End();
 
     if (input->IsPressMouse(1)) {
         float rot = static_cast<float>(M_PI / 180.0f);

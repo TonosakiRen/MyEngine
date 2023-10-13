@@ -4,46 +4,35 @@
 #include <wrl.h>
 #include "Mymath.h"
 
-//定数バッファ用データ構造体
 struct ConstBufferDataWorldTransform {
-	Matrix4x4 matWorld; //ローカル->ワールド　変換行列
+	Matrix4x4 matWorld; 
 };
 
-/// <summary>
-/// ワールド変換データ
-/// </summary>
-struct WorldTransform
+class WorldTransform
 {
-	//定数バッファ
-	Microsoft::WRL::ComPtr<ID3D12Resource> constBuff_;
-	//マッピング済みアドレス
-	ConstBufferDataWorldTransform* constMap = nullptr;
-	//ローカルスケール
+public:
+	void Initialize();
+	void UpdateMatrix();
+
+	void SetParent(WorldTransform* parent) {
+		parent_ = parent;
+	}
+
+	D3D12_GPU_VIRTUAL_ADDRESS GetGPUVirtualAddress () const {
+		return constBuff_->GetGPUVirtualAddress();
+	}
+public:
 	Vector3 scale_ = { 1.0f,1.0f,1.0f };
-	//X,Y,Z軸周りのローカル回転角
 	Vector3 rotation_ = { 0.0f,0.0f,0.0f };
-	//ローカル座標
 	Vector3 translation_ = { 0.0f,0.0f,0.0f };
-	//ローカル->ワールド変換へのポインタ
 	Matrix4x4 matWorld_;
-	//親となるワールド変換へのポインタ
+private:
+	void CreateConstBuffer();
+	void Map();
+private:
 	WorldTransform* parent_ = nullptr;
 
-	/// <summary>
-	/// 初期化
-	/// </summary>
-	void Initialize(ID3D12Device* device);
-	/// <summary>
-	/// 定数バッファ生成
-	/// </summary>
-	void CreateConstBuffer(ID3D12Device* device);
-	/// <summary>
-	/// マッピングする
-	/// </summary>
-	void Map();
-	/// <summary>
-	/// 行列を更新する
-	/// </summary>
-	void UpdateMatrix();
+	Microsoft::WRL::ComPtr<ID3D12Resource> constBuff_;
+	ConstBufferDataWorldTransform* constMap = nullptr;
 };
 

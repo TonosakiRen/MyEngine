@@ -5,15 +5,13 @@
 #include "externals/DirectXTex/d3dx12.h"
 #include "DirectXCommon.h"
 #include "externals/DirectXTex/DirectXTex.h"
+#include "WinApp.h"
 
 #pragma comment(lib, "d3dcompiler.lib")
 
 using namespace DirectX;
 using namespace Microsoft::WRL;
 
-/// <summary>
-/// 静的メンバ変数の実体
-/// </summary>
 DirectXCommon* Sprite::sDirectXCommon = nullptr;
 UINT Sprite::sDescriptorHandleIncrementSize;
 ID3D12GraphicsCommandList* Sprite::sCommandList = nullptr;
@@ -21,18 +19,17 @@ ComPtr<ID3D12RootSignature> Sprite::sRootSignature;
 ComPtr<ID3D12PipelineState> Sprite::sPipelineState;
 Matrix4x4 Sprite::sMatProjection;
 
-void Sprite::StaticInitialize( int window_width, int window_height) {
+void Sprite::StaticInitialize() {
 	
 	sDirectXCommon = DirectXCommon::GetInstance();
 
-	// デスクリプタサイズを取得
 	sDescriptorHandleIncrementSize =
 		sDirectXCommon->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 	HRESULT result = S_FALSE;
-	ComPtr<IDxcBlob> vsBlob;    // 頂点シェーダオブジェクト
-	ComPtr<IDxcBlob> psBlob;    // ピクセルシェーダオブジェクト
-	ComPtr<ID3DBlob> errorBlob; // エラーオブジェクト
+	ComPtr<IDxcBlob> vsBlob;    
+	ComPtr<IDxcBlob> psBlob;    
+	ComPtr<ID3DBlob> errorBlob; 
 
 	vsBlob = sDirectXCommon->CompileShader(L"SpriteVS.hlsl", L"vs_6_0");
 	assert(vsBlob != nullptr);
@@ -40,33 +37,30 @@ void Sprite::StaticInitialize( int window_width, int window_height) {
 	psBlob = sDirectXCommon->CompileShader(L"SpritePS.hlsl", L"ps_6_0");
 	assert(psBlob != nullptr);
 
-	// 頂点レイアウト
 	D3D12_INPUT_ELEMENT_DESC inputLayout[] = {
-	  {// xy座標(1行で書いたほうが見やすい)
+	  {
 	   "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT,
 	   D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-	  {// uv座標(1行で書いたほうが見やすい)
+	  {
 	   "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,    0, D3D12_APPEND_ALIGNED_ELEMENT,
 	   D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
 	};
 
-	// グラフィックスパイプラインの流れを設定
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC gpipeline{};
 	gpipeline.VS = CD3DX12_SHADER_BYTECODE(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize());
 	gpipeline.PS = CD3DX12_SHADER_BYTECODE(psBlob->GetBufferPointer(), psBlob->GetBufferSize());
 
-	// サンプルマスク
-	gpipeline.SampleMask = D3D12_DEFAULT_SAMPLE_MASK; // 標準設定
-	// ラスタライザステート
+	gpipeline.SampleMask = D3D12_DEFAULT_SAMPLE_MASK; 
+
 	gpipeline.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
 	gpipeline.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
-	// デプスステンシルステート
+	
 	gpipeline.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
-	gpipeline.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_ALWAYS; // 常に上書きルール
+	gpipeline.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_ALWAYS; 
 
-	// レンダーターゲットのブレンド設定
+	
 	D3D12_RENDER_TARGET_BLEND_DESC blenddesc{};
-	blenddesc.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL; // RBGA全てのチャンネルを描画
+	blenddesc.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL; 
 	blenddesc.BlendEnable = true;
 	blenddesc.BlendOp = D3D12_BLEND_OP_ADD;
 	blenddesc.SrcBlend = D3D12_BLEND_SRC_ALPHA;
@@ -76,40 +70,36 @@ void Sprite::StaticInitialize( int window_width, int window_height) {
 	blenddesc.SrcBlendAlpha = D3D12_BLEND_ONE;
 	blenddesc.DestBlendAlpha = D3D12_BLEND_ZERO;
 
-	// ブレンドステートの設定
+	
 	gpipeline.BlendState.RenderTarget[0] = blenddesc;
 
-	// 深度バッファのフォーマット
+	
 	gpipeline.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 
-	// 頂点レイアウトの設定
+	
 	gpipeline.InputLayout.pInputElementDescs = inputLayout;
 	gpipeline.InputLayout.NumElements = _countof(inputLayout);
 
-	// 図形の形状設定（三角形）
+	
 	gpipeline.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 
-	gpipeline.NumRenderTargets = 1;                            // 描画対象は1つ
-	gpipeline.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB; // 0～255指定のRGBA
-	gpipeline.SampleDesc.Count = 1; // 1ピクセルにつき1回サンプリング
+	gpipeline.NumRenderTargets = 1;                            
+	gpipeline.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB; 
+	gpipeline.SampleDesc.Count = 1; 
 
-	// デスクリプタレンジ
 	CD3DX12_DESCRIPTOR_RANGE descRangeSRV;
-	descRangeSRV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0); // t0 レジスタ
+	descRangeSRV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0); 
 
-	// ルートパラメータ
 	CD3DX12_ROOT_PARAMETER rootparams[2] = {};
 	rootparams[0].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_ALL);
 	rootparams[1].InitAsDescriptorTable(1, &descRangeSRV, D3D12_SHADER_VISIBILITY_ALL);
 
-	// スタティックサンプラー
 	CD3DX12_STATIC_SAMPLER_DESC samplerDesc =
 		CD3DX12_STATIC_SAMPLER_DESC(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR); // s0 レジスタ
 	samplerDesc.AddressU = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
 	samplerDesc.AddressV = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
 	samplerDesc.AddressW = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
 
-	// ルートシグネチャの設定
 	CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootSignatureDesc;
 	rootSignatureDesc.Init_1_0(
 		_countof(rootparams), rootparams, 1, &samplerDesc,
@@ -128,56 +118,37 @@ void Sprite::StaticInitialize( int window_width, int window_height) {
 
 	gpipeline.pRootSignature = sRootSignature.Get();
 
-	// グラフィックスパイプラインの生成
 	result = sDirectXCommon->GetDevice()->CreateGraphicsPipelineState(&gpipeline, IID_PPV_ARGS(&sPipelineState));
 	assert(SUCCEEDED(result));
 
-	// 射影行列計算
-	sMatProjection = MakeOrthograohicmatrix(0.0f, 0.0f, (float)window_width, (float)window_height,  0.0f, 1.0f);
+	sMatProjection = MakeOrthograohicmatrix(0.0f, 0.0f, (float)WinApp::kWindowWidth, (float)WinApp::kWindowHeight,  0.0f, 1.0f);
 }
 
 void Sprite::PreDraw(ID3D12GraphicsCommandList* commandList) {
-	// PreDrawとPostDrawがペアで呼ばれていなければエラー
 	assert(Sprite::sCommandList == nullptr);
 
-	// コマンドリストをセット
 	sCommandList = commandList;
 
-	// パイプラインステートの設定
 	sCommandList->SetPipelineState(sPipelineState.Get());
-	// ルートシグネチャの設定
 	sCommandList->SetGraphicsRootSignature(sRootSignature.Get());
-	// プリミティブ形状を設定
 	sCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 }
 
 void Sprite::PostDraw() {
-	// コマンドリストを解除
 	Sprite::sCommandList = nullptr;
 }
 
-Sprite* Sprite::Create(
-	uint32_t textureHandle, Vector2 position, Vector4 color, Vector2 anchorpoint, bool isFlipX,
-	bool isFlipY) {
-	// 仮サイズ
+Sprite* Sprite::Create(uint32_t textureHandle, Vector2 position, Vector4 color, Vector2 anchorpoint, bool isFlipX, bool isFlipY) {
 	Vector2 size = { 100.0f, 100.0f };
 
-	{
-		// テクスチャ情報取得
-		const D3D12_RESOURCE_DESC& resDesc =
-			TextureManager::GetInstance()->GetResoureDesc(textureHandle);
-		// スプライトのサイズをテクスチャのサイズに設定
-		size = { (float)resDesc.Width, (float)resDesc.Height };
-	}
-
-	// Spriteのインスタンスを生成
-	Sprite* sprite =
-		new Sprite(textureHandle, position, size, color, anchorpoint, isFlipX, isFlipY);
+	const D3D12_RESOURCE_DESC& resDesc = TextureManager::GetInstance()->GetResoureDesc(textureHandle);
+	size = { (float)resDesc.Width, (float)resDesc.Height };
+	
+	Sprite* sprite = new Sprite(textureHandle, position, size, color, anchorpoint, isFlipX, isFlipY);
 	if (sprite == nullptr) {
 		return nullptr;
 	}
 
-	// 初期化
 	if (!sprite->Initialize()) {
 		delete sprite;
 		assert(0);
@@ -189,9 +160,7 @@ Sprite* Sprite::Create(
 
 Sprite::Sprite() {}
 
-Sprite::Sprite(
-	uint32_t textureHandle, Vector2 position, Vector2 size, Vector4 color, Vector2 anchorpoint,
-	bool isFlipX, bool isFlipY) {
+Sprite::Sprite(uint32_t textureHandle, Vector2 position, Vector2 size, Vector4 color, Vector2 anchorpoint,bool isFlipX, bool isFlipY) {
 	position_ = position;
 	size_ = size;
 	anchorPoint_ = anchorpoint;
@@ -204,7 +173,6 @@ Sprite::Sprite(
 }
 
 bool Sprite::Initialize() {
-	// nullptrチェック
 	assert(sDirectXCommon->GetDevice());
 
 	HRESULT result = S_FALSE;
@@ -216,7 +184,7 @@ bool Sprite::Initialize() {
 		CD3DX12_HEAP_PROPERTIES heapProps = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
 		// リソース設定
 		CD3DX12_RESOURCE_DESC resourceDesc =
-			CD3DX12_RESOURCE_DESC::Buffer(sizeof(VertexPosUv) * kVertNum);
+			CD3DX12_RESOURCE_DESC::Buffer(sizeof(VertexData) * kVertNum);
 
 		// 頂点バッファ生成
 		result = sDirectXCommon->GetDevice()->CreateCommittedResource(
@@ -234,8 +202,8 @@ bool Sprite::Initialize() {
 
 	// 頂点バッファビューの作成
 	vbView_.BufferLocation = vertBuff_->GetGPUVirtualAddress();
-	vbView_.SizeInBytes = sizeof(VertexPosUv) * 4;
-	vbView_.StrideInBytes = sizeof(VertexPosUv);
+	vbView_.SizeInBytes = sizeof(VertexData) * 4;
+	vbView_.StrideInBytes = sizeof(VertexData);
 
 	{
 		// ヒーププロパティ
@@ -263,116 +231,60 @@ void Sprite::SetTextureHandle(uint32_t textureHandle) {
 	resourceDesc_ = TextureManager::GetInstance()->GetResoureDesc(textureHandle_);
 }
 
-void Sprite::SetRotation(float rotation) {
-	rotation_ = rotation;
-
-	// 頂点バッファへのデータ転送
-	TransferVertices();
-}
-
-void Sprite::SetPosition(const Vector2& position) {
-	position_ = position;
-
-	// 頂点バッファへのデータ転送
-	TransferVertices();
-}
-
-void Sprite::SetSize(const Vector2& size) {
-	size_ = size;
-
-	// 頂点バッファへのデータ転送
-	TransferVertices();
-}
-
-void Sprite::SetAnchorPoint(const Vector2& anchorpoint) {
-	anchorPoint_ = anchorpoint;
-
-	// 頂点バッファへのデータ転送
-	TransferVertices();
-}
-
-void Sprite::SetIsFlipX(bool isFlipX) {
-	isFlipX_ = isFlipX;
-
-	// 頂点バッファへのデータ転送
-	TransferVertices();
-}
-
-void Sprite::SetIsFlipY(bool isFlipY) {
-	isFlipY_ = isFlipY;
-
-	// 頂点バッファへのデータ転送
-	TransferVertices();
-}
-
-void Sprite::SetTextureRect(const Vector2& texBase, const Vector2& texSize) {
-	texBase_ = texBase;
-	texSize_ = texSize;
-
-	// 頂点バッファへのデータ転送
-	TransferVertices();
-}
-
 void Sprite::Draw() {
-	// ワールド行列の更新
 	matWorld_ = MakeIdentity4x4();
 	matWorld_ *= MakeRotateZMatrix(rotation_);
 	matWorld_ *= MakeTranslateMatrix({ position_.x, position_.y, 0.0f });
 
-	// 定数バッファにデータ転送
 	constMap->color = color_;
-	constMap->mat = matWorld_ * sMatProjection; // 行列の合成
+	constMap->mat = matWorld_ * sMatProjection;
 
-	// 頂点バッファの設定
 	sCommandList->IASetVertexBuffers(0, 1, &vbView_);
 
-	// 定数バッファビューをセット
 	sCommandList->SetGraphicsRootConstantBufferView(0, constBuff_->GetGPUVirtualAddress());
-	// シェーダリソースビューをセット
+
 	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(sCommandList, 1, textureHandle_);
-	// 描画コマンド
+	
 	sCommandList->DrawInstanced(4, 1, 0, 0);
 }
 
 void Sprite::TransferVertices() {
 	HRESULT result = S_FALSE;
 
-	// 左下、左上、右下、右上
 	enum { LB, LT, RB, RT };
 
 	float left = (0.0f - anchorPoint_.x) * size_.x;
 	float right = (1.0f - anchorPoint_.x) * size_.x;
 	float top = (0.0f - anchorPoint_.y) * size_.y;
 	float bottom = (1.0f - anchorPoint_.y) * size_.y;
-	if (isFlipX_) { // 左右入れ替え
+	if (isFlipX_) { 
 		left = -left;
 		right = -right;
 	}
 
-	if (isFlipY_) { // 上下入れ替え
+	if (isFlipY_) {
 		top = -top;
 		bottom = -bottom;
 	}
 
 	// 頂点データ
-	VertexPosUv vertices[kVertNum];
+	VertexData vertices[kVertNum];
 
-	vertices[LB].pos = { left, bottom, 0.0f };  // 左下
-	vertices[LT].pos = { left, top, 0.0f };     // 左上
-	vertices[RB].pos = { right, bottom, 0.0f }; // 右下
-	vertices[RT].pos = { right, top, 0.0f };    // 右上
+	vertices[LB].pos = { left, bottom, 0.0f };  
+	vertices[LT].pos = { left, top, 0.0f };     
+	vertices[RB].pos = { right, bottom, 0.0f }; 
+	vertices[RT].pos = { right, top, 0.0f };    
 
-	// テクスチャ情報取得
 	{
 		float tex_left = texBase_.x / resourceDesc_.Width;
 		float tex_right = (texBase_.x + texSize_.x) / resourceDesc_.Width;
 		float tex_top = texBase_.y / resourceDesc_.Height;
 		float tex_bottom = (texBase_.y + texSize_.y) / resourceDesc_.Height;
 
-		vertices[LB].uv = { tex_left, tex_bottom };  // 左下
-		vertices[LT].uv = { tex_left, tex_top };     // 左上
-		vertices[RB].uv = { tex_right, tex_bottom }; // 右下
-		vertices[RT].uv = { tex_right, tex_top };    // 右上
+		vertices[LB].uv = { tex_left, tex_bottom };  
+		vertices[LT].uv = { tex_left, tex_top };     
+		vertices[RB].uv = { tex_right, tex_bottom }; 
+		vertices[RT].uv = { tex_right, tex_top };    
 	}
 
 	// 頂点バッファへのデータ転送

@@ -4,42 +4,31 @@
 #include <wrl.h>
 #include "Mymath.h"
 
-//定数バッファ用データ構造体
 struct ConstBufferDataDirectionalLight {
-	Vector4 color;     //ライトの色
-	Vector3 direction; //ライト向き
-	float intensity;   //輝度
+	Vector4 color;     
+	Vector3 direction; 
+	float intensity;  
+	int32_t enableLighting;
 };
 
-/// <summary>
-/// ワールド変換データ
-/// </summary>
-struct DirectionalLight
+class DirectionalLight
 {
-	//定数バッファ
-	Microsoft::WRL::ComPtr<ID3D12Resource> constBuff_;
-	//マッピング済みアドレス
-	ConstBufferDataDirectionalLight* constMap = nullptr;
-	//ローカルスケール
+public:
+	void Initialize();
+	void UpdateDirectionalLight();
+
+	D3D12_GPU_VIRTUAL_ADDRESS GetGPUVirtualAddress() const {
+		return constBuff_->GetGPUVirtualAddress();
+	}
+public:
 	Vector4 color_ = { 1.0f, 1.0f, 1.0f,1.0f };
 	Vector3 direction_ = { 1.0f, -1.0f, 1.0f };
 	float intensity_ = 1.0f;
-
-	/// <summary>
-	/// 初期化
-	/// </summary>
-	void Initialize(ID3D12Device* device);
-	/// <summary>
-	/// 定数バッファ生成
-	/// </summary>
-	void CreateConstBuffer(ID3D12Device* device);
-	/// <summary>
-	/// マッピングする
-	/// </summary>
+private:
+	void CreateConstBuffer();
 	void Map();
-	/// <summary>
-	/// 行列を更新する
-	/// </summary>
-	void UpdateDirectionalLight();
+private:
+	Microsoft::WRL::ComPtr<ID3D12Resource> constBuff_;
+	ConstBufferDataDirectionalLight* constMap = nullptr;
 };
 

@@ -1,19 +1,19 @@
 #include "DirectionalLight.h"
 #include <cassert>
 #include "externals/DirectXTex/d3dx12.h"
-
+#include "DirectXCommon.h"
 
 using namespace DirectX;
 
-void DirectionalLight::Initialize(ID3D12Device* device) {
-    CreateConstBuffer(device);
+void DirectionalLight::Initialize() {
+    CreateConstBuffer();
     Map();
     UpdateDirectionalLight();
 }
 
-void DirectionalLight::CreateConstBuffer(ID3D12Device* device) {
+void DirectionalLight::CreateConstBuffer() {
     HRESULT result;
-
+    ID3D12Device* device = DirectXCommon::GetInstance()->GetDevice();
     // ヒーププロパティ
     CD3DX12_HEAP_PROPERTIES heapProps = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
     // リソース設定
@@ -38,6 +38,6 @@ void DirectionalLight::UpdateDirectionalLight() {
 
     // 定数バッファに書き込み
     constMap->color = color_;
-    constMap->direction = direction_;
+    constMap->direction = Normalize(direction_);
     constMap->intensity = intensity_;
 }
