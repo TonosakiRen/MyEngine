@@ -22,6 +22,7 @@ public:
 	void Update();
 	void ModelDraw();
 	void ParticleDraw();
+	void ParticleBoxDraw();
 	void PreSpriteDraw();
 	void PostSpriteDraw();
 	void Draw();

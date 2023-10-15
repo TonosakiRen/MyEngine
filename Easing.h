@@ -8,6 +8,7 @@ class Easing
 {
 public:
 	enum EasingMode {
+		 easeNormal,
 		 easeInSine,
 		 easeOutSine,
 		 easeInOutSine,
@@ -43,6 +44,7 @@ public:
 	
 	static std::function<float(float)> easingFunction[easeModeNum];
 
+	static float Normal(float x);
 	static float InSine(float x);
 	static float OutSine(float x);
 	static float InOutSine(float x);

@@ -97,6 +97,9 @@
     <ClCompile Include="Easing.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
+    <ClCompile Include="ParticleBox.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -177,6 +180,9 @@
     <ClInclude Include="Easing.h">
       <Filter>Engine</Filter>
     </ClInclude>
+    <ClInclude Include="ParticleBox.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\shaders\Basic.hlsli">
@@ -206,6 +212,12 @@
       <Filter>shaders</Filter>
     </FxCompile>
     <FxCompile Include="Resources\shaders\SpriteVS.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\ParticleBoxPS.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\ParticleBoxVS.hlsl">
       <Filter>shaders</Filter>
     </FxCompile>
   </ItemGroup>

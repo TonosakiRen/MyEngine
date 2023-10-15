@@ -31,7 +31,7 @@ void GameScene::Initialize() {
 	floor_ = std::make_unique<Floor>();
 	floor_->Initialize("floor", &viewProjection_, &directionalLight_);
 	player_ = std::make_unique<Player>();
-	player_->Initialize("player", &viewProjection_, &directionalLight_);
+	player_->Initialize("player", &viewProjection_, &directionalLight_,10);
 
 	sphere_.reset(GameObject::Create("sphere", &viewProjection_, &directionalLight_));
 
@@ -58,15 +58,20 @@ void GameScene::Update(){
 
 void GameScene::ModelDraw()
 {
-	skydome_->Draw();
-	floor_->Draw();
-	player_->Draw();
+	//skydome_->Draw();
+	//floor_->Draw();
+	//player_->Draw();
 }
 
 void GameScene::ParticleDraw()
 {
 	particle_->Draw(viewProjection_, textureHandle_);
 
+}
+
+void GameScene::ParticleBoxDraw()
+{
+	//player_->ParticleDraw();
 }
 
 void GameScene::PreSpriteDraw()
@@ -78,6 +83,8 @@ void GameScene::PostSpriteDraw()
 {
 
 }
+
+
 
 void GameScene::Draw() {
 	// コマンドリストの取得
@@ -100,6 +107,11 @@ void GameScene::Draw() {
 	Particle::PreDraw(commandList);
 	ParticleDraw();
 	Particle::PostDraw();
+
+	//ParticleBox描画
+	ParticleBox::PreDraw(commandList);
+	ParticleBoxDraw();
+	ParticleBox::PostDraw();
 
 	// 前景スプライト描画
 	Sprite::PreDraw(commandList);

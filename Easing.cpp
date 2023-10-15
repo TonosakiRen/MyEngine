@@ -70,6 +70,10 @@ Vector2 Easing::Bezier(const Vector2& p0, const Vector2& p1, const Vector2& p2, 
 	return tmp;
 }
 
+float Easing::Normal(float x) {
+	return x;
+}
+
 float Easing::InSine(float x) {
 	return 1.0f - cosf((x * float(M_PI)) / 2.0f);
 }
@@ -208,6 +212,7 @@ return x < 0.5f
 }
 
 std::function<float(float)> Easing::easingFunction[easeModeNum] = {
+	Easing::Normal,
 	Easing::InSine,
 	Easing::OutSine,
 	Easing::InOutSine,

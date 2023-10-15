@@ -1,4 +1,4 @@
-#include "Particle.h"
+#include "ParticleBox.h"
 #include "externals/DirectXTex/DirectXTex.h"
 #include <d3dcompiler.h>
 #include "DirectXCommon.h"
@@ -8,19 +8,23 @@
 using namespace DirectX;
 using namespace Microsoft::WRL;
 
-DirectXCommon* Particle::sDirectXCommon = nullptr;
-UINT Particle::sDescriptorHandleIncrementSize = 0;
-ID3D12GraphicsCommandList* Particle::sCommandList = nullptr;
-ComPtr<ID3D12RootSignature> Particle::sRootSignature;
-ComPtr<ID3D12PipelineState> Particle::sPipelineState;
+DirectXCommon* ParticleBox::sDirectXCommon = nullptr;
+UINT ParticleBox::sDescriptorHandleIncrementSize = 0;
+ID3D12GraphicsCommandList* ParticleBox::sCommandList = nullptr;
+ComPtr<ID3D12RootSignature> ParticleBox::sRootSignature;
+ComPtr<ID3D12PipelineState> ParticleBox::sPipelineState;
 
-void Particle::StaticInitialize() {
+ParticleBox::ParticleBox(int particleNum) : kParticleBoxNum(particleNum){
+
+}
+
+void ParticleBox::StaticInitialize() {
     sDirectXCommon = DirectXCommon::GetInstance();
     InitializeGraphicsPipeline();
 }
 
-void Particle::PreDraw(ID3D12GraphicsCommandList* commandList) {
-    assert(Particle::sCommandList == nullptr);
+void ParticleBox::PreDraw(ID3D12GraphicsCommandList* commandList) {
+    assert(ParticleBox::sCommandList == nullptr);
 
     sCommandList = commandList;
 
@@ -29,12 +33,12 @@ void Particle::PreDraw(ID3D12GraphicsCommandList* commandList) {
     commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 
-void Particle::PostDraw() {
+void ParticleBox::PostDraw() {
     sCommandList = nullptr;
 }
 
-Particle* Particle::Create() {
-    Particle* object3d = new Particle();
+ParticleBox* ParticleBox::Create(int particleNum) {
+    ParticleBox* object3d = new ParticleBox(particleNum);
     assert(object3d);
 
     object3d->Initialize();
@@ -42,26 +46,29 @@ Particle* Particle::Create() {
     return object3d;
 }
 
-void Particle::InitializeGraphicsPipeline() {
+void ParticleBox::InitializeGraphicsPipeline() {
     HRESULT result = S_FALSE;
     ComPtr<IDxcBlob> vsBlob;
     ComPtr<IDxcBlob> psBlob;
     ComPtr<ID3DBlob> errorBlob;
 
-    vsBlob = sDirectXCommon->CompileShader(L"ParticleVS.hlsl", L"vs_6_0");
+    vsBlob = sDirectXCommon->CompileShader(L"ParticleBoxVS.hlsl", L"vs_6_0");
     assert(vsBlob != nullptr);
 
-    psBlob = sDirectXCommon->CompileShader(L"ParticlePS.hlsl", L"ps_6_0");
+    psBlob = sDirectXCommon->CompileShader(L"ParticleBoxPS.hlsl", L"ps_6_0");
     assert(psBlob != nullptr);
 
     // 頂点レイアウト
     D3D12_INPUT_ELEMENT_DESC inputLayout[] = {
-      {
-       "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT,
-       D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-      {
-       "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,    0, D3D12_APPEND_ALIGNED_ELEMENT,
-       D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+     {
+      "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT,
+      D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+     {
+      "NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT,
+      D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+     {
+      "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,    0, D3D12_APPEND_ALIGNED_ELEMENT,
+      D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
     };
 
     // グラフィックスパイプライン
@@ -78,7 +85,7 @@ void Particle::InitializeGraphicsPipeline() {
 
 
     D3D12_RENDER_TARGET_BLEND_DESC blenddesc{};
-    blenddesc.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL; 
+    blenddesc.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
     blenddesc.BlendEnable = true;
     blenddesc.BlendOp = D3D12_BLEND_OP_ADD;
     blenddesc.SrcBlend = D3D12_BLEND_SRC_ALPHA;
@@ -112,6 +119,7 @@ void Particle::InitializeGraphicsPipeline() {
     rootparams[int(RootParameter::kViewProjection)].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_ALL);
     rootparams[int(RootParameter::kTexture)].InitAsDescriptorTable(1, &descRangeSRVTexture, D3D12_SHADER_VISIBILITY_ALL);
     rootparams[int(RootParameter::kMaterial)].InitAsConstantBufferView(1, 0, D3D12_SHADER_VISIBILITY_ALL);
+    rootparams[int(RootParameter::kDirectionalLight)].InitAsConstantBufferView(2, 0, D3D12_SHADER_VISIBILITY_ALL);
 
     // スタティックサンプラー
     CD3DX12_STATIC_SAMPLER_DESC samplerDesc =
@@ -140,26 +148,56 @@ void Particle::InitializeGraphicsPipeline() {
     assert(SUCCEEDED(result));
 }
 
-void Particle::CreateMesh() {
+void ParticleBox::CreateMesh() {
     HRESULT result = S_FALSE;
 
-    vertices_.resize(4);
-
-    //左下
-    vertices_[0].pos = { -0.5f,-0.5f,0.0f };
-    vertices_[0].uv = { 0.0f,1.0f };
-	//左上
-    vertices_[1].pos = { -0.5f,0.5f,0.0f};
-    vertices_[1].uv = { 0.0f,0.0f };
-	//右上
-    vertices_[2].pos = { 0.5f,0.5f,0.0f};
-    vertices_[2].uv = { 1.0f,0.0f };
-	//右下
-    vertices_[3].pos = { 0.5f,-0.5f,0.0f};
-    vertices_[3].uv = { 1.0f,1.0f };
+    vertices_ = {
+        //  x      y      z       nx     ny    nz       u     v
+        // 前
+          {{-1.0f, -1.0f, -1.0f}, {0.0f, 0.0f, -1.0f}, {0.0f, 1.0f}}, // 左下
+          {{-1.0f, +1.0f, -1.0f}, {0.0f, 0.0f, -1.0f}, {0.0f, 0.0f}}, // 左上
+          {{+1.0f, -1.0f, -1.0f}, {0.0f, 0.0f, -1.0f}, {1.0f, 1.0f}}, // 右下
+          {{+1.0f, +1.0f, -1.0f}, {0.0f, 0.0f, -1.0f}, {1.0f, 0.0f}}, // 右上
+          // 後(前面とZ座標の符号が逆)
+          {{+1.0f, -1.0f, +1.0f}, {0.0f, 0.0f, +1.0f}, {0.0f, 1.0f}}, // 左下
+          {{+1.0f, +1.0f, +1.0f}, {0.0f, 0.0f, +1.0f}, {0.0f, 0.0f}}, // 左上
+          {{-1.0f, -1.0f, +1.0f}, {0.0f, 0.0f, +1.0f}, {1.0f, 1.0f}}, // 右下
+          {{-1.0f, +1.0f, +1.0f}, {0.0f, 0.0f, +1.0f}, {1.0f, 0.0f}}, // 右上
+          // 左
+          {{-1.0f, -1.0f, +1.0f}, {-1.0f, 0.0f, 0.0f}, {0.0f, 1.0f}}, // 左下
+          {{-1.0f, +1.0f, +1.0f}, {-1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}}, // 左上
+          {{-1.0f, -1.0f, -1.0f}, {-1.0f, 0.0f, 0.0f}, {1.0f, 1.0f}}, // 右下
+          {{-1.0f, +1.0f, -1.0f}, {-1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}}, // 右上
+          // 右（左面とX座標の符号が逆）
+          {{+1.0f, -1.0f, -1.0f}, {+1.0f, 0.0f, 0.0f}, {0.0f, 1.0f}}, // 左下
+          {{+1.0f, +1.0f, -1.0f}, {+1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}}, // 左上
+          {{+1.0f, -1.0f, +1.0f}, {+1.0f, 0.0f, 0.0f}, {1.0f, 1.0f}}, // 右下
+          {{+1.0f, +1.0f, +1.0f}, {+1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}}, // 右上
+          // 下
+          {{+1.0f, -1.0f, -1.0f}, {0.0f, -1.0f, 0.0f}, {0.0f, 1.0f}}, // 左下
+          {{+1.0f, -1.0f, +1.0f}, {0.0f, -1.0f, 0.0f}, {0.0f, 0.0f}}, // 左上
+          {{-1.0f, -1.0f, -1.0f}, {0.0f, -1.0f, 0.0f}, {1.0f, 1.0f}}, // 右下
+          {{-1.0f, -1.0f, +1.0f}, {0.0f, -1.0f, 0.0f}, {1.0f, 0.0f}}, // 右上
+          // 上（下面とY座標の符号が逆）
+          {{-1.0f, +1.0f, -1.0f}, {0.0f, +1.0f, 0.0f}, {0.0f, 1.0f}}, // 左下
+          {{-1.0f, +1.0f, +1.0f}, {0.0f, +1.0f, 0.0f}, {0.0f, 0.0f}}, // 左上
+          {{+1.0f, +1.0f, -1.0f}, {0.0f, +1.0f, 0.0f}, {1.0f, 1.0f}}, // 右下
+          {{+1.0f, +1.0f, +1.0f}, {0.0f, +1.0f, 0.0f}, {1.0f, 0.0f}}, // 右上
+    };
 
     // 頂点インデックスの設定
-    indices_ = { 0,  1,  2, 0, 2, 3 };
+    indices_ = { 0,  1,  3,  3,  2,  0,
+
+                4,  5,  7,  7,  6,  4,
+
+                8,  9,  11, 11, 10, 8,
+
+                12, 13, 15, 15, 14, 12,
+
+                16, 17, 19, 19, 18, 16,
+
+                20, 21, 23, 23, 22, 20
+    };
 
     // 頂点データのサイズ
     UINT sizeVB = static_cast<UINT>(sizeof(VertexData) * vertices_.size());
@@ -194,7 +232,7 @@ void Particle::CreateMesh() {
     }
 
     // インスタンシングデータのサイズ
-    UINT sizeINB = static_cast<UINT>(sizeof(InstancingBufferData) * kParticleNum);
+    UINT sizeINB = static_cast<UINT>(sizeof(InstancingBufferData) * kParticleBoxNum);
 
     {
         // ヒーププロパティ
@@ -225,8 +263,8 @@ void Particle::CreateMesh() {
 
     result = instancingBuff_->Map(0, nullptr, reinterpret_cast<void**>(&instanceMap));
     if (SUCCEEDED(result)) {
-        particleDatas_.resize(sizeof(InstancingBufferData) * kParticleNum);
-        for (uint32_t index = 0; index < kParticleNum; ++index) {
+        particleDatas_.resize(sizeof(InstancingBufferData) * kParticleBoxNum);
+        for (uint32_t index = 0; index < kParticleBoxNum; ++index) {
             particleDatas_[index].matWorld = MakeIdentity4x4();
             instanceMap[index].matWorld = particleDatas_[index].matWorld;
         }
@@ -245,7 +283,7 @@ void Particle::CreateMesh() {
     instancingSrvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
     instancingSrvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
     instancingSrvDesc.Buffer.FirstElement = 0;
-    instancingSrvDesc.Buffer.NumElements = kParticleNum;
+    instancingSrvDesc.Buffer.NumElements = kParticleBoxNum;
     instancingSrvDesc.Buffer.StructureByteStride = sizeof(InstancingBufferData);
     UINT incrementSize = DirectXCommon::GetInstance()->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
     particleDataSRVHandleCPU_ = CD3DX12_CPU_DESCRIPTOR_HANDLE(DirectXCommon::GetInstance()->GetSRVHeap()->GetCPUDescriptorHandleForHeapStart(), DirectXCommon::GetInstance()->GetSrvHeapCount(), incrementSize);
@@ -254,18 +292,18 @@ void Particle::CreateMesh() {
     DirectXCommon::GetInstance()->IncrementSrvHeapCount();
 }
 
-void Particle::Initialize() {
+void ParticleBox::Initialize() {
     assert(sDirectXCommon->GetDevice());
     material_.Initialize();
     CreateMesh();
 }
 
-void Particle::Draw(const ViewProjection& viewProjection,const uint32_t textureHadle,const Vector4& color) {
+void ParticleBox::Draw(const ViewProjection& viewProjection , const DirectionalLight& directionalLight, const uint32_t textureHadle, const Vector4& color) {
     assert(sDirectXCommon->GetDevice());
     assert(sCommandList);
 
     //マッピング
-    for (uint32_t index = 0; index < kParticleNum; ++index) {
+    for (uint32_t index = 0; index < kParticleBoxNum; ++index) {
         instanceMap[index].matWorld = particleDatas_[index].matWorld;
     }
     material_.color_ = color;
@@ -276,8 +314,9 @@ void Particle::Draw(const ViewProjection& viewProjection,const uint32_t textureH
     sCommandList->SetGraphicsRootDescriptorTable(0, particleDataSRVHandleGPU_);
     sCommandList->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
     sCommandList->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kMaterial), material_.GetGPUVirtualAddress());
+    sCommandList->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kDirectionalLight), directionalLight.GetGPUVirtualAddress());
 
     TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(sCommandList, static_cast<UINT>(RootParameter::kTexture), textureHadle);
 
-    sCommandList->DrawIndexedInstanced(static_cast<UINT>(indices_.size()), kParticleNum, 0,0,0);
+    sCommandList->DrawIndexedInstanced(static_cast<UINT>(indices_.size()), kParticleBoxNum, 0, 0, 0);
 }

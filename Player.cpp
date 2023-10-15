@@ -2,11 +2,13 @@
 #include "Input.h"
 #include "ImGuiManager.h"
 #include "Easing.h"
-void Player::Initialize(const std::string name, ViewProjection* viewProjection, DirectionalLight* directionalLight)
+void Player::Initialize(const std::string name, ViewProjection* viewProjection, DirectionalLight* directionalLight,int particleNum)
 {
 	GameObject::Initialize(name, viewProjection, directionalLight);
 	input_ = Input::GetInstance();
 
+	particleBox_ = std::make_unique<ParticleBox>(particleNum);
+	particleBox_->Initialize();
 	material_.enableLighting_ = false;
 	worldTransform_.rotation_.y = Radian(90.0f);
 	accelaration_ = { 0.0f,0.002f };
@@ -35,30 +37,10 @@ void Player::Initialize(const std::string name, ViewProjection* viewProjection, 
 void Player::Update()
 {
 	ImGui::Begin("Player");
-	ImGui::DragFloat("up", &runUpAnimation_, 0.01f);
+	ImGui::DragFloat3("paro", &translation.x);
 	ImGui::End();
 
-	partsTransform_[RightArm].rotation_.x = Easing::easing(animationT_, -0.6f, 0.6f, animationSpeed_,Easing::EasingMode::easeInSine,false);
-	partsTransform_[LeftArm].rotation_.x = -partsTransform_[RightArm].rotation_.x;
-
-	partsTransform_[RightLeg].rotation_.x = Easing::easing(animationT_, -0.4f, 0.4f, animationSpeed_, Easing::EasingMode::easeInSine,false);
-	partsTransform_[LeftLeg].rotation_.x = -partsTransform_[RightLeg].rotation_.x;
-
-	worldTransform_.translation_.y += Easing::easing(animationBodyT_, 0.0f, runUpAnimation_, animationSpeed_, Easing::EasingMode::easeInSine, false);
-
-	animationT_ += animationSpeed_;
-	animationBodyT_ += animationBodySpeed_;
-
-	if (animationT_ >= 1.0f || animationT_ <= 0.0f)
-	{
-		animationSpeed_ *= -1.0f;
-	}
-
-	if (animationBodyT_ >= 1.0f )
-	{
-		animationBodyT_ = 0.0f;
-		runUpAnimation_ *= -1.0f;
-	}
+	Animation();
 
 	if(input_->PushKey(DIK_SPACE)) {
 		worldTransform_.translation_.y;
@@ -69,10 +51,40 @@ void Player::Update()
 		partsTransform_[i].UpdateMatrix();
 	}
 }
+void Player::Animation() {
+	if (animationT_ >= 1.0f || animationT_ <= 0.0f)
+	{
+		animationSpeed_ *= -1.0f;
+	}
 
+	if (animationBodyT_ >= 1.0f)
+	{
+		animationBodyT_ = 0.0f;
+		runUpAnimation_ *= -1.0f;
+	}
+
+	partsTransform_[RightArm].rotation_.x = Easing::easing(animationT_, -0.6f, 0.6f, animationSpeed_, Easing::EasingMode::easeNormal, false);
+	partsTransform_[LeftArm].rotation_.x = -partsTransform_[RightArm].rotation_.x;
+
+	partsTransform_[RightLeg].rotation_.x = Easing::easing(animationT_, -0.4f, 0.4f, animationSpeed_, Easing::EasingMode::easeNormal, false);
+	partsTransform_[LeftLeg].rotation_.x = -partsTransform_[RightLeg].rotation_.x;
+
+	worldTransform_.rotation_.y = Radian(90.0f) + Easing::easing(animationT_, -0.4f, 0.4f, animationSpeed_, Easing::EasingMode::easeNormal, false);
+
+	worldTransform_.translation_.y += Easing::easing(animationBodyT_, 0.0f, runUpAnimation_, animationBodySpeed_, Easing::EasingMode::easeNormal, false);
+
+
+	animationT_ += animationSpeed_;
+	animationBodyT_ += animationBodySpeed_;
+}
 void Player::Draw() {
 	model_.Draw(worldTransform_, *viewProjection_, *directionalLight_, material_);
 	for (int i = 0; i < partNum; i++) {
 		modelParts_.Draw(partsTransform_[i], *viewProjection_, *directionalLight_, material_);
 	}
+}
+
+void Player::ParticleDraw() {
+	particleBox_->particleDatas_[0].matWorld = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, translation);
+	particleBox_->Draw(*viewProjection_, *directionalLight_);
 }

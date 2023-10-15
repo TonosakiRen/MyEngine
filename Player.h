@@ -1,14 +1,17 @@
 #pragma once
 #include "GameObject.h"
 #include "Input.h"
+#include "ParticleBox.h"
 class Player :
     public GameObject
 {
 public:
    
-    void Initialize(const std::string name, ViewProjection* viewProjection, DirectionalLight* directionalLight);
+    void Initialize(const std::string name, ViewProjection* viewProjection, DirectionalLight* directionalLight , int particleNum);
     void Update();
+    void Animation();
     void Draw();
+    void ParticleDraw();
 public:
 
 private:
@@ -33,5 +36,9 @@ private:
     float animationSpeed_ = 0.05f;
     float animationBodySpeed_ = animationSpeed_ * 2.0f;
     float runUpAnimation_ = 0.08f;
+
+    //particle
+    std::unique_ptr<ParticleBox> particleBox_;
+    Vector3 translation;
 };
 

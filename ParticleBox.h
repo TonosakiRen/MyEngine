@@ -14,23 +14,25 @@
 
 class DirectXCommon;
 
-class Particle
+class ParticleBox
 {
 public:
 
-	const uint32_t kParticleNum = 10;
+	const uint32_t kParticleBoxNum;
 
 	enum class RootParameter {
 		kWorldTransform,
 		kViewProjection,
-		kTexture,      
-		kMaterial, 
+		kTexture,
+		kMaterial,
+		kDirectionalLight,
 		parameterNum
 	};
 
 	struct VertexData {
-		Vector3 pos;    
-		Vector2 uv;     
+		Vector3 pos;
+		Vector3 normal;
+		Vector2 uv;
 	};
 
 	struct InstancingBufferData {
@@ -40,17 +42,19 @@ public:
 	static void StaticInitialize();
 	static void PreDraw(ID3D12GraphicsCommandList* commandList);
 	static void PostDraw();
-	static Particle* Create();
+	static ParticleBox* Create(int particleNum);
+
+	ParticleBox(int particleNum);
 
 	void Initialize();
-	void Draw(const ViewProjection& viewProjection, const uint32_t textureHadle = 0, const Vector4& color = {0.0f,0.0f,0.0f,0.0f});
+	void Draw(const ViewProjection& viewProjection, const DirectionalLight& directionalLight, const uint32_t textureHadle = 0, const Vector4& color = { 0.0f,0.0f,0.0f,0.0f });
 	void CreateMesh();
 
 public:
 	std::vector<InstancingBufferData> particleDatas_;
 	Material material_;
 
-private: 
+private:
 	static void InitializeGraphicsPipeline();
 private:
 	static DirectXCommon* sDirectXCommon;
