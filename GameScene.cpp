@@ -26,9 +26,14 @@ void GameScene::Initialize() {
 
 	sprite_.reset(Sprite::Create(textureHandle_, { 0.0f,0.0f }));
 
-	skydome_.reset(Skydome::Create("skydome"));
-	floor_.reset(Floor::Create("floor"));
-	sphere_.reset(GameObject::Create("sphere"));
+	skydome_ = std::make_unique<Skydome>();
+	skydome_->Initialize("skydome",&viewProjection_,&directionalLight_);
+	floor_ = std::make_unique<Floor>();
+	floor_->Initialize("floor", &viewProjection_, &directionalLight_);
+	player_ = std::make_unique<Player>();
+	player_->Initialize("player", &viewProjection_, &directionalLight_);
+
+	sphere_.reset(GameObject::Create("sphere", &viewProjection_, &directionalLight_));
 
 	particle_.reset(Particle::Create());
 }
@@ -48,12 +53,14 @@ void GameScene::Update(){
 	
 	skydome_->Update();
 	floor_->Update();
+	player_->Update();
 }
 
 void GameScene::ModelDraw()
 {
-	skydome_->Draw(viewProjection_, directionalLight_);
-	floor_->Draw(viewProjection_, directionalLight_);
+	skydome_->Draw();
+	floor_->Draw();
+	player_->Draw();
 }
 
 void GameScene::ParticleDraw()

@@ -4,17 +4,28 @@
 #include "Material.h"
 #include "WorldTransform.h"
 #include "DirectionalLight.h"
+#include "ViewProjection.h"
+#include "DirectionalLight.h"
 class GameObject
 {
 public:
-	static GameObject* Create(const std::string name);
-	void Initialize(const std::string name);
+	static GameObject* Create(const std::string name, ViewProjection* viewProjection, DirectionalLight* directionalLight);
+	void Initialize(const std::string name, ViewProjection* viewProjection, DirectionalLight* directionalLight);
 	void Update();
-	void Draw(ViewProjection& viewProjection, const DirectionalLight& directionalLight,Vector4 color = {1.0f,1.0f,1.0f,1.0f});
+	void Draw(Vector4 color = {1.0f,1.0f,1.0f,1.0f});
+
+	void SetViewProjection(ViewProjection* viewProjection) {
+		viewProjection_ = viewProjection;
+	}
+	void SetDirectionalLight(DirectionalLight* directionalLight) {
+		directionalLight_ = directionalLight;
+	}
 protected:
 	WorldTransform worldTransform_;
 	Material material_;
-private:
 	Model model_;
+	ViewProjection* viewProjection_;
+	DirectionalLight* directionalLight_;
+private:
 };
 

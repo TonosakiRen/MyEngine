@@ -1,6 +1,7 @@
 #pragma once
 #define _USE_MATH_DEFINES
 #include <cmath>
+#include <numbers>
 #include <assert.h>
 
 struct Vector2 {
@@ -49,6 +50,39 @@ struct TranformationMatrix {
 	Matrix4x4 WVP;
 	Matrix4x4 World;
 };
+
+struct OBB {
+	Vector3 center;          // 中心点
+	Vector3 orientations[3]; // 座標軸、正規化、直交座標
+	Vector3 size;            // 座標軸方向の長さの半分。中心から面までの距離
+};
+
+inline float clamp(float num, float min, float max) {
+	if (num < min) {
+		return min;
+	}
+	if (num > max) {
+		return max;
+	}
+	return num;
+}
+
+inline bool closeValue(float& num, float goal, float speed) {
+	if (std::fabs(num - goal) < std::fabs(speed)) {
+		num = goal;
+		return true;
+	}
+	if (num < goal) {
+		num += speed;
+	}
+	if (num > goal) {
+		num -= speed;
+	}
+	return false;
+}
+
+inline float Radian(float degree) { return degree * std::numbers::pi_v<float> / 180.0f; }
+inline float Degree(float radian) { return radian * 180.0f / std::numbers::pi_v<float>; }
 
 #pragma region Vector3
 

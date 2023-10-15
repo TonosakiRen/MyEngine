@@ -3,9 +3,9 @@
 class Skydome :
     public GameObject
 {
-public: 
-    static Skydome* Create(const std::string name);
+public:
 
+    void Initialize(const std::string name, ViewProjection* viewProjection, DirectionalLight* directionalLight);
     void Update();
 };
 

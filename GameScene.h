@@ -10,6 +10,7 @@
 #include "GameObject.h"
 #include "Skydome.h"
 #include "Floor.h"
+#include "Player.h"
 class GameScene
 {
 
@@ -41,7 +42,7 @@ private:
 	std::unique_ptr<Skydome> skydome_;
 	std::unique_ptr<Floor> floor_;
 	std::unique_ptr<GameObject> sphere_;
-
+	std::unique_ptr<Player> player_;
 
 	std::unique_ptr<Particle> particle_;
 };
