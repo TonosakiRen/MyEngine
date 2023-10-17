@@ -100,6 +100,12 @@
     <ClCompile Include="ParticleBox.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
+    <ClCompile Include="DustParticle.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Boss.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -182,6 +188,12 @@
     </ClInclude>
     <ClInclude Include="ParticleBox.h">
       <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="DustParticle.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Boss.h">
+      <Filter>Game</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -11,13 +11,16 @@ struct ConstBufferDataWorldTransform {
 class WorldTransform
 {
 public:
+	//bufferに送る場合の初期化
 	void Initialize();
 	void UpdateMatrix();
 
 	void SetParent(WorldTransform* parent) {
 		parent_ = parent;
 	}
-
+	void SetIsScaleParent(bool isScaleParent) {
+		isScaleParent_ = isScaleParent;
+	}
 	D3D12_GPU_VIRTUAL_ADDRESS GetGPUVirtualAddress () const {
 		return constBuff_->GetGPUVirtualAddress();
 	}
@@ -31,6 +34,7 @@ private:
 	void Map();
 private:
 	WorldTransform* parent_ = nullptr;
+	bool isScaleParent_ = true;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> constBuff_;
 	ConstBufferDataWorldTransform* constMap = nullptr;

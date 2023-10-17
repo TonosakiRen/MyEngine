@@ -14,8 +14,7 @@ ID3D12GraphicsCommandList* ParticleBox::sCommandList = nullptr;
 ComPtr<ID3D12RootSignature> ParticleBox::sRootSignature;
 ComPtr<ID3D12PipelineState> ParticleBox::sPipelineState;
 
-ParticleBox::ParticleBox(int particleNum) : kParticleBoxNum(particleNum){
-
+ParticleBox::ParticleBox(uint32_t particleNum) : kParticleBoxNum(particleNum){
 }
 
 void ParticleBox::StaticInitialize() {
@@ -37,7 +36,7 @@ void ParticleBox::PostDraw() {
     sCommandList = nullptr;
 }
 
-ParticleBox* ParticleBox::Create(int particleNum) {
+ParticleBox* ParticleBox::Create(uint32_t particleNum) {
     ParticleBox* object3d = new ParticleBox(particleNum);
     assert(object3d);
 
@@ -158,7 +157,7 @@ void ParticleBox::CreateMesh() {
           {{-1.0f, +1.0f, -1.0f}, {0.0f, 0.0f, -1.0f}, {0.0f, 0.0f}}, // 左上
           {{+1.0f, -1.0f, -1.0f}, {0.0f, 0.0f, -1.0f}, {1.0f, 1.0f}}, // 右下
           {{+1.0f, +1.0f, -1.0f}, {0.0f, 0.0f, -1.0f}, {1.0f, 0.0f}}, // 右上
-          // 後(前面とZ座標の符号が逆)
+          // 後
           {{+1.0f, -1.0f, +1.0f}, {0.0f, 0.0f, +1.0f}, {0.0f, 1.0f}}, // 左下
           {{+1.0f, +1.0f, +1.0f}, {0.0f, 0.0f, +1.0f}, {0.0f, 0.0f}}, // 左上
           {{-1.0f, -1.0f, +1.0f}, {0.0f, 0.0f, +1.0f}, {1.0f, 1.0f}}, // 右下
@@ -168,7 +167,7 @@ void ParticleBox::CreateMesh() {
           {{-1.0f, +1.0f, +1.0f}, {-1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}}, // 左上
           {{-1.0f, -1.0f, -1.0f}, {-1.0f, 0.0f, 0.0f}, {1.0f, 1.0f}}, // 右下
           {{-1.0f, +1.0f, -1.0f}, {-1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}}, // 右上
-          // 右（左面とX座標の符号が逆）
+          // 右
           {{+1.0f, -1.0f, -1.0f}, {+1.0f, 0.0f, 0.0f}, {0.0f, 1.0f}}, // 左下
           {{+1.0f, +1.0f, -1.0f}, {+1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}}, // 左上
           {{+1.0f, -1.0f, +1.0f}, {+1.0f, 0.0f, 0.0f}, {1.0f, 1.0f}}, // 右下
@@ -178,14 +177,14 @@ void ParticleBox::CreateMesh() {
           {{+1.0f, -1.0f, +1.0f}, {0.0f, -1.0f, 0.0f}, {0.0f, 0.0f}}, // 左上
           {{-1.0f, -1.0f, -1.0f}, {0.0f, -1.0f, 0.0f}, {1.0f, 1.0f}}, // 右下
           {{-1.0f, -1.0f, +1.0f}, {0.0f, -1.0f, 0.0f}, {1.0f, 0.0f}}, // 右上
-          // 上（下面とY座標の符号が逆）
+          // 上
           {{-1.0f, +1.0f, -1.0f}, {0.0f, +1.0f, 0.0f}, {0.0f, 1.0f}}, // 左下
           {{-1.0f, +1.0f, +1.0f}, {0.0f, +1.0f, 0.0f}, {0.0f, 0.0f}}, // 左上
           {{+1.0f, +1.0f, -1.0f}, {0.0f, +1.0f, 0.0f}, {1.0f, 1.0f}}, // 右下
           {{+1.0f, +1.0f, +1.0f}, {0.0f, +1.0f, 0.0f}, {1.0f, 0.0f}}, // 右上
     };
 
-    // 頂点インデックスの設定
+    // 頂点インデックス
     indices_ = { 0,  1,  3,  3,  2,  0,
 
                 4,  5,  7,  7,  6,  4,
@@ -298,14 +297,14 @@ void ParticleBox::Initialize() {
     CreateMesh();
 }
 
-void ParticleBox::Draw(const ViewProjection& viewProjection , const DirectionalLight& directionalLight, const uint32_t textureHadle, const Vector4& color) {
+void ParticleBox::Draw(const std::vector<InstancingBufferData>& bufferData, const ViewProjection& viewProjection , const DirectionalLight& directionalLight, const Vector4& color, const uint32_t textureHadle) {
     assert(sDirectXCommon->GetDevice());
     assert(sCommandList);
+    assert(!bufferData.empty());
 
     //マッピング
-    for (uint32_t index = 0; index < kParticleBoxNum; ++index) {
-        instanceMap[index].matWorld = particleDatas_[index].matWorld;
-    }
+    memcpy(instanceMap, bufferData.data(), sizeof(bufferData[0]) * bufferData.size());
+
     material_.color_ = color;
     material_.UpdateMaterial();
 
@@ -318,5 +317,5 @@ void ParticleBox::Draw(const ViewProjection& viewProjection , const DirectionalL
 
     TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(sCommandList, static_cast<UINT>(RootParameter::kTexture), textureHadle);
 
-    sCommandList->DrawIndexedInstanced(static_cast<UINT>(indices_.size()), kParticleBoxNum, 0, 0, 0);
+    sCommandList->DrawIndexedInstanced(static_cast<UINT>(indices_.size()), static_cast<UINT>(bufferData.size()), 0, 0, 0);
 }

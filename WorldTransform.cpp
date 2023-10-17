@@ -38,6 +38,7 @@ void WorldTransform::UpdateMatrix() {
 
     // スケール、回転、平行移動行列の計算
     matScale = MakeScaleMatrix(scale_);
+
     matRot = MakeIdentity4x4();
     matRot *= MakeRotateZMatrix(rotation_.z);
     matRot *= MakeRotateXMatrix(rotation_.x);
@@ -48,13 +49,23 @@ void WorldTransform::UpdateMatrix() {
     matWorld_ = MakeIdentity4x4(); 
     matWorld_ *= matScale;          
     matWorld_ *= matRot;            
-    matWorld_ *= matTrans;          
+    matWorld_ *= matTrans;         
+
 
     // 親行列の指定がある場合は、掛け算する
     if (parent_) {
+        //scaleを反映させない
+        Matrix4x4 inverseMatrix;
+        if (!isScaleParent_) {
+            inverseMatrix = Inverse(MakeScaleMatrix(MakeScale(parent_->matWorld_)));
+            matWorld_ *= inverseMatrix;
+        }
+
         matWorld_ *= parent_->matWorld_;
     }
 
     // 定数バッファに書き込み
-    constMap->matWorld = matWorld_;
+    if (constMap) {
+        constMap->matWorld = matWorld_;
+    }
 }

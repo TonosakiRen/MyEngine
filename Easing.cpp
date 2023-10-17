@@ -38,7 +38,7 @@ Vector3 Easing::easing(float& t, Vector3 start, Vector3 end, float speed, Easing
 		t += speed;
 	}
 	t = clamp(t, 0.0f, 1.0f);
-	return{ ((1.0f - easingFunction[easingMode](t)) * start.x + easingFunction[easingMode](t) * end.x) ,((1.0f - easingFunction[easingMode](t)) * start.y + easingFunction[easingMode](t) * end.y) };
+	return{ ((1.0f - easingFunction[easingMode](t)) * start.x + easingFunction[easingMode](t) * end.x) ,((1.0f - easingFunction[easingMode](t)) * start.y + easingFunction[easingMode](t) * end.y),((1.0f - easingFunction[easingMode](t)) * start.z + easingFunction[easingMode](t) * end.z) };
 }
 
 Vector2 Easing::Bezier(const Vector2& p0, const Vector2& p1, const Vector2& p2, float& t, float speed, EasingMode easingMode, bool isAdd) {

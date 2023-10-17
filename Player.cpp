@@ -2,13 +2,16 @@
 #include "Input.h"
 #include "ImGuiManager.h"
 #include "Easing.h"
-void Player::Initialize(const std::string name, ViewProjection* viewProjection, DirectionalLight* directionalLight,int particleNum)
+void Player::Initialize(const std::string name, ViewProjection* viewProjection, DirectionalLight* directionalLight)
 {
 	GameObject::Initialize(name, viewProjection, directionalLight);
 	input_ = Input::GetInstance();
 
-	particleBox_ = std::make_unique<ParticleBox>(particleNum);
-	particleBox_->Initialize();
+	dustParticle_ = std::make_unique<DustParticle>();
+	dustParticle_->Initialize({0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f});
+	dustParticle_->emitterWorldTransform_.SetParent(&worldTransform_);
+	//煙の出る場所
+	dustParticle_->emitterWorldTransform_.translation_ = { 0.0f,-2.1f,-1.2f };
 	material_.enableLighting_ = false;
 	worldTransform_.rotation_.y = Radian(90.0f);
 	accelaration_ = { 0.0f,0.002f };
@@ -36,11 +39,11 @@ void Player::Initialize(const std::string name, ViewProjection* viewProjection, 
 
 void Player::Update()
 {
-	ImGui::Begin("Player");
-	ImGui::DragFloat3("paro", &translation.x);
-	ImGui::End();
 
 	Animation();
+	ImGui::Begin("Player");
+	ImGui::DragFloat3("scale", &worldTransform_.scale_.x, 0.01f);
+	ImGui::End();
 
 	if(input_->PushKey(DIK_SPACE)) {
 		worldTransform_.translation_.y;
@@ -50,6 +53,8 @@ void Player::Update()
 	for (int i = 0; i < partNum; i++) {
 		partsTransform_[i].UpdateMatrix();
 	}
+
+	dustParticle_->Update();
 }
 void Player::Animation() {
 	if (animationT_ >= 1.0f || animationT_ <= 0.0f)
@@ -85,6 +90,5 @@ void Player::Draw() {
 }
 
 void Player::ParticleDraw() {
-	particleBox_->particleDatas_[0].matWorld = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, translation);
-	particleBox_->Draw(*viewProjection_, *directionalLight_);
+	dustParticle_->Draw(viewProjection_, directionalLight_,{0.5f,0.5f,0.5f,1.0f});
 }

@@ -3,12 +3,12 @@
 #include "Input.h"
 #include "ParticleBox.h"
 #include "DustParticle.h"
-class Player :
+class Boss :
     public GameObject
 {
 public:
-   
-    void Initialize(const std::string name, ViewProjection* viewProjection, DirectionalLight* directionalLight);
+
+    void Initialize(ViewProjection* viewProjection, DirectionalLight* directionalLight);
     void Update();
     void Animation();
     void Draw();
@@ -18,14 +18,12 @@ public:
 private:
     Input* input_ = nullptr;
     enum parts {
-        LeftArm,
-        RightArm,
-        LeftLeg,
-        RightLeg,
+        Head,
+        Tin,
 
         partNum
     };
-    Model modelParts_;
+    Model modelParts_[partNum];
     WorldTransform partsTransform_[partNum];
     Vector2 velocity_;
     Vector2 accelaration_;

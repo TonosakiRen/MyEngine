@@ -11,7 +11,10 @@ class GameObject
 public:
 	static GameObject* Create(const std::string name, ViewProjection* viewProjection, DirectionalLight* directionalLight);
 	void Initialize(const std::string name, ViewProjection* viewProjection, DirectionalLight* directionalLight);
+	//modelを使わないInitialize
+	void Initialize(ViewProjection* viewProjection, DirectionalLight* directionalLight);
 	void Update();
+	void UpdateMaterial(Vector4 color = { 1.0f,1.0f,1.0f,1.0f });
 	void Draw(Vector4 color = {1.0f,1.0f,1.0f,1.0f});
 
 	void SetViewProjection(ViewProjection* viewProjection) {

@@ -1,6 +1,7 @@
 #include "GameScene.h"
 #include "externals/imgui/imgui.h"
 #include <cassert>
+#include "Easing.h"
 
 using namespace DirectX;
 
@@ -13,9 +14,9 @@ void GameScene::Initialize() {
 	input_ = Input::GetInstance();
 	
 	viewProjection_.Initialize();
-	viewProjection_.translation_.y = 7.0f;
-	viewProjection_.translation_.z = -27.0f;
 
+	viewProjection_.translation_ = { 0.0f,8.6f,-27.0f };
+	viewProjection_.target_ = { 0.0f,0.0f,0.0f };
 
 	directionalLight_.Initialize();
 	directionalLight_.direction_ = { 1.0f, -1.0f, 1.0f };
@@ -31,11 +32,14 @@ void GameScene::Initialize() {
 	floor_ = std::make_unique<Floor>();
 	floor_->Initialize("floor", &viewProjection_, &directionalLight_);
 	player_ = std::make_unique<Player>();
-	player_->Initialize("player", &viewProjection_, &directionalLight_,10);
+	player_->Initialize("player", &viewProjection_, &directionalLight_);
+
+	boss_ = std::make_unique<Boss>();
+	boss_->Initialize(&viewProjection_, &directionalLight_);
 
 	sphere_.reset(GameObject::Create("sphere", &viewProjection_, &directionalLight_));
 
-	particle_.reset(Particle::Create());
+	particle_.reset(Particle::Create(10));
 }
 
 void GameScene::Update(){
@@ -50,28 +54,37 @@ void GameScene::Update(){
 		directionalLight_.direction_ = Normalize(directionalLight_.direction_);
 		directionalLight_.UpdateDirectionalLight();
 	}
+	if (input_->TriggerKey(DIK_SPACE)) {
+		isCameraMove_ = true;
+	}
+	if (isCameraMove_) {
+		viewProjection_.translation_ = Easing::easing(cameraT_, { 11.1f,4.2f,0.11f }, { 0.0f,8.6f,-27.0f }, 0.01f, Easing::easeNormal, false);
+		viewProjection_.target_ = Easing::easing(cameraT_, { 0.0f,-1.6f,0.0f }, { 0.0f,0.0f,0.0f }, 0.01f, Easing::easeNormal, true);
+	}
 	
 	skydome_->Update();
 	floor_->Update();
 	player_->Update();
+	boss_->Update();
 }
 
 void GameScene::ModelDraw()
 {
-	//skydome_->Draw();
-	//floor_->Draw();
-	//player_->Draw();
+	skydome_->Draw();
+	floor_->Draw();
+	player_->Draw();
+	boss_->Draw();
 }
 
 void GameScene::ParticleDraw()
 {
-	particle_->Draw(viewProjection_, textureHandle_);
+	
 
 }
 
 void GameScene::ParticleBoxDraw()
 {
-	//player_->ParticleDraw();
+	player_->ParticleDraw();
 }
 
 void GameScene::PreSpriteDraw()

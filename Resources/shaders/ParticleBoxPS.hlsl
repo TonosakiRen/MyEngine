@@ -48,11 +48,11 @@ PixelShaderOutput main(VSOutput input) {
 
 	if (gMaterial.enableLighting != 0) {
 		// 陰
-		float32_t NdotL = dot(normal, -normalize(gDirectionLight.direction));
+		/*float32_t NdotL = dot(normal, -normalize(gDirectionLight.direction));
 		float32_t cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
 		output.color.xyz *= gDirectionLight.color.xyz * cos * gDirectionLight.intensity;
 
-		float32_t3 viewDirection = normalize(gViewProjection.viewPosition - input.worldPosition);
+		float32_t3 viewDirection = normalize(gViewProjection.viewPosition - input.worldPosition);*/
 
 		// フレネル
 		//float32_t3 fresnelColor = float32_t3(1.0f, 0.0f, 0.0f);

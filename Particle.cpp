@@ -14,6 +14,10 @@ ID3D12GraphicsCommandList* Particle::sCommandList = nullptr;
 ComPtr<ID3D12RootSignature> Particle::sRootSignature;
 ComPtr<ID3D12PipelineState> Particle::sPipelineState;
 
+
+Particle::Particle(int particleNum) : kParticleNum(particleNum) {
+}
+
 void Particle::StaticInitialize() {
     sDirectXCommon = DirectXCommon::GetInstance();
     InitializeGraphicsPipeline();
@@ -33,8 +37,8 @@ void Particle::PostDraw() {
     sCommandList = nullptr;
 }
 
-Particle* Particle::Create() {
-    Particle* object3d = new Particle();
+Particle* Particle::Create(int particleNum) {
+    Particle* object3d = new Particle(particleNum);
     assert(object3d);
 
     object3d->Initialize();
@@ -260,14 +264,14 @@ void Particle::Initialize() {
     CreateMesh();
 }
 
-void Particle::Draw(const ViewProjection& viewProjection,const uint32_t textureHadle,const Vector4& color) {
+void Particle::Draw(const std::vector<InstancingBufferData>& bufferData, const ViewProjection& viewProjection, const DirectionalLight& directionalLight, const Vector4& color, const uint32_t textureHadle) {
     assert(sDirectXCommon->GetDevice());
     assert(sCommandList);
+    assert(!bufferData.empty());
 
     //マッピング
-    for (uint32_t index = 0; index < kParticleNum; ++index) {
-        instanceMap[index].matWorld = particleDatas_[index].matWorld;
-    }
+    memcpy(instanceMap, bufferData.data(), sizeof(bufferData[0]) * bufferData.size());
+
     material_.color_ = color;
     material_.UpdateMaterial();
 
@@ -279,5 +283,5 @@ void Particle::Draw(const ViewProjection& viewProjection,const uint32_t textureH
 
     TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(sCommandList, static_cast<UINT>(RootParameter::kTexture), textureHadle);
 
-    sCommandList->DrawIndexedInstanced(static_cast<UINT>(indices_.size()), kParticleNum, 0,0,0);
+    sCommandList->DrawIndexedInstanced(static_cast<UINT>(indices_.size()), static_cast<UINT>(bufferData.size()), 0, 0, 0);
 }

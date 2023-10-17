@@ -5,6 +5,7 @@
 #include "Input.h"
 #include "DirectXCommon.h"
 #include "ImGuiManager.h"
+#include "Easing.h"
 
 using namespace DirectX;
 
@@ -78,3 +79,4 @@ void ViewProjection::DebugMove() {
         translation_ += cameraZ;
     }
 }
+

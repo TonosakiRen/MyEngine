@@ -3,11 +3,12 @@
 #include <cmath>
 #include <numbers>
 #include <assert.h>
+#include<cstdlib>
+#include<ctime>
 
 struct Vector2 {
 	float x;
 	float y;
-	float z;
 };
 
 struct Vector3 {
@@ -56,6 +57,7 @@ struct OBB {
 	Vector3 orientations[3]; // 座標軸、正規化、直交座標
 	Vector3 size;            // 座標軸方向の長さの半分。中心から面までの距離
 };
+
 
 inline float clamp(float num, float min, float max) {
 	if (num < min) {
@@ -111,6 +113,9 @@ inline Vector3 Add(const Vector3& v1, const Vector3& v2) {
 inline Vector3 operator +(const Vector3& v1, const Vector3& v2) {
 	return{ v1.x + v2.x,v1.y + v2.y,v1.z + v2.z };
 }
+inline Vector3 operator +(const Vector3& v1, const float& scalar) {
+	return{ v1.x + scalar,v1.y + scalar,v1.z + scalar };
+}
 //減算
 inline Vector3 Subtract(const Vector3& v1, const Vector3& v2) {
 	Vector3 tmp;
@@ -122,6 +127,18 @@ inline Vector3 Subtract(const Vector3& v1, const Vector3& v2) {
 inline Vector3 operator -(const Vector3& v1, const Vector3& v2) {
 	return{ v1.x - v2.x,v1.y - v2.y,v1.z - v2.z };
 }
+inline Vector3 operator -(const Vector3& v1, const float& scalar) {
+	return{ v1.x - scalar,v1.y - scalar,v1.z - scalar };
+}
+//割り算
+inline Vector3 operator /(const Vector3& v1, const Vector3& v2) {
+	return{ v1.x / v2.x,v1.y / v2.y,v1.z / v2.z };
+}
+//掛け算
+inline Vector3 operator *(const Vector3& v1, const Vector3& v2) {
+	return{ v1.x * v2.x,v1.y * v2.y,v1.z * v2.z };
+}
+
 //スカラー倍
 inline Vector3 Multiply(float scalar, const Vector3& v) {
 	Vector3 tmp;
@@ -147,9 +164,6 @@ inline Vector3 operator /(const float& scalar, const Vector3& v) {
 
 //内積
 inline float Dot(const Vector3& v1, const Vector3& v2) {
-	return{ v1.x * v2.x + v1.y * v2.y + v1.z * v2.z };
-}
-inline Vector3 operator *(const Vector3& v1, const Vector3& v2) {
 	return{ v1.x * v2.x + v1.y * v2.y + v1.z * v2.z };
 }
 //長さ
@@ -214,8 +228,207 @@ inline Vector3 ClosestPoint(const Vector3& point, const Segment& segment) {
 	return result;
 }
 
+// 線形補間
+inline Vector3 Lerp(const Vector3& v1, const Vector3& v2, float t) {
+	Vector3 result = v1 + (v2 - v1) * t;
+	return result;
+}
+// 球面線形補間
+inline Vector3 Slerp(const Vector3& v1, const Vector3& v2, float t) {
+
+	const float epsilon = 0.0001f;
+
+	Vector3 a = Normalize(v1);
+	Vector3 b = Normalize(v2);
+
+	float dot = Dot(a, b);
+
+	if (std::abs(dot - 1.0f) < epsilon) {
+		return a;
+	}
+	else if (std::abs(dot + 1.0f) < epsilon) {
+		return Lerp(v1, v2, t);
+	}
+
+	float theta = std::acos(dot);
+
+	float sinTheta = std::sin(theta);
+	float factorA = std::sin((1.0f - t) * theta) / sinTheta;
+	float factorB = std::sin(t * theta) / sinTheta;
+
+	return Vector3{
+		factorA * a.x + factorB * b.x, factorA * a.y + factorB * b.y,
+		factorA * a.z + factorB * b.z };
+}
+
+inline bool closeRotate(Vector3& num, Vector3 goal, float speed) {
+	if ((std::fabsf(num.x - goal.x) < std::fabsf(speed)) &&
+		(std::fabsf(num.y - goal.y) < std::fabsf(speed)) &&
+		(std::fabsf(num.z - goal.z) < std::fabsf(speed))) {
+		num = goal;
+		return true;
+	}
+
+
+	if (std::fabs(num.x - goal.x) < std::fabs(speed)) {
+		num.x = goal.x;
+	}
+	else if (
+		(std::numbers::pi_v<float> -std::fabs(num.x)) +
+		(std::numbers::pi_v<float> -std::fabs(goal.x)) <
+		std::fabs(speed)) {
+		num.x = goal.x;
+	}
+	else
+		if (std::fabs(num.x - goal.x) > std::numbers::pi_v<float>) {
+			if (goal.x < 0.0f) {
+				num.x += speed;
+				if (num.x > std::numbers::pi_v<float>) {
+					num.x = -std::numbers::pi_v<float> +(num.x - std::numbers::pi_v<float>);
+				}
+			}
+			else if (goal.x > 0.0f) {
+				num.x -= speed;
+				if (num.x < -std::numbers::pi_v<float>) {
+					num.x = std::numbers::pi_v<float> -(-std::numbers::pi_v<float> -num.x);
+				}
+			}
+
+		}
+		else
+			if (num.x < goal.x) {
+				num.x += speed;
+			}
+			else
+				if (num.x > goal.x) {
+					num.x -= speed;
+				}
+
+	if (std::fabs(num.y - goal.y) < std::fabs(speed)) {
+		num.y = goal.y;
+	}
+	else if (
+		(std::numbers::pi_v<float> -std::fabs(num.y)) +
+		(std::numbers::pi_v<float> -std::fabs(goal.y)) <
+		std::fabs(speed)) {
+		num.y = goal.y;
+	}
+	else
+		if (std::fabs(num.y - goal.y) > std::numbers::pi_v<float>) {
+			if (goal.y < 0.0f) {
+				num.y += speed;
+				if (num.y > std::numbers::pi_v<float>) {
+					num.y = -std::numbers::pi_v<float> +(num.y - std::numbers::pi_v<float>);
+				}
+			}
+			else
+				if (goal.y > 0.0f) {
+					num.y -= speed;
+					if (num.y < -std::numbers::pi_v<float>) {
+						num.y = std::numbers::pi_v<float> -(-std::numbers::pi_v<float> -num.y);
+					}
+				}
+
+		}
+		else
+			if (num.y < goal.y) {
+				num.y += speed;
+			}
+			else
+				if (num.y > goal.y) {
+					num.y -= speed;
+				}
+
+	if (std::fabs(num.z - goal.z) < std::fabs(speed)) {
+		num.z = goal.z;
+	}
+	else if (
+		(std::numbers::pi_v<float> -std::fabs(num.z)) +
+		(std::numbers::pi_v<float> -std::fabs(goal.z)) <
+		std::fabs(speed)) {
+		num.z = goal.z;
+	}
+	else
+		if (std::fabs(num.z - goal.z) > std::numbers::pi_v<float>) {
+			if (goal.z < 0.0f) {
+				num.z += speed;
+				if (num.z > std::numbers::pi_v<float>) {
+					num.z = -std::numbers::pi_v<float> +(num.z - std::numbers::pi_v<float>);
+				}
+			}
+			else if (goal.z > 0.0f) {
+				num.z -= speed;
+				if (num.z < -std::numbers::pi_v<float>) {
+					num.z = std::numbers::pi_v<float> -(-std::numbers::pi_v<float> -num.z);
+				}
+			}
+
+		}
+		else
+			if (num.z < goal.z) {
+				num.z += speed;
+			}
+			else
+				if (num.z > goal.z) {
+					num.z -= speed;
+				}
+	return false;
+}
+
+inline bool closeVector3(Vector3& num, Vector3 goal, float speed) {
+	if ((std::fabsf(num.x - goal.x) < std::fabsf(speed)) &&
+		(std::fabsf(num.y - goal.y) < std::fabsf(speed)) &&
+		(std::fabsf(num.z - goal.z) < std::fabsf(speed))) {
+		num = goal;
+		return true;
+	}
+
+	if (std::fabs(num.x - goal.x) < std::fabs(speed)) {
+		num.x = goal.x;
+	}
+	else if (num.x < goal.x) {
+		num.x += speed;
+	}
+	else if (num.x > goal.x) {
+		num.x -= speed;
+	}
+
+	if (std::fabs(num.y - goal.y) < std::fabs(speed)) {
+		num.y = goal.y;
+	}
+	else if (num.y < goal.y) {
+		num.y += speed;
+	}
+	else if (num.y > goal.y) {
+		num.y -= speed;
+	}
+
+	if (std::fabs(num.z - goal.z) < std::fabs(speed)) {
+		num.z = goal.z;
+	}
+	else if (num.z < goal.z) {
+		num.z += speed;
+	}
+	else if (num.z > goal.z) {
+		num.z -= speed;
+	}
+	return false;
+}
+
 #pragma endregion
 #pragma region Matrix4x4
+
+inline Vector3 MakeScale(const Matrix4x4& matrix) {
+	Vector3 scaleX = { matrix.m[0][0],matrix.m[0][1],matrix.m[0][2] };
+	Vector3 scaleY = { matrix.m[1][0],matrix.m[1][1],matrix.m[1][2] };
+	Vector3 scaleZ = { matrix.m[2][0],matrix.m[2][1],matrix.m[2][2] };
+	Vector3 result;
+	result.x = Length(scaleX);
+	result.y = Length(scaleY);
+	result.z = Length(scaleZ);
+	return result;
+}
+
 inline Matrix4x4 Add(const Matrix4x4& m1, const Matrix4x4& m2) {
 	Matrix4x4 tmp;
 	tmp.m[0][0] = m1.m[0][0] + m2.m[0][0];
@@ -775,3 +988,24 @@ inline Matrix4x4 MakeLookRotation(const Vector3& direction, const Vector3& up = 
 
 #pragma endregion
 
+inline int Rand(int min, int max) {
+	if (min == 0 && max == 0) {
+		return 0;
+	}
+	return min + (int)(rand() * (max - min + 1.0) / (1.0 + RAND_MAX));
+}
+inline float Rand(float min, float max) {
+	if (min == 0 && max == 0) {
+		return 0;
+	}
+	int kmin = int(min * 10000);
+	int kmax = int(max * 10000);
+
+	float result = (kmin + (int)(rand() * (kmax - kmin + 1.0) / (1.0 + RAND_MAX))) / 1000.0f;
+	return result;
+}
+inline bool Rand() { return bool(0 + (int)(rand() * (1 - 0 + 1.0) / (1.0 + RAND_MAX))); }
+
+inline void SRAND() {
+	srand((unsigned)time(NULL));
+}

@@ -40,10 +40,11 @@ public:
 	static void StaticInitialize();
 	static void PreDraw(ID3D12GraphicsCommandList* commandList);
 	static void PostDraw();
-	static Particle* Create();
+	static Particle* Create(int particleNum);
+	Particle(int particleNum);
 
 	void Initialize();
-	void Draw(const ViewProjection& viewProjection, const uint32_t textureHadle = 0, const Vector4& color = {0.0f,0.0f,0.0f,0.0f});
+	void Draw(const std::vector<InstancingBufferData>& bufferData, const ViewProjection& viewProjection, const DirectionalLight& directionalLight, const Vector4& color = { 1.0f,1.0f,1.0f,1.0f }, const uint32_t textureHadle = 0);
 	void CreateMesh();
 
 public:

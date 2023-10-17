@@ -11,6 +11,7 @@
 #include "Skydome.h"
 #include "Floor.h"
 #include "Player.h"
+#include "Boss.h"
 class GameScene
 {
 
@@ -34,6 +35,8 @@ private:
 	
 	ViewProjection viewProjection_;
 	DirectionalLight directionalLight_;
+	bool isCameraMove_ = false;
+	float cameraT_ = 0.0f;
 
 	uint32_t textureHandle_;
 
@@ -44,6 +47,7 @@ private:
 	std::unique_ptr<Floor> floor_;
 	std::unique_ptr<GameObject> sphere_;
 	std::unique_ptr<Player> player_;
+	std::unique_ptr<Boss> boss_;
 
 	std::unique_ptr<Particle> particle_;
 };
