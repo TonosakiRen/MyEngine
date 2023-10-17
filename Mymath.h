@@ -88,7 +88,7 @@ inline float Degree(float radian) { return radian * 180.0f / std::numbers::pi_v<
 
 #pragma region Vector3
 
-inline Vector3 GetXAxis(Matrix4x4 m){
+inline Vector3 GetXAxis(Matrix4x4 m) {
 
 	return { m.m[0][0],m.m[0][1],m.m[0][2] };
 }
@@ -198,7 +198,7 @@ inline Vector3 operator -(const Vector3& v1) {
 }
 
 inline Vector3 Cross(const Vector3& v1, const Vector3& v2) {
-	return { (v1.y * v2.z - v1.z * v2.y),(v1.z * v2.x - v1.x * v2.z),(v1.x * v2.y - v1.y * v2.x)};
+	return { (v1.y * v2.z - v1.z * v2.y),(v1.z * v2.x - v1.x * v2.z),(v1.x * v2.y - v1.y * v2.x) };
 }
 
 inline Vector3 operator *(const Vector3& v, const Matrix4x4& m) {
@@ -426,6 +426,17 @@ inline Vector3 MakeScale(const Matrix4x4& matrix) {
 	result.x = Length(scaleX);
 	result.y = Length(scaleY);
 	result.z = Length(scaleZ);
+	return result;
+}
+
+inline Vector3 MakeRotate(const Matrix4x4& matrix) {
+	Vector3 xAxis = Normalize(GetXAxis(matrix)); // [0][?]
+	Vector3 yAxis = Normalize(GetYAxis(matrix)); // [1][?]
+	Vector3 zAxis = Normalize(GetZAxis(matrix)); // [2][?]
+	Vector3 result;
+	result.x = atan2(zAxis.y, zAxis.z);
+	result.y = asin(-zAxis.x);
+	result.z = atan2(yAxis.x, xAxis.x);
 	return result;
 }
 
@@ -896,7 +907,7 @@ inline Matrix4x4& operator*=(Matrix4x4& m1, const Matrix4x4& m2) {
 	m1 = tmp;
 	return m1;
 
-	
+
 }
 
 
@@ -919,13 +930,13 @@ inline Matrix4x4 MakePerspectiveFovMatrix(float fovY, float aspectRatio, float n
 	tmp.m[2][3] = 1.0f;
 	tmp.m[3][0] = 0.0f;
 	tmp.m[3][1] = 0.0f;
-	tmp.m[3][2] = (- nearClip * farClip) / (farClip - nearClip);
+	tmp.m[3][2] = (-nearClip * farClip) / (farClip - nearClip);
 	tmp.m[3][3] = 0.0f;
 
 	return tmp;
 }
 //正射影行列
-inline Matrix4x4 MakeOrthograohicmatrix(float left, float top, float right, float bottom,float nearClip,float farClip) {
+inline Matrix4x4 MakeOrthograohicmatrix(float left, float top, float right, float bottom, float nearClip, float farClip) {
 	Matrix4x4 tmp;
 	tmp.m[0][0] = 2.0f / (right - left);
 	tmp.m[0][1] = 0;
@@ -948,7 +959,7 @@ inline Matrix4x4 MakeOrthograohicmatrix(float left, float top, float right, floa
 
 }
 //ビューポート変換行列
-inline Matrix4x4 MakeViewportMatrix(float left, float top, float width, float height,float minDepth , float maxDepth) {
+inline Matrix4x4 MakeViewportMatrix(float left, float top, float width, float height, float minDepth, float maxDepth) {
 	Matrix4x4 tmp;
 	tmp.m[0][0] = width / 2.0f;
 	tmp.m[0][1] = 0;
@@ -963,7 +974,7 @@ inline Matrix4x4 MakeViewportMatrix(float left, float top, float width, float he
 	tmp.m[2][2] = maxDepth - minDepth;
 	tmp.m[2][3] = 0;
 	tmp.m[3][0] = left + (width / 2.0f);
-	tmp.m[3][1] = top  + (height / 2.0f);
+	tmp.m[3][1] = top + (height / 2.0f);
 	tmp.m[3][2] = minDepth;
 	tmp.m[3][3] = 1;
 	return tmp;
@@ -975,7 +986,7 @@ inline Matrix4x4 MakeViewMatirx(const Vector3& rotate, const Vector3& tranlate) 
 	return Inverse(cameraWorldMatrix);
 }
 
-inline Matrix4x4 MakeLookRotation(const Vector3& direction, const Vector3& up = Vector3{0.0f,1.0f,0.0f}) noexcept {
+inline Matrix4x4 MakeLookRotation(const Vector3& direction, const Vector3& up = Vector3{ 0.0f,1.0f,0.0f }) noexcept {
 	Vector3 z = Normalize(direction);
 	Vector3 x = Normalize(Cross(Normalize(up), z));
 	Vector3 y = Cross(z, x);

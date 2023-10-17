@@ -1,5 +1,6 @@
 #include "DustParticle.h"
 #include "ImGuiManager.h"
+
 DustParticle::DustParticle()
 {
 	particleBox_ = std::make_unique<ParticleBox>(kParticleNum);
@@ -7,6 +8,7 @@ DustParticle::DustParticle()
 
 void DustParticle::Initialize(Vector3 minDirection, Vector3 maxDirection)
 {
+
 	particleBox_->Initialize();
 	emitterWorldTransform_.SetIsScaleParent(false);
 	SetDirection(minDirection, maxDirection);
@@ -16,15 +18,15 @@ void DustParticle::Initialize(Vector3 minDirection, Vector3 maxDirection)
 }
 
 void DustParticle::Update() {
-	
+
 	ImGui::Begin("effect");
-	ImGui::DragFloat3("emitPos",&emitterWorldTransform_.translation_.x,0.01f);
+	ImGui::DragFloat3("emitPos", &emitterWorldTransform_.translation_.x, 0.01f);
 	ImGui::End();
-	for (size_t i = 0; i < EmitNum_;i++) {
+	for (size_t i = 0; i < EmitNum_; i++) {
 		for (size_t i = 0; i < kParticleNum; i++) {
 			if (particles[i].isActive_ == false) {
 				particles[i].isActive_ = true;
-				particles[i].direction_ = Normalize({ Rand(0.0f,0.0f) ,Rand(0.0f,1.0f) ,Rand(-1.0f,0.0f) });
+				particles[i].direction_ = Normalize({ Rand(minDirection_.x, maxDirection_.x) ,Rand(minDirection_.y,maxDirection_.y) ,Rand(minDirection_.z,maxDirection_.z) });
 				particles[i].worldTransform_.translation_ = { 0.0f,0.0f,0.0f };
 				particles[i].worldTransform_.rotation_ = { 0.0f,0.0f,0.0f };
 				particles[i].worldTransform_.scale_ = initialScale_;

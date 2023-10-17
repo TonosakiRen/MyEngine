@@ -5,7 +5,7 @@
 #include "Mymath.h"
 
 struct ConstBufferDataWorldTransform {
-	Matrix4x4 matWorld; 
+	Matrix4x4 matWorld;
 };
 
 class WorldTransform
@@ -21,7 +21,10 @@ public:
 	void SetIsScaleParent(bool isScaleParent) {
 		isScaleParent_ = isScaleParent;
 	}
-	D3D12_GPU_VIRTUAL_ADDRESS GetGPUVirtualAddress () const {
+	void SetIsRotateParent(bool isRotateParent) {
+		isRotateParent_ = isRotateParent;
+	}
+	D3D12_GPU_VIRTUAL_ADDRESS GetGPUVirtualAddress() const {
 		return constBuff_->GetGPUVirtualAddress();
 	}
 public:
@@ -35,6 +38,7 @@ private:
 private:
 	WorldTransform* parent_ = nullptr;
 	bool isScaleParent_ = true;
+	bool isRotateParent_ = true;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> constBuff_;
 	ConstBufferDataWorldTransform* constMap = nullptr;

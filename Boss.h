@@ -1,8 +1,12 @@
 #pragma once
 #include "GameObject.h"
-#include "Input.h"
 #include "ParticleBox.h"
 #include "DustParticle.h"
+#include <optional>
+
+class GameScene;
+class Player;
+
 class Boss :
     public GameObject
 {
@@ -13,10 +17,8 @@ public:
     void Animation();
     void Draw();
     void ParticleDraw();
-public:
 
 private:
-    Input* input_ = nullptr;
     enum parts {
         Head,
         Tin,
@@ -25,18 +27,26 @@ private:
     };
     Model modelParts_[partNum];
     WorldTransform partsTransform_[partNum];
-    Vector2 velocity_;
-    Vector2 accelaration_;
-    bool isJump_ = false;
 
     //animation
     float animationT_ = 0.0f;
-    float animationBodyT_ = 0.0f;
-    float animationSpeed_ = 0.05f;
-    float animationBodySpeed_ = animationSpeed_ * 2.0f;
-    float runUpAnimation_ = 0.08f;
+    float animationSpeed_ = 0.01f;
+
+    Vector3 animationAccelaration_ = { 0.0f,-0.025f,0.0f };
+    Vector3 animationVelocity_ = { 0.0f,0.0f,0.0f };
+    float jumpPower_ = 0.25f;
+
+    enum AnimationStats {
+        HeadJump,
+        AllJump,
+        HeadDown,
+        AllDown
+    };
+
+    AnimationStats animationStats = HeadJump;
 
     //particle
     std::unique_ptr<DustParticle> dustParticle_;
+
 };
 
