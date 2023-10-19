@@ -12,6 +12,7 @@
 #include "Floor.h"
 #include "Player.h"
 #include "Boss.h"
+#include "FollowCamera.h"
 class GameScene
 {
 
@@ -34,6 +35,8 @@ private:
 	Input* input_ = nullptr;
 	
 	ViewProjection viewProjection_;
+	FollowCamera followCamera_;
+
 	DirectionalLight directionalLight_;
 	bool isCameraMove_ = false;
 	float cameraT_ = 0.0f;
@@ -50,5 +53,7 @@ private:
 	std::unique_ptr<Boss> boss_;
 
 	std::unique_ptr<Particle> particle_;
+
+	
 };
 

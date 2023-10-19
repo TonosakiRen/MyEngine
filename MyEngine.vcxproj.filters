@@ -106,6 +106,10 @@
     <ClCompile Include="Boss.cpp">
       <Filter>Game</Filter>
     </ClCompile>
+    <ClCompile Include="FollowCamera.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Collider.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -195,6 +199,10 @@
     <ClInclude Include="Boss.h">
       <Filter>Game</Filter>
     </ClInclude>
+    <ClInclude Include="FollowCamera.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Collider.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\shaders\Basic.hlsli">

@@ -418,6 +418,31 @@ inline bool closeVector3(Vector3& num, Vector3 goal, float speed) {
 #pragma endregion
 #pragma region Matrix4x4
 
+inline Matrix4x4 MakeIdentity4x4() {
+	Matrix4x4 tmp;
+	tmp.m[0][0] = 1.0f;
+	tmp.m[0][1] = 0.0f;
+	tmp.m[0][2] = 0.0f;
+	tmp.m[0][3] = 0.0f;
+
+	tmp.m[1][0] = 0.0f;
+	tmp.m[1][1] = 1.0f;
+	tmp.m[1][2] = 0.0f;
+	tmp.m[1][3] = 0.0f;
+
+	tmp.m[2][0] = 0.0f;
+	tmp.m[2][1] = 0.0f;
+	tmp.m[2][2] = 1.0f;
+	tmp.m[2][3] = 0.0f;
+
+	tmp.m[3][0] = 0.0f;
+	tmp.m[3][1] = 0.0f;
+	tmp.m[3][2] = 0.0f;
+	tmp.m[3][3] = 1.0f;
+
+	return tmp;
+}
+
 inline Vector3 MakeScale(const Matrix4x4& matrix) {
 	Vector3 scaleX = { matrix.m[0][0],matrix.m[0][1],matrix.m[0][2] };
 	Vector3 scaleY = { matrix.m[1][0],matrix.m[1][1],matrix.m[1][2] };
@@ -429,14 +454,29 @@ inline Vector3 MakeScale(const Matrix4x4& matrix) {
 	return result;
 }
 
-inline Vector3 MakeRotate(const Matrix4x4& matrix) {
+inline Vector3 MakeTranslation(const Matrix4x4& matrix) {
+	Vector3 result;
+	result.x = matrix.m[3][0];
+	result.y = matrix.m[3][1];
+	result.z = matrix.m[3][2];
+	return result;
+}
+//回転行列算出
+inline Matrix4x4 NormalizeMakeRotateMatrix(const Matrix4x4& matrix) {
 	Vector3 xAxis = Normalize(GetXAxis(matrix)); // [0][?]
 	Vector3 yAxis = Normalize(GetYAxis(matrix)); // [1][?]
 	Vector3 zAxis = Normalize(GetZAxis(matrix)); // [2][?]
-	Vector3 result;
-	result.x = atan2(zAxis.y, zAxis.z);
-	result.y = asin(-zAxis.x);
-	result.z = atan2(yAxis.x, xAxis.x);
+	Matrix4x4 result = MakeIdentity4x4();
+	result.m[0][0] = xAxis.x;
+	result.m[0][1] = xAxis.y;
+	result.m[0][2] = xAxis.z;
+	result.m[1][0] = yAxis.x;
+	result.m[1][1] = yAxis.y;
+	result.m[1][2] = yAxis.z;
+	result.m[2][0] = zAxis.x;
+	result.m[2][1] = zAxis.y;
+	result.m[2][2] = zAxis.z;
+
 	return result;
 }
 
@@ -678,30 +718,7 @@ inline Matrix4x4 Transpose(const Matrix4x4& m) {
 
 	return tmp;
 }
-inline Matrix4x4 MakeIdentity4x4() {
-	Matrix4x4 tmp;
-	tmp.m[0][0] = 1.0f;
-	tmp.m[0][1] = 0.0f;
-	tmp.m[0][2] = 0.0f;
-	tmp.m[0][3] = 0.0f;
 
-	tmp.m[1][0] = 0.0f;
-	tmp.m[1][1] = 1.0f;
-	tmp.m[1][2] = 0.0f;
-	tmp.m[1][3] = 0.0f;
-
-	tmp.m[2][0] = 0.0f;
-	tmp.m[2][1] = 0.0f;
-	tmp.m[2][2] = 1.0f;
-	tmp.m[2][3] = 0.0f;
-
-	tmp.m[3][0] = 0.0f;
-	tmp.m[3][1] = 0.0f;
-	tmp.m[3][2] = 0.0f;
-	tmp.m[3][3] = 1.0f;
-
-	return tmp;
-}
 
 inline Matrix4x4 MakeTranslateMatrix(const Vector3& translate) {
 	Matrix4x4 tmp;

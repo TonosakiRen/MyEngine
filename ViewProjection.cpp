@@ -43,7 +43,7 @@ void ViewProjection::UpdateMatrix() {
     // ビュー行列の生成
     matView = MakeViewMatirx(target_,translation_);
     // 透視投影による射影行列の生成
-    matProjection = MakePerspectiveFovMatrix(fovAngleY, aspectRatio, nearZ, farZ);
+    matProjection = MakePerspectiveFovMatrix(fovAngleY_, aspectRatio_, nearZ_, farZ_);
 
     // 定数バッファに書き込み
     constMap->view = matView;

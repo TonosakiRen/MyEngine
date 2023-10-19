@@ -3,6 +3,7 @@
 #include "Input.h"
 #include "ParticleBox.h"
 #include "DustParticle.h"
+#include "Collider.h"
 class Player :
     public GameObject
 {
@@ -13,6 +14,10 @@ public:
     void Animation();
     void Draw();
     void ParticleDraw();
+
+    WorldTransform* GetWorldTransform() {
+        return &worldTransform_;
+    }
 public:
 
 private:
@@ -40,5 +45,9 @@ private:
 
     //particle
     std::unique_ptr<DustParticle> dustParticle_;
+
+    //collider
+    Collider collider;
+    Collider tmpCollider;
 };
 

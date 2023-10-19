@@ -15,6 +15,9 @@ public:
 	void SetInitialScale(Vector3 scale) {
 		initialScale_ = scale;
 	}
+	void SetIsEmit(bool isEmit) {
+		isEmit_ = isEmit;
+	}
 	struct dustParticle {
 		WorldTransform worldTransform_;
 		Vector3 direction_;
@@ -26,6 +29,7 @@ public:
 	dustParticle particles[kParticleNum];
 	int EmitNum_ = 1;
 private:
+	bool isEmit_ = false;
 	std::unique_ptr<ParticleBox> particleBox_;
 	Vector3 minDirection_;
 	Vector3 maxDirection_;

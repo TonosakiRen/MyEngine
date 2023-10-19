@@ -18,6 +18,8 @@ void GameScene::Initialize() {
 	viewProjection_.translation_ = { 0.0f,8.6f,-27.0f };
 	viewProjection_.target_ = { 0.0f,0.0f,0.0f };
 
+	followCamera_.Initialize();
+
 	directionalLight_.Initialize();
 	directionalLight_.direction_ = { 1.0f, -1.0f, 1.0f };
 	directionalLight_.UpdateDirectionalLight();
@@ -28,11 +30,13 @@ void GameScene::Initialize() {
 	sprite_.reset(Sprite::Create(textureHandle_, { 0.0f,0.0f }));
 
 	skydome_ = std::make_unique<Skydome>();
-	skydome_->Initialize("skydome",&viewProjection_,&directionalLight_);
+	skydome_->Initialize("skydome",&viewProjection_, &directionalLight_);
 	floor_ = std::make_unique<Floor>();
 	floor_->Initialize("floor", &viewProjection_, &directionalLight_);
 	player_ = std::make_unique<Player>();
 	player_->Initialize("player", &viewProjection_, &directionalLight_);
+
+	followCamera_.SetTarget(player_->GetWorldTransform());
 
 	boss_ = std::make_unique<Boss>();
 	boss_->Initialize(&viewProjection_, &directionalLight_);
@@ -48,6 +52,9 @@ void GameScene::Update(){
 		// camera
 		viewProjection_.DebugMove();
 		viewProjection_.UpdateMatrix();
+
+		followCamera_.Update();
+
 		// light
 		ImGui::DragFloat3("light", &directionalLight_.direction_.x, 0.01f);
 		ImGui::DragFloat4("lightcolor", &directionalLight_.color_.x, 0.01f);

@@ -15,6 +15,12 @@ public:
 	void Initialize();
 	void UpdateMatrix();
 
+	void ConstUpdate() {
+		if (constMap) {
+			constMap->matWorld = matWorld_;
+		}
+	}
+
 	void SetParent(WorldTransform* parent) {
 		parent_ = parent;
 	}
@@ -23,6 +29,9 @@ public:
 	}
 	void SetIsRotateParent(bool isRotateParent) {
 		isRotateParent_ = isRotateParent;
+	}
+	WorldTransform* GetParent() {
+		return parent_;
 	}
 	D3D12_GPU_VIRTUAL_ADDRESS GetGPUVirtualAddress() const {
 		return constBuff_->GetGPUVirtualAddress();

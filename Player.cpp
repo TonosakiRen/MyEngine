@@ -12,6 +12,7 @@ void Player::Initialize(const std::string name, ViewProjection* viewProjection, 
 	dustParticle_->emitterWorldTransform_.SetParent(&worldTransform_);
 	//煙の出る場所
 	dustParticle_->emitterWorldTransform_.translation_ = { 0.0f,-2.1f,-1.2f };
+
 	material_.enableLighting_ = false;
 	worldTransform_.rotation_.y = Radian(90.0f);
 	accelaration_ = { 0.0f,0.002f };
@@ -35,6 +36,9 @@ void Player::Initialize(const std::string name, ViewProjection* viewProjection, 
 		partsTransform_[LeftLeg].scale_ = { 0.4f,0.4f, 0.4f };
 		partsTransform_[RightLeg].scale_ = { 0.4f,0.4f, 0.4f };
 	}
+
+	collider.Initialize(&worldTransform_, name, *viewProjection, *directionalLight);
+	tmpCollider.Initialize("tmp", *viewProjection, *directionalLight);
 }
 
 void Player::Update()
@@ -45,8 +49,18 @@ void Player::Update()
 	ImGui::DragFloat3("scale", &worldTransform_.scale_.x, 0.01f);
 	ImGui::End();
 
-	if(input_->PushKey(DIK_SPACE)) {
-		worldTransform_.translation_.y;
+	Vector3 move = {0.0f,0.0f,0.0f};
+	if(input_->PushKey(DIK_W)) {
+		
+	}
+	if (input_->PushKey(DIK_A)) {
+
+	}
+	if (input_->PushKey(DIK_S)) {
+
+	}
+	if (input_->PushKey(DIK_D)) {
+
 	}
 	worldTransform_.translation_.y = clamp(worldTransform_.translation_.y, 2.79f, 17.0f);
 	worldTransform_.UpdateMatrix();
@@ -55,8 +69,17 @@ void Player::Update()
 	}
 
 	dustParticle_->Update();
+
+	collider.AdjustmentScale();
+	tmpCollider.AdjustmentScale();
+	bool isHit = collider.Collision(tmpCollider);
+	ImGui::Begin("colldiion");
+	ImGui::Text("%d", isHit);
+	ImGui::End();
+
 }
 void Player::Animation() {
+	dustParticle_->SetIsEmit(true);
 	if (animationT_ >= 1.0f || animationT_ <= 0.0f)
 	{
 		animationSpeed_ *= -1.0f;
@@ -87,6 +110,8 @@ void Player::Draw() {
 	for (int i = 0; i < partNum; i++) {
 		modelParts_.Draw(partsTransform_[i], *viewProjection_, *directionalLight_, material_);
 	}
+	collider.Draw();
+	tmpCollider.Draw({ 1.0f,0.0f,0.0f,1.0f });
 }
 
 void Player::ParticleDraw() {
