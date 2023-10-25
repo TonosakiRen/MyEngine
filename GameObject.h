@@ -15,7 +15,7 @@ public:
 	void Initialize(ViewProjection* viewProjection, DirectionalLight* directionalLight);
 	void Update();
 	void UpdateMaterial(Vector4 color = { 1.0f,1.0f,1.0f,1.0f });
-	void Draw(Vector4 color = {1.0f,1.0f,1.0f,1.0f});
+	void Draw(Vector4 color = {1.0f,1.0f,1.0f,1.0f},uint32_t textureHandle = 0);
 	void Draw(const WorldTransform& worldTransform ,Vector4 color = { 1.0f,1.0f,1.0f,1.0f });
 
 	void SetViewProjection(ViewProjection* viewProjection) {
@@ -31,5 +31,6 @@ protected:
 	ViewProjection* viewProjection_;
 	DirectionalLight* directionalLight_;
 private:
+	bool loadObj_ = false;
 };
 

@@ -57,10 +57,10 @@ void ViewProjection::DebugMove() {
     Vector2 mouseMove = input->GetMouseMove();
     float wheel = input->GetWheel();
 
-    ImGui::Begin("Camera");
+   /* ImGui::Begin("Camera");
     ImGui::DragFloat3("target", &target_.x, 0.01f);
     ImGui::DragFloat3("translation", &translation_.x, 0.01f);
-    ImGui::End();
+    ImGui::End();*/
 
     if (input->IsPressMouse(1)) {
         float rot = static_cast<float>(M_PI / 180.0f);

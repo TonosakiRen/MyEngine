@@ -57,14 +57,40 @@ public:
 		return xInputState_.Gamepad;
 	}
 
-	Vector2 GetLStick() {
-		return Vector2{ static_cast<float>(xInputState_.Gamepad.sThumbLX),static_cast<float>(xInputState_.Gamepad.sThumbLY) };
+	Vector2 GetLStick(SHORT deadZone = XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE) {
+		Vector2 value = { 0.0f,0.0f };
+		if (xInputState_.Gamepad.sThumbLX > -deadZone && xInputState_.Gamepad.sThumbLX < deadZone) {
+			value.x = 0.0f;
+		}
+		else {
+			value.x = static_cast<float>(xInputState_.Gamepad.sThumbLX);
+		}
+		if (xInputState_.Gamepad.sThumbLY > -deadZone && xInputState_.Gamepad.sThumbLY < deadZone) {
+			value.y = 0.0f;
+		}
+		else {
+			value.y = static_cast<float>(xInputState_.Gamepad.sThumbLY);
+		}
+		return value;
 	}
-	Vector2 GetRStick() {
-		return Vector2{ static_cast<float>(xInputState_.Gamepad.sThumbLX),static_cast<float>(xInputState_.Gamepad.sThumbLY) };
+	Vector2 GetRStick(SHORT deadZone = XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE) {
+		Vector2 value = { 0.0f,0.0f };
+		if (xInputState_.Gamepad.sThumbRX > -deadZone && xInputState_.Gamepad.sThumbRX < deadZone) {
+			value.x = 0.0f;
+		}
+		else {
+			value.x = static_cast<float>(xInputState_.Gamepad.sThumbRX);
+		}
+		if (xInputState_.Gamepad.sThumbRY > -deadZone && xInputState_.Gamepad.sThumbRY < deadZone) {
+			value.y = 0.0f;
+		}
+		else {
+			value.y = static_cast<float>(xInputState_.Gamepad.sThumbRY);
+		}
+		return value;
 	}
 
-	bool DownLStick(SHORT deadZone = -20000) {
+	bool DownLStick(SHORT deadZone = -2000) {
 		if (xInputState_.Gamepad.sThumbLY < deadZone) {
 			return true;
 		}

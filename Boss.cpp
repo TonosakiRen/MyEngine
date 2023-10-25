@@ -30,24 +30,14 @@ void Boss::Initialize(ViewProjection* viewProjection, DirectionalLight* directio
 		partsTransform_[Tin].translation_.y = -6.0f;
 	}
 
+	collider_.Initialize(&worldTransform_,"boss",*viewProjection,*directionalLight,{1.8f,7.3f,2.2f},{0.0f,-5.4f,0.9f});
 }
 
 void Boss::Update()
 {
 
 	Animation();
-	ImGui::Begin("Boss");
-	ImGui::DragFloat3("core", &worldTransform_.translation_.x, 0.01f);
-	ImGui::DragFloat3("head", &partsTransform_[Head].translation_.x, 0.01f);
-	ImGui::DragFloat3("tin", &partsTransform_[Tin].translation_.x, 0.01f);
-
-	ImGui::DragFloat("jumpPower", &jumpPower_, 0.001f);
-	ImGui::DragFloat3("accelerariotn", &animationAccelaration_.x, 0.001f);
-
-	ImGui::DragFloat("animationT_", &animationT_, 0.001f);
-	ImGui::DragFloat("animationSpeed_", &animationSpeed_, 0.001f);
-
-	ImGui::End();
+	
 
 	worldTransform_.translation_.y = clamp(worldTransform_.translation_.y, 10.0f, 13.9f);
 
@@ -58,6 +48,7 @@ void Boss::Update()
 	}
 	worldTransform_.UpdateMatrix();
 	dustParticle_->Update();
+
 }
 void Boss::Animation() {
 

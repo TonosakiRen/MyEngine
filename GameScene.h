@@ -13,6 +13,8 @@
 #include "Player.h"
 #include "Boss.h"
 #include "FollowCamera.h"
+#include "Ground.h"
+#include "GoalBox.h"
 class GameScene
 {
 
@@ -54,6 +56,12 @@ private:
 
 	std::unique_ptr<Particle> particle_;
 
+	std::unique_ptr<Ground> ground_;
+	std::unique_ptr<Ground> bossGround_;
+	std::unique_ptr<Ground> goalGround_;
+	uint32_t blockHandle_;
+
+	std::unique_ptr<GoalBox> goalBox_;
 	
 };
 

@@ -21,7 +21,7 @@ void GameScene::Initialize() {
 	followCamera_.Initialize();
 
 	directionalLight_.Initialize();
-	directionalLight_.direction_ = { 1.0f, -1.0f, 1.0f };
+	directionalLight_.direction_ = { 0.5f, -1.0f, 0.5f };
 	directionalLight_.UpdateDirectionalLight();
 
 
@@ -30,20 +30,34 @@ void GameScene::Initialize() {
 	sprite_.reset(Sprite::Create(textureHandle_, { 0.0f,0.0f }));
 
 	skydome_ = std::make_unique<Skydome>();
-	skydome_->Initialize("skydome",&viewProjection_, &directionalLight_);
+	skydome_->Initialize("skydome",&followCamera_.GetViewProjection(), &directionalLight_);
 	floor_ = std::make_unique<Floor>();
-	floor_->Initialize("floor", &viewProjection_, &directionalLight_);
+	floor_->Initialize("floor", &followCamera_.GetViewProjection(), &directionalLight_);
 	player_ = std::make_unique<Player>();
-	player_->Initialize("player", &viewProjection_, &directionalLight_);
+	player_->Initialize("player", &followCamera_.GetViewProjection(), &directionalLight_);
 
 	followCamera_.SetTarget(player_->GetWorldTransform());
 
 	boss_ = std::make_unique<Boss>();
-	boss_->Initialize(&viewProjection_, &directionalLight_);
+	boss_->Initialize(&followCamera_.GetViewProjection(), &directionalLight_);
 
-	sphere_.reset(GameObject::Create("sphere", &viewProjection_, &directionalLight_));
+	sphere_.reset(GameObject::Create("sphere", &followCamera_.GetViewProjection(), &directionalLight_));
 
 	particle_.reset(Particle::Create(10));
+
+	ground_ = std::make_unique<Ground>();
+	ground_->Initialize(&followCamera_.GetViewProjection(), &directionalLight_, { 0.0f,-5.0f,0.0f });
+
+	bossGround_ = std::make_unique<Ground>();
+	bossGround_->Initialize(&followCamera_.GetViewProjection(), &directionalLight_, { -18.0f,-5.0f,0.0f });
+
+	goalGround_ = std::make_unique<Ground>();
+	goalGround_->Initialize(&followCamera_.GetViewProjection(), &directionalLight_,{0.0f,-5.0f,30.0f});
+	goalGround_->isMove_ = true;
+	blockHandle_ = TextureManager::Load("block.png");
+
+	goalBox_ = std::make_unique<GoalBox>();
+	goalBox_->Initialize(&followCamera_.GetViewProjection(), &directionalLight_, { 0.0f,2.0f,30.0f });
 }
 
 void GameScene::Update(){
@@ -55,9 +69,6 @@ void GameScene::Update(){
 
 		followCamera_.Update();
 
-		// light
-		ImGui::DragFloat3("light", &directionalLight_.direction_.x, 0.01f);
-		ImGui::DragFloat4("lightcolor", &directionalLight_.color_.x, 0.01f);
 		directionalLight_.direction_ = Normalize(directionalLight_.direction_);
 		directionalLight_.UpdateDirectionalLight();
 	}
@@ -72,15 +83,32 @@ void GameScene::Update(){
 	skydome_->Update();
 	floor_->Update();
 	player_->Update();
+
 	boss_->Update();
+
+	ground_->Update();
+
+	bossGround_->Update();
+	goalGround_->Update();
+
+	if (player_->collider.Collision(boss_->collider_) || player_->collider.Collision(goalBox_->collider_)) {
+		player_->SetInitialPos();
+	 }
+
+	player_->Collision(ground_->collider_);
+	player_->Collision(bossGround_->collider_);
+	player_->Collision(goalGround_->collider_);
 }
 
 void GameScene::ModelDraw()
 {
 	skydome_->Draw();
-	floor_->Draw();
 	player_->Draw();
 	boss_->Draw();
+	ground_->Draw();
+	bossGround_->Draw();
+	goalGround_->Draw();
+	goalBox_->Draw();
 }
 
 void GameScene::ParticleDraw()

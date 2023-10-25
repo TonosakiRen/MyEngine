@@ -11,9 +11,11 @@ public:
    
     void Initialize(const std::string name, ViewProjection* viewProjection, DirectionalLight* directionalLight);
     void Update();
+    void Collision(Collider& blockCollider);
     void Animation();
     void Draw();
     void ParticleDraw();
+    void SetInitialPos();
 
     WorldTransform* GetWorldTransform() {
         return &worldTransform_;
@@ -32,9 +34,11 @@ private:
     };
     Model modelParts_;
     WorldTransform partsTransform_[partNum];
-    Vector2 velocity_;
-    Vector2 accelaration_;
+    Vector3 velocity_;
+    Vector3 accelaration_ ;
     bool isJump_ = false;
+    bool isGround_ = false;
+    bool isWalking_ = false;
 
     //animation
     float animationT_ = 0.0f;
@@ -46,8 +50,9 @@ private:
     //particle
     std::unique_ptr<DustParticle> dustParticle_;
 
+public:
     //collider
     Collider collider;
-    Collider tmpCollider;
+    bool isGrounding_ = false;
 };
 

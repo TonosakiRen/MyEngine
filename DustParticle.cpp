@@ -10,15 +10,14 @@ void DustParticle::Initialize(Vector3 minDirection, Vector3 maxDirection)
 {
 
 	particleBox_->Initialize();
+	emitterWorldTransform_.Initialize();
 	emitterWorldTransform_.SetIsScaleParent(false);
+	emitterWorldTransform_.scale_ = { 0.3f,0.3f,0.3f };
 	SetDirection(minDirection, maxDirection);
 }
 
 void DustParticle::Update() {
 
-	ImGui::Begin("effect");
-	ImGui::DragFloat3("emitPos", &emitterWorldTransform_.translation_.x, 0.01f);
-	ImGui::End();
 	if (isEmit_) {
 		for (size_t i = 0; i < EmitNum_; i++) {
 			for (size_t i = 0; i < kParticleNum; i++) {
@@ -32,7 +31,7 @@ void DustParticle::Update() {
 					}
 					particles[i].worldTransform_.translation_ = MakeTranslation( emitterWorldTransform_.matWorld_);
 					particles[i].worldTransform_.rotation_ = { 0.0f,0.0f,0.0f };
-					particles[i].worldTransform_.scale_ = initialScale_;
+					particles[i].worldTransform_.scale_ = emitterWorldTransform_.scale_;
 					break;
 				}
 			}

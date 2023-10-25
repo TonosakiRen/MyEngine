@@ -12,9 +12,7 @@ public:
 		minDirection_ = minDirection;
 		maxDirection_ = maxDirection;
 	}
-	void SetInitialScale(Vector3 scale) {
-		initialScale_ = scale;
-	}
+	
 	void SetIsEmit(bool isEmit) {
 		isEmit_ = isEmit;
 	}
@@ -33,6 +31,5 @@ private:
 	std::unique_ptr<ParticleBox> particleBox_;
 	Vector3 minDirection_;
 	Vector3 maxDirection_;
-	Vector3 initialScale_ = { 0.4f,0.4f,0.4f };
 };
 

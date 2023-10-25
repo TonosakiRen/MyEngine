@@ -15,7 +15,10 @@ void Player::Initialize(const std::string name, ViewProjection* viewProjection, 
 
 	material_.enableLighting_ = false;
 	worldTransform_.rotation_.y = Radian(90.0f);
-	accelaration_ = { 0.0f,0.002f };
+	worldTransform_.translation_.y = 6.0f;
+
+	accelaration_ = { 0.0f,-0.03f,0.0f };
+	velocity_ = { 0.0f,0.0f,0.0f };
 	modelParts_.Initialize("player_part");
 	for (int i = 0; i < partNum; i++) {
 		partsTransform_[i].Initialize();
@@ -37,46 +40,107 @@ void Player::Initialize(const std::string name, ViewProjection* viewProjection, 
 		partsTransform_[RightLeg].scale_ = { 0.4f,0.4f, 0.4f };
 	}
 
-	collider.Initialize(&worldTransform_, name, *viewProjection, *directionalLight);
-	tmpCollider.Initialize("tmp", *viewProjection, *directionalLight);
+	collider.Initialize(&worldTransform_, name, *viewProjection, *directionalLight,{1.8f,1.72f,1.0f});
 }
 
 void Player::Update()
 {
-
-	Animation();
-	ImGui::Begin("Player");
-	ImGui::DragFloat3("scale", &worldTransform_.scale_.x, 0.01f);
-	ImGui::End();
+	isGrounding_ = false;
 
 	Vector3 move = {0.0f,0.0f,0.0f};
-	if(input_->PushKey(DIK_W)) {
-		
-	}
-	if (input_->PushKey(DIK_A)) {
+	isWalking_ = false;
+	if (input_->GetIsGamePadConnect()) {
+		// 速さ
+		const float speed = 0.3f;
+		// 移動量
+		move = {
+			input_->GetLStick().x / SHRT_MAX, 0.0f,
+			input_->GetLStick().y / SHRT_MAX };
 
-	}
-	if (input_->PushKey(DIK_S)) {
+		// 移動量に速さを反映
+		if (move.x != 0.0f|| move.y != 0.0f || move.z != 0.0f) {
+			move = Normalize(move) * speed;
+			isWalking_ = true;
+		}
+		Matrix4x4 rotateMatrix = MakeRotateYMatrix(viewProjection_->target_.y);
+		move = move * rotateMatrix;
 
-	}
-	if (input_->PushKey(DIK_D)) {
+		if (input_->GetLStick().x != 0.0f || input_->GetLStick().y != 0.0f) {
+			worldTransform_.rotation_.y = std::atan2(move.x, move.z);
+		}
 
+
+		if (input_->TriggerButton(XINPUT_GAMEPAD_A) && isJump_ == false) {
+			isGround_ = false;
+			velocity_.y = 0.5f;
+		};
 	}
-	worldTransform_.translation_.y = clamp(worldTransform_.translation_.y, 2.79f, 17.0f);
+	else {
+		if (input_->PushKey(DIK_W)) {
+
+		}
+		if (input_->PushKey(DIK_A)) {
+
+		}
+		if (input_->PushKey(DIK_S)) {
+
+		}
+		if (input_->PushKey(DIK_D)) {
+
+		}
+	}
+
+	if (isWalking_) {
+		Animation();
+	}
+	
+	// 移動
+	worldTransform_.translation_ = worldTransform_.translation_ + move;
+
+	velocity_ += accelaration_;
+	worldTransform_.translation_ += velocity_;
+
+	if (worldTransform_.translation_.y <= -30.0f) {
+		worldTransform_.SetParent(nullptr);
+		worldTransform_.translation_ = { 0.0f,3.0f,0.0f };
+	}
+
 	worldTransform_.UpdateMatrix();
 	for (int i = 0; i < partNum; i++) {
 		partsTransform_[i].UpdateMatrix();
 	}
 
+}
+void Player::Collision(Collider& blockCollider)
+{
+	
+	float minOverlap = FLT_MAX;
+	Vector3 minAxis = { 0.0f,0.0f,0.0f };
+
+	isGround_ = false;
+	if (collider.Collision(blockCollider, minAxis, minOverlap)) {
+		float dot = Dot(MakeTranslation(blockCollider.worldTransform_.matWorld_) - MakeTranslation(collider.worldTransform_.matWorld_), minAxis);
+		if (dot > 0.0f) {
+			minOverlap = -minOverlap;
+		}		
+		
+		isGround_ = true;
+		worldTransform_.translation_ += Normalize(minAxis) * minOverlap;
+		worldTransform_.UpdateMatrix();
+
+		if (minAxis.y >= 1.0f) {
+			velocity_.y = 0.0f;			
+			worldTransform_.SetParent(blockCollider.worldTransform_.GetParent());
+		}
+	}
+
+	worldTransform_.UpdateMatrix();
+	for (int i = 0; i < partNum; i++) {
+		partsTransform_[i].UpdateMatrix();
+	}
+
+	dustParticle_->SetIsEmit(isGround_ && isWalking_);
 	dustParticle_->Update();
-
-	collider.AdjustmentScale();
-	tmpCollider.AdjustmentScale();
-	bool isHit = collider.Collision(tmpCollider);
-	ImGui::Begin("colldiion");
-	ImGui::Text("%d", isHit);
-	ImGui::End();
-
 }
 void Player::Animation() {
 	dustParticle_->SetIsEmit(true);
@@ -97,7 +161,7 @@ void Player::Animation() {
 	partsTransform_[RightLeg].rotation_.x = Easing::easing(animationT_, -0.4f, 0.4f, animationSpeed_, Easing::EasingMode::easeNormal, false);
 	partsTransform_[LeftLeg].rotation_.x = -partsTransform_[RightLeg].rotation_.x;
 
-	worldTransform_.rotation_.y = Radian(90.0f) + Easing::easing(animationT_, -0.4f, 0.4f, animationSpeed_, Easing::EasingMode::easeNormal, false);
+	worldTransform_.rotation_.y +=  Easing::easing(animationT_, -Radian(10.0f), Radian(10.0f), animationSpeed_, Easing::EasingMode::easeNormal, false);
 
 	worldTransform_.translation_.y += Easing::easing(animationBodyT_, 0.0f, runUpAnimation_, animationBodySpeed_, Easing::EasingMode::easeNormal, false);
 
@@ -110,10 +174,15 @@ void Player::Draw() {
 	for (int i = 0; i < partNum; i++) {
 		modelParts_.Draw(partsTransform_[i], *viewProjection_, *directionalLight_, material_);
 	}
-	collider.Draw();
-	tmpCollider.Draw({ 1.0f,0.0f,0.0f,1.0f });
 }
 
 void Player::ParticleDraw() {
 	dustParticle_->Draw(viewProjection_, directionalLight_,{0.5f,0.5f,0.5f,1.0f});
+}
+
+void Player::SetInitialPos()
+{
+	worldTransform_.SetParent(nullptr);
+	worldTransform_.translation_ = { 0.0f,6.0f,0.0f };
+	worldTransform_.UpdateMatrix();
 }

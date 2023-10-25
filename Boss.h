@@ -3,7 +3,7 @@
 #include "ParticleBox.h"
 #include "DustParticle.h"
 #include <optional>
-
+#include "Collider.h"
 class GameScene;
 class Player;
 
@@ -47,6 +47,9 @@ private:
 
     //particle
     std::unique_ptr<DustParticle> dustParticle_;
+
+public:
+    Collider collider_;
 
 };
 

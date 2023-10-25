@@ -252,13 +252,13 @@ void Model::CreateMesh() {
     }
     else {
         vertices_ = {
-            //  x      y      z       nx     ny    nz       u     v
-            // 前
+            //  xyz  nx ny nz   u v
+              // 前
               {{-1.0f, -1.0f, -1.0f}, {0.0f, 0.0f, -1.0f}, {0.0f, 1.0f}}, // 左下
               {{-1.0f, +1.0f, -1.0f}, {0.0f, 0.0f, -1.0f}, {0.0f, 0.0f}}, // 左上
               {{+1.0f, -1.0f, -1.0f}, {0.0f, 0.0f, -1.0f}, {1.0f, 1.0f}}, // 右下
               {{+1.0f, +1.0f, -1.0f}, {0.0f, 0.0f, -1.0f}, {1.0f, 0.0f}}, // 右上
-              // 後(前面とZ座標の符号が逆)
+              // 後
               {{+1.0f, -1.0f, +1.0f}, {0.0f, 0.0f, +1.0f}, {0.0f, 1.0f}}, // 左下
               {{+1.0f, +1.0f, +1.0f}, {0.0f, 0.0f, +1.0f}, {0.0f, 0.0f}}, // 左上
               {{-1.0f, -1.0f, +1.0f}, {0.0f, 0.0f, +1.0f}, {1.0f, 1.0f}}, // 右下
@@ -268,7 +268,7 @@ void Model::CreateMesh() {
               {{-1.0f, +1.0f, +1.0f}, {-1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}}, // 左上
               {{-1.0f, -1.0f, -1.0f}, {-1.0f, 0.0f, 0.0f}, {1.0f, 1.0f}}, // 右下
               {{-1.0f, +1.0f, -1.0f}, {-1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}}, // 右上
-              // 右（左面とX座標の符号が逆）
+              // 右
               {{+1.0f, -1.0f, -1.0f}, {+1.0f, 0.0f, 0.0f}, {0.0f, 1.0f}}, // 左下
               {{+1.0f, +1.0f, -1.0f}, {+1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}}, // 左上
               {{+1.0f, -1.0f, +1.0f}, {+1.0f, 0.0f, 0.0f}, {1.0f, 1.0f}}, // 右下
@@ -278,7 +278,7 @@ void Model::CreateMesh() {
               {{+1.0f, -1.0f, +1.0f}, {0.0f, -1.0f, 0.0f}, {0.0f, 0.0f}}, // 左上
               {{-1.0f, -1.0f, -1.0f}, {0.0f, -1.0f, 0.0f}, {1.0f, 1.0f}}, // 右下
               {{-1.0f, -1.0f, +1.0f}, {0.0f, -1.0f, 0.0f}, {1.0f, 0.0f}}, // 右上
-              // 上（下面とY座標の符号が逆）
+              // 上
               {{-1.0f, +1.0f, -1.0f}, {0.0f, +1.0f, 0.0f}, {0.0f, 1.0f}}, // 左下
               {{-1.0f, +1.0f, +1.0f}, {0.0f, +1.0f, 0.0f}, {0.0f, 0.0f}}, // 左上
               {{+1.0f, +1.0f, -1.0f}, {0.0f, +1.0f, 0.0f}, {1.0f, 1.0f}}, // 右下
@@ -286,18 +286,7 @@ void Model::CreateMesh() {
         };
 
         // 頂点インデックスの設定
-        indices_ = { 0,  1,  3,  3,  2,  0,
-
-                    4,  5,  7,  7,  6,  4,
-
-                    8,  9,  11, 11, 10, 8,
-
-                    12, 13, 15, 15, 14, 12,
-
-                    16, 17, 19, 19, 18, 16,
-
-                    20, 21, 23, 23, 22, 20 
-        };
+        indices_ = {0,1,3,3,2,0,4,5,7,7,6,4,8,9,11,11,10,8,12,13,15,15,14,12,16,17,19,19,18,16,20,21,23,23,22,20};
 
     }
     
@@ -365,74 +354,54 @@ void Model::CreateMesh() {
 }
 
 void Model::Initialize() {
-    // nullptrチェック
     assert(sDirectXCommon->GetDevice());
 
-    // メッシュ生成
     CreateMesh();
 }
 
 void Model::Initialize(std::string name) {
-    // nullptrチェック
     assert(sDirectXCommon->GetDevice());
 
     isModelLoad_ = true;
     name_ = name;
 
-    // メッシュ生成
     CreateMesh();
 }
 
 void Model::Draw(const WorldTransform& worldTransform, const ViewProjection& viewProjection,const DirectionalLight& directionalLight, const Material& material,uint32_t textureHadle) {
 
-    // 頂点バッファの設定
     sCommandList->IASetVertexBuffers(0, 1, &vbView_);
 
-    // インデックスバッファの設定
     sCommandList->IASetIndexBuffer(&ibView_);
 
-    // CBVをセット（ワールド行列）
     sCommandList->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kWorldTransform),worldTransform.GetGPUVirtualAddress());
 
-    // CBVをセット（ビュープロジェクション行列）
     sCommandList->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kViewProjection),viewProjection.GetGPUVirtualAddress());
 
-    // CBVをセット（ライト）
     sCommandList->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kDirectionalLight), directionalLight.GetGPUVirtualAddress());
 
-    // CBVをセット（マテリアル）
     sCommandList->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kMaterial), material.GetGPUVirtualAddress());
 
-    // SRVをセット
     TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(sCommandList, static_cast<UINT>(RootParameter::kTexture), textureHadle);
 
-    // 描画コマンド
     sCommandList->DrawIndexedInstanced(static_cast<UINT>(indices_.size()), 1, 0, 0, 0);
 }
 
 void Model::Draw(const WorldTransform& worldTransform, const ViewProjection& viewProjection, const DirectionalLight& directionalLight, const Material& material) {
-    // nullptrチェック
     assert(sDirectXCommon->GetDevice());
     assert(sCommandList);
 
-    // 頂点バッファの設定
     sCommandList->IASetVertexBuffers(0, 1, &vbView_);
 
-    // CBVをセット（ワールド行列）
     sCommandList->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kWorldTransform), worldTransform.GetGPUVirtualAddress());
 
-    // CBVをセット（ビュープロジェクション行列）
     sCommandList->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
 
-    // CBVをセット（ライト）
     sCommandList->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kDirectionalLight), directionalLight.GetGPUVirtualAddress());
 
-    // CBVをセット（マテリアル）
     sCommandList->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kMaterial), material.GetGPUVirtualAddress());
 
-    // SRVをセット
     TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(sCommandList, static_cast<UINT>(RootParameter::kTexture), uvHandle_);
 
-    // 描画コマンド
     sCommandList->DrawInstanced(static_cast<UINT>(vertices_.size()), 1, 0, 0);
 }

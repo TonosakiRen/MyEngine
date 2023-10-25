@@ -37,7 +37,7 @@ void FollowCamera::Update() {
 		//オフセットをカメラの回転に合わせて回転させる
 		offset = offset* rotateMatrix;
 		//座標をコピーしてオフセット分ずらす
-		viewProjection_.translation_ = target_->translation_ + offset;
+		viewProjection_.translation_ = MakeTranslation(target_->matWorld_) + offset;
 	}
 
 	viewProjection_.UpdateMatrix();
