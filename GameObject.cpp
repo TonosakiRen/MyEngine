@@ -6,7 +6,7 @@
 
 void GameObject::Initialize(std::string name) {
     std::string pass = "Resources/Model/" + name + ".obj";
-    model_.CreateFromObj("pass");
+    model_.CreateFromObj(pass);
 }
 
 void GameObject::Update() {

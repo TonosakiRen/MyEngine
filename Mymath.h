@@ -2,7 +2,7 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 #include <assert.h>
-
+#include <algorithm>
 struct Vector2 {
 	float x;
 	float y;
@@ -178,6 +178,104 @@ inline Vector3 ClosestPoint(const Vector3& point, const Segment& segment) {
 }
 
 #pragma endregion
+
+#pragma region Vector4
+//Vetor4
+//加算
+inline Vector4 Add(const Vector4& v1, const Vector4& v2) {
+	Vector4 tmp;
+	tmp.x = v1.x + v2.x;
+	tmp.y = v1.y + v2.y;
+	tmp.z = v1.z + v2.z;
+	tmp.w = v1.w + v2.w;
+	return tmp;
+}
+inline Vector4 operator +(const Vector4& v1, const Vector4& v2) {
+	return{ v1.x + v2.x,v1.y + v2.y,v1.z + v2.z ,v1.w + v2.w };
+}
+//減算
+inline Vector4 Subtract(const Vector4& v1, const Vector4& v2) {
+	Vector4 tmp;
+	tmp.x = v1.x - v2.x;
+	tmp.y = v1.y - v2.y;
+	tmp.z = v1.z - v2.z;
+	tmp.w = v1.z - v2.w;
+	return tmp;
+}
+inline Vector4 operator -(const Vector4& v1, const Vector4& v2) {
+	return{ v1.x - v2.x,v1.y - v2.y,v1.z - v2.z ,v1.w - v2.w };
+}
+//スカラー倍
+inline Vector4 Multiply(float scalar, const Vector4& v) {
+	Vector4 tmp;
+	tmp.x = v.x * scalar;
+	tmp.y = v.y * scalar;
+	tmp.z = v.z * scalar;
+	tmp.w = v.w * scalar;
+	return tmp;
+}
+inline Vector4 operator *(const Vector4& v, const float& scalar) {
+	return{ v.x * scalar,v.y * scalar,v.z * scalar,v.w * scalar };
+}
+inline Vector4 operator *(const float& scalar, const Vector4& v) {
+	return{ v.x * scalar,v.y * scalar,v.z * scalar,v.w * scalar };
+}
+//スカラー割り算
+inline Vector4 operator /(const Vector4& v, const float& scalar) {
+	return{ v.x / scalar,v.y / scalar,v.z / scalar,v.w / scalar };
+}
+inline Vector4 operator /(const float& scalar, const Vector4& v) {
+	return{ v.x / scalar,v.y / scalar,v.z / scalar,v.w / scalar };
+}
+
+
+//内積
+inline float Dot(const Vector4& v1, const Vector4& v2) {
+	return{ v1.x * v2.x + v1.y * v2.y + v1.z * v2.z + v1.w * v2.w };
+}
+inline Vector4 operator *(const Vector4& v1, const Vector4& v2) {
+	return{ v1.x * v2.x + v1.y * v2.y + v1.z * v2.z + v1.w * v2.w };
+}
+//長さ
+inline float Length(const Vector4& v) {
+	float tmp = v.x * v.x + v.y * v.y + v.z * v.z + v.w * v.w;
+	tmp = sqrtf(tmp);
+	return tmp;
+}
+//正規化
+inline Vector4 Normalize(const Vector4& v) {
+	float tmp = v.x * v.x + v.y * v.y + v.z * v.z + v.w * v.w;
+	tmp = sqrtf(tmp);
+	return { v.x / tmp, v.y / tmp, v.z / tmp , v.w / tmp };
+}
+
+inline Vector4& operator+=(Vector4& v1, const Vector4& v2) {
+	v1.x += v2.x;
+	v1.y += v2.y;
+	v1.z += v2.z;
+	v1.w += v2.w;
+	return v1;
+}
+inline Vector4& operator-=(Vector4& v1, const Vector4& v2) {
+	v1.x -= v2.x;
+	v1.y -= v2.y;
+	v1.z -= v2.z;
+	v1.w -= v2.w;
+	return v1;
+}
+
+inline Vector4 operator -(const Vector4& v1) {
+	return{ -v1.x,-v1.y,-v1.z,-v1.w };
+}
+
+inline bool operator ==(const Vector4& v1,const Vector4& v2) {
+	return v1.x == v2.x && v1.y == v2.y && v1.z == v2.z && v1.w == v2.w;
+}
+inline bool operator !=(const Vector4& v1, const Vector4& v2) {
+	return !(v1 == v2);
+}
+#pragma endregion
+
 #pragma region Matrix4x4
 inline Matrix4x4 Add(const Matrix4x4& m1, const Matrix4x4& m2) {
 	Matrix4x4 tmp;
