@@ -77,17 +77,30 @@ void Player::Update()
 	}
 	else {
 		if (input_->PushKey(DIK_W)) {
-
+			move.z += 0.2f;
 		}
 		if (input_->PushKey(DIK_A)) {
-
+			move.x -= 0.2f;
 		}
 		if (input_->PushKey(DIK_S)) {
-
+			move.z -= 0.2f;
 		}
 		if (input_->PushKey(DIK_D)) {
-
+			move.x += 0.2f;
 		}
+
+		Matrix4x4 rotateMatrix = MakeRotateYMatrix(viewProjection_->target_.y);
+		move = move * rotateMatrix;
+
+		if (input_->PushKey(DIK_RIGHT) == false  || input_->PushKey(DIK_LEFT) == false) {
+			worldTransform_.rotation_.y = std::atan2(move.x, move.z);
+		}
+
+
+		if (input_->PushKey(DIK_SPACE) && isJump_ == false) {
+			isGround_ = false;
+			velocity_.y = 0.5f;
+		};
 	}
 
 	if (isWalking_) {

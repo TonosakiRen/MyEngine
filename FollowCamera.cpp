@@ -15,10 +15,10 @@ void FollowCamera::Update() {
 		viewProjection_.target_.y += input->GetRStick().x * rotateSpeed;
 	}
 	else {
-		if (input->PushKey(DIK_LEFTARROW)) {
+		if (input->PushKey(DIK_RIGHTARROW)) {
 			viewProjection_.target_.y += 30000.0f * rotateSpeed;
 		}
-		if (input->PushKey(DIK_RIGHTARROW)) {
+		if (input->PushKey(DIK_LEFTARROW)) {
 			viewProjection_.target_.y -= 30000.0f * rotateSpeed;
 		}
 		
