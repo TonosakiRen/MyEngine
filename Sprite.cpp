@@ -16,7 +16,7 @@ DirectXCommon* Sprite::sDirectXCommon = nullptr;
 UINT Sprite::sDescriptorHandleIncrementSize;
 ID3D12GraphicsCommandList* Sprite::sCommandList = nullptr;
 ComPtr<ID3D12RootSignature> Sprite::sRootSignature;
-ComPtr<ID3D12PipelineState> Sprite::sPipelineState;
+PipelineState Sprite::sPipelineState;
 Matrix4x4 Sprite::sMatProjection;
 
 void Sprite::StaticInitialize() {
@@ -118,8 +118,7 @@ void Sprite::StaticInitialize() {
 
 	gpipeline.pRootSignature = sRootSignature.Get();
 
-	result = sDirectXCommon->GetDevice()->CreateGraphicsPipelineState(&gpipeline, IID_PPV_ARGS(&sPipelineState));
-	assert(SUCCEEDED(result));
+	sPipelineState.Create(gpipeline);
 
 	sMatProjection = MakeOrthograohicmatrix(0.0f, 0.0f, (float)WinApp::kWindowWidth, (float)WinApp::kWindowHeight,  0.0f, 1.0f);
 }
@@ -129,7 +128,7 @@ void Sprite::PreDraw(ID3D12GraphicsCommandList* commandList) {
 
 	sCommandList = commandList;
 
-	sCommandList->SetPipelineState(sPipelineState.Get());
+	sCommandList->SetPipelineState(sPipelineState);
 	sCommandList->SetGraphicsRootSignature(sRootSignature.Get());
 	sCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 }
@@ -215,7 +214,7 @@ bool Sprite::Initialize() {
 		// 定数バッファの生成
 		result = sDirectXCommon->GetDevice()->CreateCommittedResource(
 			&heapProps, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ,
-			nullptr, IID_PPV_ARGS(&constBuff_));
+			nullptr, IID_PPV_ARGS(constBuff_.GetAddressOf()));
 		assert(SUCCEEDED(result));
 	}
 

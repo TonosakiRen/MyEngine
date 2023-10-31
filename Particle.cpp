@@ -248,9 +248,9 @@ void Particle::CreateMesh() {
     instancingSrvDesc.Buffer.NumElements = kParticleNum;
     instancingSrvDesc.Buffer.StructureByteStride = sizeof(InstancingBufferData);
     UINT incrementSize = DirectXCommon::GetInstance()->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-    particleDataSRVHandleCPU_ = CD3DX12_CPU_DESCRIPTOR_HANDLE(DirectXCommon::GetInstance()->GetSRVHeap()->GetCPUDescriptorHandleForHeapStart(), DirectXCommon::GetInstance()->GetSrvHeapCount(), incrementSize);
-    particleDataSRVHandleGPU_ = CD3DX12_GPU_DESCRIPTOR_HANDLE(DirectXCommon::GetInstance()->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart(), DirectXCommon::GetInstance()->GetSrvHeapCount(), incrementSize);
-    DirectXCommon::GetInstance()->GetDevice()->CreateShaderResourceView(instancingBuff_.Get(), &instancingSrvDesc, particleDataSRVHandleCPU_);
+
+    srvHandle_ = DirectXCommon::GetInstance()->GetSRVHeap().Allocate();
+    DirectXCommon::GetInstance()->GetDevice()->CreateShaderResourceView(instancingBuff_.Get(), &instancingSrvDesc, srvHandle_);
 }
 
 void Particle::Initialize() {
@@ -272,7 +272,7 @@ void Particle::Draw(const ViewProjection& viewProjection,const uint32_t textureH
 
     sCommandList->IASetVertexBuffers(0, 1, &vbView_);
     sCommandList->IASetIndexBuffer(&ibView_);
-    sCommandList->SetGraphicsRootDescriptorTable(0, particleDataSRVHandleGPU_);
+    sCommandList->SetGraphicsRootDescriptorTable(0, srvHandle_);
     sCommandList->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
     sCommandList->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kMaterial), material_.GetGPUVirtualAddress());
 

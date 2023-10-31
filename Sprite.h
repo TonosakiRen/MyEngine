@@ -5,6 +5,8 @@
 #include <string>
 #include <wrl.h>
 #include "Mymath.h"
+#include "PipelineState.h"
+#include "GPUResource.h"
 
 class DirectXCommon;
 class Sprite {
@@ -50,12 +52,12 @@ private:
 	static UINT sDescriptorHandleIncrementSize;
 	static ID3D12GraphicsCommandList* sCommandList;
 	static Microsoft::WRL::ComPtr<ID3D12RootSignature> sRootSignature;
-	static Microsoft::WRL::ComPtr<ID3D12PipelineState> sPipelineState;
+	static PipelineState sPipelineState;
 	static Matrix4x4 sMatProjection;
 
 private: 
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertBuff_;
-	Microsoft::WRL::ComPtr<ID3D12Resource> constBuff_;
+	GPUResource constBuff_;
 	VertexData* vertMap = nullptr;
 	ConstBufferData* constMap = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW vbView_{};

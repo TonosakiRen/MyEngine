@@ -9,6 +9,7 @@
 #pragma comment(lib,"dxcompiler.lib")
 #include "externals/DirectXTex/d3dx12.h"
 #include "WinApp.h"
+#include "DescriptorHeap.h"
 
 class DirectXCommon
 {
@@ -31,9 +32,7 @@ public:
 	ID3D12Device* GetDevice() { return device_.Get(); }
 	ID3D12GraphicsCommandList* GetCommandList() { return commandList_.Get(); }
 	size_t GetBackBufferCount() const { return backBuffers_.size(); }
-	ID3D12DescriptorHeap* GetSRVHeap() { return srvHeap_.Get(); }
-	uint32_t GetSrvHeapCount() { return srvHeapCount_; }
-	void IncrementSrvHeapCount() { srvHeapCount_++; }
+	DescriptorHeap GetSRVHeap() { return srvHeap_; }
 private:
 	WinApp* winApp_;
 
@@ -51,14 +50,13 @@ private:
 	std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> backBuffers_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> depthBuffer_;
 
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvHeap_;
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvHeap_;
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvHeap_;
+	DescriptorHeap rtvHeap_;
+	DescriptorHeap dsvHeap_;
+	DescriptorHeap srvHeap_;
 	
 	int32_t backBufferWidth_ = 0;
 	int32_t backBufferHeight_ = 0;
 
-	int32_t srvHeapCount_ = 0;
 private:
 	void InitializeDXGIDevice();
 	void InitializeCommand();

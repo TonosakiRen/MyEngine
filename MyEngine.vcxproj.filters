@@ -91,6 +91,12 @@
     <ClCompile Include="Floor.cpp">
       <Filter>Game</Filter>
     </ClCompile>
+    <ClCompile Include="PipelineState.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="DescriptorHeap.cpp" />
+    <ClCompile Include="SwapChain.cpp" />
+    <ClCompile Include="PixelBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -165,6 +171,14 @@
     <ClInclude Include="Floor.h">
       <Filter>Game</Filter>
     </ClInclude>
+    <ClInclude Include="PipelineState.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="DescriptorHeap.h" />
+    <ClInclude Include="DescriptorHandle.h" />
+    <ClInclude Include="SwapChain.h" />
+    <ClInclude Include="GPUResource.h" />
+    <ClInclude Include="PixelBuffer.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\shaders\Basic.hlsli">

@@ -14,7 +14,7 @@ DirectXCommon* Model::sDirectXCommon = nullptr;
 UINT Model::sDescriptorHandleIncrementSize = 0;
 ID3D12GraphicsCommandList* Model::sCommandList = nullptr;
 ComPtr<ID3D12RootSignature> Model::sRootSignature;
-ComPtr<ID3D12PipelineState> Model::sPipelineState;
+PipelineState Model::sPipelineState;
 
 void Model::StaticInitialize() {
     sDirectXCommon = DirectXCommon::GetInstance();
@@ -26,7 +26,7 @@ void Model::PreDraw(ID3D12GraphicsCommandList* commandList) {
 
     sCommandList = commandList;
 
-    commandList->SetPipelineState(sPipelineState.Get());
+    commandList->SetPipelineState(sPipelineState);
     commandList->SetGraphicsRootSignature(sRootSignature.Get());
     commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
@@ -156,8 +156,7 @@ void Model::InitializeGraphicsPipeline() {
     gpipeline.pRootSignature = sRootSignature.Get();
 
     // グラフィックスパイプラインの生成
-    result = sDirectXCommon->GetDevice()->CreateGraphicsPipelineState(&gpipeline, IID_PPV_ARGS(&sPipelineState));
-    assert(SUCCEEDED(result));
+    sPipelineState.Create(gpipeline);
 }
 
 void Model::CreateMesh() {

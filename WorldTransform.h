@@ -3,6 +3,7 @@
 #include <d3d12.h>
 #include <wrl.h>
 #include "Mymath.h"
+#include "GPUResource.h"
 
 struct ConstBufferDataWorldTransform {
 	Matrix4x4 matWorld; 
@@ -19,7 +20,7 @@ public:
 	}
 
 	D3D12_GPU_VIRTUAL_ADDRESS GetGPUVirtualAddress () const {
-		return constBuff_->GetGPUVirtualAddress();
+		return constBuff_.GetGPUVirtualAddress();
 	}
 public:
 	Vector3 scale_ = { 1.0f,1.0f,1.0f };
@@ -32,7 +33,7 @@ private:
 private:
 	WorldTransform* parent_ = nullptr;
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> constBuff_;
+	GPUResource constBuff_;
 	ConstBufferDataWorldTransform* constMap = nullptr;
 };
 

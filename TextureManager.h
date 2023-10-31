@@ -5,6 +5,8 @@
 #include <string>
 #include <unordered_map>
 #include <wrl.h>
+#include "GPUResource.h"
+#include "DescriptorHandle.h"
 
 class TextureManager
 {
@@ -12,9 +14,8 @@ public:
 	static const size_t kNumTextures = 256;
 
 	struct Texture {
-		Microsoft::WRL::ComPtr<ID3D12Resource> resource;
-		CD3DX12_CPU_DESCRIPTOR_HANDLE cpuDescHandleSRV;
-		CD3DX12_GPU_DESCRIPTOR_HANDLE gpuDescHandleSRV;
+		GPUResource resource;
+		DescriptorHandle srvHandle;
 		std::string name;
 	};
 

@@ -4,7 +4,7 @@
 #include <wrl.h>
 #include "Mymath.h"
 #include <numbers>
-
+#include "GPUResource.h"
 struct ConstBufferDataViewProjection {
 	Matrix4x4 view;			
 	Matrix4x4 projection;	
@@ -18,7 +18,7 @@ public:
 	void UpdateMatrix();
 
 	D3D12_GPU_VIRTUAL_ADDRESS GetGPUVirtualAddress() const {
-		return constBuff_->GetGPUVirtualAddress();
+		return constBuff_.GetGPUVirtualAddress();
 	}
 public:
 	Vector3 translation_ = { 0, 0, -10.0f };
@@ -35,7 +35,7 @@ private:
 	Matrix4x4 matView;
 	Matrix4x4 matProjection;
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> constBuff_;
+	GPUResource constBuff_;
 	ConstBufferDataViewProjection* constMap = nullptr;
 };
 

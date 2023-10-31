@@ -11,6 +11,7 @@
 #include "Mymath.h"
 #include "DirectionalLight.h"
 #include "Material.h"
+#include "DescriptorHandle.h"
 
 class DirectXCommon;
 
@@ -61,8 +62,9 @@ private:
 
 	D3D12_VERTEX_BUFFER_VIEW vbView_{};
 	D3D12_INDEX_BUFFER_VIEW ibView_{};
-	D3D12_CPU_DESCRIPTOR_HANDLE particleDataSRVHandleCPU_;
-	D3D12_GPU_DESCRIPTOR_HANDLE particleDataSRVHandleGPU_;
+	/*D3D12_CPU_DESCRIPTOR_HANDLE particleDataSRVHandleCPU_;
+	D3D12_GPU_DESCRIPTOR_HANDLE particleDataSRVHandleGPU_;*/
+	DescriptorHandle srvHandle_;
 	std::vector<VertexData> vertices_;
 	std::vector<uint16_t> indices_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertBuff_;

@@ -25,7 +25,7 @@ void Material::CreateConstBuffer() {
     result = device->CreateCommittedResource(
         &heapProps, 
         D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr,
-        IID_PPV_ARGS(&constBuff_));
+        IID_PPV_ARGS(constBuff_.GetAddressOf()));
     assert(SUCCEEDED(result));
 }
 
