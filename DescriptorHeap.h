@@ -10,6 +10,7 @@
 
 class DescriptorHeap {
 public:
+    DescriptorHeap() = default;
 
     void Create(D3D12_DESCRIPTOR_HEAP_TYPE type, uint32_t numDescriptors);
     // Reset関数で解放できる
@@ -31,6 +32,10 @@ public:
     }
 
 private:
+    // コピー禁止
+    DescriptorHeap(const DescriptorHeap&) = delete;
+    DescriptorHeap& operator=(const DescriptorHeap&) = delete;
+
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap_;
     D3D12_DESCRIPTOR_HEAP_TYPE type_ = D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES;
     DescriptorHandle descriptorStart_;

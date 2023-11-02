@@ -4,7 +4,7 @@
 #include <wrl/client.h>
 
 class GPUResource {
-    friend class CommandContext;
+    friend class DirectXCommon;
 public:
     operator ID3D12Resource* () const { return resource_.Get(); }
 

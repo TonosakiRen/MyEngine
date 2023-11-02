@@ -1,20 +1,17 @@
 #pragma once
 
-#include "DirectXCommon.h"
 #include "WinApp.h"
 #include "externals/imgui/imgui.h"
 class ImGuiManager
 {
 public:
 	static ImGuiManager* GetInstance();
-	void Initialize(WinApp* winApp, DirectXCommon* dxCommon);
+	void Initialize(WinApp* winApp);
 	void Finalize();
 	void Begin();
 	void End();
 	void Draw();
 
-private:
-	DirectXCommon* dxCommon_ = nullptr;
 private:
 	ImGuiManager() = default;
 	~ImGuiManager() = default;

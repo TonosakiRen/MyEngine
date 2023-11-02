@@ -97,6 +97,9 @@
     <ClCompile Include="DescriptorHeap.cpp" />
     <ClCompile Include="SwapChain.cpp" />
     <ClCompile Include="PixelBuffer.cpp" />
+    <ClCompile Include="ColorBuffer.cpp" />
+    <ClCompile Include="CommandQueue.cpp" />
+    <ClCompile Include="RootSignature.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -179,6 +182,12 @@
     <ClInclude Include="SwapChain.h" />
     <ClInclude Include="GPUResource.h" />
     <ClInclude Include="PixelBuffer.h" />
+    <ClInclude Include="DirectXCommon.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="ColorBuffer.h" />
+    <ClInclude Include="CommandQueue.h" />
+    <ClInclude Include="RootSignature.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\shaders\Basic.hlsli">

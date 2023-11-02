@@ -26,7 +26,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	input->Initialize(win->GetHInstance(), win->GetHwnd());
 
 	imguiManager = ImGuiManager::GetInstance();
-	imguiManager->Initialize(win, dxCommon);
+	imguiManager->Initialize(win);
 	// テクスチャマネージャの初期化
 	TextureManager::GetInstance()->Initialize();
 	TextureManager::Load("white1x1.png");

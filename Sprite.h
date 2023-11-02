@@ -4,9 +4,12 @@
 #include <d3d12.h>
 #include <string>
 #include <wrl.h>
+#include <memory>
 #include "Mymath.h"
 #include "PipelineState.h"
 #include "GPUResource.h"
+#include "PipelineState.h"
+#include "RootSignature.h"
 
 class DirectXCommon;
 class Sprite {
@@ -51,8 +54,8 @@ private:
 	static DirectXCommon* sDirectXCommon;
 	static UINT sDescriptorHandleIncrementSize;
 	static ID3D12GraphicsCommandList* sCommandList;
-	static Microsoft::WRL::ComPtr<ID3D12RootSignature> sRootSignature;
-	static PipelineState sPipelineState;
+	static std::unique_ptr<RootSignature> sRootSignature;
+	static std::unique_ptr<PipelineState> sPipelineState;
 	static Matrix4x4 sMatProjection;
 
 private: 

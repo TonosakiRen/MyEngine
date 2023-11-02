@@ -123,7 +123,7 @@ uint32_t TextureManager::LoadInternal(const std::string& fileName) {
 	}
 
 	// シェーダリソースビュー作成
-	texture.srvHandle = DirectXCommon::GetInstance()->GetSRVHeap().Allocate();
+	texture.srvHandle = DirectXCommon::GetInstance()->AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	/*texture.srvHandle = CD3DX12_CPU_DESCRIPTOR_HANDLE(DirectXCommon::GetInstance()->GetSRVHeap()->GetCPUDescriptorHandleForHeapStart(), DirectXCommon::GetInstance()->GetSrvHeapCount(), sDescriptorHandleIncrementSize_);
 	texture.gpuDescHandleSRV = CD3DX12_GPU_DESCRIPTOR_HANDLE(DirectXCommon::GetInstance()->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart(), DirectXCommon::GetInstance()->GetSrvHeapCount(), sDescriptorHandleIncrementSize_);*/
 
@@ -229,7 +229,7 @@ uint32_t TextureManager::LoadUvInternal(const std::string& fileName, const std::
 	}
 
 	// シェーダリソースビュー作成
-	texture.srvHandle = DirectXCommon::GetInstance()->GetSRVHeap().Allocate();
+	texture.srvHandle = DirectXCommon::GetInstance()->AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	/*texture.cpuDescHandleSRV = CD3DX12_CPU_DESCRIPTOR_HANDLE(DirectXCommon::GetInstance()->GetSRVHeap()->GetCPUDescriptorHandleForHeapStart(), DirectXCommon::GetInstance()->GetSrvHeapCount(), sDescriptorHandleIncrementSize_);
 	texture.gpuDescHandleSRV = CD3DX12_GPU_DESCRIPTOR_HANDLE(DirectXCommon::GetInstance()->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart(), DirectXCommon::GetInstance()->GetSrvHeapCount(), sDescriptorHandleIncrementSize_);*/
 

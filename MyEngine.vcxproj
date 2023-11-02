@@ -94,6 +94,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ColorBuffer.cpp" />
+    <ClCompile Include="CommandQueue.cpp" />
     <ClCompile Include="ConvertString.cpp" />
     <ClCompile Include="DescriptorHeap.cpp" />
     <ClCompile Include="DirectionalLight.cpp" />
@@ -116,6 +118,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Particle.cpp" />
     <ClCompile Include="PipelineState.cpp" />
     <ClCompile Include="PixelBuffer.cpp" />
+    <ClCompile Include="RootSignature.cpp" />
     <ClCompile Include="Skydome.cpp" />
     <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="SwapChain.cpp" />
@@ -125,9 +128,12 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="WorldTransform.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ColorBuffer.h" />
+    <ClInclude Include="CommandQueue.h" />
     <ClInclude Include="DescriptorHandle.h" />
     <ClInclude Include="DescriptorHeap.h" />
     <ClInclude Include="DirectionalLight.h" />
+    <ClInclude Include="DirectXCommon.h" />
     <ClInclude Include="externals\imgui\imconfig.h" />
     <ClInclude Include="externals\imgui\imgui.h" />
     <ClInclude Include="externals\imgui\imgui_impl_dx12.h" />
@@ -148,6 +154,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Particle.h" />
     <ClInclude Include="PipelineState.h" />
     <ClInclude Include="PixelBuffer.h" />
+    <ClInclude Include="RootSignature.h" />
     <ClInclude Include="Skydome.h" />
     <ClInclude Include="Sprite.h" />
     <ClInclude Include="SwapChain.h" />
