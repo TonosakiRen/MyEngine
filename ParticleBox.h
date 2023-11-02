@@ -16,43 +16,47 @@
 
 class DirectXCommon;
 
-struct InstancingBufferData {
-	Matrix4x4 matWorld;
-};
-
-class Particle
+class ParticleBox
 {
 public:
 
-	const uint32_t kParticleNum = 10;
+	const uint32_t kParticleBoxNum;
 
 	enum class RootParameter {
 		kWorldTransform,
 		kViewProjection,
-		kTexture,      
-		kMaterial, 
+		kTexture,
+		kMaterial,
+		kDirectionalLight,
 		parameterNum
 	};
 
 	struct VertexData {
-		Vector3 pos;    
-		Vector2 uv;     
+		Vector3 pos;
+		Vector3 normal;
+		Vector2 uv;
+	};
+
+	struct InstancingBufferData {
+		Matrix4x4 matWorld;
 	};
 
 	static void StaticInitialize();
 	static void PreDraw(ID3D12GraphicsCommandList* commandList);
 	static void PostDraw();
-	static Particle* Create();
+	static ParticleBox* Create(uint32_t particleNum);
+
+	ParticleBox(uint32_t particleNum);
 
 	void Initialize();
-	void Draw(const std::vector<InstancingBufferData>& bufferData, const ViewProjection& viewProjection, const DirectionalLight& directionalLight, const Vector4& color, const uint32_t textureHadle);
+	void Draw(const std::vector<InstancingBufferData>& bufferData, const ViewProjection& viewProjection, const DirectionalLight& directionalLight, const Vector4& color = { 1.0f,1.0f,1.0f,1.0f }, const uint32_t textureHadle = 0);
 	void CreateMesh();
 
 public:
 	std::vector<InstancingBufferData> particleDatas_;
+	uint32_t instanceNum_ = 0;
 	Material material_;
-
-private: 
+private:
 	static void InitializeGraphicsPipeline();
 private:
 	static DirectXCommon* sDirectXCommon;

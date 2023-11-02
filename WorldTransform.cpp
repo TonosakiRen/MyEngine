@@ -6,9 +6,9 @@
 using namespace DirectX;
 
 void WorldTransform::Initialize() {
-	CreateConstBuffer();
-	Map();
-	UpdateMatrix();
+    CreateConstBuffer();
+    Map();
+    UpdateMatrix();
 }
 
 void WorldTransform::CreateConstBuffer() {
@@ -23,7 +23,7 @@ void WorldTransform::CreateConstBuffer() {
     result = device->CreateCommittedResource(
         &heapProps, // アップロード可能
         D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr,
-        IID_PPV_ARGS(constBuff_.GetAddressOf()));
+        IID_PPV_ARGS(&constBuff_));
     assert(SUCCEEDED(result));
 }
 
@@ -34,27 +34,41 @@ void WorldTransform::Map() {
 }
 
 void WorldTransform::UpdateMatrix() {
-    Matrix4x4 matScale, matRot, matTrans;
 
     // スケール、回転、平行移動行列の計算
-    matScale = MakeScaleMatrix(scale_);
-    matRot = MakeIdentity4x4();
-    matRot *= MakeRotateZMatrix(rotation_.z);
-    matRot *= MakeRotateXMatrix(rotation_.x);
-    matRot *= MakeRotateYMatrix(rotation_.y);
-    matTrans = MakeTranslateMatrix(translation_);
+    Matrix4x4 scaleMatrix = MakeScaleMatrix(scale_);
+
+    Matrix4x4 rotateMatrix = MakeIdentity4x4();
+    rotateMatrix = MakeRotateXYZMatrix(rotation_);
+    Matrix4x4 translationMatrix = MakeTranslateMatrix(translation_);
 
     // ワールド行列の合成
-    matWorld_ = MakeIdentity4x4(); 
-    matWorld_ *= matScale;          
-    matWorld_ *= matRot;            
-    matWorld_ *= matTrans;          
+    matWorld_ = MakeIdentity4x4();
+    matWorld_ *= scaleMatrix;
+    matWorld_ *= rotateMatrix;
+    matWorld_ *= translationMatrix;
+
 
     // 親行列の指定がある場合は、掛け算する
     if (parent_) {
+        //scaleを反映させない
+        Matrix4x4 inverseMatrix = MakeIdentity4x4();
+
+        if (!isScaleParent_) {
+            inverseMatrix = Inverse(MakeScaleMatrix(MakeScale(parent_->matWorld_)));
+            matWorld_ *= inverseMatrix;
+        }
+
+        if (!isRotateParent_) {
+            inverseMatrix = Inverse(NormalizeMakeRotateMatrix(parent_->matWorld_));
+            matWorld_ *= inverseMatrix;
+        }
+
         matWorld_ *= parent_->matWorld_;
     }
 
     // 定数バッファに書き込み
-    constMap->matWorld = matWorld_;
+    if (constMap) {
+        constMap->matWorld = matWorld_;
+    }
 }

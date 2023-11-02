@@ -2,6 +2,9 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 #include <assert.h>
+#include <numbers>
+#include<cstdlib>
+#include<ctime>
 
 struct Vector2 {
 	float x;
@@ -50,7 +53,66 @@ struct TranformationMatrix {
 	Matrix4x4 World;
 };
 
+inline float clamp(float num, float min, float max) {
+	if (num < min) {
+		return min;
+	}
+	if (num > max) {
+		return max;
+	}
+	return num;
+}
+
+inline bool closeValue(float& num, float goal, float speed) {
+	if (std::fabs(num - goal) < std::fabs(speed)) {
+		num = goal;
+		return true;
+	}
+	if (num < goal) {
+		num += speed;
+	}
+	if (num > goal) {
+		num -= speed;
+	}
+	return false;
+}
+
+inline float Radian(float degree) { return degree * std::numbers::pi_v<float> / 180.0f; }
+inline float Degree(float radian) { return radian * 180.0f / std::numbers::pi_v<float>; }
+
+struct OBB {
+	Vector3 center;          // 中心点
+	Vector3 orientations[3]; // 座標軸、正規化、直交座標
+	Vector3 size;            // 座標軸方向の長さの半分。中心から面までの距離
+};
+
+
 #pragma region Vector3
+
+inline Matrix4x4 MakeIdentity4x4() {
+	Matrix4x4 tmp;
+	tmp.m[0][0] = 1.0f;
+	tmp.m[0][1] = 0.0f;
+	tmp.m[0][2] = 0.0f;
+	tmp.m[0][3] = 0.0f;
+
+	tmp.m[1][0] = 0.0f;
+	tmp.m[1][1] = 1.0f;
+	tmp.m[1][2] = 0.0f;
+	tmp.m[1][3] = 0.0f;
+
+	tmp.m[2][0] = 0.0f;
+	tmp.m[2][1] = 0.0f;
+	tmp.m[2][2] = 1.0f;
+	tmp.m[2][3] = 0.0f;
+
+	tmp.m[3][0] = 0.0f;
+	tmp.m[3][1] = 0.0f;
+	tmp.m[3][2] = 0.0f;
+	tmp.m[3][3] = 1.0f;
+
+	return tmp;
+}
 
 inline Vector3 GetXAxis(Matrix4x4 m){
 
@@ -77,6 +139,9 @@ inline Vector3 Add(const Vector3& v1, const Vector3& v2) {
 inline Vector3 operator +(const Vector3& v1, const Vector3& v2) {
 	return{ v1.x + v2.x,v1.y + v2.y,v1.z + v2.z };
 }
+inline Vector3 operator +(const Vector3& v1, const float& scalar) {
+	return{ v1.x + scalar,v1.y + scalar,v1.z + scalar };
+}
 //減算
 inline Vector3 Subtract(const Vector3& v1, const Vector3& v2) {
 	Vector3 tmp;
@@ -88,6 +153,10 @@ inline Vector3 Subtract(const Vector3& v1, const Vector3& v2) {
 inline Vector3 operator -(const Vector3& v1, const Vector3& v2) {
 	return{ v1.x - v2.x,v1.y - v2.y,v1.z - v2.z };
 }
+inline Vector3 operator -(const Vector3& v1, const float& scalar) {
+	return{ v1.x - scalar,v1.y - scalar,v1.z - scalar };
+}
+
 //スカラー倍
 inline Vector3 Multiply(float scalar, const Vector3& v) {
 	Vector3 tmp;
@@ -177,6 +246,43 @@ inline Vector3 Project(const Vector3& v1, const Vector3 v2) {
 
 inline Vector3 ClosestPoint(const Vector3& point, const Segment& segment) {
 	Vector3 result = segment.origin + Project(point - segment.origin, segment.diff);
+	return result;
+}
+
+inline Vector3 MakeScale(const Matrix4x4& matrix) {
+	Vector3 scaleX = { matrix.m[0][0],matrix.m[0][1],matrix.m[0][2] };
+	Vector3 scaleY = { matrix.m[1][0],matrix.m[1][1],matrix.m[1][2] };
+	Vector3 scaleZ = { matrix.m[2][0],matrix.m[2][1],matrix.m[2][2] };
+	Vector3 result;
+	result.x = Length(scaleX);
+	result.y = Length(scaleY);
+	result.z = Length(scaleZ);
+	return result;
+}
+
+inline Vector3 MakeTranslation(const Matrix4x4& matrix) {
+	Vector3 result;
+	result.x = matrix.m[3][0];
+	result.y = matrix.m[3][1];
+	result.z = matrix.m[3][2];
+	return result;
+}
+//回転行列算出
+inline Matrix4x4 NormalizeMakeRotateMatrix(const Matrix4x4& matrix) {
+	Vector3 xAxis = Normalize(GetXAxis(matrix)); // [0][?]
+	Vector3 yAxis = Normalize(GetYAxis(matrix)); // [1][?]
+	Vector3 zAxis = Normalize(GetZAxis(matrix)); // [2][?]
+	Matrix4x4 result = MakeIdentity4x4();
+	result.m[0][0] = xAxis.x;
+	result.m[0][1] = xAxis.y;
+	result.m[0][2] = xAxis.z;
+	result.m[1][0] = yAxis.x;
+	result.m[1][1] = yAxis.y;
+	result.m[1][2] = yAxis.z;
+	result.m[2][0] = zAxis.x;
+	result.m[2][1] = zAxis.y;
+	result.m[2][2] = zAxis.z;
+
 	return result;
 }
 
@@ -417,30 +523,6 @@ inline Matrix4x4 Transpose(const Matrix4x4& m) {
 	tmp.m[3][1] = m.m[1][3];
 	tmp.m[3][2] = m.m[2][3];
 	tmp.m[3][3] = m.m[3][3];
-
-	return tmp;
-}
-inline Matrix4x4 MakeIdentity4x4() {
-	Matrix4x4 tmp;
-	tmp.m[0][0] = 1.0f;
-	tmp.m[0][1] = 0.0f;
-	tmp.m[0][2] = 0.0f;
-	tmp.m[0][3] = 0.0f;
-
-	tmp.m[1][0] = 0.0f;
-	tmp.m[1][1] = 1.0f;
-	tmp.m[1][2] = 0.0f;
-	tmp.m[1][3] = 0.0f;
-
-	tmp.m[2][0] = 0.0f;
-	tmp.m[2][1] = 0.0f;
-	tmp.m[2][2] = 1.0f;
-	tmp.m[2][3] = 0.0f;
-
-	tmp.m[3][0] = 0.0f;
-	tmp.m[3][1] = 0.0f;
-	tmp.m[3][2] = 0.0f;
-	tmp.m[3][3] = 1.0f;
 
 	return tmp;
 }
@@ -740,4 +822,26 @@ inline Matrix4x4 MakeLookRotation(const Vector3& direction, const Vector3& up = 
 }
 
 #pragma endregion
+
+inline int Rand(int min, int max) {
+	if (min == 0 && max == 0) {
+		return 0;
+	}
+	return min + (int)(rand() * (max - min + 1.0) / (1.0 + RAND_MAX));
+}
+inline float Rand(float min, float max) {
+	if (min == 0 && max == 0) {
+		return 0;
+	}
+	int kmin = int(min * 10000);
+	int kmax = int(max * 10000);
+
+	float result = (kmin + (int)(rand() * (kmax - kmin + 1.0) / (1.0 + RAND_MAX))) / 10000.0f;
+	return result;
+}
+inline bool Rand() { return bool(0 + (int)(rand() * (1 - 0 + 1.0) / (1.0 + RAND_MAX))); }
+
+inline void SRAND() {
+	srand((unsigned)time(NULL));
+}
 
