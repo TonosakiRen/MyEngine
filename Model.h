@@ -11,6 +11,8 @@
 #include "DirectionalLight.h"
 #include "Material.h"
 #include <string>
+#include "PipelineState.h"
+#include "RootSignature.h"
 
 class DirectXCommon;
 
@@ -51,8 +53,8 @@ private:
 	static DirectXCommon* sDirectXCommon;
 	static UINT sDescriptorHandleIncrementSize;
 	static ID3D12GraphicsCommandList* sCommandList;
-	static Microsoft::WRL::ComPtr<ID3D12RootSignature> sRootSignature;
-	static Microsoft::WRL::ComPtr<ID3D12PipelineState> sPipelineState;
+	static std::unique_ptr<RootSignature> sRootSignature;
+	static std::unique_ptr<PipelineState> sPipelineState;
 
 	D3D12_VERTEX_BUFFER_VIEW vbView_{};
 	D3D12_INDEX_BUFFER_VIEW ibView_{};

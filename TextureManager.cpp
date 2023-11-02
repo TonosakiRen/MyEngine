@@ -35,7 +35,7 @@ const D3D12_RESOURCE_DESC TextureManager::GetResoureDesc(uint32_t textureHandle)
 void TextureManager::SetGraphicsRootDescriptorTable(ID3D12GraphicsCommandList* commandList, UINT rootParamIndex,uint32_t textureHandle) { // デスクリプタヒープの配列
 	assert(textureHandle < kNumTextures);
 	// シェーダリソースビューをセット
-	commandList->SetGraphicsRootDescriptorTable(rootParamIndex, textures_[textureHandle].gpuDescHandleSRV);
+	commandList->SetGraphicsRootDescriptorTable(rootParamIndex, textures_[textureHandle].srvHandle);
 }
 
 uint32_t TextureManager::LoadInternal(const std::string& fileName) {
@@ -105,7 +105,7 @@ uint32_t TextureManager::LoadInternal(const std::string& fileName) {
 		&heapProps, D3D12_HEAP_FLAG_NONE,
 		&texresDesc,
 		D3D12_RESOURCE_STATE_GENERIC_READ, // テクスチャ用指定
-		nullptr, IID_PPV_ARGS(&texture.resource));
+		nullptr, IID_PPV_ARGS(texture.resource.GetAddressOf()));
 
 	assert(SUCCEEDED(result));
 
@@ -123,10 +123,9 @@ uint32_t TextureManager::LoadInternal(const std::string& fileName) {
 	}
 
 	// シェーダリソースビュー作成
-	texture.cpuDescHandleSRV = CD3DX12_CPU_DESCRIPTOR_HANDLE(DirectXCommon::GetInstance()->GetSRVHeap()->GetCPUDescriptorHandleForHeapStart(), DirectXCommon::GetInstance()->GetSrvHeapCount(), sDescriptorHandleIncrementSize_);
-	texture.gpuDescHandleSRV = CD3DX12_GPU_DESCRIPTOR_HANDLE(DirectXCommon::GetInstance()->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart(), DirectXCommon::GetInstance()->GetSrvHeapCount(), sDescriptorHandleIncrementSize_);
-
-	DirectXCommon::GetInstance()->IncrementSrvHeapCount();
+	texture.srvHandle = DirectXCommon::GetInstance()->AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	/*texture.srvHandle = CD3DX12_CPU_DESCRIPTOR_HANDLE(DirectXCommon::GetInstance()->GetSRVHeap()->GetCPUDescriptorHandleForHeapStart(), DirectXCommon::GetInstance()->GetSrvHeapCount(), sDescriptorHandleIncrementSize_);
+	texture.gpuDescHandleSRV = CD3DX12_GPU_DESCRIPTOR_HANDLE(DirectXCommon::GetInstance()->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart(), DirectXCommon::GetInstance()->GetSrvHeapCount(), sDescriptorHandleIncrementSize_);*/
 
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
 	D3D12_RESOURCE_DESC resDesc = texture.resource->GetDesc();
@@ -137,9 +136,9 @@ uint32_t TextureManager::LoadInternal(const std::string& fileName) {
 	srvDesc.Texture2D.MipLevels = (UINT)metadata.mipLevels;
 
 	device_->CreateShaderResourceView(
-		texture.resource.Get(), 
+		texture.resource, 
 		&srvDesc,               
-		texture.cpuDescHandleSRV);
+		texture.srvHandle);
 
 	useTextureCount_++;
 	return handle;
@@ -212,7 +211,7 @@ uint32_t TextureManager::LoadUvInternal(const std::string& fileName, const std::
 		&heapProps, D3D12_HEAP_FLAG_NONE,
 		&texresDesc,
 		D3D12_RESOURCE_STATE_GENERIC_READ, // テクスチャ用指定
-		nullptr, IID_PPV_ARGS(&texture.resource));
+		nullptr, IID_PPV_ARGS(texture.resource.GetAddressOf()));
 
 	assert(SUCCEEDED(result));
 
@@ -230,10 +229,9 @@ uint32_t TextureManager::LoadUvInternal(const std::string& fileName, const std::
 	}
 
 	// シェーダリソースビュー作成
-	texture.cpuDescHandleSRV = CD3DX12_CPU_DESCRIPTOR_HANDLE(DirectXCommon::GetInstance()->GetSRVHeap()->GetCPUDescriptorHandleForHeapStart(), DirectXCommon::GetInstance()->GetSrvHeapCount(), sDescriptorHandleIncrementSize_);
-	texture.gpuDescHandleSRV = CD3DX12_GPU_DESCRIPTOR_HANDLE(DirectXCommon::GetInstance()->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart(), DirectXCommon::GetInstance()->GetSrvHeapCount(), sDescriptorHandleIncrementSize_);
-
-	DirectXCommon::GetInstance()->IncrementSrvHeapCount();
+	texture.srvHandle = DirectXCommon::GetInstance()->AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	/*texture.cpuDescHandleSRV = CD3DX12_CPU_DESCRIPTOR_HANDLE(DirectXCommon::GetInstance()->GetSRVHeap()->GetCPUDescriptorHandleForHeapStart(), DirectXCommon::GetInstance()->GetSrvHeapCount(), sDescriptorHandleIncrementSize_);
+	texture.gpuDescHandleSRV = CD3DX12_GPU_DESCRIPTOR_HANDLE(DirectXCommon::GetInstance()->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart(), DirectXCommon::GetInstance()->GetSrvHeapCount(), sDescriptorHandleIncrementSize_);*/
 
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
 	D3D12_RESOURCE_DESC resDesc = texture.resource->GetDesc();
@@ -244,9 +242,9 @@ uint32_t TextureManager::LoadUvInternal(const std::string& fileName, const std::
 	srvDesc.Texture2D.MipLevels = (UINT)metadata.mipLevels;
 
 	device_->CreateShaderResourceView(
-		texture.resource.Get(),
+		texture.resource,
 		&srvDesc,
-		texture.cpuDescHandleSRV);
+		texture.srvHandle);
 
 	useTextureCount_++;
 	return handle;

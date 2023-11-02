@@ -3,6 +3,7 @@
 #include <d3d12.h>
 #include <wrl.h>
 #include "Mymath.h"
+#include "GPUResource.h"
 
 struct ConstBufferDataDirectionalLight {
 	Vector4 color;     
@@ -18,7 +19,7 @@ public:
 	void UpdateDirectionalLight();
 
 	D3D12_GPU_VIRTUAL_ADDRESS GetGPUVirtualAddress() const {
-		return constBuff_->GetGPUVirtualAddress();
+		return constBuff_.GetGPUVirtualAddress();
 	}
 public:
 	Vector4 color_ = { 1.0f, 1.0f, 1.0f,1.0f };
@@ -28,7 +29,7 @@ private:
 	void CreateConstBuffer();
 	void Map();
 private:
-	Microsoft::WRL::ComPtr<ID3D12Resource> constBuff_;
+	GPUResource constBuff_;
 	ConstBufferDataDirectionalLight* constMap = nullptr;
 };
 

@@ -4,6 +4,17 @@
 
 using namespace DirectX;
 
+void (GameScene::* GameScene::SceneUpdateTable[])() = {
+	&GameScene::TitleUpdate,
+	&GameScene::InGameUpdate,
+};
+
+void (GameScene::* GameScene::SceneInitializeTable[])() = {
+	&GameScene::TitleInitialize,
+	&GameScene::InGameInitialize,
+};
+
+
 GameScene::GameScene() {};
 
 GameScene::~GameScene() {};
@@ -26,11 +37,15 @@ void GameScene::Initialize() {
 
 	sprite_.reset(Sprite::Create(textureHandle_, { 0.0f,0.0f }));
 
-	skydome_.reset(Skydome::Create("skydome"));
-	floor_.reset(Floor::Create("floor"));
-	sphere_.reset(GameObject::Create("sphere"));
+	skydome_ = std::make_unique<Skydome>();
+	skydome_->Initialize("skydome", &viewProjection_, &directionalLight_);
+	floor_ = std::make_unique<Floor>();
+	floor_->Initialize("floor", &viewProjection_, &directionalLight_);
+	sphere_ = std::make_unique<GameObject>();
+	sphere_->Initialize("sphere", &viewProjection_, &directionalLight_);
 
-	particle_.reset(Particle::Create());
+	player_ = std::make_unique<Player>();
+	player_->Initialize("player", &viewProjection_, &directionalLight_);
 }
 
 void GameScene::Update(){
@@ -45,31 +60,97 @@ void GameScene::Update(){
 		directionalLight_.direction_ = Normalize(directionalLight_.direction_);
 		directionalLight_.UpdateDirectionalLight();
 	}
+	Collider::SwitchIsDrawCollider();
+
+	//Scene初期化
+	if (sceneRequest_) {
+		scene_ = sceneRequest_.value();
+		(this->*SceneInitializeTable[static_cast<size_t>(scene_)])();
+		sceneRequest_ = std::nullopt;
+	}
+	//SceneUpdate
+	(this->*SceneUpdateTable[static_cast<size_t>(scene_)])();
 	
+	
+}
+
+void GameScene::TitleInitialize() {
+
+}
+void GameScene::TitleUpdate() {
+
+	if (input_->TriggerKey(DIK_P)) {
+		sceneRequest_ = Scene::InGame;
+	}
+
+}
+void GameScene::InGameInitialize() {
+
+}
+void GameScene::InGameUpdate() {
+	if (input_->TriggerKey(DIK_P)) {
+		sceneRequest_ = Scene::Title;
+	}
 	skydome_->Update();
 	floor_->Update();
+	player_->Update();
+	player_->Collision(floor_->collider_);
 }
 
 void GameScene::ModelDraw()
 {
-	skydome_->Draw(viewProjection_, directionalLight_);
-	floor_->Draw(viewProjection_, directionalLight_);
+	switch (scene_)
+	{
+	case GameScene::Scene::Title:
+		break;
+	case GameScene::Scene::InGame:
+		skydome_->Draw();
+		floor_->Draw();
+		player_->Draw();
+		break;
+	default:
+		break;
+	}
+	
 }
 
 void GameScene::ParticleDraw()
 {
-	particle_->Draw(viewProjection_, textureHandle_);
-
+	switch (scene_)
+	{
+	case GameScene::Scene::Title:
+		break;
+	case GameScene::Scene::InGame:
+		break;
+	default:
+		break;
+	}
 }
 
 void GameScene::PreSpriteDraw()
 {
-
+	switch (scene_)
+	{
+	case GameScene::Scene::Title:
+		break;
+	case GameScene::Scene::InGame:
+		break;
+	default:
+		break;
+	}
 }
 
 void GameScene::PostSpriteDraw()
 {
-
+	switch (scene_)
+	{
+	case GameScene::Scene::Title:
+		break;
+	case GameScene::Scene::InGame:
+		break;
+	default:
+		break;
+	}
 }
 
 void GameScene::Draw() {

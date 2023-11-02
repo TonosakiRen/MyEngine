@@ -1,5 +1,4 @@
 #pragma once
-#pragma once
 #include "TextureManager.h"
 #include "ViewProjection.h"
 #include "WorldTransform.h"
@@ -11,6 +10,9 @@
 #include "Mymath.h"
 #include "DirectionalLight.h"
 #include "Material.h"
+#include "DescriptorHandle.h"
+#include "PipelineState.h"
+#include "RootSignature.h"
 
 class DirectXCommon;
 
@@ -43,7 +45,7 @@ public:
 	static Particle* Create();
 
 	void Initialize();
-	void Draw(const ViewProjection& viewProjection, const uint32_t textureHadle = 0, const Vector4& color = {0.0f,0.0f,0.0f,0.0f});
+	void Draw(const std::vector<InstancingBufferData>& bufferData, const ViewProjection& viewProjection, const DirectionalLight& directionalLight, const Vector4& color, const uint32_t textureHadle);
 	void CreateMesh();
 
 public:
@@ -56,13 +58,12 @@ private:
 	static DirectXCommon* sDirectXCommon;
 	static UINT sDescriptorHandleIncrementSize;
 	static ID3D12GraphicsCommandList* sCommandList;
-	static Microsoft::WRL::ComPtr<ID3D12RootSignature> sRootSignature;
-	static Microsoft::WRL::ComPtr<ID3D12PipelineState> sPipelineState;
+	static std::unique_ptr<RootSignature> sRootSignature;
+	static std::unique_ptr<PipelineState> sPipelineState;
 
 	D3D12_VERTEX_BUFFER_VIEW vbView_{};
 	D3D12_INDEX_BUFFER_VIEW ibView_{};
-	D3D12_CPU_DESCRIPTOR_HANDLE particleDataSRVHandleCPU_;
-	D3D12_GPU_DESCRIPTOR_HANDLE particleDataSRVHandleGPU_;
+	DescriptorHandle srvHandle_;
 	std::vector<VertexData> vertices_;
 	std::vector<uint16_t> indices_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertBuff_;

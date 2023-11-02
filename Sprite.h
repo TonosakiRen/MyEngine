@@ -4,7 +4,12 @@
 #include <d3d12.h>
 #include <string>
 #include <wrl.h>
+#include <memory>
 #include "Mymath.h"
+#include "PipelineState.h"
+#include "GPUResource.h"
+#include "PipelineState.h"
+#include "RootSignature.h"
 
 class DirectXCommon;
 class Sprite {
@@ -49,13 +54,13 @@ private:
 	static DirectXCommon* sDirectXCommon;
 	static UINT sDescriptorHandleIncrementSize;
 	static ID3D12GraphicsCommandList* sCommandList;
-	static Microsoft::WRL::ComPtr<ID3D12RootSignature> sRootSignature;
-	static Microsoft::WRL::ComPtr<ID3D12PipelineState> sPipelineState;
+	static std::unique_ptr<RootSignature> sRootSignature;
+	static std::unique_ptr<PipelineState> sPipelineState;
 	static Matrix4x4 sMatProjection;
 
 private: 
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertBuff_;
-	Microsoft::WRL::ComPtr<ID3D12Resource> constBuff_;
+	GPUResource constBuff_;
 	VertexData* vertMap = nullptr;
 	ConstBufferData* constMap = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW vbView_{};

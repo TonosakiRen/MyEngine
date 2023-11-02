@@ -5,13 +5,14 @@
 #include "Input.h"
 #include "DirectXCommon.h"
 #include "ImGuiManager.h"
+#include "Easing.h"
 
 using namespace DirectX;
 
 void ViewProjection::Initialize() {
-	CreateConstBuffer();
-	Map();
-	UpdateMatrix();
+    CreateConstBuffer();
+    Map();
+    UpdateMatrix();
 }
 
 void ViewProjection::CreateConstBuffer() {
@@ -38,11 +39,14 @@ void ViewProjection::Map() {
 }
 
 void ViewProjection::UpdateMatrix() {
-   
+
     // ビュー行列の生成
-    matView = MakeViewMatirx(target_,translation_);
+
+    Vector3 tranlation = translation_ + Vector3{ Rand(-shakeValue_.x,shakeValue_.x),Rand(-shakeValue_.y,shakeValue_.y) ,Rand(-shakeValue_.z,shakeValue_.z) };
+    matView = MakeViewMatirx(target_, tranlation);
+
     // 透視投影による射影行列の生成
-    matProjection = MakePerspectiveFovMatrix(fovAngleY, aspectRatio, nearZ, farZ);
+    matProjection = MakePerspectiveFovMatrix(fovAngleY_, aspectRatio_, nearZ_, farZ_);
 
     // 定数バッファに書き込み
     constMap->view = matView;
@@ -50,21 +54,36 @@ void ViewProjection::UpdateMatrix() {
     constMap->viewPosition = translation_;
 }
 
+bool ViewProjection::Shake(Vector3 shakeValue, int& frame)
+{
+    frame--;
+    if (frame > 0) {
+        shakeValue_ = shakeValue;
+        return true;
+    }
+    frame = 0;
+    shakeValue_ = { 0.0f,0.0f,0.0f };
+    return false;
+}
+
 void ViewProjection::DebugMove() {
     Input* input = Input::GetInstance();
 
     Vector2 mouseMove = input->GetMouseMove();
     float wheel = input->GetWheel();
-
+#ifdef _DEBUG
     ImGui::Begin("Camera");
     ImGui::DragFloat3("target", &target_.x, 0.01f);
     ImGui::DragFloat3("translation", &translation_.x, 0.01f);
     ImGui::End();
+#endif // _DEBUG
+
+
 
     if (input->IsPressMouse(1)) {
         float rot = static_cast<float>(M_PI / 180.0f);
-       target_.x += rot * mouseMove.y * 0.1f;
-       target_.y += rot * mouseMove.x * 0.1f;
+        target_.x += rot * mouseMove.y * 0.1f;
+        target_.y += rot * mouseMove.x * 0.1f;
     }
     else if (input->IsPressMouse(2)) {
         Matrix4x4 rotMat = MakeRotateXYZMatrix(target_);
@@ -78,3 +97,4 @@ void ViewProjection::DebugMove() {
         translation_ += cameraZ;
     }
 }
+

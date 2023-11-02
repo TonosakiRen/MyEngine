@@ -3,6 +3,7 @@
 #include <d3d12.h>
 #include <wrl.h>
 #include "Mymath.h"
+#include "GPUResource.h"
 
 struct ConstBufferDataMaterial {
 	Vector4 color;
@@ -18,7 +19,7 @@ public:
 	void UpdateMaterial();
 
 	D3D12_GPU_VIRTUAL_ADDRESS GetGPUVirtualAddress() const {
-		return constBuff_->GetGPUVirtualAddress();
+		return constBuff_.GetGPUVirtualAddress();
 	}
 public:
 	Vector4 color_ = { 1.0f, 1.0f, 1.0f,1.0f };
@@ -31,7 +32,7 @@ private:
 	void Map();
 private:
 	Matrix4x4 uvTransform_;
-	Microsoft::WRL::ComPtr<ID3D12Resource> constBuff_;
+	GPUResource constBuff_;
 	ConstBufferDataMaterial* constMap = nullptr;
 
 };
