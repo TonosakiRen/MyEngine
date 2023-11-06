@@ -6,6 +6,7 @@
 
 #include <cstdint>
 #include <memory>
+#include <chrono>
 
 #include "DescriptorHandle.h"
 
@@ -25,6 +26,7 @@ public:
 private:
     Microsoft::WRL::ComPtr<IDXGISwapChain4> swapChain_;
     std::unique_ptr<ColorBuffer> buffers_[kNumBuffers];
+    std::chrono::steady_clock::time_point reference_;
     uint32_t currentBufferIndex_ = 0;
     int32_t refreshRate_ = 0;
 };

@@ -40,7 +40,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	//　スプライト静的初期化
 	Sprite::StaticInitialize();
 
-#pragma endregion
+#pragma endregion変数
 
 	// ゲームシーンの初期化
 	gameScene = new GameScene();

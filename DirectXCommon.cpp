@@ -90,21 +90,10 @@ void DirectXCommon::PreDraw() {
 void DirectXCommon::PostDraw() {
 	HRESULT result = S_FALSE;
 
-	//// リソースバリアを変更（描画対象→表示状態）
-	//UINT bbIndex = swapChain_.GetBufferIndex();
-	//CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
-	//	backBuffers_[bbIndex].Get(), D3D12_RESOURCE_STATE_RENDER_TARGET,
-	//	D3D12_RESOURCE_STATE_PRESENT);
-	//commandList_->ResourceBarrier(1, &barrier);
-
 	TransitionResource(swapChain_.GetColorBuffer(), D3D12_RESOURCE_STATE_PRESENT);
 
 	// 命令のクローズ
 	commandList_->Close();
-
-	// コマンドリストの実行
-	//ID3D12CommandList* cmdLists[] = { commandList_.Get() }; // コマンドリストの配列
-	//commandQueue_->ExecuteCommandLists(1, cmdLists);
 
 	commandQueue_.Execute(commandList_.Get());
 
@@ -124,17 +113,9 @@ void DirectXCommon::PostDraw() {
 	}
 #endif
 
-	// コマンドリストの実行完了を待つ
-	/*commandQueue_->Signal(fence_.Get(), ++fenceVal_);
-	if (fence_->GetCompletedValue() != fenceVal_) {
-		HANDLE event = CreateEvent(nullptr, false, false, nullptr);
-		fence_->SetEventOnCompletion(fenceVal_, event);
-		WaitForSingleObject(event, INFINITE);
-		CloseHandle(event);
-	}*/
-
 	commandQueue_.Signal();
 	commandQueue_.WaitForGPU();
+	commandQueue_.UpdateFixFPS();
 
 	commandAllocator_->Reset(); // キューをクリア
 	commandList_->Reset(commandAllocator_.Get(),
