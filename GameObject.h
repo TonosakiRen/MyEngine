@@ -27,15 +27,6 @@ public:
 	void SetEnableLighting(bool enableLighting) {
 		material_.enableLighting_ = enableLighting;
 	}
-	void SetViewProjection(ViewProjection* viewProjection) {
-		viewProjection_ = viewProjection;
-	}
-	void SetDirectionalLight(DirectionalLight* directionalLight) {
-		directionalLight_ = directionalLight;
-	}
-	void SetEnableLighting(bool enableLighting) {
-		material_.enableLighting_ = enableLighting;
-	}
 	void SetParent(WorldTransform* parent) {
 		worldTransform_.SetParent(parent);
 	}
@@ -51,6 +42,7 @@ public:
 	WorldTransform* GetWorldTransform() {
 		return &worldTransform_;
 	}
+
 protected:
 	WorldTransform worldTransform_;
 	Material material_;
