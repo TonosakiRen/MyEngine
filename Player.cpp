@@ -78,15 +78,19 @@ void Player::Update()
 	else {
 		if (input_->PushKey(DIK_W)) {
 			move.z += 0.2f;
+			isWalking_ = true;
 		}
 		if (input_->PushKey(DIK_A)) {
 			move.x -= 0.2f;
+			isWalking_ = true;
 		}
 		if (input_->PushKey(DIK_S)) {
 			move.z -= 0.2f;
+			isWalking_ = true;
 		}
 		if (input_->PushKey(DIK_D)) {
 			move.x += 0.2f;
+			isWalking_ = true;
 		}
 
 		Matrix4x4 rotateMatrix = MakeRotateYMatrix(viewProjection_->target_.y);
