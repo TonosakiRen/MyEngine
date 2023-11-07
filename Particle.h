@@ -16,15 +16,11 @@
 
 class DirectXCommon;
 
-struct InstancingBufferData {
-	Matrix4x4 matWorld;
-};
-
 class Particle
 {
 public:
 
-	const uint32_t kParticleNum = 10;
+	const uint32_t kParticleNum;
 
 	enum class RootParameter {
 		kWorldTransform,
@@ -39,10 +35,16 @@ public:
 		Vector2 uv;     
 	};
 
+	struct InstancingBufferData {
+		Matrix4x4 matWorld;
+	};
+
 	static void StaticInitialize();
 	static void PreDraw(ID3D12GraphicsCommandList* commandList);
 	static void PostDraw();
-	static Particle* Create();
+	static Particle* Create(uint32_t particleNum);
+
+	Particle(uint32_t particleNum);
 
 	void Initialize();
 	void Draw(const std::vector<InstancingBufferData>& bufferData, const ViewProjection& viewProjection, const DirectionalLight& directionalLight, const Vector4& color, const uint32_t textureHadle);

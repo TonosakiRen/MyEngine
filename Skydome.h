@@ -8,3 +8,4 @@ public:
     void Initialize(const std::string name, ViewProjection* viewProjection, DirectionalLight* directionalLight);
     void Update();
 };
+

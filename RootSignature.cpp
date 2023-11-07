@@ -24,7 +24,7 @@ void RootSignature::Create(const D3D12_ROOT_SIGNATURE_DESC& desc) {
         0,
         blob->GetBufferPointer(),
         blob->GetBufferSize(),
-        IID_PPV_ARGS(rootSignature_.ReleaseAndGetAddressOf()));
+        IID_PPV_ARGS(rootSignature_.GetAddressOf()));
 
     assert(SUCCEEDED(result));
 }
