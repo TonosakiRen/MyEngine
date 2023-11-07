@@ -96,15 +96,6 @@ void Model::InitializeGraphicsPipeline() {
 
         sRootSignature->Create(rootSignatureDesc);
 
-        //ComPtr<ID3DBlob> rootSigBlob;errorBlob
-        //// バージョン自動判定のシリアライズ
-        //result = D3DX12SerializeVersionedRootSignature(
-        //    &rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1_0, &rootSigBlob, &);
-        //// ルートシグネチャの生成
-        //result = sDirectXCommon->GetDevice()->CreateRootSignature(
-        //    0, rootSigBlob->GetBufferPointer(), rootSigBlob->GetBufferSize(),
-        //    IID_PPV_ARGS(&sRootSignature));
-        //assert(SUCCEEDED(result));
     }
 
     {

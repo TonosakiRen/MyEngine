@@ -127,6 +127,10 @@ void GameScene::ParticleDraw()
 	}
 }
 
+void GameScene::ParticleBoxDraw()
+{
+}
+
 void GameScene::PreSpriteDraw()
 {
 	switch (scene_)
@@ -174,6 +178,11 @@ void GameScene::Draw() {
 	Particle::PreDraw(commandList);
 	ParticleDraw();
 	Particle::PostDraw();
+
+	//Particle描画
+	ParticleBox::PreDraw(commandList);
+	ParticleBoxDraw();
+	ParticleBox::PostDraw();
 
 	// 前景スプライト描画
 	Sprite::PreDraw(commandList);
