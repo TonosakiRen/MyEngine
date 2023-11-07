@@ -53,6 +53,7 @@ private:
 	Microsoft::WRL::ComPtr<IDxcIncludeHandler> includeHandler_;
 	SwapChain swapChain_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> depthBuffer_;
+	ColorBuffer mainColorBuffer_;
 
 	DescriptorHeap descriptorHeaps_[D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES];
 

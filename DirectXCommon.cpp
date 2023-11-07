@@ -28,40 +28,15 @@ void DirectXCommon::Initialize(int32_t backBufferWidth, int32_t backBufferHeight
 	swapChain_.Create(winApp_->GetHwnd());
 	CreateDepthBuffer();
 	CreateSrvHeap();
-	
+
 }
 
 void DirectXCommon::PreDraw() {
 
-	////TransitionBarrierの設定
-	//D3D12_RESOURCE_BARRIER barrier{};
-	////今回のバリアはTransition
-	//barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	////Noneにしておく
-	//barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	////バリアを張る対象のリソース。現在のバックバッファに対して行う 
-	//barrier.Transition.pResource = swapChain_.GetColorBuffer();
-	////遷移前(現在)のResorceState
-	//barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
-	////遷移後のResourceState
-	//barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	////TransitionBarrierを張る
-	//commandList_->ResourceBarrier(1, &barrier);
-
 	TransitionResource(swapChain_.GetColorBuffer(), D3D12_RESOURCE_STATE_RENDER_TARGET);
-
-
-	//// レンダーターゲットビュー用ディスクリプタヒープのハンドルを取得
-	//CD3DX12_CPU_DESCRIPTOR_HANDLE rtvH = CD3DX12_CPU_DESCRIPTOR_HANDLE(
-	//	rtvHeap_->GetCPUDescriptorHandleForHeapStart(), bbIndex,
-	//	device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV));
 
 	// レンダーターゲットビュー用ディスクリプタヒープのハンドルを取得
 	DescriptorHandle rtvH = descriptorHeaps_[D3D12_DESCRIPTOR_HEAP_TYPE_RTV].GetDiscriptorHandle(swapChain_.GetBufferIndex());
-
-	// 深度ステンシルビュー用デスクリプタヒープのハンドルを取得
-	/*CD3DX12_CPU_DESCRIPTOR_HANDLE dsvH =
-		CD3DX12_CPU_DESCRIPTOR_HANDLE(dsvHeap_.GetCPUDescriptorHandleForHeapStart());*/
 
 	// 深度ステンシルビュー用デスクリプタヒープのハンドルを取得
 	DescriptorHandle dsvH = descriptorHeaps_[D3D12_DESCRIPTOR_HEAP_TYPE_DSV].GetDiscriptorHandle(0); //start

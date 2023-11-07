@@ -26,7 +26,7 @@ void ColorBuffer::Create(uint32_t width, uint32_t height, DXGI_FORMAT format) {
     clearValue.Format = format;
     memcpy(clearValue.Color, clearColor_, sizeof(clearValue.Color));
 
-    CreateTextureResource( desc, clearValue);
+    CreateTextureResource(desc, clearValue);
     CreateViews();
 }
 
