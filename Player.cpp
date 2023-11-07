@@ -41,9 +41,28 @@ void Player::Initialize(const std::string name, ViewProjection* viewProjection, 
 	}
 
 	collider.Initialize(&worldTransform_, name, viewProjection, directionalLight, { 1.8f,1.72f,1.0f });
+
+	weaponRotateWorldTransform_.UpdateMatrix();
+	weaponRotateWorldTransform_.SetParent(&worldTransform_);
+
+	weaponObject_.Initialize(viewProjection, directionalLight);
+	weaponObject_.SetScale({ 0.4f,2.0f,0.5f });
+	weaponObject_.SetPosition({ 0.0f,4.6f,0.0f });
+	weaponObject_.UpdateMatrix();
+	weaponObject_.SetParent(&weaponRotateWorldTransform_);
+	blockHandle_ = TextureManager::Load("block.png");
+
+	
+	weaponCollider_.Initialize(weaponObject_.GetWorldTransform(), "武器", viewProjection, directionalLight);
 }
 
 void Player::Update()
+{
+	
+	Attack();
+	Move();
+}
+void Player::Move()
 {
 	isGrounding_ = false;
 
@@ -126,7 +145,15 @@ void Player::Update()
 	for (int i = 0; i < partNum; i++) {
 		partsTransform_[i].UpdateMatrix();
 	}
+}
+void Player::Attack()
+{
+	weaponDegree_ += Radian(1.0f);
+	weaponRotateWorldTransform_.rotation_.x = weaponDegree_;
+	weaponCollider_.AdjustmentScale();
 
+	weaponRotateWorldTransform_.UpdateMatrix();
+	weaponObject_.UpdateMatrix();
 }
 void Player::Collision(Collider& blockCollider)
 {
@@ -191,6 +218,8 @@ void Player::Draw() {
 	for (int i = 0; i < partNum; i++) {
 		modelParts_.Draw(partsTransform_[i], *viewProjection_, *directionalLight_, material_);
 	}
+	weaponCollider_.Draw();
+	weaponObject_.Draw(blockHandle_);
 }
 
 void Player::ParticleDraw() {

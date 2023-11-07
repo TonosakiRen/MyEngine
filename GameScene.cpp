@@ -79,6 +79,7 @@ void GameScene::Update() {
 		viewProjection_.translation_ = Easing::easing(cameraT_, Vector3{ 11.1f,4.2f,0.11f }, Vector3{ 0.0f,8.6f,-27.0f }, 0.01f, Easing::easeNormal, false);
 		viewProjection_.target_ = Easing::easing(cameraT_, Vector3{ 0.0f,-1.6f,0.0f }, Vector3{ 0.0f,0.0f,0.0f }, 0.01f, Easing::easeNormal, true);
 	}
+	Collider::SwitchIsDrawCollider();
 
 	skydome_->Update();
 	floor_->Update();

@@ -22,5 +22,5 @@ void Ground::Update()
 	collider_.MatrixUpdate();
 }
 void Ground::Draw() {
-	GameObject::Draw({ 1.0f,1.0f,1.0f });
+	GameObject::Draw();
 }

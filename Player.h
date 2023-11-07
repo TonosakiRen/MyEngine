@@ -11,6 +11,8 @@ public:
 
     void Initialize(const std::string name, ViewProjection* viewProjection, DirectionalLight* directionalLight);
     void Update();
+    void Move();
+    void Attack();
     void Collision(Collider& blockCollider);
     void Animation();
     void Draw();
@@ -50,8 +52,18 @@ private:
     //particle
     std::unique_ptr<DustParticle> dustParticle_;
 
+    //武器
+    WorldTransform weaponRotateWorldTransform_;
+    GameObject weaponObject_;
+    float weaponDegree_ = 0.0f;
+
+    //block,png
+    uint32_t blockHandle_;
+
 public:
     //collider
     Collider collider;
+    Collider weaponCollider_;
+
     bool isGrounding_ = false;
 };

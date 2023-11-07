@@ -29,12 +29,12 @@ void GameObject::Initialize(ViewProjection* viewProjection, DirectionalLight* di
 	SetDirectionalLight(directionalLight);
 }
 
-void GameObject::Update()
+void GameObject::UpdateMatrix()
 {
 	worldTransform_.UpdateMatrix();
 }
 
-void GameObject::Draw(Vector4 color, uint32_t textureHandle)
+void GameObject::Draw(uint32_t textureHandle,Vector4 color)
 {
 	if (loadObj_ == true) {
 		material_.color_ = color;

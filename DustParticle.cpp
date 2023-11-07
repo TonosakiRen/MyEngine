@@ -11,6 +11,7 @@ void DustParticle::Initialize(Vector3 minDirection, Vector3 maxDirection)
 
 	particleBox_->Initialize();
 	emitterWorldTransform_.SetIsScaleParent(false);
+	emitterWorldTransform_.UpdateMatrix();
 	SetDirection(minDirection, maxDirection);
 }
 
