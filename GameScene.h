@@ -7,13 +7,14 @@
 #include "Sprite.h"
 #include "DirectionalLight.h"
 #include "Particle.h"
-#include "ParticleBox.h"
 #include "GameObject.h"
 #include "Skydome.h"
 #include "Floor.h"
 #include "Player.h"
-
-#include <optional>
+#include "Boss.h"
+#include "FollowCamera.h"
+#include "Ground.h"
+#include "GoalBox.h"
 class GameScene
 {
 
@@ -31,12 +32,16 @@ public:
 	void Draw();
 
 
-private: 
+private:
 	DirectXCommon* dxCommon_ = nullptr;
 	Input* input_ = nullptr;
-	
+
 	ViewProjection viewProjection_;
+	FollowCamera followCamera_;
+
 	DirectionalLight directionalLight_;
+	bool isCameraMove_ = false;
+	float cameraT_ = 0.0f;
 
 	uint32_t textureHandle_;
 
@@ -46,28 +51,16 @@ private:
 	std::unique_ptr<Skydome> skydome_;
 	std::unique_ptr<Floor> floor_;
 	std::unique_ptr<GameObject> sphere_;
-
 	std::unique_ptr<Player> player_;
+	std::unique_ptr<Boss> boss_;
 
-	//Scene
-	enum class Scene {
-		Title,
-		InGame,
+	std::unique_ptr<Particle> particle_;
 
-		SceneNum
-	};
+	std::unique_ptr<Ground> ground_;
+	std::unique_ptr<Ground> bossGround_;
+	std::unique_ptr<Ground> goalGround_;
+	uint32_t blockHandle_;
 
-	Scene scene_ = Scene::Title;
-	Scene nextScene = Scene::Title;
-	static void (GameScene::* SceneInitializeTable[])();
-	static void (GameScene::* SceneUpdateTable[])();
-	std::optional<Scene> sceneRequest_ = std::nullopt;
+	std::unique_ptr<GoalBox> goalBox_;
 
-	//タイトル
-	void TitleInitialize();
-	void TitleUpdate();
-	//インゲーム
-	void InGameInitialize();
-	void InGameUpdate();
 };
-

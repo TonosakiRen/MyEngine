@@ -130,6 +130,10 @@
     <ClCompile Include="Player.cpp">
       <Filter>Game</Filter>
     </ClCompile>
+    <ClCompile Include="Boss.cpp" />
+    <ClCompile Include="FollowCamera.cpp" />
+    <ClCompile Include="GoalBox.cpp" />
+    <ClCompile Include="Ground.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -252,6 +256,10 @@
     <ClInclude Include="Player.h">
       <Filter>Game</Filter>
     </ClInclude>
+    <ClInclude Include="Boss.h" />
+    <ClInclude Include="FollowCamera.h" />
+    <ClInclude Include="GoalBox.h" />
+    <ClInclude Include="Ground.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\shaders\Basic.hlsli">
