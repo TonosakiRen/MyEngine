@@ -14,6 +14,9 @@ ID3D12GraphicsCommandList* Particle::sCommandList = nullptr;
 std::unique_ptr<RootSignature> Particle::sRootSignature;
 std::unique_ptr<PipelineState> Particle::sPipelineState;
 
+Particle::Particle(uint32_t particleNum) : kParticleNum(particleNum) {
+}
+
 void Particle::StaticInitialize() {
     sDirectXCommon = DirectXCommon::GetInstance();
     InitializeGraphicsPipeline();
@@ -33,8 +36,8 @@ void Particle::PostDraw() {
     sCommandList = nullptr;
 }
 
-Particle* Particle::Create() {
-    Particle* object3d = new Particle();
+Particle* Particle::Create(uint32_t particleNum) {
+    Particle* object3d = new Particle(particleNum);
     assert(object3d);
 
     object3d->Initialize();
