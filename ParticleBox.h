@@ -75,4 +75,3 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> instancingBuff_;
 	InstancingBufferData* instanceMap = nullptr;
 };
-
