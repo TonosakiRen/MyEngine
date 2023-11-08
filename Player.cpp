@@ -98,8 +98,7 @@ void Player::Update()
 
 void Player::UpdateMatrix()
 {
-
-	worldTransform_.UpdateMatrix(rotate);
+	worldTransform_.UpdateMatrix();
 
 	weaponCollider_.AdjustmentScale();
 	weaponRotateWorldTransform_.UpdateMatrix();
@@ -267,7 +266,7 @@ void Player::BehaviorMoveUpdate()
 		if (move.x != 0.0f || move.z != 0.0f) {
 
 			Vector3 nowDirection = Normalize(Vector3{ 0.0f,0.0f,1.0f } *MakeRotateYMatrix(worldTransform_.rotation_.y));
-			rotate = DirectionToDirection(nowDirection, move);
+			Matrix4x4 rotate = DirectionToDirection(nowDirection, move);
 			Vector3 move2 = nowDirection * rotate;
 			worldTransform_.rotation_ = worldTransform_.rotation_ * rotate;
 		}

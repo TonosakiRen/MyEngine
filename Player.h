@@ -90,6 +90,4 @@ public:
     Collider weaponCollider_;
 
     bool isGrounding_ = false;
-
-    Matrix4x4 rotate;
 };

@@ -15,8 +15,6 @@ public:
 	void Initialize();
 	void UpdateMatrix();
 
-	void UpdateMatrix(const Matrix4x4& rotate);
-
 	void ConstUpdate() {
 		if (constMap) {
 			constMap->matWorld = matWorld_;
@@ -65,6 +63,7 @@ public:
 public:
 	Vector3 scale_ = { 1.0f,1.0f,1.0f };
 	Vector3 rotation_ = { 0.0f,0.0f,0.0f };
+	Quaternion quaternion_ = IdentityQuaternion();
 	Vector3 translation_ = { 0.0f,0.0f,0.0f };
 	Matrix4x4 matWorld_;
 private:
