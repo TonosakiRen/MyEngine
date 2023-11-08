@@ -27,7 +27,7 @@ public:
 				Matrix4x4 localMatrix = matWorld_ * Inverse(parent->matWorld_);
 				translation_ = MakeTranslation(localMatrix);
 				if (isRotateParent_ == true) {
-					rotation_ = MakeEulerAngle(NormalizeMakeRotateMatrix(localMatrix));
+					quaternion_ = MakeEulerAngle(NormalizeMakeRotateMatrix(localMatrix));
 				}
 				if (isScaleParent_ == true) {
 					scale_ = MakeScale(localMatrix);
@@ -62,7 +62,6 @@ public:
 	}
 public:
 	Vector3 scale_ = { 1.0f,1.0f,1.0f };
-	Vector3 rotation_ = { 0.0f,0.0f,0.0f };
 	Quaternion quaternion_ = IdentityQuaternion();
 	Vector3 translation_ = { 0.0f,0.0f,0.0f };
 	Matrix4x4 matWorld_;
