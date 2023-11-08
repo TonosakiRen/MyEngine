@@ -24,22 +24,37 @@ void DirectXCommon::Initialize(int32_t backBufferWidth, int32_t backBufferHeight
 	InitializeDXGIDevice();
 	InitializeCommand();
 	CreateDirectXCompilier();
-	descriptorHeaps_[D3D12_DESCRIPTOR_HEAP_TYPE_RTV].Create(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, SwapChain::kNumBuffers);
-	swapChain_.Create(winApp_->GetHwnd());
-	CreateDepthBuffer();
-	CreateSrvHeap();
 
+	descriptorHeaps_[D3D12_DESCRIPTOR_HEAP_TYPE_RTV].Create(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, SwapChain::kNumBuffers + kMainColorBufferNum);
+	descriptorHeaps_[D3D12_DESCRIPTOR_HEAP_TYPE_DSV].Create(D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1);
+	descriptorHeaps_[D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV].Create(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, kSrvHeapDescritorNum);
+
+	swapChain_.Create(winApp_->GetHwnd());
+
+	mainColorBuffer_.Create(backBufferWidth_, backBufferHeight_, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB);
+
+	mainDepthBuffer_.Create(backBufferWidth_, backBufferHeight_, DXGI_FORMAT_D24_UNORM_S8_UINT);
+	TransitionResource(mainDepthBuffer_, D3D12_RESOURCE_STATE_DEPTH_WRITE);
+	
 }
 
 void DirectXCommon::PreDraw() {
 
-	TransitionResource(swapChain_.GetColorBuffer(), D3D12_RESOURCE_STATE_RENDER_TARGET);
+	TransitionResource(mainColorBuffer_, D3D12_RESOURCE_STATE_RENDER_TARGET);
+
+	/*TransitionResource(swapChain_.GetColorBuffer(), D3D12_RESOURCE_STATE_RENDER_TARGET);*/
+	
 
 	// レンダーターゲットビュー用ディスクリプタヒープのハンドルを取得
-	DescriptorHandle rtvH = descriptorHeaps_[D3D12_DESCRIPTOR_HEAP_TYPE_RTV].GetDiscriptorHandle(swapChain_.GetBufferIndex());
+	DescriptorHandle rtvH = mainColorBuffer_.GetRTV();
+
+	/*DescriptorHandle rtvH = swapChain_.GetRTV();*/
 
 	// 深度ステンシルビュー用デスクリプタヒープのハンドルを取得
-	DescriptorHandle dsvH = descriptorHeaps_[D3D12_DESCRIPTOR_HEAP_TYPE_DSV].GetDiscriptorHandle(0); //start
+	//DescriptorHandle dsvH = descriptorHeaps_[D3D12_DESCRIPTOR_HEAP_TYPE_DSV].GetDiscriptorHandle(0); //start
+
+	DescriptorHandle dsvH = mainDepthBuffer_.GetDSV();
+
 
 	// レンダーターゲットをセット
 	commandList_->OMSetRenderTargets(1, &rtvH.GetCpuHandle(), false, &dsvH.GetCpuHandle());
@@ -65,7 +80,7 @@ void DirectXCommon::PreDraw() {
 void DirectXCommon::PostDraw() {
 	HRESULT result = S_FALSE;
 
-	TransitionResource(swapChain_.GetColorBuffer(), D3D12_RESOURCE_STATE_PRESENT);
+	TransitionResource(mainColorBuffer_,D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
 	// 命令のクローズ
 	commandList_->Close();
@@ -99,16 +114,19 @@ void DirectXCommon::PostDraw() {
 
 void DirectXCommon::ClearRenderTarget() {
 	// レンダーターゲットビュー用ディスクリプタヒープのハンドルを取得
-	DescriptorHandle rtvH = descriptorHeaps_[D3D12_DESCRIPTOR_HEAP_TYPE_RTV].GetDiscriptorHandle(swapChain_.GetBufferIndex());
+	DescriptorHandle mainRTVH = mainColorBuffer_.GetRTV();
+	// レンダーターゲットビュー用ディスクリプタヒープのハンドルを取得
+	DescriptorHandle swapChainRTVH = swapChain_.GetRTV();
 
 	// 全画面クリア          Red   Green  Blue  Alpha
 	float clearColor[] = { 0.1f, 0.25f, 0.5f, 0.0f }; // 青っぽい色
-	commandList_->ClearRenderTargetView(rtvH, clearColor, 0, nullptr);
+	commandList_->ClearRenderTargetView(mainRTVH, clearColor, 0, nullptr);
+	commandList_->ClearRenderTargetView(swapChainRTVH, clearColor, 0, nullptr);
 }
 
 void DirectXCommon::ClearDepthBuffer() {
 	// 深度ステンシルビュー用デスクリプタヒープのハンドルを取得
-	DescriptorHandle dsvH = descriptorHeaps_[D3D12_DESCRIPTOR_HEAP_TYPE_DSV].GetDiscriptorHandle(0);
+	DescriptorHandle dsvH = mainDepthBuffer_.GetDSV();
 	// 深度バッファのクリア
 	commandList_->ClearDepthStencilView(dsvH, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 }
@@ -130,7 +148,7 @@ void DirectXCommon::InitializeDXGIDevice() {
 
 #endif
 
-	//DXGIファクトリー	
+	//DXGIファクトリー
 	dxgiFactory_ = nullptr;
 	//HRESULTはWIndows系のエラーコードであり、
 	//関数が成功したかどうかをSUCCEEDEDマクロで判定できる
@@ -213,13 +231,6 @@ void DirectXCommon::InitializeDXGIDevice() {
 }
 void DirectXCommon::InitializeCommand() {
 	HRESULT hr = S_FALSE;
-
-	//コマンドキューを生成する
-	//D3D12_COMMAND_QUEUE_DESC commandQueueDesc{};
-	//hr = device_->CreateCommandQueue(&commandQueueDesc,
-	//	IID_PPV_ARGS(commandQueue_));
-	////コマンドキューの生成がうまくいかなかったので起動できない
-	//assert(SUCCEEDED(hr));
 
 	commandQueue_.Create();
 
@@ -321,87 +332,6 @@ ComPtr<IDxcBlob> DirectXCommon::CompileShader(
 
 DescriptorHandle DirectXCommon::AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE type) {
 	return descriptorHeaps_[type].Allocate();
-}
-
-//void DirectXCommon::CreateSwapChain() {
-//	HRESULT hr = S_FALSE;
-//	
-//	//スワップチェーンを生成する	
-//	swapChain_ = nullptr;
-//	DXGI_SWAP_CHAIN_DESC1 swapChainDesc{};
-//	swapChainDesc.Width = backBufferWidth_;//画面の幅。ウィンドウのクライアント領域を同じものにしておく
-//	swapChainDesc.Height = backBufferHeight_;//画面の高さ。ウィンドウのクライアント領域を同じものにしておく
-//	swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;//色の形式
-//	swapChainDesc.SampleDesc.Count = 1;//マルチサンプルしない
-//	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;//描画のターゲットとして利用する
-//	swapChainDesc.BufferCount = 2;//ダブルバッファ
-//	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;//モニタにうつしたら、中身を破棄する
-//	//コマンドキュー、ウィンドウハンドル、設定を渡して生成する	
-//	hr = dxgiFactory_->CreateSwapChainForHwnd(commandQueue_, winApp_->GetHwnd(), &swapChainDesc, nullptr, nullptr, reinterpret_cast<IDXGISwapChain1**>(swapChain_.GetAddressOf()));
-//	assert(SUCCEEDED(hr));
-//
-//	//SwapChainからResourceを引っ張てくる
-//	backBuffers_.resize(swapChainDesc.BufferCount);
-//	hr = swapChain_->GetBuffer(0, IID_PPV_ARGS(&backBuffers_[0]));
-//	//うまく取得できなければ起動できない
-//	assert(SUCCEEDED(hr));
-//	hr = swapChain_->GetBuffer(1, IID_PPV_ARGS(&backBuffers_[1]));
-//	assert(SUCCEEDED(hr));
-//
-//}
-//void DirectXCommon::CreateFinalRenderTargets() {
-//	/*rtvHeap_ = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);*/
-//	descriptorHeaps_[D3D12_DESCRIPTOR_HEAP_TYPE_RTV].Create(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2);
-//
-//	DescriptorHandle rtvHandles[2];
-//	rtvHandles[0] = descriptorHeaps_[D3D12_DESCRIPTOR_HEAP_TYPE_RTV].Allocate();
-//	rtvHandles[1] = descriptorHeaps_[D3D12_DESCRIPTOR_HEAP_TYPE_RTV].Allocate();
-//
-//	//RTVの設定
-//	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
-//	rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;//出力結果をSRGBに変換して書き込む
-//	rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;//2dtextureとして書き込む
-//
-//	device_->CreateRenderTargetView(backBuffers_[0].Get(), &rtvDesc, rtvHandles[0]);
-//	device_->CreateRenderTargetView(backBuffers_[1].Get(), &rtvDesc, rtvHandles[1]);
-//	
-//
-//	////RTVの設定
-//	//D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
-//	//rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;//出力結果をSRGBに変換して書き込む
-//	//rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;//2dtextureとして書き込む
-//	////ディスクリプタの先頭を取得する	
-//	//D3D12_CPU_DESCRIPTOR_HANDLE rtvStartHandle = rtvHeap_->GetCPUDescriptorHandleForHeapStart();
-//	////RTVを2つつくるのでディスクリプタを2つ用意
-//	//D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2];
-//	////まず一つ目を作る１つ目は最初のところに作る。作る場所をこちらで指定してあげる必要がある
-//	//rtvHandles[0] = rtvStartHandle;
-//	//device_->CreateRenderTargetView(backBuffers_[0].Get(), &rtvDesc, rtvHandles[0]);
-//	////２つ目のディスクリプタハンドルを得る(自力で)
-//	//rtvHandles[1].ptr = rtvHandles[0].ptr + device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-//	////２つ目を作る
-//	//device_->CreateRenderTargetView(backBuffers_[1].Get(), &rtvDesc, rtvHandles[1]);
-//
-//}
-void DirectXCommon::CreateDepthBuffer() {
-	/*dsvHeap_ = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);*/
-	descriptorHeaps_[D3D12_DESCRIPTOR_HEAP_TYPE_DSV].Create(D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1);
-
-	//DSVの設定
-	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
-	dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;//Format.基本的にはResourceに合わせる。
-	dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;//2dTexture
-
-	//DepthStencilTextureをウィンドウのサイズで作成
-	depthBuffer_ = CreateDepthStencilTextureResource();
-
-	//DSVHeapの先頭にDSVを作る
-	device_->CreateDepthStencilView(depthBuffer_.Get(), &dsvDesc, descriptorHeaps_[D3D12_DESCRIPTOR_HEAP_TYPE_DSV].GetDiscriptorHandle(0));
-}
-
-void DirectXCommon::CreateSrvHeap() {
-	/*srvHeap_ = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, kSrvHeapDescritorNum, true);*/
-	descriptorHeaps_[D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV].Create(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, kSrvHeapDescritorNum);
 }
 
 void DirectXCommon::TransitionResource(GPUResource& resource, D3D12_RESOURCE_STATES newState)

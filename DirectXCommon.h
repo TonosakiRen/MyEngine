@@ -13,6 +13,7 @@
 #include "CommandQueue.h"
 #include "SwapChain.h"
 #include "ColorBuffer.h"
+#include "DepthBuffer.h"
 
 class DirectXCommon
 {
@@ -20,6 +21,9 @@ public:
 
 	//うんち設計
 	uint32_t kSrvHeapDescritorNum = 1024;
+
+	//mainColorBufferNum
+	uint32_t kMainColorBufferNum = 1;
 
 	static DirectXCommon* GetInstance();
 	void Initialize(int32_t backBufferWidth = 1280, int32_t backBufferHeight = 720);
@@ -38,8 +42,7 @@ public:
 	CommandQueue& GetCommandQueue() { return commandQueue_; }
 
 	DescriptorHeap& GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE type) { return descriptorHeaps_[type]; }
-	
-	
+
 private:
 	WinApp* winApp_;
 
@@ -52,7 +55,8 @@ private:
 	Microsoft::WRL::ComPtr<IDxcUtils> dxcUtils_;
 	Microsoft::WRL::ComPtr<IDxcIncludeHandler> includeHandler_;
 	SwapChain swapChain_;
-	Microsoft::WRL::ComPtr<ID3D12Resource> depthBuffer_;
+
+	DepthBuffer mainDepthBuffer_;
 	ColorBuffer mainColorBuffer_;
 
 	DescriptorHeap descriptorHeaps_[D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES];
@@ -63,11 +67,7 @@ private:
 private:
 	void InitializeDXGIDevice();
 	void InitializeCommand();
-	/*void CreateSwapChain();*/
 	void CreateDirectXCompilier();
-	/*void CreateFinalRenderTargets();*/
-	void CreateDepthBuffer();
-	void CreateSrvHeap();
 	void TransitionResource(GPUResource& resource, D3D12_RESOURCE_STATES newState);
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateDepthStencilTextureResource();
