@@ -24,7 +24,11 @@ public:
 	/// <returns>ビュープロジェクション</returns>
 	ViewProjection& GetViewProjection() { return viewProjection_; }
 
-	void SetTarget(const WorldTransform* target) { target_ = target; }
+	void Reset();
+
+	Vector3 GetOffset()const;
+
+	void SetTarget(const WorldTransform* target);
 
 private:
 
@@ -49,5 +53,8 @@ private:
 	// 結果
 	Vector3 goalRotation = { 0.0f, 0.0f, 0.0f };
 	Vector3 goalTranslation = { 0.0f, 0.0f, 0.0f };
+
+	Vector3 interTarget_ = {};
+	float destinationAngleY_;
 
 };

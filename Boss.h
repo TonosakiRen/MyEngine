@@ -15,9 +15,13 @@ public:
     void Initialize(ViewProjection* viewProjection, DirectionalLight* directionalLight);
     void Update();
     void Animation();
+    void OnCollision();
     void Draw();
     void ParticleDraw();
 
+    bool GetIsDead() {
+        return isDead_;
+    }
 private:
     enum parts {
         Head,
@@ -47,6 +51,8 @@ private:
 
     //particle
     std::unique_ptr<DustParticle> dustParticle_;
+
+    bool isDead_ = false;
 
 public:
     Collider collider_;

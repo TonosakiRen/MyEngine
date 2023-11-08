@@ -4,6 +4,7 @@
 #include "ParticleBox.h"
 #include "DustParticle.h"
 #include "Collider.h"
+#include <optional>
 class Player :
     public GameObject
 {
@@ -11,9 +12,9 @@ public:
 
     void Initialize(const std::string name, ViewProjection* viewProjection, DirectionalLight* directionalLight);
     void Update();
-    void Move();
-    void Attack();
+    void UpdateMatrix();
     void Collision(Collider& blockCollider);
+    bool weaponCollision(Collider& bossCollider);
     void Animation();
     void Draw();
     void ParticleDraw();
@@ -55,10 +56,33 @@ private:
     //武器
     WorldTransform weaponRotateWorldTransform_;
     GameObject weaponObject_;
-    float weaponDegree_ = 0.0f;
+    float weaponRadian_ = 0.0f;
+    bool isAttack_ = false;
 
     //block,png
     uint32_t blockHandle_;
+
+    //dash
+    bool isDash_ = false;
+    uint32_t dashFrame = 0;
+
+    enum class Behavior {
+        kMove,
+        kAttack,
+        kDash
+    };
+    Behavior behavior_ = Behavior::kMove;
+
+    //次の振る舞いリクエスト
+    std::optional<Behavior> behaviorRequest_ = std::nullopt;
+
+    void BehaviorMoveUpdate();
+    void BehaviorAttackUpdate();
+    void BehaviorDashUpdate();
+
+    void BehaviorMoveInitialize();
+    void BehaviorAttackInitialize();
+    void BehaviorDashInitialize();
 
 public:
     //collider
@@ -66,4 +90,6 @@ public:
     Collider weaponCollider_;
 
     bool isGrounding_ = false;
+
+    Matrix4x4 rotate;
 };

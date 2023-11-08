@@ -25,6 +25,13 @@ struct Vector4 {
 	float w;
 };
 
+struct Quaternion {
+	float x;
+	float y;
+	float z;
+	float w;
+};
+
 struct Matrix4x4 {
 	float m[4][4];
 };
@@ -304,6 +311,39 @@ inline Matrix4x4 NormalizeMakeRotateMatrix(const Matrix4x4& matrix) {
 	result.m[2][2] = zAxis.z;
 
 	return result;
+}
+
+// 線形補間
+inline Vector3 Lerp(const Vector3& v1, const Vector3& v2, float t) {
+	Vector3 result = v1 + (v2 - v1) * t;
+	return result;
+}
+// 球面線形補間
+inline Vector3 Slerp(const Vector3& v1, const Vector3& v2, float t) {
+
+	const float epsilon = 0.0001f;
+
+	Vector3 a = Normalize(v1);
+	Vector3 b = Normalize(v2);
+
+	float dot = Dot(a, b);
+
+	if (std::abs(dot - 1.0f) < epsilon) {
+		return a;
+	}
+	else if (std::abs(dot + 1.0f) < epsilon) {
+		return Lerp(v1, v2, t);
+	}
+
+	float theta = std::acos(dot);
+
+	float sinTheta = std::sin(theta);
+	float factorA = std::sin((1.0f - t) * theta) / sinTheta;
+	float factorB = std::sin(t * theta) / sinTheta;
+
+	return Vector3{
+		factorA * a.x + factorB * b.x, factorA * a.y + factorB * b.y,
+		factorA * a.z + factorB * b.z };
 }
 
 #pragma endregion
@@ -666,6 +706,7 @@ inline Matrix4x4 MakeRotateYMatrix(float radian) {
 
 	return tmp;
 }
+
 inline Matrix4x4 MakeRotateZMatrix(float radian) {
 
 	Matrix4x4 tmp;
@@ -698,7 +739,45 @@ inline Matrix4x4 MakeRotateXYZMatrix(const Vector3& radian) {
 	return MakeRotateXMatrix(radian.x) * MakeRotateYMatrix(radian.y) * MakeRotateZMatrix(radian.z);;
 }
 
+inline Matrix4x4 DirectionToDirection(const Vector3& from, const Vector3& to) {
+	Vector3 normalizeFrom = Normalize(from);
+	Vector3 normalizeTo = Normalize(to);
 
+	Vector3 n;
+
+	if (Length(Cross(normalizeFrom, normalizeTo)) > 0) {
+		n = Normalize(Cross(normalizeFrom, normalizeTo));
+	}
+	else if (normalizeFrom.x != 0.0f || normalizeFrom.y != 0.0f) {
+		n.x = normalizeFrom.z;
+		n.y = 0.0f;
+		n.z = -normalizeFrom.x;
+
+	}
+	else if (normalizeFrom.x != 0.0f || normalizeFrom.z != 0.0f) {
+		n.x = normalizeFrom.y;
+		n.y = -normalizeFrom.x;
+		n.z = 0.0f;
+	}
+
+	float cos = Dot(normalizeFrom, normalizeTo);
+	float sin = Length(Cross(normalizeFrom, normalizeTo));
+
+	Matrix4x4 RotateMatrix = MakeIdentity4x4();
+	RotateMatrix.m[0][0] = n.x * n.x * (1.0f - cos) + cos;
+	RotateMatrix.m[0][1] = n.x * n.y * (1.0f - cos) + n.z * sin;
+	RotateMatrix.m[0][2] = n.x * n.z * (1.0f - cos) - n.y * sin;
+
+	RotateMatrix.m[1][0] = n.x * n.y * (1.0f - cos) - n.z * sin;
+	RotateMatrix.m[1][1] = n.y * n.y * (1.0f - cos) + cos;
+	RotateMatrix.m[1][2] = n.y * n.z * (1.0f - cos) + n.x * sin;
+
+	RotateMatrix.m[2][0] = n.x * n.z * (1.0f - cos) + n.y * sin;
+	RotateMatrix.m[2][1] = n.y * n.z * (1.0f - cos) - n.x * sin;
+	RotateMatrix.m[2][2] = n.z * n.z * (1.0f - cos) + cos;
+
+	return RotateMatrix;
+}
 
 inline Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Vector3& translate) {
 	Matrix4x4 scaleMatrix = MakeScaleMatrix(scale);
@@ -842,6 +921,112 @@ inline Matrix4x4 MakeLookRotation(const Vector3& direction, const Vector3& up = 
 }
 
 #pragma endregion
+
+inline Quaternion Multiply(const Quaternion& lhs, const Quaternion& rhs) {
+
+	Quaternion result{
+	lhs.w * rhs.x + lhs.x * rhs.w + lhs.y * rhs.z - lhs.z * rhs.y,
+	lhs.w * rhs.y + lhs.y * rhs.w + lhs.z * rhs.x - lhs.x * rhs.z,
+	lhs.w * rhs.z + lhs.z * rhs.w + lhs.x * rhs.y - lhs.y * rhs.x,
+	lhs.w * rhs.w - lhs.x * rhs.x - lhs.y * rhs.y - lhs.z * rhs.z };
+
+	return result;
+}
+
+inline Quaternion operator *(const Quaternion& lhs, const Quaternion& rhs) {
+
+	Quaternion result{
+	lhs.w * rhs.x + lhs.x * rhs.w + lhs.y * rhs.z - lhs.z * rhs.y,
+	lhs.w * rhs.y + lhs.y * rhs.w + lhs.z * rhs.x - lhs.x * rhs.z,
+	lhs.w * rhs.z + lhs.z * rhs.w + lhs.x * rhs.y - lhs.y * rhs.x,
+	lhs.w * rhs.w - lhs.x * rhs.x - lhs.y * rhs.y - lhs.z * rhs.z };
+
+	return result;
+}
+
+inline Quaternion IdentityQuaternion() {
+	Quaternion result{0.0f,0.0f,0.0f,1.0f };
+	return result;
+}
+
+inline Quaternion Conjugate(const Quaternion& q) {
+	Quaternion result{ -q.x,-q.y,-q.z,q.w };
+	return result;
+}
+
+inline float Norm(const Quaternion& q) {
+	float result = sqrtf(q.w * q.w + q.x * q.x + q.y * q.y + q.z * q.z);
+	return result;
+}
+
+inline Quaternion Normalize(const Quaternion& q) {
+	float tmp = q.w * q.w + q.x * q.x + q.y * q.y + q.z * q.z;
+	tmp = sqrtf(tmp);
+	return { q.x / tmp, q.y / tmp, q.z / tmp, q.w / tmp };
+}
+
+inline Quaternion Inverse(const Quaternion& q) {
+	float norm = Norm(q);
+	norm = norm * norm;
+	Quaternion conjugate = Conjugate(q);
+	Quaternion result;
+	result.x = conjugate.x / norm;
+	result.y = conjugate.y / norm;
+	result.z = conjugate.z / norm;
+	result.w = conjugate.w / norm;
+	return result;
+}
+
+inline Quaternion MakeRotateAxisAngleQuaternion(const Vector3& axis, float angle) {
+	Vector3 v = Normalize(axis) * std::sinf(angle * 0.5f);
+	Quaternion result;
+	result.x = v.x;
+	result.y = v.y;
+	result.z = v.z;
+	result.w = std::cosf(angle * 0.5f);
+	return result;
+}
+
+inline Vector3 RotateVector(const Vector3& v, const Quaternion& q) {
+	Quaternion vq = { v.x,v.y,v.z, 0 };
+	Quaternion inverseQ = Inverse(q);
+	Quaternion resultQ = q * vq * inverseQ;
+	Vector3 result = { resultQ.x,resultQ.y,resultQ.z };
+	return result;
+}
+
+inline Vector3 operator *(const Vector3& v, const Quaternion& q) {
+	Quaternion vq = { v.x,v.y,v.z, 0 };
+	Quaternion inverseQ = Inverse(q);
+	Quaternion resultQ = q * vq * inverseQ;
+	Vector3 result = { resultQ.x,resultQ.y,resultQ.z };
+	return result;
+}
+
+inline Matrix4x4 MakeRotateMatrix(const Quaternion& quaternion) {
+	Matrix4x4 result;
+	result.m[0][0] = quaternion.w * quaternion.w + quaternion.x * quaternion.x - quaternion.y * quaternion.y - quaternion.z * quaternion.z;
+	result.m[0][1] = 2 * (quaternion.x * quaternion.y + quaternion.w * quaternion.z);
+	result.m[0][2] = 2 * (quaternion.x * quaternion.z - quaternion.w * quaternion.y);
+	result.m[0][3] = 0;
+
+	result.m[1][0] = 2 * (quaternion.x * quaternion.y - quaternion.w * quaternion.z);
+	result.m[1][1] = quaternion.w * quaternion.w - quaternion.x * quaternion.x + quaternion.y * quaternion.y - quaternion.z * quaternion.z;
+	result.m[1][2] = 2 * (quaternion.y * quaternion.z + quaternion.w * quaternion.x);
+	result.m[1][3] = 0;
+
+	result.m[2][0] = 2 * (quaternion.x * quaternion.z + quaternion.w * quaternion.y);
+	result.m[2][1] = 2 * (quaternion.y * quaternion.z - quaternion.w * quaternion.x);
+	result.m[2][2] = quaternion.w * quaternion.w - quaternion.x * quaternion.x - quaternion.y * quaternion.y + quaternion.z * quaternion.z;
+	result.m[2][3] = 0;
+
+	result.m[3][0] = 0;
+	result.m[3][1] = 0;
+	result.m[3][2] = 0;
+	result.m[3][3] = 1;
+
+	return result;
+}
 
 inline int Rand(int min, int max) {
 	if (min == 0 && max == 0) {

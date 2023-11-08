@@ -28,7 +28,7 @@ void DustParticle::Update() {
 						particles[i].direction_ = Normalize(Vector3{ Rand(minDirection_.x, maxDirection_.x) ,Rand(minDirection_.y,maxDirection_.y) ,Rand(minDirection_.z,maxDirection_.z) } *NormalizeMakeRotateMatrix(emitterWorldTransform_.GetParent()->matWorld_));
 					}
 					else {
-						particles[i].direction_ = Normalize({ Rand(minDirection_.x, maxDirection_.x) ,Rand(minDirection_.y,maxDirection_.y) ,Rand(minDirection_.z,maxDirection_.z) });
+						particles[i].direction_ = Normalize(Vector3{ Rand(minDirection_.x, maxDirection_.x) ,Rand(minDirection_.y,maxDirection_.y) ,Rand(minDirection_.z,maxDirection_.z) });
 					}
 					particles[i].worldTransform_.translation_ = MakeTranslation(emitterWorldTransform_.matWorld_);
 					particles[i].worldTransform_.rotation_ = { 0.0f,0.0f,0.0f };

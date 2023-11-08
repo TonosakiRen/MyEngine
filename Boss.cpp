@@ -67,9 +67,15 @@ void Boss::Animation() {
 	partsTransform_[Head].translation_.y = clamp(partsTransform_[Head].translation_.y, -3.0f, 0.8f);
 	partsTransform_[Tin].translation_.y = clamp(partsTransform_[Tin].translation_.y, -6.0f, -2.2f);
 }
+void Boss::OnCollision()
+{
+	isDead_ = true;
+}
 void Boss::Draw() {
-	for (int i = 0; i < partNum; i++) {
-		modelParts_[i].Draw(partsTransform_[i], *viewProjection_, *directionalLight_, material_);
+	if (isDead_ == false) {
+		for (int i = 0; i < partNum; i++) {
+			modelParts_[i].Draw(partsTransform_[i], *viewProjection_, *directionalLight_, material_);
+		}
 	}
 }
 

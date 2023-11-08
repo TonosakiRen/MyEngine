@@ -134,6 +134,7 @@
     <ClCompile Include="FollowCamera.cpp" />
     <ClCompile Include="GoalBox.cpp" />
     <ClCompile Include="Ground.cpp" />
+    <ClCompile Include="GlobalVariables.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -260,6 +261,7 @@
     <ClInclude Include="FollowCamera.h" />
     <ClInclude Include="GoalBox.h" />
     <ClInclude Include="Ground.h" />
+    <ClInclude Include="GlobalVariables.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\shaders\Basic.hlsli">

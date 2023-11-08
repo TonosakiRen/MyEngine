@@ -58,103 +58,59 @@ void Player::Initialize(const std::string name, ViewProjection* viewProjection, 
 
 void Player::Update()
 {
-	
-	Attack();
-	Move();
+
+	if (behaviorRequest_) {
+		//振る舞いを変更する
+		behavior_ = behaviorRequest_.value();
+		//各振る舞いごとの初期化を実行
+		switch (behavior_) {
+		case Behavior::kMove:
+		default:
+			BehaviorMoveInitialize();
+			break;
+		case Behavior::kAttack:
+			BehaviorAttackInitialize();
+			break;
+		case Behavior::kDash:
+			BehaviorDashInitialize();
+			break;
+		}
+		//振る舞いリクエストをリセット
+		behaviorRequest_ = std::nullopt;
+	}
+
+
+	switch (behavior_) {
+	case Behavior::kMove:
+	default:
+		BehaviorMoveUpdate();
+		break;
+	case Behavior::kAttack:
+		BehaviorAttackUpdate();
+		break;
+	case Behavior::kDash:
+		BehaviorDashUpdate();
+		break;
+	}
+
+	UpdateMatrix();
 }
-void Player::Move()
+
+void Player::UpdateMatrix()
 {
-	isGrounding_ = false;
 
-	Vector3 move = { 0.0f,0.0f,0.0f };
-	isWalking_ = false;
-	if (input_->GetIsGamePadConnect()) {
-		// 速さ
-		const float speed = 0.3f;
-		// 移動量
-		move = {
-			input_->GetLStick().x / SHRT_MAX, 0.0f,
-			input_->GetLStick().y / SHRT_MAX };
+	worldTransform_.UpdateMatrix(rotate);
 
-		// 移動量に速さを反映
-		if (move.x != 0.0f || move.y != 0.0f || move.z != 0.0f) {
-			move = Normalize(move) * speed;
-			isWalking_ = true;
-		}
-		Matrix4x4 rotateMatrix = MakeRotateYMatrix(viewProjection_->target_.y);
-		move = move * rotateMatrix;
+	weaponCollider_.AdjustmentScale();
+	weaponRotateWorldTransform_.UpdateMatrix();
+	weaponObject_.UpdateMatrix();
 
-		if (input_->GetLStick().x != 0.0f || input_->GetLStick().y != 0.0f) {
-			worldTransform_.rotation_.y = std::atan2(move.x, move.z);
-		}
-
-
-		if (input_->TriggerButton(XINPUT_GAMEPAD_A) && isJump_ == false) {
-			isGround_ = false;
-			velocity_.y = 0.5f;
-		};
-	}
-	else {
-		if (input_->PushKey(DIK_W)) {
-			move.z += 0.2f;
-			isWalking_ = true;
-		}
-		if (input_->PushKey(DIK_A)) {
-			move.x -= 0.2f;
-			isWalking_ = true;
-		}
-		if (input_->PushKey(DIK_S)) {
-			move.z -= 0.2f;
-			isWalking_ = true;
-		}
-		if (input_->PushKey(DIK_D)) {
-			move.x += 0.2f;
-			isWalking_ = true;
-		}
-
-		Matrix4x4 rotateMatrix = MakeRotateYMatrix(viewProjection_->target_.y);
-		move = move * rotateMatrix;
-
-		if (input_->PushKey(DIK_RIGHT) == false || input_->PushKey(DIK_LEFT) == false) {
-			worldTransform_.rotation_.y = std::atan2(move.x, move.z);
-		}
-
-
-		if (input_->PushKey(DIK_SPACE) && isJump_ == false) {
-			isGround_ = false;
-			velocity_.y = 0.5f;
-		};
-	}
-
-	if (isWalking_) {
-		Animation();
-	}
-
-	// 移動
-	worldTransform_.translation_ = worldTransform_.translation_ + move;
-
-	velocity_ += accelaration_;
-	worldTransform_.translation_ += velocity_;
-
-	if (worldTransform_.translation_.y <= -30.0f) {
-		worldTransform_.SetParent(nullptr);
-		worldTransform_.translation_ = { 0.0f,3.0f,0.0f };
-	}
-
-	worldTransform_.UpdateMatrix();
 	for (int i = 0; i < partNum; i++) {
 		partsTransform_[i].UpdateMatrix();
 	}
 }
-void Player::Attack()
-{
-	weaponDegree_ += Radian(1.0f);
-	weaponRotateWorldTransform_.rotation_.x = weaponDegree_;
-	weaponCollider_.AdjustmentScale();
 
-	weaponRotateWorldTransform_.UpdateMatrix();
-	weaponObject_.UpdateMatrix();
-}
+
 void Player::Collision(Collider& blockCollider)
 {
 
@@ -185,6 +141,15 @@ void Player::Collision(Collider& blockCollider)
 
 	dustParticle_->SetIsEmit(isGround_ && isWalking_);
 	dustParticle_->Update();
+}
+bool Player::weaponCollision(Collider& bossCollider)
+{
+	if (isAttack_) {
+		bool isHit = false;
+		isHit = weaponCollider_.Collision(bossCollider);
+		return isHit;
+	}
+	return false;
 }
 void Player::Animation() {
 	dustParticle_->SetIsEmit(true);
@@ -231,4 +196,145 @@ void Player::SetInitialPos()
 	worldTransform_.SetParent(nullptr);
 	worldTransform_.translation_ = { 0.0f,6.0f,0.0f };
 	worldTransform_.UpdateMatrix();
+}
+
+void Player::BehaviorMoveUpdate()
+{
+
+	if (input_->TriggerKey(DIK_R)) {
+		behaviorRequest_ = Behavior::kAttack;
+	}
+
+	if (input_->TriggerKey(DIK_LSHIFT)) {
+		behaviorRequest_ = Behavior::kDash;
+	}
+
+	isGrounding_ = false;
+
+	Vector3 move = { 0.0f,0.0f,0.0f };
+	isWalking_ = false;
+	if (input_->GetIsGamePadConnect()) {
+		// 速さ
+		const float speed = 0.3f;
+		// 移動量
+		move = {
+			input_->GetLStick().x / SHRT_MAX, 0.0f,
+			input_->GetLStick().y / SHRT_MAX };
+
+		// 移動量に速さを反映
+		if (move.x != 0.0f || move.y != 0.0f || move.z != 0.0f) {
+			move = Normalize(move) * speed;
+			isWalking_ = true;
+		}
+		Matrix4x4 rotateMatrix = MakeRotateYMatrix(viewProjection_->target_.y);
+		move = move * rotateMatrix;
+
+		if (input_->GetLStick().x != 0.0f || input_->GetLStick().y != 0.0f) {
+			Vector3 nowDirection = Normalize(Vector3{ 0.0f,0.0f,1.0f } *MakeRotateYMatrix(worldTransform_.rotation_.y));
+
+			Matrix4x4 directionMatrix = DirectionToDirection(nowDirection, move);
+
+			worldTransform_.rotation_ = worldTransform_.rotation_ * directionMatrix;
+
+		}
+
+		if (input_->TriggerButton(XINPUT_GAMEPAD_A) && isJump_ == false) {
+			isGround_ = false;
+			velocity_.y = 0.5f;
+		};
+	}
+	else {
+		if (input_->PushKey(DIK_W)) {
+			move.z += 0.2f;
+			isWalking_ = true;
+		}
+		if (input_->PushKey(DIK_A)) {
+			move.x -= 0.2f;
+			isWalking_ = true;
+		}
+		if (input_->PushKey(DIK_S)) {
+			move.z -= 0.2f;
+			isWalking_ = true;
+		}
+		if (input_->PushKey(DIK_D)) {
+			move.x += 0.2f;
+			isWalking_ = true;
+		}
+
+		Matrix4x4 rotateMatrix = MakeRotateYMatrix(viewProjection_->target_.y);
+		move = move * rotateMatrix;
+
+		if (move.x != 0.0f || move.z != 0.0f) {
+
+			Vector3 nowDirection = Normalize(Vector3{ 0.0f,0.0f,1.0f } *MakeRotateYMatrix(worldTransform_.rotation_.y));
+			rotate = DirectionToDirection(nowDirection, move);
+			Vector3 move2 = nowDirection * rotate;
+			worldTransform_.rotation_ = worldTransform_.rotation_ * rotate;
+		}
+		
+
+		if (input_->PushKey(DIK_SPACE) && isJump_ == false) {
+			isGround_ = false;
+			velocity_.y = 0.5f;
+		};
+	}
+
+	if (isWalking_) {
+		//Animation();
+	}
+
+	// 移動
+	worldTransform_.translation_ = worldTransform_.translation_ + move;
+
+	velocity_ += accelaration_;
+	worldTransform_.translation_ += velocity_;
+
+	if (worldTransform_.translation_.y <= -30.0f) {
+		worldTransform_.SetParent(nullptr);
+		worldTransform_.translation_ = { 0.0f,3.0f,0.0f };
+	}
+}
+
+void Player::BehaviorAttackUpdate()
+{
+	weaponRadian_ += Radian(3.0f);
+	
+	if (weaponRadian_ >= Radian(90.0f)) {
+		behaviorRequest_ = Behavior::kMove;
+		weaponRadian_ = 0.0f;
+	}
+
+	weaponRotateWorldTransform_.rotation_.x = weaponRadian_;
+}
+
+void Player::BehaviorDashUpdate()
+{
+
+	dashFrame++;
+	// 速さ
+	const float speed = 0.9f;
+
+	Matrix4x4 rotateMatrix = MakeRotateYMatrix(worldTransform_.rotation_.y);
+
+	Vector3 move = Normalize(Vector3{ 0.0f,0.0f,1.0f }) * rotateMatrix * speed;
+
+	// 移動
+	worldTransform_.translation_ = worldTransform_.translation_ + move;
+
+	if (dashFrame >= 10) {
+		behaviorRequest_ = Behavior::kMove;
+		dashFrame = 0;
+	}
+}
+
+void Player::BehaviorMoveInitialize()
+{
+}
+
+void Player::BehaviorAttackInitialize()
+{
+}
+
+void Player::BehaviorDashInitialize()
+{
 }

@@ -15,6 +15,8 @@ public:
 	void Initialize();
 	void UpdateMatrix();
 
+	void UpdateMatrix(const Matrix4x4& rotate);
+
 	void ConstUpdate() {
 		if (constMap) {
 			constMap->matWorld = matWorld_;

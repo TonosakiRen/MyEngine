@@ -93,8 +93,15 @@ void GameScene::Update() {
 	goalGround_->Update();
 
 	if (player_->collider.Collision(boss_->collider_) || player_->collider.Collision(goalBox_->collider_)) {
-		player_->SetInitialPos();
+		if (boss_->GetIsDead() == false) {
+			player_->SetInitialPos();
+		}
 	}
+
+
+	if (player_->weaponCollision(boss_->collider_)) {
+		boss_->OnCollision();
+	};
 
 	player_->Collision(ground_->collider_);
 	player_->Collision(bossGround_->collider_);
