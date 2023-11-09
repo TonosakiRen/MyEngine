@@ -29,6 +29,7 @@ public:
 	void PreSpriteDraw();
 	void PostSpriteDraw();
 	void Draw();
+	void UIDraw();
 
 
 private: 
@@ -57,8 +58,8 @@ private:
 		SceneNum
 	};
 
-	Scene scene_ = Scene::Title;
-	Scene nextScene = Scene::Title;
+	Scene scene_ = Scene::InGame;
+	Scene nextScene = Scene::InGame;
 	static void (GameScene::* SceneInitializeTable[])();
 	static void (GameScene::* SceneUpdateTable[])();
 	std::optional<Scene> sceneRequest_ = std::nullopt;

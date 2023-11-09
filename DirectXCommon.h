@@ -14,6 +14,7 @@
 #include "SwapChain.h"
 #include "ColorBuffer.h"
 #include "DepthBuffer.h"
+#include "PostEffect.h"
 
 class DirectXCommon
 {
@@ -27,10 +28,14 @@ public:
 
 	static DirectXCommon* GetInstance();
 	void Initialize(int32_t backBufferWidth = 1280, int32_t backBufferHeight = 720);
+	void InitializePostEffect();
 	
-	void PreDraw();
-	void PostDraw();
-	void ClearRenderTarget();
+	void MainPreDraw();
+	void MainPostDraw();
+	void SwapChainPreDraw();
+	void SwapChainPostDraw();
+	void ClearSwapChainRenderTarget();
+	void ClearMainRenderTarget();
 	void ClearDepthBuffer();
 
 	Microsoft::WRL::ComPtr<IDxcBlob> CompileShader(const std::wstring& filePath,const wchar_t* profile);
@@ -58,6 +63,8 @@ private:
 
 	DepthBuffer mainDepthBuffer_;
 	ColorBuffer mainColorBuffer_;
+
+	PostEffect postEffect_;
 
 	DescriptorHeap descriptorHeaps_[D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES];
 

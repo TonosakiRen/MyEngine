@@ -184,6 +184,12 @@ void GameScene::Draw() {
 	ParticleBoxDraw();
 	ParticleBox::PostDraw();
 
+}
+
+void GameScene::UIDraw()
+{
+	// コマンドリストの取得
+	ID3D12GraphicsCommandList* commandList = dxCommon_->GetCommandList();
 	// 前景スプライト描画
 	Sprite::PreDraw(commandList);
 	PostSpriteDraw();

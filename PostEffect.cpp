@@ -6,6 +6,7 @@
 #include <sstream>
 #pragma comment(lib, "d3dcompiler.lib")
 #include "TextureManager.h"
+#include "DWParam.h"
 
 using namespace DirectX;
 using namespace Microsoft::WRL;
@@ -51,10 +52,10 @@ void PostEffect::InitializeGraphicsPipeline() {
     ComPtr<IDxcBlob> psBlob;
     ComPtr<ID3DBlob> errorBlob;
 
-    vsBlob = sDirectXCommon->CompileShader(L"BasicVS.hlsl", L"vs_6_0");
+    vsBlob = sDirectXCommon->CompileShader(L"PostEffectVS.hlsl", L"vs_6_0");
     assert(vsBlob != nullptr);
 
-    psBlob = sDirectXCommon->CompileShader(L"BasicPS.hlsl", L"ps_6_0");
+    psBlob = sDirectXCommon->CompileShader(L"PostEffectPS.hlsl", L"ps_6_0");
     assert(psBlob != nullptr);
 
     sRootSignature = std::make_unique<RootSignature>();
@@ -109,7 +110,7 @@ void PostEffect::InitializeGraphicsPipeline() {
         // ラスタライザステート
         gpipeline.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
         //  デプスステンシルステート
-        gpipeline.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
+        //gpipeline.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
 
         // レンダーターゲットのブレンド設定
         D3D12_RENDER_TARGET_BLEND_DESC blenddesc{};
@@ -127,7 +128,7 @@ void PostEffect::InitializeGraphicsPipeline() {
         gpipeline.BlendState.RenderTarget[0] = blenddesc;
 
         // 深度バッファのフォーマット
-        gpipeline.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+        //gpipeline.DSVFormat = nullptr;
 
         // 頂点レイアウトの設定
         gpipeline.InputLayout.pInputElementDescs = inputLayout;
@@ -153,16 +154,16 @@ void PostEffect::CreateMesh() {
     vertices_.resize(4);
 
     //左下
-    vertices_[0].pos = { -0.5f,-0.5f,0.0f };
+    vertices_[0].pos = { -1.0f,-1.0f,0.0f };
     vertices_[0].uv = { 0.0f,1.0f };
     //左上
-    vertices_[1].pos = { -0.5f,0.5f,0.0f };
+    vertices_[1].pos = { -1.0f,1.0f,0.0f };
     vertices_[1].uv = { 0.0f,0.0f };
     //右上
-    vertices_[2].pos = { 0.5f,0.5f,0.0f };
+    vertices_[2].pos = { 1.0f,1.0f,0.0f };
     vertices_[2].uv = { 1.0f,0.0f };
     //右下
-    vertices_[3].pos = { 0.5f,-0.5f,0.0f };
+    vertices_[3].pos = { 1.0f,-1.0f,0.0f };
     vertices_[3].uv = { 1.0f,1.0f };
 
     // 頂点インデックスの設定
@@ -247,11 +248,15 @@ void PostEffect::Draw(DescriptorHandle srvHandle) {
     // インデックスバッファの設定
     sCommandList->IASetIndexBuffer(&ibView_);
 
+    DWParam constant = constant_;
+
     // CBVをセット（ワールド行列）
-    sCommandList->SetGraphicsRoot32BitConstant(static_cast<UINT>(RootParameter::Constant), constant_, 0);
+    sCommandList->SetGraphicsRoot32BitConstant(static_cast<UINT>(RootParameter::Constant), constant.v.u, 0);
 
     // SRVをセット
     sCommandList->SetGraphicsRootDescriptorTable(static_cast<UINT>(RootParameter::kTexture), srvHandle);
+
+  /*  TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(sCommandList, 1, 0);*/
 
     // 描画コマンド
     sCommandList->DrawIndexedInstanced(static_cast<UINT>(indices_.size()), 1, 0, 0, 0);

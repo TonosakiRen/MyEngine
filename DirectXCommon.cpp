@@ -35,23 +35,19 @@ void DirectXCommon::Initialize(int32_t backBufferWidth, int32_t backBufferHeight
 
 	mainDepthBuffer_.Create(backBufferWidth_, backBufferHeight_, DXGI_FORMAT_D24_UNORM_S8_UINT);
 	TransitionResource(mainDepthBuffer_, D3D12_RESOURCE_STATE_DEPTH_WRITE);
-	
 }
 
-void DirectXCommon::PreDraw() {
+void DirectXCommon::InitializePostEffect()
+{
+	postEffect_.Initialize();
+}
 
-	TransitionResource(mainColorBuffer_, D3D12_RESOURCE_STATE_RENDER_TARGET);
+void DirectXCommon::MainPreDraw() {
 
-	/*TransitionResource(swapChain_.GetColorBuffer(), D3D12_RESOURCE_STATE_RENDER_TARGET);*/
-	
+	TransitionResource(mainColorBuffer_, D3D12_RESOURCE_STATE_RENDER_TARGET);	
 
 	// レンダーターゲットビュー用ディスクリプタヒープのハンドルを取得
 	DescriptorHandle rtvH = mainColorBuffer_.GetRTV();
-
-	/*DescriptorHandle rtvH = swapChain_.GetRTV();*/
-
-	// 深度ステンシルビュー用デスクリプタヒープのハンドルを取得
-	//DescriptorHandle dsvH = descriptorHeaps_[D3D12_DESCRIPTOR_HEAP_TYPE_DSV].GetDiscriptorHandle(0); //start
 
 	DescriptorHandle dsvH = mainDepthBuffer_.GetDSV();
 
@@ -60,7 +56,7 @@ void DirectXCommon::PreDraw() {
 	commandList_->OMSetRenderTargets(1, &rtvH.GetCpuHandle(), false, &dsvH.GetCpuHandle());
 	
 	// 全画面クリア
-	ClearRenderTarget();
+	ClearMainRenderTarget();
 	// 深度バッファクリア
 	ClearDepthBuffer();
 
@@ -77,10 +73,34 @@ void DirectXCommon::PreDraw() {
 	commandList_->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
 }
 
-void DirectXCommon::PostDraw() {
+void DirectXCommon::MainPostDraw() {
 	HRESULT result = S_FALSE;
 
 	TransitionResource(mainColorBuffer_,D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+	TransitionResource(swapChain_.GetColorBuffer(), D3D12_RESOURCE_STATE_RENDER_TARGET);
+}
+
+void DirectXCommon::SwapChainPreDraw()
+{
+	// レンダーターゲットビュー用ディスクリプタヒープのハンドルを取得
+	DescriptorHandle rtvH = swapChain_.GetRTV();
+
+	// レンダーターゲットをセット
+	commandList_->OMSetRenderTargets(1, &rtvH.GetCpuHandle(), false, nullptr);
+
+	// 全画面クリア
+	ClearSwapChainRenderTarget();
+
+	PostEffect::PreDraw(commandList_.Get());
+	postEffect_.Draw(mainColorBuffer_.GetSRV());
+	PostEffect::PostDraw();
+}
+
+void DirectXCommon::SwapChainPostDraw()
+{
+	HRESULT result = S_FALSE;
+
+	TransitionResource(swapChain_.GetColorBuffer(), D3D12_RESOURCE_STATE_PRESENT);
 
 	// 命令のクローズ
 	commandList_->Close();
@@ -112,16 +132,20 @@ void DirectXCommon::PostDraw() {
 		nullptr); // 再びコマンドリストを貯める準備
 }
 
-void DirectXCommon::ClearRenderTarget() {
-	// レンダーターゲットビュー用ディスクリプタヒープのハンドルを取得
-	DescriptorHandle mainRTVH = mainColorBuffer_.GetRTV();
+void DirectXCommon::ClearSwapChainRenderTarget()
+{
 	// レンダーターゲットビュー用ディスクリプタヒープのハンドルを取得
 	DescriptorHandle swapChainRTVH = swapChain_.GetRTV();
-
 	// 全画面クリア          Red   Green  Blue  Alpha
 	float clearColor[] = { 0.1f, 0.25f, 0.5f, 0.0f }; // 青っぽい色
-	commandList_->ClearRenderTargetView(mainRTVH, clearColor, 0, nullptr);
 	commandList_->ClearRenderTargetView(swapChainRTVH, clearColor, 0, nullptr);
+}
+
+void DirectXCommon::ClearMainRenderTarget() {
+	// レンダーターゲットビュー用ディスクリプタヒープのハンドルを取得
+	DescriptorHandle mainRTVH = mainColorBuffer_.GetRTV();
+
+	commandList_->ClearRenderTargetView(mainRTVH, mainColorBuffer_.GetClearColor(), 0, nullptr);
 }
 
 void DirectXCommon::ClearDepthBuffer() {

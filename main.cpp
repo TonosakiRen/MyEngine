@@ -6,6 +6,7 @@
 #include "ImGuiManager.h"
 #include "Particle.h"
 #include "ParticleBox.h"
+#include "PostEffect.h"
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	WinApp* win = nullptr;
@@ -39,10 +40,13 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	Particle::StaticInitialize();
 	ParticleBox::StaticInitialize();
 
+	PostEffect::StaticInitialize();
+	dxCommon->InitializePostEffect();
+
 	//　スプライト静的初期化
 	Sprite::StaticInitialize();
 
-#pragma endregion変数
+#pragma endregion 変数
 
 	// ゲームシーンの初期化
 	gameScene = new GameScene();
@@ -67,13 +71,20 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 
 		// 描画開始
-		dxCommon->PreDraw();
+		dxCommon->MainPreDraw();
 		// ゲームシーンの描画
 		gameScene->Draw();
+		
+		dxCommon->MainPostDraw();
+
+		dxCommon->SwapChainPreDraw();
+
+		gameScene->UIDraw();
+
 		// ImGui描画
 		imguiManager->Draw();
-		// 描画終了
-		dxCommon->PostDraw();
+
+		dxCommon->SwapChainPostDraw();
 	}
 
 

@@ -132,6 +132,7 @@
     </ClCompile>
     <ClCompile Include="DepthBuffer.cpp" />
     <ClCompile Include="PostEffect.cpp" />
+    <ClCompile Include="DWParam.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -256,6 +257,7 @@
     </ClInclude>
     <ClInclude Include="DepthBuffer.h" />
     <ClInclude Include="PostEffect.h" />
+    <ClInclude Include="DWParam.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\shaders\Basic.hlsli">
@@ -291,6 +293,12 @@
       <Filter>shaders</Filter>
     </FxCompile>
     <FxCompile Include="Resources\shaders\ParticleBoxVS.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\PostEffectPS.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\PostEffectVS.hlsl">
       <Filter>shaders</Filter>
     </FxCompile>
   </ItemGroup>

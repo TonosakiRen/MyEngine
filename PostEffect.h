@@ -28,7 +28,6 @@ public:
 
 	struct VertexData {
 		Vector3 pos;
-		Vector3 normal;
 		Vector2 uv;
 	};
 
@@ -59,6 +58,6 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertBuff_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexBuff_;
 	uint32_t uvHandle_;
-	float constant_ = 0.0f;
+	float constant_ = 1.0f;
 };
 
