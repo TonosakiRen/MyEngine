@@ -134,6 +134,7 @@
     <ClCompile Include="PostEffect.cpp" />
     <ClCompile Include="DWParam.cpp" />
     <ClCompile Include="GaussianBlur.cpp" />
+    <ClCompile Include="UploadBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -260,6 +261,7 @@
     <ClInclude Include="PostEffect.h" />
     <ClInclude Include="DWParam.h" />
     <ClInclude Include="GaussianBlur.h" />
+    <ClInclude Include="UploadBuffer.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\shaders\Basic.hlsli">
