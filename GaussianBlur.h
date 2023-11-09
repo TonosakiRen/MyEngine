@@ -1,63 +1,48 @@
 #pragma once
-#include "TextureManager.h"
-#include "ViewProjection.h"
-#include "WorldTransform.h"
-#include <Windows.h>
-#include <d3d12.h>
-#include "externals/DirectXTex/d3dx12.h"
-#include <vector>
-#include <wrl.h>
-#include "Mymath.h"
-#include "DirectionalLight.h"
-#include "Material.h"
-#include <string>
+#include <stdint.h>
+#include "ColorBuffer.h"
+#include "UploadBuffer.h"
 #include "PipelineState.h"
 #include "RootSignature.h"
+#include <Windows.h>
+#include <d3d12.h>
+#include "DirectXCommon.h"
 
-class DirectXCommon;
-
-class PostEffect
+#include <memory>
+class GaussianBlur
 {
 public:
-	enum class RootParameter {
-		Constant,
-		kTexture,
-
-		ParameterNum
-	};
-
-	struct VertexData {
-		Vector3 pos;
-		Vector2 uv;
-	};
-
+	static uint32_t gbInstanceCount;
 	static void StaticInitialize();
-	static void PreDraw(ID3D12GraphicsCommandList* commandList);
-	static void PostDraw();
-	static PostEffect* Create();
 
-	void Initialize();
+	void Initialize(ColorBuffer* originalTexture);
+	void Render(ID3D12GraphicsCommandList* commandList);
+	void UpdateWeightTable(float blurPower);
 
-	void Draw(DescriptorHandle srvHandle);
-
-	void CreateMesh();
-
+	ColorBuffer& GetResult() { return verticalBlurTexture_; }
 private:
 	static void InitializeGraphicsPipeline();
 private:
 	static DirectXCommon* sDirectXCommon;
-	static UINT sDescriptorHandleIncrementSize;
 	static ID3D12GraphicsCommandList* sCommandList;
 	static std::unique_ptr<RootSignature> sRootSignature;
-	static std::unique_ptr<PipelineState> sPipelineState;
+	static std::unique_ptr<PipelineState> sHorizontalBlurPipelineState;
+	static std::unique_ptr<PipelineState> sVerticalBlurPipelineState;
 
-	D3D12_VERTEX_BUFFER_VIEW vbView_{};
-	D3D12_INDEX_BUFFER_VIEW ibView_{};
-	std::vector<VertexData> vertices_;
-	std::vector<uint16_t> indices_;
-	Microsoft::WRL::ComPtr<ID3D12Resource> vertBuff_;
-	Microsoft::WRL::ComPtr<ID3D12Resource> indexBuff_;
-	uint32_t uvHandle_;
-	float constant_ = 1.0f;
+	static const uint32_t kNumWeights = 8;
+
+	GaussianBlur(const GaussianBlur&) = delete;
+	GaussianBlur& operator=(const GaussianBlur&) = delete;
+
+
+	ColorBuffer* originalTexture_ = nullptr;
+	ColorBuffer horizontalBlurTexture_;
+	ColorBuffer verticalBlurTexture_;
+	UploadBuffer constantBuffer_;
+	float weights_[kNumWeights]{};
+
+	PipelineState horizontalBlurPSO;
+	PipelineState verticalBlurPSO;
+
 };
 

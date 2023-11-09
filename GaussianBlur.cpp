@@ -92,20 +92,20 @@ void GaussianBlur::InitializeGraphicsPipeline()
         // 深度バッファのフォーマット
         gpipeline.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 
-        // 頂点レイアウトの設定
-        gpipeline.InputLayout.pInputElementDescs = inputLayout;
-        gpipeline.InputLayout.NumElements = _countof(inputLayout);
+        //// 頂点レイアウトの設定
+        //gpipeline.InputLayout.pInputElementDescs = inputLayout;
+        //gpipeline.InputLayout.NumElements = _countof(inputLayout);
 
-        // 図形の形状設定（三角形）
-        gpipeline.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+        //// 図形の形状設定（三角形）
+        //gpipeline.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 
-        gpipeline.NumRenderTargets = 1;                            // 描画対象は1つ
-        gpipeline.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB; // 0～255指定のRGBA
-        gpipeline.SampleDesc.Count = 1; // 1ピクセルにつき1回サンプリング
+        //gpipeline.NumRenderTargets = 1;                            // 描画対象は1つ
+        //gpipeline.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB; // 0～255指定のRGBA
+        //gpipeline.SampleDesc.Count = 1; // 1ピクセルにつき1回サンプリング
 
-        gpipeline.pRootSignature = *sRootSignature;
+        //gpipeline.pRootSignature = *sRootSignature;
 
-        // グラフィックスパイプラインの生成
-        sPipelineState->Create(gpipeline);
+        //// グラフィックスパイプラインの生成
+        //sPipelineState->Create(gpipeline);
     }
 }
