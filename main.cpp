@@ -6,6 +6,7 @@
 #include "ImGuiManager.h"
 #include "Particle.h"
 #include "ParticleBox.h"
+#include "GlobalVariables.h"
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	WinApp* win = nullptr;
@@ -44,6 +45,9 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 #pragma endregion 変数
 
+	//グローバル変数の読み込み
+	GlobalVariables::GetInstance()->Loadfiles();
+
 	// ゲームシーンの初期化
 	gameScene = new GameScene();
 	gameScene->Initialize();
@@ -60,6 +64,9 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		// 入力関連の毎フレーム処理
 		input->Update();
+
+		// グローバル変数の毎フレーム処理
+		GlobalVariables::GetInstance()->Update();
 
 		// ゲームシーンの毎フレーム処理
 		gameScene->Update();

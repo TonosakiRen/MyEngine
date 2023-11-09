@@ -2,8 +2,27 @@
 #include "Input.h"
 #include "ImGuiManager.h"
 #include "Easing.h"
+#include "GlobalVariables.h"
+
+
+void Player::ApplyGlobalVariables() {
+
+	GlobalVariables* globalVariables = GlobalVariables::GetInstance();
+	const char* groupName = "Player";
+	dashSpeed_ = globalVariables->GetFloatValue(groupName, "dashSpeed");
+}
+
 void Player::Initialize(const std::string name, ViewProjection* viewProjection, DirectionalLight* directionalLight)
 {
+
+	GlobalVariables* globalVariables = GlobalVariables::GetInstance();
+	const char* groupName = "Player";
+	// グループを追加
+	GlobalVariables::GetInstance()->CreateGroup(groupName);
+	globalVariables->AddItem(groupName, "dashSpeed", dashSpeed_);
+
+	ApplyGlobalVariables();
+
 	GameObject::Initialize(name, viewProjection, directionalLight);
 	input_ = Input::GetInstance();
 
@@ -14,7 +33,7 @@ void Player::Initialize(const std::string name, ViewProjection* viewProjection, 
 	dustParticle_->emitterWorldTransform_.translation_ = { 0.0f,-2.1f,-1.2f };
 
 	material_.enableLighting_ = false;
-	worldTransform_.rotation_.y = Radian(90.0f);
+	worldTransform_.quaternion_ *= MakeRotateAxisAngleQuaternion({ 0.0f,1.0f,0.0f }, Radian(90.0f));
 	worldTransform_.translation_.y = 6.0f;
 
 	accelaration_ = { 0.0f,-0.03f,0.0f };
@@ -150,33 +169,33 @@ bool Player::weaponCollision(Collider& bossCollider)
 	}
 	return false;
 }
-void Player::Animation() {
-	dustParticle_->SetIsEmit(true);
-	if (animationT_ >= 1.0f || animationT_ <= 0.0f)
-	{
-		animationSpeed_ *= -1.0f;
-	}
-
-	if (animationBodyT_ >= 1.0f)
-	{
-		animationBodyT_ = 0.0f;
-		runUpAnimation_ *= -1.0f;
-	}
-
-	partsTransform_[RightArm].rotation_.x = Easing::easing(animationT_, -0.6f, 0.6f, animationSpeed_, Easing::EasingMode::easeNormal, false);
-	partsTransform_[LeftArm].rotation_.x = -partsTransform_[RightArm].rotation_.x;
-
-	partsTransform_[RightLeg].rotation_.x = Easing::easing(animationT_, -0.4f, 0.4f, animationSpeed_, Easing::EasingMode::easeNormal, false);
-	partsTransform_[LeftLeg].rotation_.x = -partsTransform_[RightLeg].rotation_.x;
-
-	worldTransform_.rotation_.y += Easing::easing(animationT_, -Radian(10.0f), Radian(10.0f), animationSpeed_, Easing::EasingMode::easeNormal, false);
-
-	worldTransform_.translation_.y += Easing::easing(animationBodyT_, 0.0f, runUpAnimation_, animationBodySpeed_, Easing::EasingMode::easeNormal, false);
-
-
-	animationT_ += animationSpeed_;
-	animationBodyT_ += animationBodySpeed_;
-}
+//void Player::Animation() {
+//	dustParticle_->SetIsEmit(true);
+//	if (animationT_ >= 1.0f || animationT_ <= 0.0f)
+//	{
+//		animationSpeed_ *= -1.0f;
+//	}
+//
+//	if (animationBodyT_ >= 1.0f)
+//	{
+//		animationBodyT_ = 0.0f;
+//		runUpAnimation_ *= -1.0f;
+//	}
+//
+//	partsTransform_[RightArm].rotation_.x = Easing::easing(animationT_, -0.6f, 0.6f, animationSpeed_, Easing::EasingMode::easeNormal, false);
+//	partsTransform_[LeftArm].rotation_.x = -partsTransform_[RightArm].rotation_.x;
+//
+//	partsTransform_[RightLeg].rotation_.x = Easing::easing(animationT_, -0.4f, 0.4f, animationSpeed_, Easing::EasingMode::easeNormal, false);
+//	partsTransform_[LeftLeg].rotation_.x = -partsTransform_[RightLeg].rotation_.x;
+//
+//	worldTransform_.rotation_.y += Easing::easing(animationT_, -Radian(10.0f), Radian(10.0f), animationSpeed_, Easing::EasingMode::easeNormal, false);
+//
+//	worldTransform_.translation_.y += Easing::easing(animationBodyT_, 0.0f, runUpAnimation_, animationBodySpeed_, Easing::EasingMode::easeNormal, false);
+//
+//
+//	animationT_ += animationSpeed_;
+//	animationBodyT_ += animationBodySpeed_;
+//}
 void Player::Draw() {
 	model_.Draw(worldTransform_, *viewProjection_, *directionalLight_, material_);
 	for (int i = 0; i < partNum; i++) {
@@ -229,11 +248,13 @@ void Player::BehaviorMoveUpdate()
 		move = move * rotateMatrix;
 
 		if (input_->GetLStick().x != 0.0f || input_->GetLStick().y != 0.0f) {
-			Vector3 nowDirection = Normalize(Vector3{ 0.0f,0.0f,1.0f } *MakeRotateYMatrix(worldTransform_.rotation_.y));
+			Vector3 nowDirection = Normalize(Vector3{ 0.0f,0.0f,1.0f } * worldTransform_.quaternion_);
 
 			Matrix4x4 directionMatrix = DirectionToDirection(nowDirection, move);
 
-			worldTransform_.rotation_ = worldTransform_.rotation_ * directionMatrix;
+			Quaternion directionQ =  RotateMatrixToQuaternion(directionMatrix);
+
+			worldTransform_.quaternion_ *= directionQ;
 
 		}
 
@@ -265,10 +286,13 @@ void Player::BehaviorMoveUpdate()
 
 		if (move.x != 0.0f || move.z != 0.0f) {
 
-			Vector3 nowDirection = Normalize(Vector3{ 0.0f,0.0f,1.0f } *MakeRotateYMatrix(worldTransform_.rotation_.y));
-			Matrix4x4 rotate = DirectionToDirection(nowDirection, move);
-			Vector3 move2 = nowDirection * rotate;
-			worldTransform_.rotation_ = worldTransform_.rotation_ * rotate;
+			Vector3 nowDirection = Normalize(Vector3{ 0.0f,0.0f,1.0f } * worldTransform_.quaternion_);
+
+			Matrix4x4 directionMatrix = DirectionToDirection(nowDirection, move);
+
+			Quaternion directionQ = RotateMatrixToQuaternion(directionMatrix);
+
+			worldTransform_.quaternion_ *= directionQ;
 		}
 		
 
@@ -303,19 +327,15 @@ void Player::BehaviorAttackUpdate()
 		weaponRadian_ = 0.0f;
 	}
 
-	weaponRotateWorldTransform_.rotation_.x = weaponRadian_;
+	weaponRotateWorldTransform_.quaternion_ *= MakeRotateAxisAngleQuaternion({ 1.0f,0.0f,0.0f }, Radian(3.0f));
 }
 
 void Player::BehaviorDashUpdate()
 {
 
 	dashFrame++;
-	// 速さ
-	const float speed = 0.9f;
-
-	Matrix4x4 rotateMatrix = MakeRotateYMatrix(worldTransform_.rotation_.y);
-
-	Vector3 move = Normalize(Vector3{ 0.0f,0.0f,1.0f }) * rotateMatrix * speed;
+	
+	Vector3 move = Normalize(Vector3{ 0.0f,0.0f,1.0f }) * worldTransform_.quaternion_ * dashSpeed_;
 
 	// 移動
 	worldTransform_.translation_ = worldTransform_.translation_ + move;

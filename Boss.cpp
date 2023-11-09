@@ -17,7 +17,7 @@ void Boss::Initialize(ViewProjection* viewProjection, DirectionalLight* directio
 	worldTransform_.translation_.y = 10.0f;
 	worldTransform_.translation_.x = -20.0f;
 
-	worldTransform_.rotation_.y = Radian(90.0f);
+	worldTransform_.quaternion_ *= MakeRotateAxisAngleQuaternion({ 0.0f,1.0f,0.0f }, Radian(90.0f));
 	modelParts_[Head].Initialize("boss_head");
 	modelParts_[Tin].Initialize("boss_tin");
 	for (int i = 0; i < partNum; i++) {

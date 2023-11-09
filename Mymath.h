@@ -346,6 +346,10 @@ inline Vector3 Slerp(const Vector3& v1, const Vector3& v2, float t) {
 		factorA * a.z + factorB * b.z };
 }
 
+inline float Angle(const Vector3& from, const Vector3& to) {
+	return std::acosf(Dot(Normalize(from), Normalize(to)));
+}
+
 #pragma endregion
 #pragma region Matrix4x4
 inline Matrix4x4 Add(const Matrix4x4& m1, const Matrix4x4& m2) {
@@ -739,6 +743,31 @@ inline Matrix4x4 MakeRotateXYZMatrix(const Vector3& radian) {
 	return MakeRotateXMatrix(radian.x) * MakeRotateYMatrix(radian.y) * MakeRotateZMatrix(radian.z);;
 }
 
+inline Matrix4x4 MakeRotateMatrix(const Quaternion& quaternion) {
+	Matrix4x4 result;
+	result.m[0][0] = quaternion.w * quaternion.w + quaternion.x * quaternion.x - quaternion.y * quaternion.y - quaternion.z * quaternion.z;
+	result.m[0][1] = 2 * (quaternion.x * quaternion.y + quaternion.w * quaternion.z);
+	result.m[0][2] = 2 * (quaternion.x * quaternion.z - quaternion.w * quaternion.y);
+	result.m[0][3] = 0;
+
+	result.m[1][0] = 2 * (quaternion.x * quaternion.y - quaternion.w * quaternion.z);
+	result.m[1][1] = quaternion.w * quaternion.w - quaternion.x * quaternion.x + quaternion.y * quaternion.y - quaternion.z * quaternion.z;
+	result.m[1][2] = 2 * (quaternion.y * quaternion.z + quaternion.w * quaternion.x);
+	result.m[1][3] = 0;
+
+	result.m[2][0] = 2 * (quaternion.x * quaternion.z + quaternion.w * quaternion.y);
+	result.m[2][1] = 2 * (quaternion.y * quaternion.z - quaternion.w * quaternion.x);
+	result.m[2][2] = quaternion.w * quaternion.w - quaternion.x * quaternion.x - quaternion.y * quaternion.y + quaternion.z * quaternion.z;
+	result.m[2][3] = 0;
+
+	result.m[3][0] = 0;
+	result.m[3][1] = 0;
+	result.m[3][2] = 0;
+	result.m[3][3] = 1;
+
+	return result;
+}
+
 inline Matrix4x4 DirectionToDirection(const Vector3& from, const Vector3& to) {
 	Vector3 normalizeFrom = Normalize(from);
 	Vector3 normalizeTo = Normalize(to);
@@ -787,6 +816,15 @@ inline Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, c
 	Matrix4x4 translateMatrix = MakeTranslateMatrix(translate);
 
 	Matrix4x4 tmp = scaleMatrix * rotateXMatrix * rotateYMatrix * rotateZMatrix * translateMatrix;
+
+	return tmp;
+}
+inline Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Quaternion& rotate, const Vector3& translate) {
+	Matrix4x4 scaleMatrix = MakeScaleMatrix(scale);
+	Matrix4x4 rotateMatrix = MakeRotateMatrix(rotate);
+	Matrix4x4 translateMatrix = MakeTranslateMatrix(translate);
+
+	Matrix4x4 tmp = scaleMatrix * rotateMatrix * translateMatrix;
 
 	return tmp;
 }
@@ -909,6 +947,12 @@ inline Matrix4x4 MakeViewMatirx(const Vector3& rotate, const Vector3& tranlate) 
 	return Inverse(cameraWorldMatrix);
 }
 
+inline Matrix4x4 MakeViewMatirx(const Quaternion& q, const Vector3& tranlate) {
+	Matrix4x4 cameraWorldMatrix = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, q, tranlate);
+	return Inverse(cameraWorldMatrix);
+}
+
+
 inline Matrix4x4 MakeLookRotation(const Vector3& direction, const Vector3& up = Vector3{0.0f,1.0f,0.0f}) noexcept {
 	Vector3 z = Normalize(direction);
 	Vector3 x = Normalize(Cross(Normalize(up), z));
@@ -943,6 +987,12 @@ inline Quaternion operator *(const Quaternion& lhs, const Quaternion& rhs) {
 
 	return result;
 }
+
+inline Quaternion& operator *=(Quaternion& lhs, const Quaternion& rhs) {
+	lhs = rhs * lhs;
+	return lhs;
+}
+
 
 inline Quaternion IdentityQuaternion() {
 	Quaternion result{0.0f,0.0f,0.0f,1.0f };
@@ -1003,29 +1053,163 @@ inline Vector3 operator *(const Vector3& v, const Quaternion& q) {
 	return result;
 }
 
-inline Matrix4x4 MakeRotateMatrix(const Quaternion& quaternion) {
-	Matrix4x4 result;
-	result.m[0][0] = quaternion.w * quaternion.w + quaternion.x * quaternion.x - quaternion.y * quaternion.y - quaternion.z * quaternion.z;
-	result.m[0][1] = 2 * (quaternion.x * quaternion.y + quaternion.w * quaternion.z);
-	result.m[0][2] = 2 * (quaternion.x * quaternion.z - quaternion.w * quaternion.y);
-	result.m[0][3] = 0;
-
-	result.m[1][0] = 2 * (quaternion.x * quaternion.y - quaternion.w * quaternion.z);
-	result.m[1][1] = quaternion.w * quaternion.w - quaternion.x * quaternion.x + quaternion.y * quaternion.y - quaternion.z * quaternion.z;
-	result.m[1][2] = 2 * (quaternion.y * quaternion.z + quaternion.w * quaternion.x);
-	result.m[1][3] = 0;
-
-	result.m[2][0] = 2 * (quaternion.x * quaternion.z + quaternion.w * quaternion.y);
-	result.m[2][1] = 2 * (quaternion.y * quaternion.z - quaternion.w * quaternion.x);
-	result.m[2][2] = quaternion.w * quaternion.w - quaternion.x * quaternion.x - quaternion.y * quaternion.y + quaternion.z * quaternion.z;
-	result.m[2][3] = 0;
-
-	result.m[3][0] = 0;
-	result.m[3][1] = 0;
-	result.m[3][2] = 0;
-	result.m[3][3] = 1;
-
+inline Quaternion MakeFromOrthonormal(const Vector3& x, const Vector3& y, const Vector3& z)  {
+	float trace = x.x + y.y + z.z;
+	if (trace > 0.0f) {
+		float s = std::sqrtf(trace + 1.0f) * 0.5f;
+		Quaternion result{};
+		result.w = s;
+		s = 0.25f / s;
+		result.x = (y.z - z.y) * s;
+		result.y = (z.x - x.z) * s;
+		result.z = (x.y - y.x) * s;
+		return result;
+	}
+	else if (x.x > y.y && x.x > z.z) {
+		float s = std::sqrtf(1.0f + x.x - y.y - z.z) * 0.5f;
+		Quaternion result{};
+		result.x = s;
+		s = 0.25f / s;
+		result.y = (x.y + y.x) * s;
+		result.z = (z.x + x.z) * s;
+		result.w = (y.z - z.y) * s;
+		return result;
+	}
+	else if (y.y > z.z) {
+		float s = std::sqrtf(1.0f - x.x + y.y - z.z) * 0.5f;
+		Quaternion result{};
+		result.y = s;
+		s = 0.25f / s;
+		result.x = (x.y + y.x) * s;
+		result.z = (y.z + z.y) * s;
+		result.w = (z.x - x.z) * s;
+		return result;
+	}
+	Quaternion result{};
+	float s = std::sqrtf(1.0f - x.x - y.y + z.z) * 0.5f;
+	result.z = s;
+	s = 0.25f / s;
+	result.x = (z.x + x.z) * s;
+	result.y = (y.z + z.y) * s;
+	result.w = (x.y - y.x) * s;
 	return result;
+}
+
+inline Quaternion MakeFromOrthonormal(const Matrix4x4& m) { 
+	Vector3 x = GetXAxis(m);
+	Vector3 y = GetYAxis(m);
+	Vector3 z = GetZAxis(m);
+
+	float trace = x.x + y.y + z.z;
+	if (trace > 0.0f) {
+		float s = std::sqrtf(trace + 1.0f) * 0.5f;
+		Quaternion result{};
+		result.w = s;
+		s = 0.25f / s;
+		result.x = (y.z - z.y) * s;
+		result.y = (z.x - x.z) * s;
+		result.z = (x.y - y.x) * s;
+		return result;
+	}
+	else if (x.x > y.y && x.x > z.z) {
+		float s = std::sqrtf(1.0f + x.x - y.y - z.z) * 0.5f;
+		Quaternion result{};
+		result.x = s;
+		s = 0.25f / s;
+		result.y = (x.y + y.x) * s;
+		result.z = (z.x + x.z) * s;
+		result.w = (y.z - z.y) * s;
+		return result;
+	}
+	else if (y.y > z.z) {
+		float s = std::sqrtf(1.0f - x.x + y.y - z.z) * 0.5f;
+		Quaternion result{};
+		result.y = s;
+		s = 0.25f / s;
+		result.x = (x.y + y.x) * s;
+		result.z = (y.z + z.y) * s;
+		result.w = (z.x - x.z) * s;
+		return result;
+	}
+	Quaternion result{};
+	float s = std::sqrtf(1.0f - x.x - y.y + z.z) * 0.5f;
+	result.z = s;
+	s = 0.25f / s;
+	result.x = (z.x + x.z) * s;
+	result.y = (y.z + z.y) * s;
+	result.w = (x.y - y.x) * s;
+	return result;
+}
+
+inline Quaternion MakeFromTwoVector(const Vector3& from, const Vector3& to) {
+	Vector3 axis = Cross(from, to);
+	float angle = Angle(from, to);
+	return MakeRotateAxisAngleQuaternion(axis, angle);
+}
+
+
+
+inline Quaternion RotateMatrixToQuaternion(Matrix4x4 m) {
+	float px = m.m[0][0] - m.m[1][1] - m.m[2][2] + 1.0f;
+	float py = -m.m[0][0] + m.m[1][1] - m.m[2][2] + 1.0f;
+	float pz = -m.m[0][0] - m.m[1][1] + m.m[2][2] + 1.0f;
+	float pw = m.m[0][0] + m.m[1][1] + m.m[2][2] + 1.0f;
+
+	int selected = 0;
+	float max = px;
+	if (max < py) {
+		selected = 1;
+		max = py;
+	}
+	if (max < pz) {
+		selected = 2;
+		max = pz;
+	}
+	if (max < pw) {
+		selected = 3;
+		max = pw;
+	}
+
+	if (selected == 0) {
+		float x = std::sqrt(px) * 0.5f;
+		float d = 1.0f / (4.0f * x);
+		return Quaternion(
+			x,
+			(m.m[1][0] + m.m[0][1]) * d,
+			(m.m[0][2] + m.m[2][0]) * d,
+			(m.m[2][1] - m.m[1][2]) * d
+		);
+	}
+	else if (selected == 1) {
+		float y = std::sqrt(py) * 0.5f;
+		float d = 1.0f / (4.0f * y);
+		return Quaternion(
+			(m.m[1][0] + m.m[0][1]) * d,
+			y,
+			(m.m[2][1] + m.m[1][2]) * d,
+			(m.m[0][2] - m.m[2][0]) * d
+		);
+	}
+	else if (selected == 2) {
+		float z = std::sqrt(pz) * 0.5f;
+		float d = 1.0f / (4.0f * z);
+		return Quaternion(
+			(m.m[0][2] + m.m[2][0]) * d,
+			(m.m[2][1] + m.m[1][2]) * d,
+			z,
+			(m.m[1][0] - m.m[0][1]) * d
+		);
+	}
+	else if (selected == 3) {
+		float w = std::sqrtf(pw) * 0.5f;
+		float d = 1.0f / (4.0f * w);
+		return Quaternion(
+			(m.m[2][1] - m.m[1][2]) * d,
+			(m.m[0][2] - m.m[2][0]) * d,
+			(m.m[1][0] - m.m[0][1]) * d,
+			w
+		);
+	}
 }
 
 inline int Rand(int min, int max) {

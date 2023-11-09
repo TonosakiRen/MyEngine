@@ -33,9 +33,6 @@ public:
 	void SetScale(Vector3 scale) {
 		worldTransform_.scale_ = scale;
 	}
-	void SetRotation(Vector3 rotation) {
-		worldTransform_.rotation_ = rotation;
-	}
 	void SetPosition(Vector3 position) {
 		worldTransform_.translation_ = position;
 	}

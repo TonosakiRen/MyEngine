@@ -4,8 +4,6 @@
 #include "DustParticle.h"
 #include <optional>
 #include "Collider.h"
-class GameScene;
-class Player;
 
 class Boss :
     public GameObject

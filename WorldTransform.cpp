@@ -39,15 +39,13 @@ void WorldTransform::UpdateMatrix() {
     Matrix4x4 scaleMatrix = MakeScaleMatrix(scale_);
 
     Matrix4x4 rotateMatrix = MakeIdentity4x4();
-    rotateMatrix = MakeRotateXYZMatrix(rotation_);
-    Matrix4x4 QrotateMatrix = MakeRotateMatrix(quaternion_);
+    rotateMatrix = MakeRotateMatrix(quaternion_);
     Matrix4x4 translationMatrix = MakeTranslateMatrix(translation_);
 
     // ワールド行列の合成
     matWorld_ = MakeIdentity4x4();
     matWorld_ *= scaleMatrix;
     matWorld_ *= rotateMatrix;
-    matWorld_ *= QrotateMatrix;
     matWorld_ *= translationMatrix;
 
 

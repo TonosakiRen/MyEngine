@@ -27,7 +27,7 @@ public:
 				Matrix4x4 localMatrix = matWorld_ * Inverse(parent->matWorld_);
 				translation_ = MakeTranslation(localMatrix);
 				if (isRotateParent_ == true) {
-					quaternion_ = MakeEulerAngle(NormalizeMakeRotateMatrix(localMatrix));
+					quaternion_ = RotateMatrixToQuaternion((NormalizeMakeRotateMatrix(localMatrix)));
 				}
 				if (isScaleParent_ == true) {
 					scale_ = MakeScale(localMatrix);
@@ -38,7 +38,7 @@ public:
 			else {
 				translation_ = MakeTranslation(matWorld_);
 				if (isRotateParent_ == true) {
-					rotation_ = MakeEulerAngle(NormalizeMakeRotateMatrix(matWorld_));
+					quaternion_ = RotateMatrixToQuaternion((NormalizeMakeRotateMatrix(matWorld_)));
 				}
 				if (isScaleParent_ == true) {
 					scale_ = MakeScale(matWorld_);

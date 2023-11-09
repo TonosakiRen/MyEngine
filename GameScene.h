@@ -40,7 +40,6 @@ private:
 	FollowCamera followCamera_;
 
 	DirectionalLight directionalLight_;
-	bool isCameraMove_ = false;
 	float cameraT_ = 0.0f;
 
 	uint32_t textureHandle_;

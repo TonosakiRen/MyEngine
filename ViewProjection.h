@@ -27,7 +27,7 @@ public:
 	}
 public:
 	Vector3 translation_ = { 0.0f, 0.0f, -10.0f };
-	Vector3 target_ = { 0.0f, 0.0f, 0.0f };
+	Quaternion target_ = IdentityQuaternion();
 	Vector3 shakeValue_ = { 0.0f,0.0f,0.0f };
 private:
 	void CreateConstBuffer();
