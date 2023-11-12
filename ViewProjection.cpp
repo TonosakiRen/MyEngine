@@ -85,13 +85,13 @@ void ViewProjection::DebugMove() {
         target_.y += rot * mouseMove.x * 0.1f;
     }
     else if (input->IsPressMouse(2)) {
-        Matrix4x4 rotMat = MakeRotateMatrix(target_);
+        Matrix4x4 rotMat = MakeRotateXYZMatrix(target_);
         Vector3 cameraX = GetXAxis(rotMat) * static_cast<float>(-mouseMove.x) * 0.01f;
         Vector3 cameraY = GetYAxis(rotMat) * static_cast<float>(mouseMove.y) * 0.01f;
         translation_ += cameraX + cameraY;
     }
     else if (wheel != 0) {
-        Matrix4x4 rotMat = MakeRotateMatrix(target_);
+         Matrix4x4 rotMat = MakeRotateXYZMatrix(target_);
         Vector3 cameraZ = GetZAxis(rotMat) * (static_cast<float>(wheel / 120) * 0.5f);
         translation_ += cameraZ;
     }

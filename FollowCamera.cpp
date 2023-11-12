@@ -16,10 +16,10 @@ void FollowCamera::Update() {
 	}
 	else {
 		if (input->PushKey(DIK_RIGHTARROW)) {
-			viewProjection_.target_ *= MakeRotateAxisAngleQuaternion({ 0.0f,1.0f,0.0f }, 30000.0f * rotateSpeed);
+			viewProjection_.target_.y += 30000.0f * rotateSpeed;
 		}
 		if (input->PushKey(DIK_LEFTARROW)) {
-			viewProjection_.target_ *= MakeRotateAxisAngleQuaternion({ 0.0f,1.0f,0.0f }, -30000.0f * rotateSpeed);
+			viewProjection_.target_.y -= 30000.0f * rotateSpeed;
 		}
 		
 	}

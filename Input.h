@@ -61,7 +61,7 @@ public:
 		return Vector2{ static_cast<float>(xInputState_.Gamepad.sThumbLX),static_cast<float>(xInputState_.Gamepad.sThumbLY) };
 	}
 	Vector2 GetRStick() {
-		return Vector2{ static_cast<float>(xInputState_.Gamepad.sThumbLX),static_cast<float>(xInputState_.Gamepad.sThumbLY) };
+		return Vector2{ static_cast<float>(xInputState_.Gamepad.sThumbRX),static_cast<float>(xInputState_.Gamepad.sThumbRY) };
 	}
 
 	bool DownLStick(SHORT deadZone = -20000) {

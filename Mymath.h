@@ -93,6 +93,10 @@ struct OBB {
 	Vector3 size;            // 座標軸方向の長さの半分。中心から面までの距離
 };
 
+inline float Cross(Vector2 v1, Vector2 v2) {
+	return v1.x * v2.y - v1.y * v2.x;
+}
+
 
 #pragma region Vector3
 
@@ -347,7 +351,14 @@ inline Vector3 Slerp(const Vector3& v1, const Vector3& v2, float t) {
 }
 
 inline float Angle(const Vector3& from, const Vector3& to) {
-	return std::acosf(Dot(Normalize(from), Normalize(to)));
+	float dot = Dot(Normalize(from), Normalize(to));
+	if (dot >= 1.0f) {
+		return 0.0f;
+	}
+	if (dot <= -1.0f) {
+		return Radian(180.0f);
+	}
+	return std::acosf(dot);
 }
 
 #pragma endregion
@@ -993,6 +1004,17 @@ inline Quaternion& operator *=(Quaternion& lhs, const Quaternion& rhs) {
 	return lhs;
 }
 
+inline Quaternion operator+(const Quaternion& lhs, const Quaternion& rhs) {
+	return Quaternion{ lhs.x + rhs.x, lhs.y + rhs.y, lhs.z + rhs.z, lhs.w + rhs.w };
+}
+
+inline Quaternion operator*(const Quaternion& lhs, float rhs){
+	return Quaternion{ lhs.x * rhs, lhs.y * rhs, lhs.z * rhs, lhs.w * rhs };
+}
+
+inline Quaternion operator*(float lhs, const Quaternion& rhs) {
+	return Quaternion{ lhs * rhs.x, lhs * rhs.y, lhs * rhs.z, lhs * rhs.w };
+}
 
 inline Quaternion IdentityQuaternion() {
 	Quaternion result{0.0f,0.0f,0.0f,1.0f };
@@ -1210,6 +1232,37 @@ inline Quaternion RotateMatrixToQuaternion(Matrix4x4 m) {
 			w
 		);
 	}
+}
+
+inline float Dot(const Quaternion& lhs, const Quaternion& rhs) noexcept {
+	return lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z + lhs.w * rhs.w;
+}
+
+inline Quaternion Lerp(float t, const Quaternion& start, const Quaternion& end) noexcept {
+	return Quaternion{
+		start.x + t * (end.x - start.x),
+		start.y + t * (end.y - start.y),
+		start.z + t * (end.z - start.z),
+		start.w + t * (end.w - start.w) };
+}
+
+inline Quaternion Slerp(float t, const Quaternion& start, const Quaternion& end) noexcept {
+	Quaternion s = start;
+	float dot = Dot(start, end);
+	if (dot > 0.9999f) {
+		return Lerp(t, start, end);
+	}
+	// q1,q2が反対向きの場合
+	if (dot < 0) {
+		s.x = -s.x;
+		s.y = -s.y;
+		s.z = -s.z;
+		s.w = -s.w;
+		dot = -dot;
+	}
+	// 球面線形補間の計算
+	float theta = std::acos(dot);
+	return (std::sin((1.0f - t) * theta) * s + std::sin(t * theta) * end) * (1.0f / std::sin(theta));
 }
 
 inline int Rand(int min, int max) {

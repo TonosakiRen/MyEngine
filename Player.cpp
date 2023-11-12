@@ -77,7 +77,7 @@ void Player::Initialize(const std::string name, ViewProjection* viewProjection, 
 
 void Player::Update()
 {
-
+	ApplyGlobalVariables();
 	if (behaviorRequest_) {
 		//振る舞いを変更する
 		behavior_ = behaviorRequest_.value();
@@ -240,22 +240,42 @@ void Player::BehaviorMoveUpdate()
 			input_->GetLStick().y / SHRT_MAX };
 
 		// 移動量に速さを反映
-		if (move.x != 0.0f || move.y != 0.0f || move.z != 0.0f) {
+		if (move.x >= 0.04f || move.y >= 0.04f || move.z >= 0.04f) {
 			move = Normalize(move) * speed;
 			isWalking_ = true;
+		}
+		else {
+			move = { 0.0f,0.0f,0.0f };
 		}
 		Matrix4x4 rotateMatrix = MakeRotateYMatrix(viewProjection_->target_.y);
 		move = move * rotateMatrix;
 
-		if (input_->GetLStick().x != 0.0f || input_->GetLStick().y != 0.0f) {
-			Vector3 nowDirection = Normalize(Vector3{ 0.0f,0.0f,1.0f } * worldTransform_.quaternion_);
+		if (isWalking_ == true) {
+			Vector3 nowDirection = Normalize(Vector3{ 0.0f,0.0f,1.0f } *worldTransform_.quaternion_);
 
-			Matrix4x4 directionMatrix = DirectionToDirection(nowDirection, move);
+			float angle = Angle(nowDirection, move);
 
-			Quaternion directionQ =  RotateMatrixToQuaternion(directionMatrix);
+			Quaternion quaternion = MakeRotateAxisAngleQuaternion({ 0.0f,1.0f,0.0f }, angle);
 
-			worldTransform_.quaternion_ *= directionQ;
+			Vector3 afterDirection = nowDirection * quaternion;
 
+			bool isRight = false;
+
+			float a = Cross(Vector2{ nowDirection.x,nowDirection.z }, Vector2{ afterDirection.x,afterDirection.z });
+
+			if (Cross(Vector2{ nowDirection.x,nowDirection.z }, Vector2{ afterDirection.x,afterDirection.z }) > 0.0f) {
+				isRight = true;
+			}
+
+			if (isRight) {
+				quaternion = MakeRotateAxisAngleQuaternion({ 0.0f,1.0f,0.0f }, angle);
+			}
+			else {
+				quaternion = MakeRotateAxisAngleQuaternion({ 0.0f,-1.0f,0.0f }, angle);
+			}
+
+
+			worldTransform_.quaternion_ = worldTransform_.quaternion_ * quaternion;
 		}
 
 		if (input_->TriggerButton(XINPUT_GAMEPAD_A) && isJump_ == false) {
@@ -288,11 +308,29 @@ void Player::BehaviorMoveUpdate()
 
 			Vector3 nowDirection = Normalize(Vector3{ 0.0f,0.0f,1.0f } * worldTransform_.quaternion_);
 
-			Matrix4x4 directionMatrix = DirectionToDirection(nowDirection, move);
+			float angle = Angle(nowDirection, move);
 
-			Quaternion directionQ = RotateMatrixToQuaternion(directionMatrix);
+			Quaternion quaternion = MakeRotateAxisAngleQuaternion({ 0.0f,1.0f,0.0f }, angle);
 
-			worldTransform_.quaternion_ *= directionQ;
+			Vector3 afterDirection = nowDirection * quaternion;
+
+			bool isRight = false;
+
+			float a = Cross(Vector2{ nowDirection.x,nowDirection.z }, Vector2{ afterDirection.x,afterDirection.z });
+
+			if (Cross(Vector2{ nowDirection.x,nowDirection.z}, Vector2{ afterDirection.x,afterDirection.z }) > 0.0f) {
+				isRight = true;
+			}
+
+			if (isRight) {
+				 quaternion = MakeRotateAxisAngleQuaternion({ 0.0f,1.0f,0.0f }, angle);
+			}
+			else {
+				quaternion = MakeRotateAxisAngleQuaternion({ 0.0f,-1.0f,0.0f }, angle);
+			}
+			
+
+			worldTransform_.quaternion_ = worldTransform_.quaternion_ * quaternion;
 		}
 		
 
