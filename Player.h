@@ -10,6 +10,30 @@ class Player :
 {
 public:
 
+    //コンボ数
+    static const int ComboNum = 3;
+
+    //コンボ
+    struct ConstAttack {
+        //振りかぶりの時間
+        uint32_t anticipationTime;
+        //ための時間
+        uint32_t chargeTime;
+        //攻撃振りの時間
+        uint32_t swingTime;
+        //硬直時間<frame>
+        uint32_t recoveryTime;
+        //振りかぶりの移動速さ
+        float anticipationSpeed;
+        //ための移動速さ
+        float chargeSpeed;
+        //攻撃振りの移動速さ
+        float swingSpeed;
+    };
+
+    //コンボ定数表
+    static const std::array<ConstAttack, ComboNum> kConstAttacks_;
+
     //調整項目の適用
     void ApplyGlobalVariables();
     float dashSpeed_ = 0.9f;
@@ -88,6 +112,13 @@ private:
     void BehaviorAttackInitialize();
     void BehaviorDashInitialize();
 
+    //攻撃用ワーク
+    struct WorkAttck {
+        int32_t comboindex = 0;
+        int32_t inComboPhase = 0;
+        bool comboNext = false;
+    };
+    WorkAttck workAttack_;
 public:
     //collider
     Collider collider;

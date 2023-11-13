@@ -4,6 +4,14 @@
 #include "Easing.h"
 #include "GlobalVariables.h"
 
+const std::array<Player::ConstAttack, Player::ComboNum> Player::kConstAttacks_ = {
+	{
+		{0,0,20,0,0.0f,0.0f,0.15f},
+		{15,10,15,0,0.2f,0.0f,0.0f},
+		{15,10,15,30,0.2f,0.0f,0.0f}
+	}
+
+};
 
 void Player::ApplyGlobalVariables() {
 
@@ -169,33 +177,33 @@ bool Player::weaponCollision(Collider& bossCollider)
 	}
 	return false;
 }
-//void Player::Animation() {
-//	dustParticle_->SetIsEmit(true);
-//	if (animationT_ >= 1.0f || animationT_ <= 0.0f)
-//	{
-//		animationSpeed_ *= -1.0f;
-//	}
-//
-//	if (animationBodyT_ >= 1.0f)
-//	{
-//		animationBodyT_ = 0.0f;
-//		runUpAnimation_ *= -1.0f;
-//	}
-//
-//	partsTransform_[RightArm].rotation_.x = Easing::easing(animationT_, -0.6f, 0.6f, animationSpeed_, Easing::EasingMode::easeNormal, false);
-//	partsTransform_[LeftArm].rotation_.x = -partsTransform_[RightArm].rotation_.x;
-//
-//	partsTransform_[RightLeg].rotation_.x = Easing::easing(animationT_, -0.4f, 0.4f, animationSpeed_, Easing::EasingMode::easeNormal, false);
-//	partsTransform_[LeftLeg].rotation_.x = -partsTransform_[RightLeg].rotation_.x;
-//
-//	worldTransform_.rotation_.y += Easing::easing(animationT_, -Radian(10.0f), Radian(10.0f), animationSpeed_, Easing::EasingMode::easeNormal, false);
-//
-//	worldTransform_.translation_.y += Easing::easing(animationBodyT_, 0.0f, runUpAnimation_, animationBodySpeed_, Easing::EasingMode::easeNormal, false);
-//
-//
-//	animationT_ += animationSpeed_;
-//	animationBodyT_ += animationBodySpeed_;
-//}
+void Player::Animation() {
+	/*dustParticle_->SetIsEmit(true);
+	if (animationT_ >= 1.0f || animationT_ <= 0.0f)
+	{
+		animationSpeed_ *= -1.0f;
+	}
+
+	if (animationBodyT_ >= 1.0f)
+	{
+		animationBodyT_ = 0.0f;
+		runUpAnimation_ *= -1.0f;
+	}
+
+	partsTransform_[RightArm].rotation_.x = Easing::easing(animationT_, -0.6f, 0.6f, animationSpeed_, Easing::EasingMode::easeNormal, false);
+	partsTransform_[LeftArm].rotation_.x = -partsTransform_[RightArm].rotation_.x;
+
+	partsTransform_[RightLeg].rotation_.x = Easing::easing(animationT_, -0.4f, 0.4f, animationSpeed_, Easing::EasingMode::easeNormal, false);
+	partsTransform_[LeftLeg].rotation_.x = -partsTransform_[RightLeg].rotation_.x;
+
+	worldTransform_.rotation_.y += Easing::easing(animationT_, -Radian(10.0f), Radian(10.0f), animationSpeed_, Easing::EasingMode::easeNormal, false);
+
+	worldTransform_.translation_.y += Easing::easing(animationBodyT_, 0.0f, runUpAnimation_, animationBodySpeed_, Easing::EasingMode::easeNormal, false);
+
+
+	animationT_ += animationSpeed_;
+	animationBodyT_ += animationBodySpeed_;*/
+}
 void Player::Draw() {
 	model_.Draw(worldTransform_, *viewProjection_, *directionalLight_, material_);
 	for (int i = 0; i < partNum; i++) {
@@ -359,7 +367,7 @@ void Player::BehaviorMoveUpdate()
 
 void Player::BehaviorAttackUpdate()
 {
-	weaponRadian_ += Radian(3.0f);
+	/*weaponRadian_ += Radian(3.0f);
 	
 	if (weaponRadian_ >= Radian(90.0f)) {
 		behaviorRequest_ = Behavior::kMove;
@@ -367,7 +375,13 @@ void Player::BehaviorAttackUpdate()
 		weaponRotateWorldTransform_.quaternion_ = { 0.0f,0.0f,0.0f,1.0f };
 	}
 
-	weaponRotateWorldTransform_.quaternion_ *= MakeRotateAxisAngleQuaternion({ 1.0f,0.0f,0.0f }, Radian(3.0f));
+	weaponRotateWorldTransform_.quaternion_ *= MakeRotateAxisAngleQuaternion({ 1.0f,0.0f,0.0f }, Radian(3.0f));*/
+
+	if (comboindex < ComboNum) {
+		if () {
+
+		}
+	}
 }
 
 void Player::BehaviorDashUpdate()
