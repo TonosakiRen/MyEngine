@@ -257,9 +257,11 @@ void GlobalVariables::AddItem(const std::string& groupName, const std::string& k
 	std::map<std::string, Group>::iterator itGroup = datas_.find(groupName);
 	// 項目が未登録なら
 	if (itGroup != datas_.end()) {
-		SetValue(groupName, key, value);
+		Group& group = datas_[groupName];
+		if (!group.contains(key)) {
+			SetValue(groupName, key, value);
+		}
 	}
-
 }
 // 項目の追加(float)
 void GlobalVariables::AddItem(const std::string& groupName, const std::string& key, float value) {
@@ -267,7 +269,10 @@ void GlobalVariables::AddItem(const std::string& groupName, const std::string& k
 	std::map<std::string, Group>::iterator itGroup = datas_.find(groupName);
 	// 項目が未登録なら
 	if (itGroup != datas_.end()) {
-		SetValue(groupName, key, value);
+		Group& group = datas_[groupName];
+		if (!group.contains(key)) {
+			SetValue(groupName, key, value);
+		}
 	}
 }
 // 項目の追加(Vector3)
@@ -277,7 +282,10 @@ void GlobalVariables::AddItem(const std::string& groupName, const std::string& k
 
 	// 項目が未登録なら
 	if (itGroup != datas_.end()) {
-		SetValue(groupName, key, value);
+		Group& group = datas_[groupName];
+		if (!group.contains(key)) {
+			SetValue(groupName, key, value);
+		}
 	}
 }
 

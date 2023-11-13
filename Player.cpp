@@ -162,7 +162,7 @@ void Player::Collision(Collider& blockCollider)
 }
 bool Player::weaponCollision(Collider& bossCollider)
 {
-	if (isAttack_) {
+	if (behavior_ == Behavior::kAttack) {
 		bool isHit = false;
 		isHit = weaponCollider_.Collision(bossCollider);
 		return isHit;
@@ -219,11 +219,11 @@ void Player::SetInitialPos()
 void Player::BehaviorMoveUpdate()
 {
 
-	if (input_->TriggerKey(DIK_R)) {
+	if (input_->TriggerKey(DIK_R) || input_->PushBotton(XINPUT_GAMEPAD_RIGHT_SHOULDER)) {
 		behaviorRequest_ = Behavior::kAttack;
 	}
 
-	if (input_->TriggerKey(DIK_LSHIFT)) {
+	if (input_->TriggerKey(DIK_LSHIFT) || input_->PushBotton(XINPUT_GAMEPAD_LEFT_SHOULDER)) {
 		behaviorRequest_ = Behavior::kDash;
 	}
 
@@ -240,7 +240,7 @@ void Player::BehaviorMoveUpdate()
 			input_->GetLStick().y / SHRT_MAX };
 
 		// 移動量に速さを反映
-		if (move.x >= 0.04f || move.y >= 0.04f || move.z >= 0.04f) {
+		if (move.x != 0.0f || move.y != 0.0f || move.z != 0.0f) {
 			move = Normalize(move) * speed;
 			isWalking_ = true;
 		}
@@ -251,19 +251,20 @@ void Player::BehaviorMoveUpdate()
 		move = move * rotateMatrix;
 
 		if (isWalking_ == true) {
+
 			Vector3 nowDirection = Normalize(Vector3{ 0.0f,0.0f,1.0f } *worldTransform_.quaternion_);
 
-			float angle = Angle(nowDirection, move);
-
-			Quaternion quaternion = MakeRotateAxisAngleQuaternion({ 0.0f,1.0f,0.0f }, angle);
-
-			Vector3 afterDirection = nowDirection * quaternion;
+			Vector3 afterDirection = Normalize(move);
 
 			bool isRight = false;
 
 			float a = Cross(Vector2{ nowDirection.x,nowDirection.z }, Vector2{ afterDirection.x,afterDirection.z });
 
-			if (Cross(Vector2{ nowDirection.x,nowDirection.z }, Vector2{ afterDirection.x,afterDirection.z }) > 0.0f) {
+			float angle = Angle(nowDirection, move);
+
+			Quaternion quaternion = MakeRotateAxisAngleQuaternion({ 0.0f,1.0f,0.0f }, angle);
+
+			if (Cross(Vector2{ nowDirection.x,nowDirection.z }, Vector2{ afterDirection.x,afterDirection.z }) < 0.0f) {
 				isRight = true;
 			}
 
@@ -271,7 +272,7 @@ void Player::BehaviorMoveUpdate()
 				quaternion = MakeRotateAxisAngleQuaternion({ 0.0f,1.0f,0.0f }, angle);
 			}
 			else {
-				quaternion = MakeRotateAxisAngleQuaternion({ 0.0f,-1.0f,0.0f }, angle);
+				quaternion = MakeRotateAxisAngleQuaternion({ 0.0f,1.0f,0.0f }, -angle);
 			}
 
 
@@ -306,29 +307,29 @@ void Player::BehaviorMoveUpdate()
 
 		if (move.x != 0.0f || move.z != 0.0f) {
 
-			Vector3 nowDirection = Normalize(Vector3{ 0.0f,0.0f,1.0f } * worldTransform_.quaternion_);
+			Vector3 nowDirection = Normalize(Vector3{ 0.0f,0.0f,1.0f } *worldTransform_.quaternion_);
 
-			float angle = Angle(nowDirection, move);
-
-			Quaternion quaternion = MakeRotateAxisAngleQuaternion({ 0.0f,1.0f,0.0f }, angle);
-
-			Vector3 afterDirection = nowDirection * quaternion;
+			Vector3 afterDirection = Normalize(move);
 
 			bool isRight = false;
 
 			float a = Cross(Vector2{ nowDirection.x,nowDirection.z }, Vector2{ afterDirection.x,afterDirection.z });
 
-			if (Cross(Vector2{ nowDirection.x,nowDirection.z}, Vector2{ afterDirection.x,afterDirection.z }) > 0.0f) {
+			float angle = Angle(nowDirection, move);
+
+			Quaternion quaternion = MakeRotateAxisAngleQuaternion({ 0.0f,1.0f,0.0f }, angle);
+
+			if (Cross(Vector2{ nowDirection.x,nowDirection.z }, Vector2{ afterDirection.x,afterDirection.z }) < 0.0f) {
 				isRight = true;
 			}
 
 			if (isRight) {
-				 quaternion = MakeRotateAxisAngleQuaternion({ 0.0f,1.0f,0.0f }, angle);
+				quaternion = MakeRotateAxisAngleQuaternion({ 0.0f,1.0f,0.0f }, angle);
 			}
 			else {
-				quaternion = MakeRotateAxisAngleQuaternion({ 0.0f,-1.0f,0.0f }, angle);
+				quaternion = MakeRotateAxisAngleQuaternion({ 0.0f,1.0f,0.0f }, -angle);
 			}
-			
+
 
 			worldTransform_.quaternion_ = worldTransform_.quaternion_ * quaternion;
 		}
@@ -363,6 +364,7 @@ void Player::BehaviorAttackUpdate()
 	if (weaponRadian_ >= Radian(90.0f)) {
 		behaviorRequest_ = Behavior::kMove;
 		weaponRadian_ = 0.0f;
+		weaponRotateWorldTransform_.quaternion_ = { 0.0f,0.0f,0.0f,1.0f };
 	}
 
 	weaponRotateWorldTransform_.quaternion_ *= MakeRotateAxisAngleQuaternion({ 1.0f,0.0f,0.0f }, Radian(3.0f));

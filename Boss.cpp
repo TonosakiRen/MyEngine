@@ -77,6 +77,7 @@ void Boss::Draw() {
 			modelParts_[i].Draw(partsTransform_[i], *viewProjection_, *directionalLight_, material_);
 		}
 	}
+	collider_.Draw();
 }
 
 void Boss::ParticleDraw() {

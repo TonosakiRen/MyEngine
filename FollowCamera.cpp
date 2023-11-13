@@ -2,11 +2,32 @@
 #include "Input.h"
 #include <numbers>
 #include "ImGuiManager.h"
+#include "GlobalVariables.h"
+
+void FollowCamera::ApplyGlobalVariables() {
+
+	GlobalVariables* globalVariables = GlobalVariables::GetInstance();
+	const char* groupName = "FollowCamera";
+	delayCameraSpeed_ = globalVariables->GetFloatValue(groupName, "delayCameraSpeed");
+}
+
 void FollowCamera::Initialize() {
 	// ビュープロジェクション
 	viewProjection_.Initialize();
+
+	GlobalVariables* globalVariables = GlobalVariables::GetInstance();
+	const char* groupName = "FollowCamera";
+	// グループを追加
+	GlobalVariables::GetInstance()->CreateGroup(groupName);
+	globalVariables->AddItem(groupName, "delayCameraSpeed", delayCameraSpeed_);
+
+	ApplyGlobalVariables();
 }
 void FollowCamera::Update() {
+
+	ApplyGlobalVariables();
+
+	delayCameraSpeed_ = clamp(delayCameraSpeed_, 0.0f, 1.0f);
 
 	Input* input = Input::GetInstance();
 	const float rotateSpeed = 0.0000035f / (2.0f * float(M_PI));
@@ -27,7 +48,7 @@ void FollowCamera::Update() {
 	// 追従対象がいれば
 	if (target_) {
 
-		interTarget_ = Lerp(interTarget_, MakeTranslation(target_->matWorld_), 0.1f);
+		interTarget_ = Lerp(interTarget_, MakeTranslation(target_->matWorld_), delayCameraSpeed_);
 
 		//追従対象からカメラまでのオフセット
 		Vector3 offset = GetOffset();

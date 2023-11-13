@@ -8,6 +8,11 @@
 /// </summary>
 class FollowCamera {
 public:
+
+	//調整項目の適用
+	void ApplyGlobalVariables();
+	float delayCameraSpeed_ = 0.1f;
+
 	/// <summary>
 	/// 初期化
 	/// </summary>

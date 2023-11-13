@@ -13,7 +13,7 @@ public:
     //調整項目の適用
     void ApplyGlobalVariables();
     float dashSpeed_ = 0.9f;
-
+  
     void Initialize(const std::string name, ViewProjection* viewProjection, DirectionalLight* directionalLight);
     void Update();
     void UpdateMatrix();
