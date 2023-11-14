@@ -10,29 +10,24 @@ class Player :
 {
 public:
 
-    //コンボ数
-    static const int ComboNum = 3;
+    enum Combo {
+        ShortSwing,
+        Drop,
+        LongSwing,
 
-    //コンボ
+        ComboNum
+    };
+
+    //コンボ定数
     struct ConstAttack {
-        //振りかぶりの時間
-        uint32_t anticipationTime;
-        //ための時間
-        uint32_t chargeTime;
-        //攻撃振りの時間
-        uint32_t swingTime;
         //硬直時間<frame>
         uint32_t recoveryTime;
-        //振りかぶりの移動速さ
-        float anticipationSpeed;
-        //ための移動速さ
-        float chargeSpeed;
-        //攻撃振りの移動速さ
-        float swingSpeed;
+        //攻撃速さ
+        float AttackSpeed;
     };
 
     //コンボ定数表
-    static const std::array<ConstAttack, ComboNum> kConstAttacks_;
+    static std::array<ConstAttack, ComboNum> kConstAttacks_;
 
     //調整項目の適用
     void ApplyGlobalVariables();
@@ -114,9 +109,10 @@ private:
 
     //攻撃用ワーク
     struct WorkAttck {
-        int32_t comboindex = 0;
-        int32_t inComboPhase = 0;
-        bool comboNext = false;
+        Combo comboPhase = Combo::ShortSwing;
+        Combo comboRequest = Combo::ShortSwing;
+        bool comboFinish = false;
+        bool initialize = false;
     };
     WorkAttck workAttack_;
 public:

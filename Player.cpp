@@ -4,13 +4,12 @@
 #include "Easing.h"
 #include "GlobalVariables.h"
 
-const std::array<Player::ConstAttack, Player::ComboNum> Player::kConstAttacks_ = {
+std::array<Player::ConstAttack, Player::ComboNum> Player::kConstAttacks_ = {
 	{
-		{0,0,20,0,0.0f,0.0f,0.15f},
-		{15,10,15,0,0.2f,0.0f,0.0f},
-		{15,10,15,30,0.2f,0.0f,0.0f}
+		{0,Radian(3.0f)},
+		{5,Radian(3.0f)},
+		{15,Radian(3.0f)}
 	}
-
 };
 
 void Player::ApplyGlobalVariables() {
@@ -18,6 +17,9 @@ void Player::ApplyGlobalVariables() {
 	GlobalVariables* globalVariables = GlobalVariables::GetInstance();
 	const char* groupName = "Player";
 	dashSpeed_ = globalVariables->GetFloatValue(groupName, "dashSpeed");
+	kConstAttacks_[ShortSwing].AttackSpeed = globalVariables->GetFloatValue(groupName, "shortSwingAttackSpeed");
+	kConstAttacks_[Drop].AttackSpeed = globalVariables->GetFloatValue(groupName, "dropAttackSpeed");
+	kConstAttacks_[LongSwing].AttackSpeed = globalVariables->GetFloatValue(groupName, "longSwingAttackSpeed");
 }
 
 void Player::Initialize(const std::string name, ViewProjection* viewProjection, DirectionalLight* directionalLight)
@@ -28,6 +30,9 @@ void Player::Initialize(const std::string name, ViewProjection* viewProjection, 
 	// グループを追加
 	GlobalVariables::GetInstance()->CreateGroup(groupName);
 	globalVariables->AddItem(groupName, "dashSpeed", dashSpeed_);
+	globalVariables->AddItem(groupName, "shortSwingAttackSpeed", kConstAttacks_[ShortSwing].AttackSpeed);
+	globalVariables->AddItem(groupName, "dropAttackSpeed", kConstAttacks_[Drop].AttackSpeed);
+	globalVariables->AddItem(groupName, "longSwingAttackSpeed", kConstAttacks_[LongSwing].AttackSpeed);
 
 	ApplyGlobalVariables();
 
@@ -367,21 +372,71 @@ void Player::BehaviorMoveUpdate()
 
 void Player::BehaviorAttackUpdate()
 {
-	/*weaponRadian_ += Radian(3.0f);
+
+	switch (workAttack_.comboPhase)
+	{
+	case ShortSwing:
+		if (workAttack_.initialize == false) {
+			weaponRotateWorldTransform_.quaternion_ *= MakeRotateAxisAngleQuaternion({ 1.0f,0.0f,0.0f }, Radian(90.0f));
+			weaponRotateWorldTransform_.quaternion_ *= MakeRotateAxisAngleQuaternion({ 0.0f,1.0f,0.0f }, -Radian(30.0f));
+			workAttack_.initialize = true;
+		}
+		weaponRadian_ += kConstAttacks_[ShortSwing].AttackSpeed;
+		weaponRotateWorldTransform_.quaternion_ *= MakeRotateAxisAngleQuaternion({ 0.0f,1.0f,0.0f }, kConstAttacks_[ShortSwing].AttackSpeed);
+		if (weaponRadian_ >= Radian(60.0f)) {
+			workAttack_.comboFinish = true;
+		}
+		break;
+	case Drop:
+		if (workAttack_.initialize == false) {
+			workAttack_.initialize = true;
+		}
+		weaponRadian_ += kConstAttacks_[Drop].AttackSpeed;
+		weaponRotateWorldTransform_.quaternion_ *= MakeRotateAxisAngleQuaternion({ 1.0f,0.0f,0.0f }, kConstAttacks_[Drop].AttackSpeed);
+		if (weaponRadian_ >= Radian(90.0f)) {
+			workAttack_.comboFinish = true;
+		}
+		break;
+	case LongSwing:
+		if (workAttack_.initialize == false) {
+			weaponRotateWorldTransform_.quaternion_ *= MakeRotateAxisAngleQuaternion({ 1.0f,0.0f,0.0f }, Radian(90.0f));
+			weaponRotateWorldTransform_.quaternion_ *= MakeRotateAxisAngleQuaternion({ 0.0f,1.0f,0.0f }, -Radian(90.0f));
+			workAttack_.initialize = true;
+		}
+		weaponRadian_ += kConstAttacks_[LongSwing].AttackSpeed;
+		weaponRotateWorldTransform_.quaternion_ *= MakeRotateAxisAngleQuaternion({ 0.0f,1.0f,0.0f }, kConstAttacks_[LongSwing].AttackSpeed);
+		if (weaponRadian_ >= Radian(360.0f)) {
+			workAttack_.comboFinish = true;
+		}
+		break;
+	default:
+		break;
+	}
 	
-	if (weaponRadian_ >= Radian(90.0f)) {
-		behaviorRequest_ = Behavior::kMove;
-		weaponRadian_ = 0.0f;
-		weaponRotateWorldTransform_.quaternion_ = { 0.0f,0.0f,0.0f,1.0f };
+	if ((input_->TriggerButton(XINPUT_GAMEPAD_RIGHT_SHOULDER) || input_->TriggerKey(DIK_R)) && workAttack_.comboPhase < ComboNum - 1) {
+		workAttack_.comboRequest = static_cast<Combo>(workAttack_.comboPhase + 1);
 	}
 
-	weaponRotateWorldTransform_.quaternion_ *= MakeRotateAxisAngleQuaternion({ 1.0f,0.0f,0.0f }, Radian(3.0f));*/
+	if (workAttack_.comboFinish == true) {
+		workAttack_.comboFinish = false;
 
-	if (comboindex < ComboNum) {
-		if () {
+		//攻撃変数初期化
+		weaponRadian_ = 0.0f;
+		workAttack_.initialize = false;
+		weaponRotateWorldTransform_.quaternion_ = { 0.0f,0.0f,0.0f,1.0f };
 
+		//コンボ遷移
+		if (workAttack_.comboPhase != workAttack_.comboRequest) {
+			workAttack_.comboPhase = workAttack_.comboRequest;
+		}
+		else {
+			workAttack_.comboPhase = ShortSwing;
+			workAttack_.comboRequest = ShortSwing;
+			behaviorRequest_ = Behavior::kMove;
 		}
 	}
+
+	
 }
 
 void Player::BehaviorDashUpdate()
