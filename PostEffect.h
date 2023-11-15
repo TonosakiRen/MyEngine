@@ -27,7 +27,7 @@ public:
 	};
 
 	struct VertexData {
-		Vector3 pos;
+		Vector4 pos;
 		Vector2 uv;
 	};
 

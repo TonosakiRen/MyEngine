@@ -135,6 +135,10 @@
     <ClCompile Include="DWParam.cpp" />
     <ClCompile Include="GaussianBlur.cpp" />
     <ClCompile Include="UploadBuffer.cpp" />
+    <ClCompile Include="CommandContext.cpp" />
+    <ClCompile Include="RenderManager.cpp" />
+    <ClCompile Include="Bloom.cpp" />
+    <ClCompile Include="Helper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -262,6 +266,10 @@
     <ClInclude Include="DWParam.h" />
     <ClInclude Include="GaussianBlur.h" />
     <ClInclude Include="UploadBuffer.h" />
+    <ClInclude Include="CommandContext.h" />
+    <ClInclude Include="RenderManager.h" />
+    <ClInclude Include="Bloom.h" />
+    <ClInclude Include="Helper.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\shaders\Basic.hlsli">
@@ -303,6 +311,21 @@
       <Filter>shaders</Filter>
     </FxCompile>
     <FxCompile Include="Resources\shaders\PostEffectVS.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\GaussianBlurPS.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\HorizontalGaussianBlurVS.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\VerticalGaussianBlurVS.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\BloomPS.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\LuminanceExtractionrPS.hlsl">
       <Filter>shaders</Filter>
     </FxCompile>
   </ItemGroup>

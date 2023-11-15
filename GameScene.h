@@ -28,8 +28,8 @@ public:
 	void ParticleBoxDraw();
 	void PreSpriteDraw();
 	void PostSpriteDraw();
-	void Draw();
-	void UIDraw();
+	void Draw(CommandContext& commandContext);
+	void UIDraw(CommandContext& commandContext);
 
 
 private: 

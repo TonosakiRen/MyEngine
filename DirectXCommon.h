@@ -15,6 +15,9 @@
 #include "ColorBuffer.h"
 #include "DepthBuffer.h"
 #include "PostEffect.h"
+#include "CommandContext.h"
+#include "GaussianBlur.h"
+#include "Bloom.h"
 
 class DirectXCommon
 {
@@ -22,6 +25,7 @@ public:
 
 	//うんち設計
 	uint32_t kSrvHeapDescritorNum = 1024;
+	uint32_t kRtvHeapDescritorNum = 32;
 
 	//mainColorBufferNum
 	uint32_t kMainColorBufferNum = 1;
@@ -34,19 +38,18 @@ public:
 	void MainPostDraw();
 	void SwapChainPreDraw();
 	void SwapChainPostDraw();
-	void ClearSwapChainRenderTarget();
-	void ClearMainRenderTarget();
-	void ClearDepthBuffer();
 
 	Microsoft::WRL::ComPtr<IDxcBlob> CompileShader(const std::wstring& filePath,const wchar_t* profile);
 
 	DescriptorHandle AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE type);
 
 	ID3D12Device* GetDevice() { return device_.Get(); }
-	ID3D12GraphicsCommandList* GetCommandList() { return commandList_.Get(); }
 	CommandQueue& GetCommandQueue() { return commandQueue_; }
+	CommandContext* GetCommandContext() { return &commandContext_; }
 
 	DescriptorHeap& GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE type) { return descriptorHeaps_[type]; }
+
+	void ClearMainDepthBuffer() { commandContext_.ClearDepth(mainDepthBuffer_); }
 
 private:
 	WinApp* winApp_;
@@ -54,8 +57,7 @@ private:
 	Microsoft::WRL::ComPtr<IDXGIFactory7> dxgiFactory_;
 	Microsoft::WRL::ComPtr<ID3D12Device> device_;
 	CommandQueue commandQueue_;
-	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator_;
-	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList_;
+	CommandContext commandContext_;
 	Microsoft::WRL::ComPtr<IDxcCompiler3> dxcCompiler_;
 	Microsoft::WRL::ComPtr<IDxcUtils> dxcUtils_;
 	Microsoft::WRL::ComPtr<IDxcIncludeHandler> includeHandler_;
@@ -65,6 +67,7 @@ private:
 	ColorBuffer mainColorBuffer_;
 
 	PostEffect postEffect_;
+	Bloom bloom_;
 
 	DescriptorHeap descriptorHeaps_[D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES];
 
@@ -73,9 +76,7 @@ private:
 
 private:
 	void InitializeDXGIDevice();
-	void InitializeCommand();
 	void CreateDirectXCompilier();
-	void TransitionResource(GPUResource& resource, D3D12_RESOURCE_STATES newState);
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateDepthStencilTextureResource();
 };

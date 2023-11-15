@@ -7,6 +7,7 @@
 #include "Particle.h"
 #include "ParticleBox.h"
 #include "PostEffect.h"
+#include "GaussianBlur.h"
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	WinApp* win = nullptr;
@@ -41,10 +42,12 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	ParticleBox::StaticInitialize();
 
 	PostEffect::StaticInitialize();
+	GaussianBlur::StaticInitialize();
 	dxCommon->InitializePostEffect();
 
 	//　スプライト静的初期化
 	Sprite::StaticInitialize();
+
 
 #pragma endregion 変数
 
@@ -73,13 +76,13 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		// 描画開始
 		dxCommon->MainPreDraw();
 		// ゲームシーンの描画
-		gameScene->Draw();
+		gameScene->Draw(*dxCommon->GetCommandContext());
 		
 		dxCommon->MainPostDraw();
 
 		dxCommon->SwapChainPreDraw();
 
-		gameScene->UIDraw();
+		gameScene->UIDraw(*dxCommon->GetCommandContext());
 
 		// ImGui描画
 		imguiManager->Draw();
