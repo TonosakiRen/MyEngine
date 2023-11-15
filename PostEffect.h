@@ -16,41 +16,37 @@
 
 class DirectXCommon;
 
-class Model
+class PostEffect
 {
 public:
 	enum class RootParameter {
-		kWorldTransform, 
-		kViewProjection, 
-		kTexture,        
-		kDirectionalLight, 
-		kMaterial,
+		Constant,
+		kTexture,
+
+		ParameterNum
 	};
 
 	struct VertexData {
-		Vector3 pos;    
-		Vector3 normal;
-		Vector2 uv;     
+		Vector4 pos;
+		Vector2 uv;
 	};
 
 	static void StaticInitialize();
 	static void PreDraw(ID3D12GraphicsCommandList* commandList);
 	static void PostDraw();
-	static Model* Create();
-	static Model* Create(std::string name);
+	static PostEffect* Create();
 
 	void Initialize();
-	void Initialize(std::string name);
 
-	void Draw(const WorldTransform& worldTransform, const ViewProjection& viewProjection, const DirectionalLight& directionalLight, const Material& material, uint32_t textureHadle);
-	void Draw(const WorldTransform& worldTransform, const ViewProjection& viewProjection, const DirectionalLight& directionalLight, const Material& material);
+	void Draw(DescriptorHandle srvHandle);
 
 	void CreateMesh();
 
-private: 
+private:
 	static void InitializeGraphicsPipeline();
 private:
 	static DirectXCommon* sDirectXCommon;
+	static UINT sDescriptorHandleIncrementSize;
 	static ID3D12GraphicsCommandList* sCommandList;
 	static std::unique_ptr<RootSignature> sRootSignature;
 	static std::unique_ptr<PipelineState> sPipelineState;
@@ -61,8 +57,7 @@ private:
 	std::vector<uint16_t> indices_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertBuff_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexBuff_;
-	bool isModelLoad_ = false;
 	uint32_t uvHandle_;
-	std::string name_;
+	float constant_ = 1.0f;
 };
 

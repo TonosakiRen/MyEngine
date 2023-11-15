@@ -11,7 +11,6 @@ using namespace DirectX;
 using namespace Microsoft::WRL;
 
 DirectXCommon* Model::sDirectXCommon = nullptr;
-UINT Model::sDescriptorHandleIncrementSize = 0;
 ID3D12GraphicsCommandList* Model::sCommandList = nullptr;
 std::unique_ptr<RootSignature> Model::sRootSignature;
 std::unique_ptr<PipelineState> Model::sPipelineState;

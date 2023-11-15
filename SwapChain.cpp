@@ -3,7 +3,6 @@
 #include <cassert>
 
 #include "DirectXCommon.h"
-#include "ColorBuffer.h"
 
 using namespace Microsoft::WRL;
 

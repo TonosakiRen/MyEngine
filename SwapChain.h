@@ -9,8 +9,7 @@
 #include <chrono>
 
 #include "DescriptorHandle.h"
-
-class ColorBuffer;
+#include "ColorBuffer.h"
 
 class SwapChain {
 public:
@@ -22,6 +21,7 @@ public:
     ColorBuffer& GetColorBuffer() { return *buffers_[currentBufferIndex_]; }
     const ColorBuffer& GetColorBuffer() const { return *buffers_[currentBufferIndex_]; }
     uint32_t GetBufferIndex() const { return currentBufferIndex_; }
+    const DescriptorHandle& GetRTV() const { return buffers_[currentBufferIndex_]->GetRTV(); }
 
 private:
     Microsoft::WRL::ComPtr<IDXGISwapChain4> swapChain_;
