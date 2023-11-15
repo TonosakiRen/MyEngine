@@ -130,15 +130,33 @@
     <ClCompile Include="Player.cpp">
       <Filter>Game</Filter>
     </ClCompile>
-    <ClCompile Include="DepthBuffer.cpp" />
-    <ClCompile Include="PostEffect.cpp" />
-    <ClCompile Include="DWParam.cpp" />
-    <ClCompile Include="GaussianBlur.cpp" />
-    <ClCompile Include="UploadBuffer.cpp" />
-    <ClCompile Include="CommandContext.cpp" />
-    <ClCompile Include="RenderManager.cpp" />
-    <ClCompile Include="Bloom.cpp" />
-    <ClCompile Include="Helper.cpp" />
+    <ClCompile Include="Bloom.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="CommandContext.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="DepthBuffer.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="DWParam.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="GaussianBlur.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Helper.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="PostEffect.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderManager.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="UploadBuffer.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -261,15 +279,33 @@
     <ClInclude Include="Player.h">
       <Filter>Game</Filter>
     </ClInclude>
-    <ClInclude Include="DepthBuffer.h" />
-    <ClInclude Include="PostEffect.h" />
-    <ClInclude Include="DWParam.h" />
-    <ClInclude Include="GaussianBlur.h" />
-    <ClInclude Include="UploadBuffer.h" />
-    <ClInclude Include="CommandContext.h" />
-    <ClInclude Include="RenderManager.h" />
-    <ClInclude Include="Bloom.h" />
-    <ClInclude Include="Helper.h" />
+    <ClInclude Include="Bloom.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="CommandContext.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="DepthBuffer.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="DWParam.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="GaussianBlur.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Helper.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="PostEffect.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderManager.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="UploadBuffer.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\shaders\Basic.hlsli">
