@@ -38,9 +38,6 @@ void GameScene::Initialize() {
 
 	followCamera_.SetTarget(player_->GetWorldTransform());
 
-	//boss_ = std::make_unique<Boss>();
-	//boss_->Initialize(&followCamera_.GetViewProjection(), &directionalLight_, { -20.0f,10.0f,0.0f });
-
 	bosses_.push_back(std::make_unique<Boss>(&followCamera_.GetViewProjection(), &directionalLight_, Vector3{ -20.0f,10.0f,0.0f }));
 	
 
