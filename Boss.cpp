@@ -4,18 +4,10 @@
 #include "Player.h"
 #include "GameScene.h"
 
-void Boss::Initialize(ViewProjection* viewProjection, DirectionalLight* directionalLight)
+Boss::Boss(ViewProjection* viewProjection, DirectionalLight* directionalLight, Vector3 pos)
 {
 	GameObject::Initialize(viewProjection, directionalLight);
-
-	dustParticle_ = std::make_unique<DustParticle>();
-	dustParticle_->Initialize({ 0.0f,0.0f,0.0f }, { 0.0f,0.0f,0.0f });
-	dustParticle_->emitterWorldTransform_.SetParent(&worldTransform_);
-	//煙の出る場所
-	dustParticle_->emitterWorldTransform_.translation_ = { 0.0f,-2.1f,-1.2f };
-
-	worldTransform_.translation_.y = 10.0f;
-	worldTransform_.translation_.x = -20.0f;
+	worldTransform_.translation_ = pos;
 
 	worldTransform_.quaternion_ *= MakeRotateAxisAngleQuaternion({ 0.0f,1.0f,0.0f }, Radian(90.0f));
 	modelParts_[Head].Initialize("boss_head");
@@ -30,8 +22,34 @@ void Boss::Initialize(ViewProjection* viewProjection, DirectionalLight* directio
 		partsTransform_[Tin].translation_.y = -6.0f;
 	}
 
-	collider_.Initialize(&worldTransform_,"boss",viewProjection,directionalLight,{1.8f,7.3f,2.2f},{0.0f,-5.4f,0.9f});
+	collider_.Initialize(&worldTransform_, "boss", viewProjection, directionalLight, { 1.8f,7.3f,2.2f }, { 0.0f,-5.4f,0.9f });
 }
+
+//void Boss::Initialize(ViewProjection* viewProjection, DirectionalLight* directionalLight,Vector3 pos)
+//{
+//	GameObject::Initialize(viewProjection, directionalLight);
+//
+//	worldTransform_.translation_ = { -20.0f,10.0f,0.0f };
+//	worldTransform_.translation_ = pos;
+//
+//	worldTransform_.translation_.y = 10.0f;
+//	worldTransform_.translation_.x = -20.0f;
+//
+//	worldTransform_.quaternion_ *= MakeRotateAxisAngleQuaternion({ 0.0f,1.0f,0.0f }, Radian(90.0f));
+//	modelParts_[Head].Initialize("boss_head");
+//	modelParts_[Tin].Initialize("boss_tin");
+//	for (int i = 0; i < partNum; i++) {
+//		partsTransform_[i].Initialize();
+//		partsTransform_[i].SetParent(&worldTransform_);
+//	}
+//	//model位置初期化
+//	{
+//		partsTransform_[Head].translation_.y = -3.0f;
+//		partsTransform_[Tin].translation_.y = -6.0f;
+//	}
+//
+//	collider_.Initialize(&worldTransform_,"boss",viewProjection,directionalLight,{1.8f,7.3f,2.2f},{0.0f,-5.4f,0.9f});
+//}
 
 void Boss::Update()
 {
@@ -47,7 +65,6 @@ void Boss::Update()
 		partsTransform_[i].UpdateMatrix();
 	}
 	worldTransform_.UpdateMatrix();
-	dustParticle_->Update();
 
 }
 void Boss::Animation() {
@@ -79,8 +96,3 @@ void Boss::Draw() {
 	}
 	collider_.Draw();
 }
-
-void Boss::ParticleDraw() {
-	dustParticle_->Draw(viewProjection_, directionalLight_, { 0.5f,0.5f,0.5f,1.0f });
-}
-

@@ -38,8 +38,11 @@ void GameScene::Initialize() {
 
 	followCamera_.SetTarget(player_->GetWorldTransform());
 
-	boss_ = std::make_unique<Boss>();
-	boss_->Initialize(&followCamera_.GetViewProjection(), &directionalLight_);
+	//boss_ = std::make_unique<Boss>();
+	//boss_->Initialize(&followCamera_.GetViewProjection(), &directionalLight_, { -20.0f,10.0f,0.0f });
+
+	bosses_.push_back(std::make_unique<Boss>(&followCamera_.GetViewProjection(), &directionalLight_, Vector3{ -20.0f,10.0f,0.0f }));
+	
 
 	sphere_.reset(GameObject::Create("sphere", &followCamera_.GetViewProjection(), &directionalLight_));
 
@@ -78,23 +81,29 @@ void GameScene::Update() {
 	floor_->Update();
 	player_->Update();
 
-	boss_->Update();
+
+	for (const auto& boss : bosses_) {
+		boss->Update();
+	}
 
 	ground_->Update();
 
 	bossGround_->Update();
 	goalGround_->Update();
 
-	if (player_->collider.Collision(boss_->collider_) || player_->collider.Collision(goalBox_->collider_)) {
-		if (boss_->GetIsDead() == false) {
-			player_->SetInitialPos();
+	for (const auto& boss : bosses_) {
+		if (player_->collider.Collision(boss->collider_) || player_->collider.Collision(goalBox_->collider_)) {
+			if (boss->GetIsDead() == false) {
+				player_->SetInitialPos();
+			}
 		}
 	}
 
-
-	if (player_->weaponCollision(boss_->collider_)) {
-		boss_->OnCollision();
-	};
+	for (const auto& boss : bosses_) {
+		if (player_->weaponCollision(boss->collider_)) {
+			boss->OnCollision();
+		};
+	}
 
 	player_->Collision(ground_->collider_);
 	player_->Collision(bossGround_->collider_);
@@ -105,7 +114,9 @@ void GameScene::ModelDraw()
 {
 	skydome_->Draw();
 	player_->Draw();
-	boss_->Draw();
+	for (const auto& boss : bosses_) {
+		boss->Draw();
+	}
 	ground_->Draw();
 	bossGround_->Draw();
 	goalGround_->Draw();

@@ -10,12 +10,13 @@ class Boss :
 {
 public:
 
-    void Initialize(ViewProjection* viewProjection, DirectionalLight* directionalLight);
+
+    Boss(ViewProjection* viewProjection, DirectionalLight* directionalLight, Vector3 pos);
+   /* void Initialize(ViewProjection* viewProjection, DirectionalLight* directionalLight, Vector3 pos);*/
     void Update();
     void Animation();
     void OnCollision();
     void Draw();
-    void ParticleDraw();
 
     bool GetIsDead() {
         return isDead_;
@@ -46,9 +47,6 @@ private:
     };
 
     AnimationStats animationStats = HeadJump;
-
-    //particle
-    std::unique_ptr<DustParticle> dustParticle_;
 
     bool isDead_ = false;
 
