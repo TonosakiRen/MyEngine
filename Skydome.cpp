@@ -9,6 +9,5 @@ void Skydome::Initialize(const std::string name, ViewProjection* viewProjection,
 
 void Skydome::Update()
 {
-	worldTransform_.rotation_.y -= 0.002f;
 	worldTransform_.UpdateMatrix();
 }

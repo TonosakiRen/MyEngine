@@ -41,7 +41,6 @@ void ViewProjection::Map() {
 void ViewProjection::UpdateMatrix() {
 
     // ビュー行列の生成
-
     Vector3 tranlation = translation_ + Vector3{ Rand(-shakeValue_.x,shakeValue_.x),Rand(-shakeValue_.y,shakeValue_.y) ,Rand(-shakeValue_.z,shakeValue_.z) };
     matView = MakeViewMatirx(target_, tranlation);
 
@@ -97,4 +96,3 @@ void ViewProjection::DebugMove() {
         translation_ += cameraZ;
     }
 }
-

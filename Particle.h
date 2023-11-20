@@ -29,14 +29,14 @@ public:
 	enum class RootParameter {
 		kWorldTransform,
 		kViewProjection,
-		kTexture,      
-		kMaterial, 
+		kTexture,
+		kMaterial,
 		parameterNum
 	};
 
 	struct VertexData {
-		Vector3 pos;    
-		Vector2 uv;     
+		Vector3 pos;
+		Vector2 uv;
 	};
 
 	static void StaticInitialize();
@@ -53,7 +53,7 @@ public:
 	std::vector<InstancingBufferData> particleDatas_;
 	Material material_;
 
-private: 
+private:
 	static void InitializeGraphicsPipeline();
 private:
 	static DirectXCommon* sDirectXCommon;
@@ -72,4 +72,3 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> instancingBuff_;
 	InstancingBufferData* instanceMap = nullptr;
 };
-

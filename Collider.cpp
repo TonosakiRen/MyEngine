@@ -101,7 +101,7 @@ bool Collider::Collision(Collider& colliderB, Vector3& pushBuckVector)
 		if (dot > 0.0f) {
 			minOverlap = -minOverlap;
 		}
-		pushBuckVector = Normalize(minAxis)* minOverlap;
+		pushBuckVector = Normalize(minAxis) * minOverlap;
 		return true;
 	}
 	else {
@@ -140,7 +140,7 @@ void Collider::MatrixUpdate()
 	Matrix4x4 scaleMatrix = MakeScaleMatrix(worldTransform_.scale_);
 
 	Matrix4x4 rotateMatrix = MakeIdentity4x4();
-	rotateMatrix = MakeRotateXYZMatrix(worldTransform_.rotation_);
+	rotateMatrix = MakeRotateMatrix(worldTransform_.quaternion_);
 	Matrix4x4 translationMatrix = MakeTranslateMatrix(worldTransform_.translation_);
 
 

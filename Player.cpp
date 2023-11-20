@@ -8,7 +8,6 @@ void Player::Initialize(const std::string name, ViewProjection* viewProjection, 
 	worldTransform_.translation_ = { 0.0f,2.0f,0.0f };
 	velocisity_ = { 0.0f,0.0f,0.0f };
 	acceleration_ = { 0.0f,-0.05f,0.0f };
-	/*acceleration_ = { 0.0f,0.00f,0.0f };*/
 	material_.enableLighting_ = false;
 }
 

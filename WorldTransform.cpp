@@ -39,7 +39,7 @@ void WorldTransform::UpdateMatrix() {
     Matrix4x4 scaleMatrix = MakeScaleMatrix(scale_);
 
     Matrix4x4 rotateMatrix = MakeIdentity4x4();
-    rotateMatrix = MakeRotateXYZMatrix(rotation_);
+    rotateMatrix = MakeRotateMatrix(quaternion_);
     Matrix4x4 translationMatrix = MakeTranslateMatrix(translation_);
 
     // ワールド行列の合成

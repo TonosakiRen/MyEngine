@@ -13,9 +13,9 @@ public:
 	void Initialize(const std::string name, ViewProjection* viewProjection, DirectionalLight* directionalLight);
 	//modelを使わないInitialize
 	void Initialize(ViewProjection* viewProjection, DirectionalLight* directionalLight);
-	void Update();
+	void UpdateMatrix();
 	void UpdateMaterial(Vector4 color = { 1.0f,1.0f,1.0f,1.0f });
-	void Draw(Vector4 color = { 1.0f,1.0f,1.0f,1.0f }, uint32_t textureHandle = 0);
+	void Draw(uint32_t textureHandle = 0, Vector4 color = { 1.0f,1.0f,1.0f,1.0f });
 	void Draw(const WorldTransform& worldTransform, Vector4 color = { 1.0f,1.0f,1.0f,1.0f });
 
 	void SetViewProjection(ViewProjection* viewProjection) {
@@ -33,16 +33,12 @@ public:
 	void SetScale(Vector3 scale) {
 		worldTransform_.scale_ = scale;
 	}
-	void SetRotation(Vector3 rotation) {
-		worldTransform_.rotation_ = rotation;
-	}
 	void SetPosition(Vector3 position) {
 		worldTransform_.translation_ = position;
 	}
 	WorldTransform* GetWorldTransform() {
 		return &worldTransform_;
 	}
-
 protected:
 	WorldTransform worldTransform_;
 	Material material_;

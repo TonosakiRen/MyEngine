@@ -157,6 +157,9 @@
     <ClCompile Include="UploadBuffer.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
+    <ClCompile Include="GlobalVariables.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -304,6 +307,9 @@
       <Filter>Engine</Filter>
     </ClInclude>
     <ClInclude Include="UploadBuffer.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="GlobalVariables.h">
       <Filter>Engine</Filter>
     </ClInclude>
   </ItemGroup>

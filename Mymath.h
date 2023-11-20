@@ -25,6 +25,13 @@ struct Vector4 {
 	float w;
 };
 
+struct Quaternion {
+	float x;
+	float y;
+	float z;
+	float w;
+};
+
 struct Matrix4x4 {
 	float m[4][4];
 };
@@ -86,6 +93,10 @@ struct OBB {
 	Vector3 size;            // 座標軸方向の長さの半分。中心から面までの距離
 };
 
+inline float Cross(Vector2 v1, Vector2 v2) {
+	return v1.x * v2.y - v1.y * v2.x;
+}
+
 
 #pragma region Vector3
 
@@ -114,7 +125,7 @@ inline Matrix4x4 MakeIdentity4x4() {
 	return tmp;
 }
 
-inline Vector3 GetXAxis(Matrix4x4 m){
+inline Vector3 GetXAxis(Matrix4x4 m) {
 
 	return { m.m[0][0],m.m[0][1],m.m[0][2] };
 }
@@ -219,7 +230,7 @@ inline Vector3 operator -(const Vector3& v1) {
 }
 
 inline Vector3 Cross(const Vector3& v1, const Vector3& v2) {
-	return { (v1.y * v2.z - v1.z * v2.y),(v1.z * v2.x - v1.x * v2.z),(v1.x * v2.y - v1.y * v2.x)};
+	return { (v1.y * v2.z - v1.z * v2.y),(v1.z * v2.x - v1.x * v2.z),(v1.x * v2.y - v1.y * v2.x) };
 }
 
 inline Vector3 operator *(const Vector3& v, const Matrix4x4& m) {
@@ -304,6 +315,50 @@ inline Matrix4x4 NormalizeMakeRotateMatrix(const Matrix4x4& matrix) {
 	result.m[2][2] = zAxis.z;
 
 	return result;
+}
+
+// 線形補間
+inline Vector3 Lerp(const Vector3& v1, const Vector3& v2, float t) {
+	Vector3 result = v1 + (v2 - v1) * t;
+	return result;
+}
+// 球面線形補間
+inline Vector3 Slerp(const Vector3& v1, const Vector3& v2, float t) {
+
+	const float epsilon = 0.0001f;
+
+	Vector3 a = Normalize(v1);
+	Vector3 b = Normalize(v2);
+
+	float dot = Dot(a, b);
+
+	if (std::abs(dot - 1.0f) < epsilon) {
+		return a;
+	}
+	else if (std::abs(dot + 1.0f) < epsilon) {
+		return Lerp(v1, v2, t);
+	}
+
+	float theta = std::acos(dot);
+
+	float sinTheta = std::sin(theta);
+	float factorA = std::sin((1.0f - t) * theta) / sinTheta;
+	float factorB = std::sin(t * theta) / sinTheta;
+
+	return Vector3{
+		factorA * a.x + factorB * b.x, factorA * a.y + factorB * b.y,
+		factorA * a.z + factorB * b.z };
+}
+
+inline float Angle(const Vector3& from, const Vector3& to) {
+	float dot = Dot(Normalize(from), Normalize(to));
+	if (dot >= 1.0f) {
+		return 0.0f;
+	}
+	if (dot <= -1.0f) {
+		return Radian(180.0f);
+	}
+	return std::acosf(dot);
 }
 
 #pragma endregion
@@ -666,6 +721,7 @@ inline Matrix4x4 MakeRotateYMatrix(float radian) {
 
 	return tmp;
 }
+
 inline Matrix4x4 MakeRotateZMatrix(float radian) {
 
 	Matrix4x4 tmp;
@@ -698,7 +754,70 @@ inline Matrix4x4 MakeRotateXYZMatrix(const Vector3& radian) {
 	return MakeRotateXMatrix(radian.x) * MakeRotateYMatrix(radian.y) * MakeRotateZMatrix(radian.z);;
 }
 
+inline Matrix4x4 MakeRotateMatrix(const Quaternion& quaternion) {
+	Matrix4x4 result;
+	result.m[0][0] = quaternion.w * quaternion.w + quaternion.x * quaternion.x - quaternion.y * quaternion.y - quaternion.z * quaternion.z;
+	result.m[0][1] = 2 * (quaternion.x * quaternion.y + quaternion.w * quaternion.z);
+	result.m[0][2] = 2 * (quaternion.x * quaternion.z - quaternion.w * quaternion.y);
+	result.m[0][3] = 0;
 
+	result.m[1][0] = 2 * (quaternion.x * quaternion.y - quaternion.w * quaternion.z);
+	result.m[1][1] = quaternion.w * quaternion.w - quaternion.x * quaternion.x + quaternion.y * quaternion.y - quaternion.z * quaternion.z;
+	result.m[1][2] = 2 * (quaternion.y * quaternion.z + quaternion.w * quaternion.x);
+	result.m[1][3] = 0;
+
+	result.m[2][0] = 2 * (quaternion.x * quaternion.z + quaternion.w * quaternion.y);
+	result.m[2][1] = 2 * (quaternion.y * quaternion.z - quaternion.w * quaternion.x);
+	result.m[2][2] = quaternion.w * quaternion.w - quaternion.x * quaternion.x - quaternion.y * quaternion.y + quaternion.z * quaternion.z;
+	result.m[2][3] = 0;
+
+	result.m[3][0] = 0;
+	result.m[3][1] = 0;
+	result.m[3][2] = 0;
+	result.m[3][3] = 1;
+
+	return result;
+}
+
+inline Matrix4x4 DirectionToDirection(const Vector3& from, const Vector3& to) {
+	Vector3 normalizeFrom = Normalize(from);
+	Vector3 normalizeTo = Normalize(to);
+
+	Vector3 n;
+
+	if (Length(Cross(normalizeFrom, normalizeTo)) > 0) {
+		n = Normalize(Cross(normalizeFrom, normalizeTo));
+	}
+	else if (normalizeFrom.x != 0.0f || normalizeFrom.y != 0.0f) {
+		n.x = normalizeFrom.z;
+		n.y = 0.0f;
+		n.z = -normalizeFrom.x;
+
+	}
+	else if (normalizeFrom.x != 0.0f || normalizeFrom.z != 0.0f) {
+		n.x = normalizeFrom.y;
+		n.y = -normalizeFrom.x;
+		n.z = 0.0f;
+	}
+
+	float cos = Dot(normalizeFrom, normalizeTo);
+	float sin = Length(Cross(normalizeFrom, normalizeTo));
+
+	Matrix4x4 RotateMatrix = MakeIdentity4x4();
+	RotateMatrix.m[0][0] = n.x * n.x * (1.0f - cos) + cos;
+	RotateMatrix.m[0][1] = n.x * n.y * (1.0f - cos) + n.z * sin;
+	RotateMatrix.m[0][2] = n.x * n.z * (1.0f - cos) - n.y * sin;
+
+	RotateMatrix.m[1][0] = n.x * n.y * (1.0f - cos) - n.z * sin;
+	RotateMatrix.m[1][1] = n.y * n.y * (1.0f - cos) + cos;
+	RotateMatrix.m[1][2] = n.y * n.z * (1.0f - cos) + n.x * sin;
+
+	RotateMatrix.m[2][0] = n.x * n.z * (1.0f - cos) + n.y * sin;
+	RotateMatrix.m[2][1] = n.y * n.z * (1.0f - cos) - n.x * sin;
+	RotateMatrix.m[2][2] = n.z * n.z * (1.0f - cos) + cos;
+
+	return RotateMatrix;
+}
 
 inline Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Vector3& translate) {
 	Matrix4x4 scaleMatrix = MakeScaleMatrix(scale);
@@ -708,6 +827,15 @@ inline Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, c
 	Matrix4x4 translateMatrix = MakeTranslateMatrix(translate);
 
 	Matrix4x4 tmp = scaleMatrix * rotateXMatrix * rotateYMatrix * rotateZMatrix * translateMatrix;
+
+	return tmp;
+}
+inline Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Quaternion& rotate, const Vector3& translate) {
+	Matrix4x4 scaleMatrix = MakeScaleMatrix(scale);
+	Matrix4x4 rotateMatrix = MakeRotateMatrix(rotate);
+	Matrix4x4 translateMatrix = MakeTranslateMatrix(translate);
+
+	Matrix4x4 tmp = scaleMatrix * rotateMatrix * translateMatrix;
 
 	return tmp;
 }
@@ -751,7 +879,7 @@ inline Matrix4x4& operator*=(Matrix4x4& m1, const Matrix4x4& m2) {
 	m1 = tmp;
 	return m1;
 
-	
+
 }
 
 
@@ -774,13 +902,13 @@ inline Matrix4x4 MakePerspectiveFovMatrix(float fovY, float aspectRatio, float n
 	tmp.m[2][3] = 1.0f;
 	tmp.m[3][0] = 0.0f;
 	tmp.m[3][1] = 0.0f;
-	tmp.m[3][2] = (- nearClip * farClip) / (farClip - nearClip);
+	tmp.m[3][2] = (-nearClip * farClip) / (farClip - nearClip);
 	tmp.m[3][3] = 0.0f;
 
 	return tmp;
 }
 //正射影行列
-inline Matrix4x4 MakeOrthograohicmatrix(float left, float top, float right, float bottom,float nearClip,float farClip) {
+inline Matrix4x4 MakeOrthograohicmatrix(float left, float top, float right, float bottom, float nearClip, float farClip) {
 	Matrix4x4 tmp;
 	tmp.m[0][0] = 2.0f / (right - left);
 	tmp.m[0][1] = 0;
@@ -803,7 +931,7 @@ inline Matrix4x4 MakeOrthograohicmatrix(float left, float top, float right, floa
 
 }
 //ビューポート変換行列
-inline Matrix4x4 MakeViewportMatrix(float left, float top, float width, float height,float minDepth , float maxDepth) {
+inline Matrix4x4 MakeViewportMatrix(float left, float top, float width, float height, float minDepth, float maxDepth) {
 	Matrix4x4 tmp;
 	tmp.m[0][0] = width / 2.0f;
 	tmp.m[0][1] = 0;
@@ -818,7 +946,7 @@ inline Matrix4x4 MakeViewportMatrix(float left, float top, float width, float he
 	tmp.m[2][2] = maxDepth - minDepth;
 	tmp.m[2][3] = 0;
 	tmp.m[3][0] = left + (width / 2.0f);
-	tmp.m[3][1] = top  + (height / 2.0f);
+	tmp.m[3][1] = top + (height / 2.0f);
 	tmp.m[3][2] = minDepth;
 	tmp.m[3][3] = 1;
 	return tmp;
@@ -830,7 +958,13 @@ inline Matrix4x4 MakeViewMatirx(const Vector3& rotate, const Vector3& tranlate) 
 	return Inverse(cameraWorldMatrix);
 }
 
-inline Matrix4x4 MakeLookRotation(const Vector3& direction, const Vector3& up = Vector3{0.0f,1.0f,0.0f}) noexcept {
+inline Matrix4x4 MakeViewMatirx(const Quaternion& q, const Vector3& tranlate) {
+	Matrix4x4 cameraWorldMatrix = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, q, tranlate);
+	return Inverse(cameraWorldMatrix);
+}
+
+
+inline Matrix4x4 MakeLookRotation(const Vector3& direction, const Vector3& up = Vector3{ 0.0f,1.0f,0.0f }) noexcept {
 	Vector3 z = Normalize(direction);
 	Vector3 x = Normalize(Cross(Normalize(up), z));
 	Vector3 y = Cross(z, x);
@@ -842,6 +976,294 @@ inline Matrix4x4 MakeLookRotation(const Vector3& direction, const Vector3& up = 
 }
 
 #pragma endregion
+
+inline Quaternion Multiply(const Quaternion& lhs, const Quaternion& rhs) {
+
+	Quaternion result{
+	lhs.w * rhs.x + lhs.x * rhs.w + lhs.y * rhs.z - lhs.z * rhs.y,
+	lhs.w * rhs.y + lhs.y * rhs.w + lhs.z * rhs.x - lhs.x * rhs.z,
+	lhs.w * rhs.z + lhs.z * rhs.w + lhs.x * rhs.y - lhs.y * rhs.x,
+	lhs.w * rhs.w - lhs.x * rhs.x - lhs.y * rhs.y - lhs.z * rhs.z };
+
+	return result;
+}
+
+inline Quaternion operator *(const Quaternion& lhs, const Quaternion& rhs) {
+
+	Quaternion result{
+	lhs.w * rhs.x + lhs.x * rhs.w + lhs.y * rhs.z - lhs.z * rhs.y,
+	lhs.w * rhs.y + lhs.y * rhs.w + lhs.z * rhs.x - lhs.x * rhs.z,
+	lhs.w * rhs.z + lhs.z * rhs.w + lhs.x * rhs.y - lhs.y * rhs.x,
+	lhs.w * rhs.w - lhs.x * rhs.x - lhs.y * rhs.y - lhs.z * rhs.z };
+
+	return result;
+}
+
+inline Quaternion& operator *=(Quaternion& lhs, const Quaternion& rhs) {
+	lhs = rhs * lhs;
+	return lhs;
+}
+
+inline Quaternion operator+(const Quaternion& lhs, const Quaternion& rhs) {
+	return Quaternion{ lhs.x + rhs.x, lhs.y + rhs.y, lhs.z + rhs.z, lhs.w + rhs.w };
+}
+
+inline Quaternion operator*(const Quaternion& lhs, float rhs) {
+	return Quaternion{ lhs.x * rhs, lhs.y * rhs, lhs.z * rhs, lhs.w * rhs };
+}
+
+inline Quaternion operator*(float lhs, const Quaternion& rhs) {
+	return Quaternion{ lhs * rhs.x, lhs * rhs.y, lhs * rhs.z, lhs * rhs.w };
+}
+
+inline Quaternion IdentityQuaternion() {
+	Quaternion result{ 0.0f,0.0f,0.0f,1.0f };
+	return result;
+}
+
+inline Quaternion Conjugate(const Quaternion& q) {
+	Quaternion result{ -q.x,-q.y,-q.z,q.w };
+	return result;
+}
+
+inline float Norm(const Quaternion& q) {
+	float result = sqrtf(q.w * q.w + q.x * q.x + q.y * q.y + q.z * q.z);
+	return result;
+}
+
+inline Quaternion Normalize(const Quaternion& q) {
+	float tmp = q.w * q.w + q.x * q.x + q.y * q.y + q.z * q.z;
+	tmp = sqrtf(tmp);
+	return { q.x / tmp, q.y / tmp, q.z / tmp, q.w / tmp };
+}
+
+inline Quaternion Inverse(const Quaternion& q) {
+	float norm = Norm(q);
+	norm = norm * norm;
+	Quaternion conjugate = Conjugate(q);
+	Quaternion result;
+	result.x = conjugate.x / norm;
+	result.y = conjugate.y / norm;
+	result.z = conjugate.z / norm;
+	result.w = conjugate.w / norm;
+	return result;
+}
+
+inline Quaternion MakeRotateAxisAngleQuaternion(const Vector3& axis, float angle) {
+	Vector3 v = Normalize(axis) * std::sinf(angle * 0.5f);
+	Quaternion result;
+	result.x = v.x;
+	result.y = v.y;
+	result.z = v.z;
+	result.w = std::cosf(angle * 0.5f);
+	return result;
+}
+
+inline Vector3 RotateVector(const Vector3& v, const Quaternion& q) {
+	Quaternion vq = { v.x,v.y,v.z, 0 };
+	Quaternion inverseQ = Inverse(q);
+	Quaternion resultQ = q * vq * inverseQ;
+	Vector3 result = { resultQ.x,resultQ.y,resultQ.z };
+	return result;
+}
+
+inline Vector3 operator *(const Vector3& v, const Quaternion& q) {
+	Quaternion vq = { v.x,v.y,v.z, 0 };
+	Quaternion inverseQ = Inverse(q);
+	Quaternion resultQ = q * vq * inverseQ;
+	Vector3 result = { resultQ.x,resultQ.y,resultQ.z };
+	return result;
+}
+
+inline Quaternion MakeFromOrthonormal(const Vector3& x, const Vector3& y, const Vector3& z) {
+	float trace = x.x + y.y + z.z;
+	if (trace > 0.0f) {
+		float s = std::sqrtf(trace + 1.0f) * 0.5f;
+		Quaternion result{};
+		result.w = s;
+		s = 0.25f / s;
+		result.x = (y.z - z.y) * s;
+		result.y = (z.x - x.z) * s;
+		result.z = (x.y - y.x) * s;
+		return result;
+	}
+	else if (x.x > y.y && x.x > z.z) {
+		float s = std::sqrtf(1.0f + x.x - y.y - z.z) * 0.5f;
+		Quaternion result{};
+		result.x = s;
+		s = 0.25f / s;
+		result.y = (x.y + y.x) * s;
+		result.z = (z.x + x.z) * s;
+		result.w = (y.z - z.y) * s;
+		return result;
+	}
+	else if (y.y > z.z) {
+		float s = std::sqrtf(1.0f - x.x + y.y - z.z) * 0.5f;
+		Quaternion result{};
+		result.y = s;
+		s = 0.25f / s;
+		result.x = (x.y + y.x) * s;
+		result.z = (y.z + z.y) * s;
+		result.w = (z.x - x.z) * s;
+		return result;
+	}
+	Quaternion result{};
+	float s = std::sqrtf(1.0f - x.x - y.y + z.z) * 0.5f;
+	result.z = s;
+	s = 0.25f / s;
+	result.x = (z.x + x.z) * s;
+	result.y = (y.z + z.y) * s;
+	result.w = (x.y - y.x) * s;
+	return result;
+}
+
+inline Quaternion MakeFromOrthonormal(const Matrix4x4& m) {
+	Vector3 x = GetXAxis(m);
+	Vector3 y = GetYAxis(m);
+	Vector3 z = GetZAxis(m);
+
+	float trace = x.x + y.y + z.z;
+	if (trace > 0.0f) {
+		float s = std::sqrtf(trace + 1.0f) * 0.5f;
+		Quaternion result{};
+		result.w = s;
+		s = 0.25f / s;
+		result.x = (y.z - z.y) * s;
+		result.y = (z.x - x.z) * s;
+		result.z = (x.y - y.x) * s;
+		return result;
+	}
+	else if (x.x > y.y && x.x > z.z) {
+		float s = std::sqrtf(1.0f + x.x - y.y - z.z) * 0.5f;
+		Quaternion result{};
+		result.x = s;
+		s = 0.25f / s;
+		result.y = (x.y + y.x) * s;
+		result.z = (z.x + x.z) * s;
+		result.w = (y.z - z.y) * s;
+		return result;
+	}
+	else if (y.y > z.z) {
+		float s = std::sqrtf(1.0f - x.x + y.y - z.z) * 0.5f;
+		Quaternion result{};
+		result.y = s;
+		s = 0.25f / s;
+		result.x = (x.y + y.x) * s;
+		result.z = (y.z + z.y) * s;
+		result.w = (z.x - x.z) * s;
+		return result;
+	}
+	Quaternion result{};
+	float s = std::sqrtf(1.0f - x.x - y.y + z.z) * 0.5f;
+	result.z = s;
+	s = 0.25f / s;
+	result.x = (z.x + x.z) * s;
+	result.y = (y.z + z.y) * s;
+	result.w = (x.y - y.x) * s;
+	return result;
+}
+
+inline Quaternion MakeFromTwoVector(const Vector3& from, const Vector3& to) {
+	Vector3 axis = Cross(from, to);
+	float angle = Angle(from, to);
+	return MakeRotateAxisAngleQuaternion(axis, angle);
+}
+
+
+
+inline Quaternion RotateMatrixToQuaternion(Matrix4x4 m) {
+	float px = m.m[0][0] - m.m[1][1] - m.m[2][2] + 1.0f;
+	float py = -m.m[0][0] + m.m[1][1] - m.m[2][2] + 1.0f;
+	float pz = -m.m[0][0] - m.m[1][1] + m.m[2][2] + 1.0f;
+	float pw = m.m[0][0] + m.m[1][1] + m.m[2][2] + 1.0f;
+
+	int selected = 0;
+	float max = px;
+	if (max < py) {
+		selected = 1;
+		max = py;
+	}
+	if (max < pz) {
+		selected = 2;
+		max = pz;
+	}
+	if (max < pw) {
+		selected = 3;
+		max = pw;
+	}
+
+	if (selected == 0) {
+		float x = std::sqrt(px) * 0.5f;
+		float d = 1.0f / (4.0f * x);
+		return Quaternion(
+			x,
+			(m.m[1][0] + m.m[0][1]) * d,
+			(m.m[0][2] + m.m[2][0]) * d,
+			(m.m[2][1] - m.m[1][2]) * d
+		);
+	}
+	else if (selected == 1) {
+		float y = std::sqrt(py) * 0.5f;
+		float d = 1.0f / (4.0f * y);
+		return Quaternion(
+			(m.m[1][0] + m.m[0][1]) * d,
+			y,
+			(m.m[2][1] + m.m[1][2]) * d,
+			(m.m[0][2] - m.m[2][0]) * d
+		);
+	}
+	else if (selected == 2) {
+		float z = std::sqrt(pz) * 0.5f;
+		float d = 1.0f / (4.0f * z);
+		return Quaternion(
+			(m.m[0][2] + m.m[2][0]) * d,
+			(m.m[2][1] + m.m[1][2]) * d,
+			z,
+			(m.m[1][0] - m.m[0][1]) * d
+		);
+	}
+	else if (selected == 3) {
+		float w = std::sqrtf(pw) * 0.5f;
+		float d = 1.0f / (4.0f * w);
+		return Quaternion(
+			(m.m[2][1] - m.m[1][2]) * d,
+			(m.m[0][2] - m.m[2][0]) * d,
+			(m.m[1][0] - m.m[0][1]) * d,
+			w
+		);
+	}
+}
+
+inline float Dot(const Quaternion& lhs, const Quaternion& rhs) noexcept {
+	return lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z + lhs.w * rhs.w;
+}
+
+inline Quaternion Lerp(float t, const Quaternion& start, const Quaternion& end) noexcept {
+	return Quaternion{
+		start.x + t * (end.x - start.x),
+		start.y + t * (end.y - start.y),
+		start.z + t * (end.z - start.z),
+		start.w + t * (end.w - start.w) };
+}
+
+inline Quaternion Slerp(float t, const Quaternion& start, const Quaternion& end) noexcept {
+	Quaternion s = start;
+	float dot = Dot(start, end);
+	if (dot > 0.9999f) {
+		return Lerp(t, start, end);
+	}
+	// q1,q2が反対向きの場合
+	if (dot < 0) {
+		s.x = -s.x;
+		s.y = -s.y;
+		s.z = -s.z;
+		s.w = -s.w;
+		dot = -dot;
+	}
+	// 球面線形補間の計算
+	float theta = std::acos(dot);
+	return (std::sin((1.0f - t) * theta) * s + std::sin(t * theta) * end) * (1.0f / std::sin(theta));
+}
 
 inline int Rand(int min, int max) {
 	if (min == 0 && max == 0) {
@@ -864,4 +1286,3 @@ inline bool Rand() { return bool(0 + (int)(rand() * (1 - 0 + 1.0) / (1.0 + RAND_
 inline void SRAND() {
 	srand((unsigned)time(NULL));
 }
-
