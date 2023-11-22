@@ -130,13 +130,27 @@
     <ClCompile Include="Player.cpp">
       <Filter>Game</Filter>
     </ClCompile>
-    <ClCompile Include="Boss.cpp" />
-    <ClCompile Include="FollowCamera.cpp" />
-    <ClCompile Include="GoalBox.cpp" />
-    <ClCompile Include="Ground.cpp" />
-    <ClCompile Include="GlobalVariables.cpp" />
-    <ClCompile Include="LockOn.cpp" />
-    <ClCompile Include="DeathParticle.cpp" />
+    <ClCompile Include="Boss.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="DeathParticle.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="FollowCamera.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="GlobalVariables.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="GoalBox.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Ground.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="LockOn.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -259,14 +273,30 @@
     <ClInclude Include="Player.h">
       <Filter>Game</Filter>
     </ClInclude>
-    <ClInclude Include="Boss.h" />
-    <ClInclude Include="FollowCamera.h" />
-    <ClInclude Include="GoalBox.h" />
-    <ClInclude Include="Ground.h" />
-    <ClInclude Include="GlobalVariables.h" />
-    <ClInclude Include="LockOn.h" />
-    <ClInclude Include="resource.h" />
-    <ClInclude Include="DeathParticle.h" />
+    <ClInclude Include="Boss.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="DeathParticle.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="FollowCamera.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="GlobalVariables.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="GoalBox.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Ground.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="LockOn.h">
+      <Filter>Game</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\shaders\Basic.hlsli">
