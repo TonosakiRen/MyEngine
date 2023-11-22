@@ -819,6 +819,23 @@ inline Matrix4x4 DirectionToDirection(const Vector3& from, const Vector3& to) {
 	return RotateMatrix;
 }
 
+inline Matrix4x4 MakeRotateAxisAngle(const Vector3& axis, float angle) {
+	Matrix4x4 RotateMatrix = MakeIdentity4x4();
+	RotateMatrix.m[0][0] = axis.x * axis.x * (1.0f - std::cosf(angle)) + std::cosf(angle);
+	RotateMatrix.m[0][1] = axis.x * axis.y * (1.0f - std::cosf(angle)) + axis.z * std::sinf(angle);
+	RotateMatrix.m[0][2] = axis.x * axis.z * (1.0f - std::cosf(angle)) - axis.y * std::sinf(angle);
+
+	RotateMatrix.m[1][0] = axis.x * axis.y * (1.0f - std::cosf(angle)) - axis.z * std::sinf(angle);
+	RotateMatrix.m[1][1] = axis.y * axis.y * (1.0f - std::cosf(angle)) + std::cosf(angle);
+	RotateMatrix.m[1][2] = axis.y * axis.z * (1.0f - std::cosf(angle)) + axis.x * std::sinf(angle);
+
+	RotateMatrix.m[2][0] = axis.x * axis.z * (1.0f - std::cosf(angle)) + axis.y * std::sinf(angle);
+	RotateMatrix.m[2][1] = axis.y * axis.z * (1.0f - std::cosf(angle)) - axis.x * std::sinf(angle);
+	RotateMatrix.m[2][2] = axis.z * axis.z * (1.0f - std::cosf(angle)) + std::cosf(angle);
+
+	return RotateMatrix;
+}
+
 inline Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Vector3& translate) {
 	Matrix4x4 scaleMatrix = MakeScaleMatrix(scale);
 	Matrix4x4 rotateXMatrix = MakeRotateXMatrix(rotate.x);
