@@ -10,8 +10,8 @@
 #include "GPUResource.h"
 #include "PipelineState.h"
 #include "RootSignature.h"
+#include "UploadBuffer.h"
 
-class DirectXCommon;
 class Sprite {
 public:
 	struct VertexData {
@@ -50,19 +50,14 @@ public:
 	Vector2 texSize_ = { 100.0f, 100.0f };
 
 private:
-	static const int kVertNum = 4;
-	static DirectXCommon* sDirectXCommon;
-	static UINT sDescriptorHandleIncrementSize;
 	static ID3D12GraphicsCommandList* sCommandList;
 	static std::unique_ptr<RootSignature> sRootSignature;
 	static std::unique_ptr<PipelineState> sPipelineState;
 	static Matrix4x4 sMatProjection;
 
 private: 
-	Microsoft::WRL::ComPtr<ID3D12Resource> vertBuff_;
-	GPUResource constBuff_;
-	VertexData* vertMap = nullptr;
-	ConstBufferData* constMap = nullptr;
+	UploadBuffer vertexBuffer_;
+	UploadBuffer constBuffer_;
 	D3D12_VERTEX_BUFFER_VIEW vbView_{};
 	UINT textureHandle_ = 0;
 	Matrix4x4 matWorld_{};

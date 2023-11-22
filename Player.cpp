@@ -37,7 +37,7 @@ void Player::Update()
 	velocisity_.y = clamp(velocisity_.y, -0.5f, 200.0f);
 	velocisity_ += acceleration_;
 	worldTransform_.translation_ += velocisity_;
-	worldTransform_.UpdateMatrix();
+	worldTransform_.Update();
 }
 
 void Player::Collision(Collider& otherCollider)
@@ -45,7 +45,7 @@ void Player::Collision(Collider& otherCollider)
 	Vector3 puchBackVector;
 	if (collider_.Collision(otherCollider, puchBackVector)) {
 		worldTransform_.translation_ += puchBackVector;
-		worldTransform_.UpdateMatrix();
+		worldTransform_.Update();
 	}
 
 }

@@ -8,21 +8,29 @@
 #include "ParticleBox.h"
 #include "PostEffect.h"
 #include "GaussianBlur.h"
+#include "ShaderManager.h"
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	WinApp* win = nullptr;
 	DirectXCommon* dxCommon = nullptr;
+	ShaderManager* shderManager = nullptr;
 	//汎用機能
 	GameScene* gameScene = nullptr;
 	Input* input = nullptr;
-	ImGuiManager* imguiManager;
+	ImGuiManager* imguiManager = nullptr;
 
 	// ゲームウィンドウの作成
 	win = WinApp::GetInstance();
 	win->CreateGameWindow();
+
 	// DirectX初期化処理
 	dxCommon = DirectXCommon::GetInstance();
 	dxCommon->Initialize();
+
+	// DirectXCompiler初期化
+	shderManager = ShaderManager::GetInstance();
+	shderManager->Initialize();
+
 	// 汎用機能
 #pragma region 汎用機能初期化
 	input = Input::GetInstance();

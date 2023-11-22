@@ -1,11 +1,10 @@
 #include "RootSignature.h"
 
-#include <cassert>
+#include "Helper.h"
 
 #include "DirectXCommon.h"
 
 void RootSignature::Create(const D3D12_ROOT_SIGNATURE_DESC& desc) {
-    HRESULT result;
 
     Microsoft::WRL::ComPtr<ID3DBlob> blob;
     Microsoft::WRL::ComPtr<ID3DBlob> errorBlob;
@@ -20,11 +19,9 @@ void RootSignature::Create(const D3D12_ROOT_SIGNATURE_DESC& desc) {
         assert(false);
     }
 
-    result = DirectXCommon::GetInstance()->GetDevice()->CreateRootSignature(
+    Helper::AssertIfFailed(DirectXCommon::GetInstance()->GetDevice()->CreateRootSignature(
         0,
         blob->GetBufferPointer(),
         blob->GetBufferSize(),
-        IID_PPV_ARGS(rootSignature_.ReleaseAndGetAddressOf()));
-
-    assert(SUCCEEDED(result));
+        IID_PPV_ARGS(rootSignature_.ReleaseAndGetAddressOf())));
 }

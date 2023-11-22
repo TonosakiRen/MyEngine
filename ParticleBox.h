@@ -13,6 +13,7 @@
 #include "DescriptorHandle.h"
 #include "PipelineState.h"
 #include "RootSignature.h"
+#include "UploadBuffer.h"
 
 class DirectXCommon;
 
@@ -60,7 +61,6 @@ private:
 	static void InitializeGraphicsPipeline();
 private:
 	static DirectXCommon* sDirectXCommon;
-	static UINT sDescriptorHandleIncrementSize;
 	static ID3D12GraphicsCommandList* sCommandList;
 	static std::unique_ptr<RootSignature> sRootSignature;
 	static std::unique_ptr<PipelineState> sPipelineState;
@@ -70,8 +70,8 @@ private:
 	DescriptorHandle srvHandle_;
 	std::vector<VertexData> vertices_;
 	std::vector<uint16_t> indices_;
-	Microsoft::WRL::ComPtr<ID3D12Resource> vertBuff_;
-	Microsoft::WRL::ComPtr<ID3D12Resource> indexBuff_;
+	UploadBuffer vertexBuffer_;
+	UploadBuffer indexBuffer_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> instancingBuff_;
 	InstancingBufferData* instanceMap = nullptr;
 };

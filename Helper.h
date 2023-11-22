@@ -4,6 +4,9 @@
 
 #include <winnt.h>
 
+#include <string>
+#include <format>
+
 namespace Helper {
 
     extern const D3D12_RASTERIZER_DESC RasterizerDefault;
@@ -41,4 +44,9 @@ namespace Helper {
     size_t GetBytePerPixel(DXGI_FORMAT format);
 
     void AssertIfFailed(HRESULT hr);
+
+    void Log(const std::string& message);
+    void Log(const std::wstring& message);
+    std::wstring ConvertString(const std::string& str);
+    std::string ConvertString(const std::wstring& str);
 }

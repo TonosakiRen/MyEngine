@@ -1,5 +1,5 @@
 #include "Input.h"
-#include <cassert>
+#include "Helper.h"
 
 #pragma comment(lib,"dinput8.lib")
 #pragma comment(lib,"dxguid.lib")
@@ -11,27 +11,18 @@ Input* Input::GetInstance() {
 }
 
 void Input::Initialize(HINSTANCE hInstance, HWND hwnd) {
-	HRESULT result = S_FALSE;
 
-	result = DirectInput8Create(hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&dInput_, nullptr);
-	assert(SUCCEEDED(result));
+	Helper::AssertIfFailed(DirectInput8Create(hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&dInput_, nullptr));
 
 	//keyBoard
-	result = dInput_->CreateDevice(GUID_SysKeyboard, &devKeyboard_, nullptr);
-	assert(SUCCEEDED(result));
-	result = devKeyboard_->SetDataFormat(&c_dfDIKeyboard);
-	assert(SUCCEEDED(result));
-	result = devKeyboard_->SetCooperativeLevel(hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
-	assert(SUCCEEDED(result));
+	Helper::AssertIfFailed(dInput_->CreateDevice(GUID_SysKeyboard, &devKeyboard_, nullptr));
+	Helper::AssertIfFailed(devKeyboard_->SetDataFormat(&c_dfDIKeyboard));
+	Helper::AssertIfFailed(devKeyboard_->SetCooperativeLevel(hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY));
 
 	//mouse
-	result = dInput_->CreateDevice(GUID_SysMouse, &devMouse_, nullptr);
-	assert(SUCCEEDED(result));
-	result = devMouse_->SetDataFormat(&c_dfDIMouse);
-	assert(SUCCEEDED(result));
-	result = devMouse_->SetCooperativeLevel(hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
-	assert(SUCCEEDED(result));
-
+	Helper::AssertIfFailed(dInput_->CreateDevice(GUID_SysMouse, &devMouse_, nullptr));
+	Helper::AssertIfFailed(devMouse_->SetDataFormat(&c_dfDIMouse));
+	Helper::AssertIfFailed(devMouse_->SetCooperativeLevel(hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY));
 }
 
 void Input::Update() {

@@ -1,21 +1,15 @@
 #include "Bloom.h"
 
-#include <cassert>
-
-#include "DirectXCommon.h"
+#include "ShaderManager.h"
 #include "CommandContext.h"
 #include "Helper.h"
 
 #include "externals/DirectXTex/d3dx12.h"
 
-using namespace DirectX;
 using namespace Microsoft::WRL;
-
-DirectXCommon* Bloom::sDirectXCommon = nullptr;
 
 void Bloom::Initialize(ColorBuffer* originalTexture)
 {
-    sDirectXCommon = DirectXCommon::GetInstance();
     // メッシュ生成
     CreateMesh();
 
@@ -71,8 +65,10 @@ void Bloom::Initialize(ColorBuffer* originalTexture)
         D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc{};
         psoDesc.pRootSignature = rootSignature_;
 
-        ComPtr<IDxcBlob> vs = sDirectXCommon->CompileShader(L"PostEffectVS.hlsl", L"vs_6_0");
-        ComPtr<IDxcBlob> ps = sDirectXCommon->CompileShader(L"LuminanceExtractionrPS.hlsl", L"ps_6_0");
+        auto shaderManager = ShaderManager::GetInstance();
+
+        ComPtr<IDxcBlob> vs = shaderManager->Compile(L"PostEffectVS.hlsl", ShaderManager::kVertex);
+        ComPtr<IDxcBlob> ps = shaderManager->Compile(L"LuminanceExtractionrPS.hlsl", ShaderManager::kPixel);
         psoDesc.VS = CD3DX12_SHADER_BYTECODE(vs->GetBufferPointer(), vs->GetBufferSize());
         psoDesc.PS = CD3DX12_SHADER_BYTECODE(ps->GetBufferPointer(), ps->GetBufferSize());
 
@@ -89,7 +85,7 @@ void Bloom::Initialize(ColorBuffer* originalTexture)
 
         luminacePipelineState_.Create(psoDesc);
 
-        ps = sDirectXCommon->CompileShader(L"BloomPS.hlsl", L"ps_6_0");
+        ps = shaderManager->Compile(L"BloomPS.hlsl", ShaderManager::kPixel);
         psoDesc.PS = CD3DX12_SHADER_BYTECODE(ps->GetBufferPointer(), ps->GetBufferSize());
 
         psoDesc.BlendState = Helper::BlendAdditive;
@@ -150,7 +146,6 @@ void Bloom::Render(CommandContext& commandContext, uint32_t level)
 
 void Bloom::CreateMesh()
 {
-    HRESULT result = S_FALSE;
 
     vertices_.resize(4);
 
@@ -173,29 +168,12 @@ void Bloom::CreateMesh()
     // 頂点データのサイズ
     UINT sizeVB = static_cast<UINT>(sizeof(VertexData) * vertices_.size());
 
-    {
-        // ヒーププロパティ
-        CD3DX12_HEAP_PROPERTIES heapProps = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
-        // リソース設定
-        CD3DX12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(sizeVB);
+    vertexBuffer_.Create(sizeVB);
 
-        // 頂点バッファ生成
-        result = sDirectXCommon->GetDevice()->CreateCommittedResource(
-            &heapProps, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr,
-            IID_PPV_ARGS(&vertBuff_));
-        assert(SUCCEEDED(result));
-    }
-
-    // 頂点バッファへのデータ転送
-    VertexData* vertMap = nullptr;
-    result = vertBuff_->Map(0, nullptr, (void**)&vertMap);
-    if (SUCCEEDED(result)) {
-        std::copy(vertices_.begin(), vertices_.end(), vertMap);
-        vertBuff_->Unmap(0, nullptr);
-    }
+    vertexBuffer_.Copy(vertices_.data(), sizeVB);
 
     // 頂点バッファビューの作成
-    vbView_.BufferLocation = vertBuff_->GetGPUVirtualAddress();
+    vbView_.BufferLocation = vertexBuffer_->GetGPUVirtualAddress();
     vbView_.SizeInBytes = sizeVB;
     vbView_.StrideInBytes = sizeof(vertices_[0]);
 
@@ -203,30 +181,17 @@ void Bloom::CreateMesh()
     // インデックスデータのサイズ
     UINT sizeIB = static_cast<UINT>(sizeof(uint16_t) * indices_.size());
 
-    {
-        // ヒーププロパティ
-        CD3DX12_HEAP_PROPERTIES heapProps = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
-        // リソース設定
-        CD3DX12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(sizeIB);
+    indexBuffer_.Create(sizeIB);
 
-        // インデックスバッファ生成
-        result = sDirectXCommon->GetDevice()->CreateCommittedResource(
-            &heapProps, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr,
-            IID_PPV_ARGS(&indexBuff_));
-        assert(SUCCEEDED(result));
-    }
-
-    // インデックスバッファへのデータ転送
-    uint16_t* indexMap = nullptr;
-    result = indexBuff_->Map(0, nullptr, (void**)&indexMap);
-    if (SUCCEEDED(result)) {
-        std::copy(indices_.begin(), indices_.end(), indexMap);
-
-        indexBuff_->Unmap(0, nullptr);
-    }
+    indexBuffer_.Copy(indices_.data(), sizeIB);
 
     // インデックスバッファビューの作成
-    ibView_.BufferLocation = indexBuff_->GetGPUVirtualAddress();
+    ibView_.BufferLocation = indexBuffer_.GetGPUVirtualAddress();
+    ibView_.Format = DXGI_FORMAT_R16_UINT;
+    ibView_.SizeInBytes = sizeIB;
+
+    // インデックスバッファビューの作成
+    ibView_.BufferLocation = indexBuffer_->GetGPUVirtualAddress();
     ibView_.Format = DXGI_FORMAT_R16_UINT;
     ibView_.SizeInBytes = sizeIB;
 

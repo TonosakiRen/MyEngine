@@ -11,13 +11,13 @@ void DustParticle::Initialize(Vector3 minDirection, Vector3 maxDirection)
 
 	particleBox_->Initialize();
 	emitterWorldTransform_.SetIsScaleParent(false);
-	emitterWorldTransform_.UpdateMatrix();
+	emitterWorldTransform_.Update();
 	SetDirection(minDirection, maxDirection);
 }
 
 void DustParticle::Update() {
 
-	emitterWorldTransform_.UpdateMatrix();
+	emitterWorldTransform_.Update();
 
 	if (isEmit_) {
 		for (size_t i = 0; i < EmitNum_; i++) {
@@ -57,7 +57,7 @@ void DustParticle::Update() {
 void DustParticle::Draw(ViewProjection* viewProjection, DirectionalLight* directionalLight, Vector4 color)
 {
 
-	emitterWorldTransform_.UpdateMatrix();
+	emitterWorldTransform_.Update();
 
 	std::vector<ParticleBox::InstancingBufferData> instancingBufferDatas;
 	instancingBufferDatas.reserve(kParticleNum);
@@ -65,7 +65,7 @@ void DustParticle::Draw(ViewProjection* viewProjection, DirectionalLight* direct
 	for (size_t i = 0; i < kParticleNum; i++)
 	{
 		if (particles[i].isActive_) {
-			particles[i].worldTransform_.UpdateMatrix();
+			particles[i].worldTransform_.Update();
 			instancingBufferDatas.emplace_back(particles[i].worldTransform_.matWorld_);
 		}
 	}

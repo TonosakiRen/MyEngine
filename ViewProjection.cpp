@@ -1,44 +1,14 @@
 #include "ViewProjection.h"
 #include "WinApp.h"
-#include <cassert>
-#include "externals/DirectXTex/d3dx12.h"
 #include "Input.h"
-#include "DirectXCommon.h"
 #include "ImGuiManager.h"
-#include "Easing.h"
-
-using namespace DirectX;
 
 void ViewProjection::Initialize() {
-    CreateConstBuffer();
-    Map();
-    UpdateMatrix();
+    constBuffer_.Create((sizeof(ConstBufferData) + 0xff) & ~0xff);
+    Update();
 }
 
-void ViewProjection::CreateConstBuffer() {
-    HRESULT result;
-    ID3D12Device* device = DirectXCommon::GetInstance()->GetDevice();
-    // ヒーププロパティ
-    CD3DX12_HEAP_PROPERTIES heapProps = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
-    // リソース設定
-    CD3DX12_RESOURCE_DESC resourceDesc =
-        CD3DX12_RESOURCE_DESC::Buffer((sizeof(ConstBufferDataViewProjection) + 0xff) & ~0xff);
-
-    // 定数バッファの生成
-    result = device->CreateCommittedResource(
-        &heapProps, // アップロード可能
-        D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr,
-        IID_PPV_ARGS(&constBuff_));
-    assert(SUCCEEDED(result));
-}
-
-void ViewProjection::Map() {
-    // 定数バッファとのデータリンク
-    HRESULT result = constBuff_->Map(0, nullptr, (void**)&constMap);
-    assert(SUCCEEDED(result));
-}
-
-void ViewProjection::UpdateMatrix() {
+void ViewProjection::Update() {
 
     // ビュー行列の生成
     Vector3 tranlation = translation_ + Vector3{ Rand(-shakeValue_.x,shakeValue_.x),Rand(-shakeValue_.y,shakeValue_.y) ,Rand(-shakeValue_.z,shakeValue_.z) };
@@ -48,9 +18,12 @@ void ViewProjection::UpdateMatrix() {
     matProjection = MakePerspectiveFovMatrix(fovAngleY_, aspectRatio_, nearZ_, farZ_);
 
     // 定数バッファに書き込み
-    constMap->view = matView;
-    constMap->projection = matProjection;
-    constMap->viewPosition = translation_;
+    ConstBufferData bufferData;
+    bufferData.view = matView;
+    bufferData.projection = matProjection;
+    bufferData.viewPosition = translation_;
+
+    constBuffer_.Copy(bufferData);
 }
 
 bool ViewProjection::Shake(Vector3 shakeValue, int& frame)

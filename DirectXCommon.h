@@ -2,11 +2,6 @@
 #include <Windows.h>
 #include <cstdlib>
 #include <d3d12.h>
-#include <dxgi1_6.h>
-#include <wrl.h>
-#include <vector>
-#include <dxcapi.h>
-#pragma comment(lib,"dxcompiler.lib")
 #include "externals/DirectXTex/d3dx12.h"
 #include "WinApp.h"
 #include "DescriptorHeap.h"
@@ -18,6 +13,7 @@
 #include "CommandContext.h"
 #include "GaussianBlur.h"
 #include "Bloom.h"
+#include "ShaderManager.h"
 
 class DirectXCommon
 {
@@ -39,8 +35,6 @@ public:
 	void SwapChainPreDraw();
 	void SwapChainPostDraw();
 
-	Microsoft::WRL::ComPtr<IDxcBlob> CompileShader(const std::wstring& filePath,const wchar_t* profile);
-
 	DescriptorHandle AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE type);
 
 	ID3D12Device* GetDevice() { return device_.Get(); }
@@ -58,9 +52,6 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Device> device_;
 	CommandQueue commandQueue_;
 	CommandContext commandContext_;
-	Microsoft::WRL::ComPtr<IDxcCompiler3> dxcCompiler_;
-	Microsoft::WRL::ComPtr<IDxcUtils> dxcUtils_;
-	Microsoft::WRL::ComPtr<IDxcIncludeHandler> includeHandler_;
 	SwapChain swapChain_;
 
 	DepthBuffer mainDepthBuffer_;
@@ -76,8 +67,5 @@ private:
 
 private:
 	void InitializeDXGIDevice();
-	void CreateDirectXCompilier();
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
-	Microsoft::WRL::ComPtr<ID3D12Resource> CreateDepthStencilTextureResource();
 };
 

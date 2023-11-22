@@ -6,35 +6,28 @@
 #include "DirectXCommon.h"
 #include "externals/DirectXTex/DirectXTex.h"
 #include "WinApp.h"
+#include "ShaderManager.h"
 
 #pragma comment(lib, "d3dcompiler.lib")
 
 using namespace DirectX;
 using namespace Microsoft::WRL;
-
-DirectXCommon* Sprite::sDirectXCommon = nullptr;
-UINT Sprite::sDescriptorHandleIncrementSize;
 ID3D12GraphicsCommandList* Sprite::sCommandList = nullptr;
 std::unique_ptr<RootSignature> Sprite::sRootSignature;
 std::unique_ptr<PipelineState> Sprite::sPipelineState;
 Matrix4x4 Sprite::sMatProjection;
 
 void Sprite::StaticInitialize() {
-	
-	sDirectXCommon = DirectXCommon::GetInstance();
-
-	sDescriptorHandleIncrementSize =
-		sDirectXCommon->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-
-	HRESULT result = S_FALSE;
 	ComPtr<IDxcBlob> vsBlob;    
 	ComPtr<IDxcBlob> psBlob;    
 	ComPtr<ID3DBlob> errorBlob; 
 
-	vsBlob = sDirectXCommon->CompileShader(L"SpriteVS.hlsl", L"vs_6_0");
+	auto shaderManager = ShaderManager::GetInstance();
+
+	vsBlob = shaderManager->Compile(L"SpriteVS.hlsl", ShaderManager::kVertex);
 	assert(vsBlob != nullptr);
 
-	psBlob = sDirectXCommon->CompileShader(L"SpritePS.hlsl", L"ps_6_0");
+	psBlob = shaderManager->Compile(L"SpritePS.hlsl", ShaderManager::kPixel);
 	assert(psBlob != nullptr);
 
 	sRootSignature = std::make_unique<RootSignature>();
@@ -86,9 +79,6 @@ void Sprite::StaticInitialize() {
 
 		gpipeline.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
 		gpipeline.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
-
-		gpipeline.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
-		gpipeline.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_ALWAYS;
 
 
 		D3D12_RENDER_TARGET_BLEND_DESC blenddesc{};
@@ -178,55 +168,20 @@ Sprite::Sprite(uint32_t textureHandle, Vector2 position, Vector2 size, Vector4 c
 }
 
 bool Sprite::Initialize() {
-	assert(sDirectXCommon->GetDevice());
-
-	HRESULT result = S_FALSE;
 
 	resourceDesc_ = TextureManager::GetInstance()->GetResoureDesc(textureHandle_);
 
-	{
-		// ヒーププロパティ
-		CD3DX12_HEAP_PROPERTIES heapProps = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
-		// リソース設定
-		CD3DX12_RESOURCE_DESC resourceDesc =
-			CD3DX12_RESOURCE_DESC::Buffer(sizeof(VertexData) * kVertNum);
-
-		// 頂点バッファ生成
-		result = sDirectXCommon->GetDevice()->CreateCommittedResource(
-			&heapProps, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ,
-			nullptr, IID_PPV_ARGS(&vertBuff_));
-		assert(SUCCEEDED(result));
-
-		// 頂点バッファマッピング
-		result = vertBuff_->Map(0, nullptr, (void**)&vertMap);
-		assert(SUCCEEDED(result));
-	}
+	vertexBuffer_.Create(sizeof(VertexData) * 4);
 
 	// 頂点バッファへのデータ転送
 	TransferVertices();
 
 	// 頂点バッファビューの作成
-	vbView_.BufferLocation = vertBuff_->GetGPUVirtualAddress();
+	vbView_.BufferLocation = vertexBuffer_->GetGPUVirtualAddress();
 	vbView_.SizeInBytes = sizeof(VertexData) * 4;
 	vbView_.StrideInBytes = sizeof(VertexData);
 
-	{
-		// ヒーププロパティ
-		CD3DX12_HEAP_PROPERTIES heapProps = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
-		// リソース設定
-		CD3DX12_RESOURCE_DESC resourceDesc =
-			CD3DX12_RESOURCE_DESC::Buffer((sizeof(ConstBufferData) + 0xff) & ~0xff);
-
-		// 定数バッファの生成
-		result = sDirectXCommon->GetDevice()->CreateCommittedResource(
-			&heapProps, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ,
-			nullptr, IID_PPV_ARGS(constBuff_.GetAddressOf()));
-		assert(SUCCEEDED(result));
-	}
-
-	// 定数バッファマッピング
-	result = constBuff_->Map(0, nullptr, (void**)&constMap);
-	assert(SUCCEEDED(result));
+	constBuffer_.Create((sizeof(ConstBufferData) + 0xff) & ~0xff);
 
 	return true;
 }
@@ -244,12 +199,16 @@ void Sprite::Draw() {
 	matWorld_ *= MakeRotateZMatrix(rotation_);
 	matWorld_ *= MakeTranslateMatrix({ position_.x, position_.y, 0.0f });
 
-	constMap->color = color_;
-	constMap->mat = matWorld_ * sMatProjection;
+	ConstBufferData mapData;
+
+	mapData.color = color_;
+	mapData.mat = matWorld_ * sMatProjection;
+
+	constBuffer_.Copy(mapData);
 
 	sCommandList->IASetVertexBuffers(0, 1, &vbView_);
 
-	sCommandList->SetGraphicsRootConstantBufferView(0, constBuff_->GetGPUVirtualAddress());
+	sCommandList->SetGraphicsRootConstantBufferView(0, constBuffer_.GetGPUVirtualAddress());
 
 	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(sCommandList, 1, textureHandle_);
 	
@@ -257,7 +216,6 @@ void Sprite::Draw() {
 }
 
 void Sprite::TransferVertices() {
-	HRESULT result = S_FALSE;
 
 	enum { LB, LT, RB, RT };
 
@@ -276,7 +234,7 @@ void Sprite::TransferVertices() {
 	}
 
 	// 頂点データ
-	VertexData vertices[kVertNum];
+	VertexData vertices[4];
 
 	vertices[LB].pos = { left, bottom, 0.0f };  
 	vertices[LT].pos = { left, top, 0.0f };     
@@ -296,5 +254,5 @@ void Sprite::TransferVertices() {
 	}
 
 	// 頂点バッファへのデータ転送
-	memcpy(vertMap, vertices, sizeof(vertices));
+	vertexBuffer_.Copy(vertices, sizeof(vertices));
 }

@@ -3,20 +3,17 @@
 #include "DirectXCommon.h"
 #include "DescriptorHeap.h"
 
+#include "Helper.h"
+
 void CommandContext::Create() {
-    HRESULT result = S_FALSE;
 
     auto device = DirectXCommon::GetInstance()->GetDevice();
-    result = device->CreateCommandAllocator(
-        D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(commandAllocator_.ReleaseAndGetAddressOf()));
+    Helper::AssertIfFailed(device->CreateCommandAllocator(
+        D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(commandAllocator_.ReleaseAndGetAddressOf())));
 
-    assert(SUCCEEDED(result));
-
-    result = device->CreateCommandList(
+    Helper::AssertIfFailed(device->CreateCommandList(
         0, D3D12_COMMAND_LIST_TYPE_DIRECT, commandAllocator_.Get(),
-        nullptr, IID_PPV_ARGS(commandList_.ReleaseAndGetAddressOf()));
-
-    assert(SUCCEEDED(result));
+        nullptr, IID_PPV_ARGS(commandList_.ReleaseAndGetAddressOf())));
 }
 
 void CommandContext::SetDescriptorHeap()
@@ -29,20 +26,15 @@ void CommandContext::SetDescriptorHeap()
 }
 
 void CommandContext::Close() {
-    HRESULT result = S_FALSE;
     FlushResourceBarriers();
-    result = commandList_->Close();
-    assert(SUCCEEDED(result));
+    Helper::AssertIfFailed(commandList_->Close());
 }
 
 void CommandContext::Reset() {
-    HRESULT result = S_FALSE;
+    
+    Helper::AssertIfFailed(commandAllocator_->Reset());
 
-    result = commandAllocator_->Reset();
-    assert(SUCCEEDED(result));
-
-    result = commandList_->Reset(commandAllocator_.Get(), nullptr);
-    assert(SUCCEEDED(result));
+    Helper::AssertIfFailed(commandList_->Reset(commandAllocator_.Get(), nullptr));
 
     auto graphics = DirectXCommon::GetInstance();
     ID3D12DescriptorHeap* ppHeaps[] = {

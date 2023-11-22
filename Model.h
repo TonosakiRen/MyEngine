@@ -13,6 +13,7 @@
 #include <string>
 #include "PipelineState.h"
 #include "RootSignature.h"
+#include "UploadBuffer.h"
 
 class DirectXCommon;
 
@@ -50,17 +51,17 @@ public:
 private: 
 	static void InitializeGraphicsPipeline();
 private:
-	static DirectXCommon* sDirectXCommon;
 	static ID3D12GraphicsCommandList* sCommandList;
 	static std::unique_ptr<RootSignature> sRootSignature;
 	static std::unique_ptr<PipelineState> sPipelineState;
 
+	UploadBuffer vertexBuffer_;
+	UploadBuffer indexBuffer_;
+	
 	D3D12_VERTEX_BUFFER_VIEW vbView_{};
 	D3D12_INDEX_BUFFER_VIEW ibView_{};
 	std::vector<VertexData> vertices_;
 	std::vector<uint16_t> indices_;
-	Microsoft::WRL::ComPtr<ID3D12Resource> vertBuff_;
-	Microsoft::WRL::ComPtr<ID3D12Resource> indexBuff_;
 	bool isModelLoad_ = false;
 	uint32_t uvHandle_;
 	std::string name_;

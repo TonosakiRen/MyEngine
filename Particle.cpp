@@ -2,6 +2,7 @@
 #include "externals/DirectXTex/DirectXTex.h"
 #include <d3dcompiler.h>
 #include "DirectXCommon.h"
+#include "ShaderManager.h"
 
 #pragma comment(lib, "d3dcompiler.lib")
 
@@ -9,7 +10,6 @@ using namespace DirectX;
 using namespace Microsoft::WRL;
 
 DirectXCommon* Particle::sDirectXCommon = nullptr;
-UINT Particle::sDescriptorHandleIncrementSize = 0;
 ID3D12GraphicsCommandList* Particle::sCommandList = nullptr;
 std::unique_ptr<RootSignature> Particle::sRootSignature;
 std::unique_ptr<PipelineState> Particle::sPipelineState;
@@ -46,15 +46,16 @@ Particle* Particle::Create(uint32_t particleNum) {
 }
 
 void Particle::InitializeGraphicsPipeline() {
-    HRESULT result = S_FALSE;
     ComPtr<IDxcBlob> vsBlob;
     ComPtr<IDxcBlob> psBlob;
     ComPtr<ID3DBlob> errorBlob;
 
-    vsBlob = sDirectXCommon->CompileShader(L"ParticleVS.hlsl", L"vs_6_0");
+    auto shaderManager = ShaderManager::GetInstance();
+
+    vsBlob = shaderManager->Compile(L"ParticleVS.hlsl", ShaderManager::kVertex);
     assert(vsBlob != nullptr);
 
-    psBlob = sDirectXCommon->CompileShader(L"ParticlePS.hlsl", L"ps_6_0");
+    psBlob = shaderManager->Compile(L"ParticlePS.hlsl", ShaderManager::kPixel);
     assert(psBlob != nullptr);
 
     sRootSignature = std::make_unique<RootSignature>();
@@ -172,34 +173,21 @@ void Particle::CreateMesh() {
     // 頂点データのサイズ
     UINT sizeVB = static_cast<UINT>(sizeof(VertexData) * vertices_.size());
 
-    {
-        // ヒーププロパティ
-        CD3DX12_HEAP_PROPERTIES heapProps = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
-        // リソース設定
-        CD3DX12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(sizeVB);
+    vertexBuffer_.Create(sizeVB);
 
-        // 頂点バッファ生成
-        result = sDirectXCommon->GetDevice()->CreateCommittedResource(
-            &heapProps, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr,
-            IID_PPV_ARGS(&vertBuff_));
-        assert(SUCCEEDED(result));
-    }
+    vertexBuffer_.Copy(vertices_.data(), sizeVB);
 
     // インデックスデータのサイズ
     UINT sizeIB = static_cast<UINT>(sizeof(uint16_t) * indices_.size());
 
-    {
-        // ヒーププロパティ
-        CD3DX12_HEAP_PROPERTIES heapProps = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
-        // リソース設定
-        CD3DX12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(sizeIB);
+    indexBuffer_.Create(sizeIB);
 
-        // インデックスバッファ生成
-        result = sDirectXCommon->GetDevice()->CreateCommittedResource(
-            &heapProps, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr,
-            IID_PPV_ARGS(&indexBuff_));
-        assert(SUCCEEDED(result));
-    }
+    indexBuffer_.Copy(indices_.data(), sizeIB);
+
+    // インデックスバッファビューの作成
+    ibView_.BufferLocation = indexBuffer_.GetGPUVirtualAddress();
+    ibView_.Format = DXGI_FORMAT_R16_UINT;
+    ibView_.SizeInBytes = sizeIB;
 
     // インスタンシングデータのサイズ
     UINT sizeINB = static_cast<UINT>(sizeof(InstancingBufferData) * kParticleNum);
@@ -217,20 +205,6 @@ void Particle::CreateMesh() {
         assert(SUCCEEDED(result));
     }
 
-    VertexData* vertMap = nullptr;
-    result = vertBuff_->Map(0, nullptr, reinterpret_cast<void**>(&vertMap));
-    if (SUCCEEDED(result)) {
-        std::copy(vertices_.begin(), vertices_.end(), vertMap);
-        vertBuff_->Unmap(0, nullptr);
-    }
-
-    uint16_t* indexMap = nullptr;
-    result = indexBuff_->Map(0, nullptr, reinterpret_cast<void**>(&indexMap));
-    if (SUCCEEDED(result)) {
-        std::copy(indices_.begin(), indices_.end(), indexMap);
-        indexBuff_->Unmap(0, nullptr);
-    }
-
     result = instancingBuff_->Map(0, nullptr, reinterpret_cast<void**>(&instanceMap));
     if (SUCCEEDED(result)) {
         particleDatas_.resize(sizeof(InstancingBufferData) * kParticleNum);
@@ -240,14 +214,6 @@ void Particle::CreateMesh() {
         }
     }
 
-    vbView_.BufferLocation = vertBuff_->GetGPUVirtualAddress();
-    vbView_.SizeInBytes = sizeVB;
-    vbView_.StrideInBytes = sizeof(vertices_[0]);
-
-    ibView_.BufferLocation = indexBuff_->GetGPUVirtualAddress();
-    ibView_.Format = DXGI_FORMAT_R16_UINT;
-    ibView_.SizeInBytes = sizeIB;
-
     D3D12_SHADER_RESOURCE_VIEW_DESC instancingSrvDesc{};
     instancingSrvDesc.Format = DXGI_FORMAT_UNKNOWN;
     instancingSrvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
@@ -255,7 +221,6 @@ void Particle::CreateMesh() {
     instancingSrvDesc.Buffer.FirstElement = 0;
     instancingSrvDesc.Buffer.NumElements = kParticleNum;
     instancingSrvDesc.Buffer.StructureByteStride = sizeof(InstancingBufferData);
-    UINT incrementSize = DirectXCommon::GetInstance()->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
     srvHandle_ = DirectXCommon::GetInstance()->AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
     DirectXCommon::GetInstance()->GetDevice()->CreateShaderResourceView(instancingBuff_.Get(), &instancingSrvDesc, srvHandle_);
@@ -276,7 +241,7 @@ void Particle::Draw(const std::vector<InstancingBufferData>& bufferData, const V
     memcpy(instanceMap, bufferData.data(), sizeof(bufferData[0]) * bufferData.size());
 
     material_.color_ = color;
-    material_.UpdateMaterial();
+    material_.Update();
 
     sCommandList->IASetVertexBuffers(0, 1, &vbView_);
     sCommandList->IASetIndexBuffer(&ibView_);

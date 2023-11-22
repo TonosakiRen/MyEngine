@@ -1,6 +1,6 @@
 #include "CommandQueue.h"
 
-#include <cassert>
+#include "Helper.h"
 
 #include "DirectXCommon.h"
 
@@ -9,16 +9,13 @@ CommandQueue::~CommandQueue() {
 }
 
 void CommandQueue::Create() {
-    HRESULT result;
 
     auto device = DirectXCommon::GetInstance()->GetDevice();
 
     D3D12_COMMAND_QUEUE_DESC desc{};
-    result = device->CreateCommandQueue(&desc, IID_PPV_ARGS(commandQueue_.ReleaseAndGetAddressOf()));
+    Helper::AssertIfFailed(device->CreateCommandQueue(&desc, IID_PPV_ARGS(commandQueue_.ReleaseAndGetAddressOf())));
 
-    assert(SUCCEEDED(result));
-
-    result = device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(fence_.ReleaseAndGetAddressOf()));
+    Helper::AssertIfFailed(device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(fence_.ReleaseAndGetAddressOf())));
 
     if (fenceEvent_) {
         fenceEvent_ = CreateEvent(nullptr, FALSE, FALSE, nullptr);
@@ -36,16 +33,13 @@ void CommandQueue::Execute(ID3D12GraphicsCommandList* commandList) {
 }
 
 void CommandQueue::Signal() {
-    HRESULT result;
-    result = commandQueue_->Signal(fence_.Get(), ++fenceValue_);
-    assert(SUCCEEDED(result));
+    Helper::AssertIfFailed(commandQueue_->Signal(fence_.Get(), ++fenceValue_));
 }
 
 void CommandQueue::WaitForGPU() {
-    HRESULT result;
 
     if (fence_->GetCompletedValue() < fenceValue_) {
-        result = fence_->SetEventOnCompletion(fenceValue_, fenceEvent_);
+        Helper::AssertIfFailed(fence_->SetEventOnCompletion(fenceValue_, fenceEvent_));
         WaitForSingleObject(fenceEvent_, INFINITE);
     }
 }

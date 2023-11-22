@@ -34,7 +34,6 @@ public:
 private:
 	static void InitializeGraphicsPipeline();
 private:
-	static DirectXCommon* sDirectXCommon;
 	static ID3D12GraphicsCommandList* sCommandList;
 	static std::unique_ptr<RootSignature> sRootSignature;
 	static std::unique_ptr<PipelineState> sHorizontalBlurPipelineState;
@@ -44,8 +43,8 @@ private:
 	D3D12_INDEX_BUFFER_VIEW ibView_{};
 	std::vector<VertexData> vertices_;
 	std::vector<uint16_t> indices_;
-	Microsoft::WRL::ComPtr<ID3D12Resource> vertBuff_;
-	Microsoft::WRL::ComPtr<ID3D12Resource> indexBuff_;
+	UploadBuffer vertexBuffer_;
+	UploadBuffer indexBuffer_;
 
 	static const uint32_t kNumWeights = 8;
 

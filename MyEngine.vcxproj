@@ -106,7 +106,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="ColorBuffer.cpp" />
     <ClCompile Include="CommandContext.cpp" />
     <ClCompile Include="CommandQueue.cpp" />
-    <ClCompile Include="ConvertString.cpp" />
     <ClCompile Include="DepthBuffer.cpp" />
     <ClCompile Include="DescriptorHeap.cpp" />
     <ClCompile Include="DirectionalLight.cpp" />
@@ -138,8 +137,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="PixelBuffer.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PostEffect.cpp" />
+    <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="RenderManager.cpp" />
     <ClCompile Include="RootSignature.cpp" />
+    <ClCompile Include="ShaderManager.cpp" />
     <ClCompile Include="Skydome.cpp" />
     <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="SwapChain.cpp" />
@@ -190,8 +191,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="PixelBuffer.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="PostEffect.h" />
+    <ClInclude Include="Renderer.h" />
     <ClInclude Include="RenderManager.h" />
     <ClInclude Include="RootSignature.h" />
+    <ClInclude Include="ShaderManager.h" />
     <ClInclude Include="Skydome.h" />
     <ClInclude Include="Sprite.h" />
     <ClInclude Include="SwapChain.h" />

@@ -1,5 +1,6 @@
 #pragma once
 #include "GaussianBlur.h"
+#include "UploadBuffer.h"
 
 class CommandContext;
 
@@ -26,7 +27,6 @@ public:
     ColorBuffer& GetLuminanceTexture() { return luminanceTexture_; }
 
 private:
-    static DirectXCommon* sDirectXCommon;
     RootSignature rootSignature_;
     PipelineState luminacePipelineState_;
     PipelineState additivePipelineState_;
@@ -39,8 +39,8 @@ private:
     D3D12_INDEX_BUFFER_VIEW ibView_{};
     std::vector<VertexData> vertices_;
     std::vector<uint16_t> indices_;
-    Microsoft::WRL::ComPtr<ID3D12Resource> vertBuff_;
-    Microsoft::WRL::ComPtr<ID3D12Resource> indexBuff_;
+    UploadBuffer vertexBuffer_;
+    UploadBuffer indexBuffer_;
 
     float threshold_ = 0.8f;
     float knee_ = 0.3f;

@@ -2,8 +2,6 @@
 #include "externals/imgui/imgui.h"
 #include <cassert>
 
-using namespace DirectX;
-
 void (GameScene::* GameScene::SceneUpdateTable[])() = {
 	&GameScene::TitleUpdate,
 	&GameScene::InGameUpdate,
@@ -30,7 +28,7 @@ void GameScene::Initialize() {
 
 	directionalLight_.Initialize();
 	directionalLight_.direction_ = { 1.0f, -1.0f, 1.0f };
-	directionalLight_.UpdateDirectionalLight();
+	directionalLight_.Update();
 
 
 	textureHandle_ = TextureManager::Load("uvChecker.png");
@@ -53,12 +51,12 @@ void GameScene::Update(){
 	{
 		// camera
 		viewProjection_.DebugMove();
-		viewProjection_.UpdateMatrix();
+		viewProjection_.Update();
 		// light
 		ImGui::DragFloat3("light", &directionalLight_.direction_.x, 0.01f);
 		ImGui::DragFloat4("lightcolor", &directionalLight_.color_.x, 0.01f);
 		directionalLight_.direction_ = Normalize(directionalLight_.direction_);
-		directionalLight_.UpdateDirectionalLight();
+		directionalLight_.Update();
 	}
 	Collider::SwitchIsDrawCollider();
 
@@ -70,6 +68,8 @@ void GameScene::Update(){
 	}
 	//SceneUpdate
 	(this->*SceneUpdateTable[static_cast<size_t>(scene_)])();
+
+	
 	
 	
 }
@@ -151,6 +151,7 @@ void GameScene::PostSpriteDraw()
 	case GameScene::Scene::Title:
 		break;
 	case GameScene::Scene::InGame:
+		sprite_->Draw();
 		break;
 	default:
 		break;

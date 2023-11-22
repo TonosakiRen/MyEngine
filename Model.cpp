@@ -1,21 +1,19 @@
 #include "Model.h"
 #include "externals/DirectXTex/DirectXTex.h"
 #include <d3dcompiler.h>
-#include "DirectXCommon.h"
 #include <fstream>
 #include <sstream>
 #pragma comment(lib, "d3dcompiler.lib")
 #include "TextureManager.h"
+#include "ShaderManager.h"
 
 using namespace DirectX;
 using namespace Microsoft::WRL;
 
-DirectXCommon* Model::sDirectXCommon = nullptr;
 ID3D12GraphicsCommandList* Model::sCommandList = nullptr;
 std::unique_ptr<RootSignature> Model::sRootSignature;
 std::unique_ptr<PipelineState> Model::sPipelineState;
 void Model::StaticInitialize() {
-    sDirectXCommon = DirectXCommon::GetInstance();
     InitializeGraphicsPipeline();
 }
 
@@ -58,10 +56,12 @@ void Model::InitializeGraphicsPipeline() {
     ComPtr<IDxcBlob> psBlob;    
     ComPtr<ID3DBlob> errorBlob; 
 
-    vsBlob = sDirectXCommon->CompileShader(L"BasicVS.hlsl",L"vs_6_0");
+    auto shaderManager = ShaderManager::GetInstance();
+
+    vsBlob = shaderManager->Compile(L"BasicVS.hlsl",ShaderManager::kVertex);
     assert(vsBlob != nullptr);
 
-    psBlob = sDirectXCommon->CompileShader(L"BasicPS.hlsl", L"ps_6_0");
+    psBlob = shaderManager->Compile(L"BasicPS.hlsl", ShaderManager::kPixel);
     assert(psBlob != nullptr);
 
     sRootSignature = std::make_unique<RootSignature>();
@@ -303,29 +303,12 @@ void Model::CreateMesh() {
     // 頂点データのサイズ
     UINT sizeVB = static_cast<UINT>(sizeof(VertexData) * vertices_.size());
 
-    {
-        // ヒーププロパティ
-        CD3DX12_HEAP_PROPERTIES heapProps = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
-        // リソース設定
-        CD3DX12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(sizeVB);
+    vertexBuffer_.Create(sizeVB);
 
-        // 頂点バッファ生成
-        result = sDirectXCommon->GetDevice()->CreateCommittedResource(
-            &heapProps, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr,
-            IID_PPV_ARGS(&vertBuff_));
-        assert(SUCCEEDED(result));
-    }
-
-    // 頂点バッファへのデータ転送
-    VertexData* vertMap = nullptr;
-    result = vertBuff_->Map(0, nullptr, (void**)&vertMap);
-    if (SUCCEEDED(result)) {
-        std::copy(vertices_.begin(), vertices_.end(), vertMap);
-        vertBuff_->Unmap(0, nullptr);
-    }
+    vertexBuffer_.Copy(vertices_.data(), sizeVB);
 
     // 頂点バッファビューの作成
-    vbView_.BufferLocation = vertBuff_->GetGPUVirtualAddress();
+    vbView_.BufferLocation = vertexBuffer_.GetGPUVirtualAddress();
     vbView_.SizeInBytes = sizeVB;
     vbView_.StrideInBytes = sizeof(vertices_[0]);
 
@@ -333,30 +316,12 @@ void Model::CreateMesh() {
         // インデックスデータのサイズ
         UINT sizeIB = static_cast<UINT>(sizeof(uint16_t) * indices_.size());
 
-        {
-            // ヒーププロパティ
-            CD3DX12_HEAP_PROPERTIES heapProps = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
-            // リソース設定
-            CD3DX12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(sizeIB);
+        indexBuffer_.Create(sizeIB);
 
-            // インデックスバッファ生成
-            result = sDirectXCommon->GetDevice()->CreateCommittedResource(
-                &heapProps, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr,
-                IID_PPV_ARGS(&indexBuff_));
-            assert(SUCCEEDED(result));
-        }
-
-        // インデックスバッファへのデータ転送
-        uint16_t* indexMap = nullptr;
-        result = indexBuff_->Map(0, nullptr, (void**)&indexMap);
-        if (SUCCEEDED(result)) {
-            std::copy(indices_.begin(), indices_.end(), indexMap);
-
-            indexBuff_->Unmap(0, nullptr);
-        }
+        indexBuffer_.Copy(indices_.data(), sizeIB);
 
         // インデックスバッファビューの作成
-        ibView_.BufferLocation = indexBuff_->GetGPUVirtualAddress();
+        ibView_.BufferLocation = indexBuffer_.GetGPUVirtualAddress();
         ibView_.Format = DXGI_FORMAT_R16_UINT;
         ibView_.SizeInBytes = sizeIB;
     }
@@ -364,17 +329,11 @@ void Model::CreateMesh() {
 }
 
 void Model::Initialize() {
-    // nullptrチェック
-    assert(sDirectXCommon->GetDevice());
-
     // メッシュ生成
     CreateMesh();
 }
 
 void Model::Initialize(std::string name) {
-    // nullptrチェック
-    assert(sDirectXCommon->GetDevice());
-
     isModelLoad_ = true;
     name_ = name;
 
@@ -410,8 +369,6 @@ void Model::Draw(const WorldTransform& worldTransform, const ViewProjection& vie
 }
 
 void Model::Draw(const WorldTransform& worldTransform, const ViewProjection& viewProjection, const DirectionalLight& directionalLight, const Material& material) {
-    // nullptrチェック
-    assert(sDirectXCommon->GetDevice());
     assert(sCommandList);
 
     // 頂点バッファの設定

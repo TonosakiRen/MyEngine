@@ -1,24 +1,22 @@
 #pragma once
-#include <DirectXMath.h>
 #include <d3d12.h>
-#include <wrl.h>
 #include "Mymath.h"
-
-struct ConstBufferDataWorldTransform {
-	Matrix4x4 matWorld;
-};
+#include "UploadBuffer.h"
 
 class WorldTransform
 {
 public:
+
+	struct ConstBufferData {
+		Matrix4x4 matWorld;
+	};
+
 	//bufferに送る場合の初期化
 	void Initialize();
-	void UpdateMatrix();
+	void Update();
 
 	void ConstUpdate() {
-		if (constMap) {
-			constMap->matWorld = matWorld_;
-		}
+		constBuffer_.Copy(matWorld_);
 	}
 
 	void SetParent(WorldTransform* parent) {
@@ -58,7 +56,7 @@ public:
 		return parent_;
 	}
 	D3D12_GPU_VIRTUAL_ADDRESS GetGPUVirtualAddress() const {
-		return constBuff_->GetGPUVirtualAddress();
+		return constBuffer_.GetGPUVirtualAddress();
 	}
 public:
 	Vector3 scale_ = { 1.0f,1.0f,1.0f };
@@ -66,13 +64,9 @@ public:
 	Vector3 translation_ = { 0.0f,0.0f,0.0f };
 	Matrix4x4 matWorld_;
 private:
-	void CreateConstBuffer();
-	void Map();
-private:
 	WorldTransform* parent_ = nullptr;
 	bool isScaleParent_ = true;
 	bool isRotateParent_ = true;
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> constBuff_;
-	ConstBufferDataWorldTransform* constMap = nullptr;
+	UploadBuffer constBuffer_;
 };

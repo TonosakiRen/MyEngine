@@ -2,23 +2,21 @@
 
 #include "Externals/DirectXTex/d3dx12.h"
 
-#include <cassert>
+
+#include "Helper.h"
 
 #include "DirectXCommon.h"
 
 void PixelBuffer::CreateTextureResource(const D3D12_RESOURCE_DESC& desc, D3D12_CLEAR_VALUE clearValue) {
-    HRESULT result;
     resource_.Reset();
 
     auto device = DirectXCommon::GetInstance()->GetDevice();
 
     CD3DX12_HEAP_PROPERTIES heapProps(D3D12_HEAP_TYPE_DEFAULT);
-    result = device->CreateCommittedResource(
+    Helper::AssertIfFailed(device->CreateCommittedResource(
         &heapProps, D3D12_HEAP_FLAG_NONE,
         &desc, D3D12_RESOURCE_STATE_COMMON,
-        &clearValue, IID_PPV_ARGS(resource_.GetAddressOf()));
-
-    assert(SUCCEEDED(result));
+        &clearValue, IID_PPV_ARGS(resource_.GetAddressOf())));
 
     state_ = D3D12_RESOURCE_STATE_COMMON;
 

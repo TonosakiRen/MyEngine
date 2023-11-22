@@ -1,39 +1,11 @@
 #include "WorldTransform.h"
-#include <cassert>
-#include "externals/DirectXTex/d3dx12.h"
-#include "DirectXCommon.h"
-
-using namespace DirectX;
 
 void WorldTransform::Initialize() {
-    CreateConstBuffer();
-    Map();
-    UpdateMatrix();
+    constBuffer_.Create((sizeof(ConstBufferData) + 0xff) & ~0xff);
+    Update();
 }
 
-void WorldTransform::CreateConstBuffer() {
-    HRESULT result;
-    ID3D12Device* device = DirectXCommon::GetInstance()->GetDevice();
-    // ヒーププロパティ
-    CD3DX12_HEAP_PROPERTIES heapProps = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
-    // リソース設定
-    CD3DX12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Buffer((sizeof(ConstBufferDataWorldTransform) + 0xff) & ~0xff);
-
-    // 定数バッファの生成
-    result = device->CreateCommittedResource(
-        &heapProps, // アップロード可能
-        D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr,
-        IID_PPV_ARGS(&constBuff_));
-    assert(SUCCEEDED(result));
-}
-
-void WorldTransform::Map() {
-    // 定数バッファとのデータリンク
-    HRESULT result = constBuff_->Map(0, nullptr, (void**)&constMap);
-    assert(SUCCEEDED(result));
-}
-
-void WorldTransform::UpdateMatrix() {
+void WorldTransform::Update() {
 
     // スケール、回転、平行移動行列の計算
     Matrix4x4 scaleMatrix = MakeScaleMatrix(scale_);
@@ -67,8 +39,5 @@ void WorldTransform::UpdateMatrix() {
         matWorld_ *= parent_->matWorld_;
     }
 
-    // 定数バッファに書き込み
-    if (constMap) {
-        constMap->matWorld = matWorld_;
-    }
+    constBuffer_.Copy(matWorld_);
 }

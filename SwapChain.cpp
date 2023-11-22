@@ -1,17 +1,15 @@
 #include "SwapChain.h"
 
-#include <cassert>
+#include "Helper.h"
 
 #include "DirectXCommon.h"
 
 using namespace Microsoft::WRL;
 
 void SwapChain::Create(HWND hWnd) {
-    HRESULT result = S_FALSE;
 
     ComPtr<IDXGIFactory7> factory;
-    result = CreateDXGIFactory(IID_PPV_ARGS(factory.GetAddressOf()));
-    assert(SUCCEEDED(result));
+    Helper::AssertIfFailed(CreateDXGIFactory(IID_PPV_ARGS(factory.GetAddressOf())));
 
     RECT clientRect{};
     if (!GetClientRect(hWnd, &clientRect)) {
@@ -34,19 +32,17 @@ void SwapChain::Create(HWND hWnd) {
     desc.BufferCount = kNumBuffers;
     desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD; // モニタに移したら、中身を破棄
 
-    result = (factory->CreateSwapChainForHwnd(
+    Helper::AssertIfFailed((factory->CreateSwapChainForHwnd(
         DirectXCommon::GetInstance()->GetCommandQueue(),
         hWnd,
         &desc,
         nullptr,
         nullptr,
-        reinterpret_cast<IDXGISwapChain1**>(swapChain_.ReleaseAndGetAddressOf())));
-
-    assert(SUCCEEDED(result));
+        reinterpret_cast<IDXGISwapChain1**>(swapChain_.ReleaseAndGetAddressOf()))));
 
     for (uint32_t i = 0; i < kNumBuffers; ++i) {
         ComPtr<ID3D12Resource> resource;
-        result = swapChain_->GetBuffer(i, IID_PPV_ARGS(resource.GetAddressOf()));
+        Helper::AssertIfFailed(swapChain_->GetBuffer(i, IID_PPV_ARGS(resource.GetAddressOf())));
         buffers_[i] = std::make_unique<ColorBuffer>();
         buffers_[i]->CreateFromSwapChain(resource.Detach());
     }

@@ -31,19 +31,19 @@ void GameObject::Initialize(ViewProjection* viewProjection, DirectionalLight* di
 
 void GameObject::UpdateMatrix()
 {
-	worldTransform_.UpdateMatrix();
+	worldTransform_.Update();
 }
 
 void GameObject::Draw(uint32_t textureHandle, Vector4 color)
 {
 	if (loadObj_ == true) {
 		material_.color_ = color;
-		material_.UpdateMaterial();
+		material_.Update();
 		model_.Draw(worldTransform_, *viewProjection_, *directionalLight_, material_);
 	}
 	else {
 		material_.color_ = color;
-		material_.UpdateMaterial();
+		material_.Update();
 		model_.Draw(worldTransform_, *viewProjection_, *directionalLight_, material_, textureHandle);
 	}
 
@@ -53,12 +53,12 @@ void GameObject::Draw(const WorldTransform& worldTransform, Vector4 color)
 {
 	if (loadObj_ == true) {
 		material_.color_ = color;
-		material_.UpdateMaterial();
+		material_.Update();
 		model_.Draw(worldTransform, *viewProjection_, *directionalLight_, material_);
 	}
 	else {
 		material_.color_ = color;
-		material_.UpdateMaterial();
+		material_.Update();
 		model_.Draw(worldTransform, *viewProjection_, *directionalLight_, material_, 0);
 	}
 
@@ -67,5 +67,5 @@ void GameObject::Draw(const WorldTransform& worldTransform, Vector4 color)
 void GameObject::UpdateMaterial(Vector4 color)
 {
 	material_.color_ = color;
-	material_.UpdateMaterial();
+	material_.Update();
 }

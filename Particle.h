@@ -2,17 +2,18 @@
 #include "TextureManager.h"
 #include "ViewProjection.h"
 #include "WorldTransform.h"
+#include "DirectionalLight.h"
 #include <Windows.h>
 #include <d3d12.h>
 #include "externals/DirectXTex/d3dx12.h"
 #include <vector>
 #include <wrl.h>
 #include "Mymath.h"
-#include "DirectionalLight.h"
 #include "Material.h"
 #include "DescriptorHandle.h"
 #include "PipelineState.h"
 #include "RootSignature.h"
+#include "UploadBuffer.h"
 
 class DirectXCommon;
 
@@ -57,7 +58,6 @@ private:
 	static void InitializeGraphicsPipeline();
 private:
 	static DirectXCommon* sDirectXCommon;
-	static UINT sDescriptorHandleIncrementSize;
 	static ID3D12GraphicsCommandList* sCommandList;
 	static std::unique_ptr<RootSignature> sRootSignature;
 	static std::unique_ptr<PipelineState> sPipelineState;
@@ -67,8 +67,8 @@ private:
 	DescriptorHandle srvHandle_;
 	std::vector<VertexData> vertices_;
 	std::vector<uint16_t> indices_;
-	Microsoft::WRL::ComPtr<ID3D12Resource> vertBuff_;
-	Microsoft::WRL::ComPtr<ID3D12Resource> indexBuff_;
+	UploadBuffer vertexBuffer_;
+	UploadBuffer indexBuffer_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> instancingBuff_;
 	InstancingBufferData* instanceMap = nullptr;
 };

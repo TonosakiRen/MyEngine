@@ -3,7 +3,7 @@
 #include "externals/imgui/imgui.h"
 #include "externals/imgui/imgui_impl_dx12.h"
 #include "externals/imgui/imgui_impl_win32.h"
-#include "ConvertString.h"
+#include "Helper.h"
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 const wchar_t WinApp::kWindowClassName[] = L"DirectXGame";
@@ -52,7 +52,7 @@ void WinApp::CreateGameWindow(const char* title) {
 	AdjustWindowRect(&windowRect_, WS_OVERLAPPEDWINDOW, false);
 
 	// ウィンドウタイトルをwchar_tに変換
-	std::wstring titleWString = ConvertString(title);
+	std::wstring titleWString = Helper::ConvertString(title);
 
 	hwnd_ = CreateWindow(
 		wndClass_.lpszClassName,//利用するクラス名
