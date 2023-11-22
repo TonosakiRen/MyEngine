@@ -18,12 +18,18 @@ public:
 	void UpdateMatrix();
 	bool Shake(Vector3 shakeValue, int& frame);
 
+	Vector2 MakeScreenVector (Vector3 position) const;
+
 	D3D12_GPU_VIRTUAL_ADDRESS GetGPUVirtualAddress() const {
 		return constBuff_->GetGPUVirtualAddress();
 	}
 
 	void SetFarZ(float farZ) {
 		farZ_ = farZ;
+	}
+
+	Matrix4x4 GetMatView() const {
+		return matView;
 	}
 public:
 	Vector3 translation_ = { 0.0f, 0.0f, -10.0f };

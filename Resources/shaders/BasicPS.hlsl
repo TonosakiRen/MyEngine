@@ -44,6 +44,7 @@ PixelShaderOutput main(VSOutput input) {
 	float32_t4 tranformedUV = mul(float32_t4(input.uv, 0.0f, 1.0f), gMaterial.uvTransfrom);
 	float32_t4 texColor = tex.Sample(smp, tranformedUV.xy);
 	output.color.xyz += gMaterial.materialcolor.xyz * texColor.xyz;
+	output.color.w = gMaterial.materialcolor.w;
 
 	if (gMaterial.enableLighting != 0) {
 		// 陰

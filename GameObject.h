@@ -36,7 +36,7 @@ public:
 	void SetPosition(Vector3 position) {
 		worldTransform_.translation_ = position;
 	}
-	WorldTransform* GetWorldTransform() {
+	const WorldTransform* GetWorldTransform () const {
 		return &worldTransform_;
 	}
 protected:

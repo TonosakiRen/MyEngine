@@ -39,7 +39,17 @@ void GameScene::Initialize() {
 	followCamera_.SetTarget(player_->GetWorldTransform());
 
 	bosses_.push_back(std::make_unique<Boss>(&followCamera_.GetViewProjection(), &directionalLight_, Vector3{ -20.0f,10.0f,0.0f }));
+	bosses_.push_back(std::make_unique<Boss>(&followCamera_.GetViewProjection(), &directionalLight_, Vector3{ -20.0f,10.0f,20.0f }));
+	bosses_.push_back(std::make_unique<Boss>(&followCamera_.GetViewProjection(), &directionalLight_, Vector3{ -40.0f,10.0f,0.0f }));
+	bosses_.push_back(std::make_unique<Boss>(&followCamera_.GetViewProjection(), &directionalLight_, Vector3{ -40.0f,10.0f,20.0f }));
+	bosses_.push_back(std::make_unique<Boss>(&followCamera_.GetViewProjection(), &directionalLight_, Vector3{ -40.0f,10.0f,40.0f }));
+
 	
+	bossGrounds_.push_back(std::make_unique<Ground>(&followCamera_.GetViewProjection(), &directionalLight_, Vector3{ -20.0f,-5.0f,0.0f }));
+	bossGrounds_.push_back(std::make_unique<Ground>(&followCamera_.GetViewProjection(), &directionalLight_, Vector3{ -20.0f,-5.0f,20.0f }));
+	bossGrounds_.push_back(std::make_unique<Ground>(&followCamera_.GetViewProjection(), &directionalLight_, Vector3{ -40.0f,-5.0f,0.0f }));
+	bossGrounds_.push_back(std::make_unique<Ground>(&followCamera_.GetViewProjection(), &directionalLight_, Vector3{ -40.0f,-5.0f,20.0f }));
+	bossGrounds_.push_back(std::make_unique<Ground>(&followCamera_.GetViewProjection(), &directionalLight_, Vector3{ -40.0f,-5.0f,40.0f }));
 
 	sphere_.reset(GameObject::Create("sphere", &followCamera_.GetViewProjection(), &directionalLight_));
 
@@ -48,8 +58,6 @@ void GameScene::Initialize() {
 	ground_ = std::make_unique<Ground>();
 	ground_->Initialize(&followCamera_.GetViewProjection(), &directionalLight_, { 0.0f,-5.0f,0.0f });
 
-	bossGround_ = std::make_unique<Ground>();
-	bossGround_->Initialize(&followCamera_.GetViewProjection(), &directionalLight_, { -18.0f,-5.0f,0.0f });
 
 	goalGround_ = std::make_unique<Ground>();
 	goalGround_->Initialize(&followCamera_.GetViewProjection(), &directionalLight_, { 0.0f,-5.0f,30.0f });
@@ -58,6 +66,13 @@ void GameScene::Initialize() {
 
 	goalBox_ = std::make_unique<GoalBox>();
 	goalBox_->Initialize(&followCamera_.GetViewProjection(), &directionalLight_, { 0.0f,2.0f,30.0f });
+
+	lockOn_ = std::make_unique<LockOn>();
+	lockOn_->Initialize();
+
+	followCamera_.SetLockOn(lockOn_.get());
+
+	player_->SetLockOn(lockOn_.get());
 }
 
 void GameScene::Update() {
@@ -74,9 +89,21 @@ void GameScene::Update() {
 	}
 	Collider::SwitchIsDrawCollider();
 
+	if (player_->collider.Collision(goalBox_->collider_)) {
+		player_->SetIsDrop(true);
+	}
+
+	if (player_->GetIsDrop()) {
+		for (const auto& boss : bosses_) {
+			boss->Respowan();
+		}
+		player_->SetIsDrop(false);
+	}
+
 	skydome_->Update();
 	floor_->Update();
 	player_->Update();
+	lockOn_->Update(bosses_,followCamera_.GetViewProjection());
 
 
 	for (const auto& boss : bosses_) {
@@ -85,7 +112,10 @@ void GameScene::Update() {
 
 	ground_->Update();
 
-	bossGround_->Update();
+	for (const auto& bossGround : bossGrounds_) {
+		bossGround->Update();
+	}
+
 	goalGround_->Update();
 
 	for (const auto& boss : bosses_) {
@@ -103,8 +133,11 @@ void GameScene::Update() {
 	}
 
 	player_->Collision(ground_->collider_);
-	player_->Collision(bossGround_->collider_);
+	for (const auto& bossGround : bossGrounds_) {
+		player_->Collision(bossGround->collider_);
+	}
 	player_->Collision(goalGround_->collider_);
+
 }
 
 void GameScene::ModelDraw()
@@ -115,7 +148,9 @@ void GameScene::ModelDraw()
 		boss->Draw();
 	}
 	ground_->Draw();
-	bossGround_->Draw();
+	for (const auto& bossGround : bossGrounds_) {
+		bossGround->Draw();
+	}
 	goalGround_->Draw();
 	goalBox_->Draw();
 }
@@ -138,7 +173,7 @@ void GameScene::PreSpriteDraw()
 
 void GameScene::PostSpriteDraw()
 {
-
+	lockOn_->Draw();
 }
 
 

@@ -15,6 +15,7 @@
 #include "FollowCamera.h"
 #include "Ground.h"
 #include "GoalBox.h"
+#include "LockOn.h"
 class GameScene
 {
 
@@ -58,10 +59,14 @@ private:
 	std::unique_ptr<Particle> particle_;
 
 	std::unique_ptr<Ground> ground_;
-	std::unique_ptr<Ground> bossGround_;
+
+	std::list<std::unique_ptr<Ground>> bossGrounds_;
+
 	std::unique_ptr<Ground> goalGround_;
 	uint32_t blockHandle_;
 
 	std::unique_ptr<GoalBox> goalBox_;
+
+	std::unique_ptr<LockOn> lockOn_;
 
 };

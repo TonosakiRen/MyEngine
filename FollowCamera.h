@@ -3,6 +3,7 @@
 #include "WorldTransform.h"
 #include "Mymath.h"
 #include "Player.h"
+#include "LockOn.h"
 /// <summary>
 /// 追従カメラ
 /// </summary>
@@ -35,6 +36,8 @@ public:
 
 	void SetTarget(const WorldTransform* target);
 
+	void SetLockOn(const LockOn* lockOn) { lockOn_ = lockOn; }
+
 private:
 
 
@@ -62,4 +65,5 @@ private:
 	Vector3 interTarget_ = {};
 	float destinationAngleY_;
 
+	const LockOn* lockOn_ = nullptr;
 };

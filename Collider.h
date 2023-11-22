@@ -7,7 +7,7 @@ public:
 	static bool isDrawCollider;
 	static void SwitchIsDrawCollider();
 
-	void Initialize(WorldTransform* objectWorldTransform, const std::string name, ViewProjection* viewProjection, DirectionalLight* directionalLight, Vector3 initialScale = { 1.0f,1.0f,1.0f }, Vector3 initialPos = { 0.0f,0.0f,0.0f });
+	void Initialize(const WorldTransform* objectWorldTransform, const std::string name, ViewProjection* viewProjection, DirectionalLight* directionalLight, Vector3 initialScale = { 1.0f,1.0f,1.0f }, Vector3 initialPos = { 0.0f,0.0f,0.0f });
 	//ただの四角形用
 	void Initialize(const std::string name, ViewProjection* viewProjection, DirectionalLight* directionalLight);
 	bool Collision(Collider& colliderB);

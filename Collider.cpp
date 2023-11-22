@@ -18,7 +18,7 @@ void Collider::SwitchIsDrawCollider()
 	ImGui::End();
 }
 
-void Collider::Initialize(WorldTransform* objectWorldTransform, const std::string name, ViewProjection* viewProjection, DirectionalLight* directionalLight, Vector3 initialScale, Vector3 initialPos)
+void Collider::Initialize(const WorldTransform* objectWorldTransform, const std::string name, ViewProjection* viewProjection, DirectionalLight* directionalLight, Vector3 initialScale, Vector3 initialPos)
 {
 	worldTransform_.Initialize();
 	worldTransform_.SetParent(objectWorldTransform);

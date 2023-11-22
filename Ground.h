@@ -6,6 +6,9 @@ class Ground :
 {
 public:
 
+    Ground();
+    Ground(ViewProjection* viewProjection, DirectionalLight* directionalLight, Vector3 initialPos = { 1.0f,1.0f,1.0f });
+
     void Initialize(ViewProjection* viewProjection, DirectionalLight* directionalLight, Vector3 initialPos = { 1.0f,1.0f,1.0f });
     void Update();
     void Draw();

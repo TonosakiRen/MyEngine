@@ -3,6 +3,7 @@
 #include <numbers>
 #include "ImGuiManager.h"
 #include "GlobalVariables.h"
+#include "Easing.h"
 
 void FollowCamera::ApplyGlobalVariables() {
 
@@ -29,20 +30,45 @@ void FollowCamera::Update() {
 
 	delayCameraSpeed_ = clamp(delayCameraSpeed_, 0.0f, 1.0f);
 
-	Input* input = Input::GetInstance();
-	const float rotateSpeed = 0.0000035f / (2.0f * float(M_PI));
-	// gamePadが有効なら
-	if (input->GetIsGamePadConnect()) {
-		viewProjection_.target_.y += input->GetRStick().x * rotateSpeed;
+	if (lockOn_->ExitTarget()) {
+		Vector3 lockOnPosition = lockOn_->GetTargetPosition();
+		Vector3 sub = lockOnPosition - MakeTranslation(target_->matWorld_);
+		sub = { sub.x,0.0f,sub.z };
+		sub = Normalize(sub);
+
+		/*viewProjection_.target_.y = std::atan2(sub.x, sub.z);*/
+
+
+		float angle = Angle({ 0.0f,0.0f,1.0f }, sub);
+
+		
+
+		if (Cross({ 0.0f,1.0f }, Vector2{ sub.x,sub.z }) < 0.0f) {
+
+			viewProjection_.target_.y = Easing::easing(0.02f, viewProjection_.target_.y, angle);
+		}
+		else {
+			viewProjection_.target_.y = Easing::easing(0.02f, viewProjection_.target_.y, -angle);
+		}
+
+		
 	}
 	else {
-		if (input->PushKey(DIK_RIGHTARROW)) {
-			viewProjection_.target_.y += 30000.0f * rotateSpeed;
+		Input* input = Input::GetInstance();
+		const float rotateSpeed = 0.0000035f / (2.0f * float(M_PI));
+		// gamePadが有効なら
+		if (input->GetIsGamePadConnect()) {
+			viewProjection_.target_.y += input->GetRStick().x * rotateSpeed;
 		}
-		if (input->PushKey(DIK_LEFTARROW)) {
-			viewProjection_.target_.y -= 30000.0f * rotateSpeed;
+		else {
+			if (input->PushKey(DIK_RIGHTARROW)) {
+				viewProjection_.target_.y += 30000.0f * rotateSpeed;
+			}
+			if (input->PushKey(DIK_LEFTARROW)) {
+				viewProjection_.target_.y -= 30000.0f * rotateSpeed;
+			}
+
 		}
-		
 	}
 
 	// 追従対象がいれば

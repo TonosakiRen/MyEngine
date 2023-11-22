@@ -3,6 +3,7 @@
 #include "ImGuiManager.h"
 #include "Easing.h"
 #include "GlobalVariables.h"
+#include "LockOn.h"
 
 std::array<Player::ConstAttack, Player::ComboNum> Player::kConstAttacks_ = {
 	{
@@ -175,9 +176,12 @@ void Player::Collision(Collider& blockCollider)
 }
 bool Player::weaponCollision(Collider& bossCollider)
 {
-	if (behavior_ == Behavior::kAttack) {
+	if (behavior_ == Behavior::kAttack && isHited_ == false) {
 		bool isHit = false;
 		isHit = weaponCollider_.Collision(bossCollider);
+		if (isHit) {
+			isHited_ = true;
+		}
 		return isHit;
 	}
 	return false;
@@ -214,7 +218,6 @@ void Player::Draw() {
 	for (int i = 0; i < partNum; i++) {
 		modelParts_.Draw(partsTransform_[i], *viewProjection_, *directionalLight_, material_);
 	}
-	weaponCollider_.Draw();
 	weaponObject_.Draw(blockHandle_);
 }
 
@@ -326,8 +329,6 @@ void Player::BehaviorMoveUpdate()
 
 			bool isRight = false;
 
-			float a = Cross(Vector2{ nowDirection.x,nowDirection.z }, Vector2{ afterDirection.x,afterDirection.z });
-
 			float angle = Angle(nowDirection, move);
 
 			Quaternion quaternion = MakeRotateAxisAngleQuaternion({ 0.0f,1.0f,0.0f }, angle);
@@ -343,6 +344,33 @@ void Player::BehaviorMoveUpdate()
 				quaternion = MakeRotateAxisAngleQuaternion({ 0.0f,1.0f,0.0f }, -angle);
 			}
 
+
+			worldTransform_.quaternion_ = worldTransform_.quaternion_ * quaternion;
+		}
+		else if (lockOn_ && lockOn_->ExitTarget()) {
+			Vector3 lockOnPosition = lockOn_->GetTargetPosition();
+			Vector3 sub = lockOn_->GetTargetPosition() - MakeTranslation(worldTransform_.matWorld_);
+
+			Vector3 nowDirection = Normalize(Vector3{ 0.0f,0.0f,1.0f } *worldTransform_.quaternion_);
+
+			Vector3 afterDirection = Normalize(Vector3{ sub.x,0.0f,sub.z });
+
+			bool isRight = false;
+
+			float angle = Angle(nowDirection, afterDirection);
+
+			Quaternion quaternion = MakeRotateAxisAngleQuaternion({ 0.0f,1.0f,0.0f }, angle);
+
+			if (Cross(Vector2{ nowDirection.x,nowDirection.z }, Vector2{ afterDirection.x,afterDirection.z }) < 0.0f) {
+				isRight = true;
+			}
+
+			if (isRight) {
+				quaternion = MakeRotateAxisAngleQuaternion({ 0.0f,1.0f,0.0f }, angle);
+			}
+			else {
+				quaternion = MakeRotateAxisAngleQuaternion({ 0.0f,1.0f,0.0f }, -angle);
+			}
 
 			worldTransform_.quaternion_ = worldTransform_.quaternion_ * quaternion;
 		}
@@ -367,6 +395,7 @@ void Player::BehaviorMoveUpdate()
 	if (worldTransform_.translation_.y <= -30.0f) {
 		worldTransform_.SetParent(nullptr);
 		worldTransform_.translation_ = { 0.0f,3.0f,0.0f };
+		isDrop_ = true;
 	}
 }
 
@@ -379,6 +408,7 @@ void Player::BehaviorAttackUpdate()
 		if (workAttack_.initialize == false) {
 			weaponRotateWorldTransform_.quaternion_ *= MakeRotateAxisAngleQuaternion({ 1.0f,0.0f,0.0f }, Radian(90.0f));
 			weaponRotateWorldTransform_.quaternion_ *= MakeRotateAxisAngleQuaternion({ 0.0f,1.0f,0.0f }, -Radian(30.0f));
+			isHited_ = false;
 			workAttack_.initialize = true;
 		}
 		weaponRadian_ += kConstAttacks_[ShortSwing].AttackSpeed;
@@ -390,6 +420,7 @@ void Player::BehaviorAttackUpdate()
 	case Drop:
 		if (workAttack_.initialize == false) {
 			workAttack_.initialize = true;
+			isHited_ = false;
 		}
 		weaponRadian_ += kConstAttacks_[Drop].AttackSpeed;
 		weaponRotateWorldTransform_.quaternion_ *= MakeRotateAxisAngleQuaternion({ 1.0f,0.0f,0.0f }, kConstAttacks_[Drop].AttackSpeed);
@@ -402,6 +433,7 @@ void Player::BehaviorAttackUpdate()
 			weaponRotateWorldTransform_.quaternion_ *= MakeRotateAxisAngleQuaternion({ 1.0f,0.0f,0.0f }, Radian(90.0f));
 			weaponRotateWorldTransform_.quaternion_ *= MakeRotateAxisAngleQuaternion({ 0.0f,1.0f,0.0f }, -Radian(90.0f));
 			workAttack_.initialize = true;
+			isHited_ = false;
 		}
 		weaponRadian_ += kConstAttacks_[LongSwing].AttackSpeed;
 		weaponRotateWorldTransform_.quaternion_ *= MakeRotateAxisAngleQuaternion({ 0.0f,1.0f,0.0f }, kConstAttacks_[LongSwing].AttackSpeed);
@@ -436,6 +468,33 @@ void Player::BehaviorAttackUpdate()
 		}
 	}
 
+	if (lockOn_ && lockOn_->ExitTarget()) {
+		Vector3 lockOnPosition = lockOn_->GetTargetPosition();
+		Vector3 sub = lockOn_->GetTargetPosition() - MakeTranslation(worldTransform_.matWorld_);
+
+		Vector3 nowDirection = Normalize(Vector3{ 0.0f,0.0f,1.0f } *worldTransform_.quaternion_);
+
+		Vector3 afterDirection = Normalize(Vector3{ sub.x,0.0f,sub.z });
+
+		bool isRight = false;
+
+		float angle = Angle(nowDirection, afterDirection);
+
+		Quaternion quaternion = MakeRotateAxisAngleQuaternion({ 0.0f,1.0f,0.0f }, angle);
+
+		if (Cross(Vector2{ nowDirection.x,nowDirection.z }, Vector2{ afterDirection.x,afterDirection.z }) < 0.0f) {
+			isRight = true;
+		}
+
+		if (isRight) {
+			quaternion = MakeRotateAxisAngleQuaternion({ 0.0f,1.0f,0.0f }, angle);
+		}
+		else {
+			quaternion = MakeRotateAxisAngleQuaternion({ 0.0f,1.0f,0.0f }, -angle);
+		}
+
+		worldTransform_.quaternion_ = worldTransform_.quaternion_ * quaternion;
+	}
 	
 }
 

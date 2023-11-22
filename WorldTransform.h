@@ -21,7 +21,7 @@ public:
 		}
 	}
 
-	void SetParent(WorldTransform* parent) {
+	void SetParent(const WorldTransform* parent) {
 		if (parent != parent_) {
 			if (parent) {
 				Matrix4x4 localMatrix = matWorld_ * Inverse(parent->matWorld_);
@@ -54,7 +54,7 @@ public:
 	void SetIsRotateParent(bool isRotateParent) {
 		isRotateParent_ = isRotateParent;
 	}
-	WorldTransform* GetParent() {
+	const WorldTransform* GetParent() const {
 		return parent_;
 	}
 	D3D12_GPU_VIRTUAL_ADDRESS GetGPUVirtualAddress() const {
@@ -69,7 +69,7 @@ private:
 	void CreateConstBuffer();
 	void Map();
 private:
-	WorldTransform* parent_ = nullptr;
+	const WorldTransform* parent_ = nullptr;
 	bool isScaleParent_ = true;
 	bool isRotateParent_ = true;
 

@@ -140,6 +140,7 @@ void Model::InitializeGraphicsPipeline() {
         // ブレンドステートの設定
         gpipeline.BlendState.RenderTarget[0] = blenddesc;
 
+
         // 深度バッファのフォーマット
         gpipeline.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 

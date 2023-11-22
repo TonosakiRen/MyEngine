@@ -1,6 +1,18 @@
 #include "Ground.h"
 #include "ImGuiManager.h"
 
+Ground::Ground()
+{
+}
+
+Ground::Ground(ViewProjection* viewProjection, DirectionalLight* directionalLight, Vector3 initialPos)
+{
+	GameObject::Initialize("box6x6", viewProjection, directionalLight);
+	worldTransform_.translation_ = { initialPos };
+	worldTransform_.UpdateMatrix();
+	collider_.Initialize(&worldTransform_, "ground", viewProjection, directionalLight, { 6.0f,6.0f,6.0f });
+}
+
 void Ground::Initialize( ViewProjection* viewProjection, DirectionalLight* directionalLight, Vector3 initialPos)
 {
 	GameObject::Initialize("box6x6", viewProjection, directionalLight);

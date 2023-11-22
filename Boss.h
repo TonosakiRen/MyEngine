@@ -16,9 +16,10 @@ public:
     void Update();
     void Animation();
     void OnCollision();
+    void Respowan();
     void Draw();
 
-    bool GetIsDead() {
+    bool GetIsDead() const {
         return isDead_;
     }
 private:
@@ -49,6 +50,12 @@ private:
     AnimationStats animationStats = HeadJump;
 
     bool isDead_ = false;
+    float alpha_ = 1.0f;
+    int hp_ = 3;
+    Vector3 initialPos_ = { 0.0f,0.0f,0.0f };
+
+    float speed_ = 0.1f;
+    float speedDiff = 0.0f;
 
 public:
     Collider collider_;

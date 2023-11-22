@@ -135,6 +135,8 @@
     <ClCompile Include="GoalBox.cpp" />
     <ClCompile Include="Ground.cpp" />
     <ClCompile Include="GlobalVariables.cpp" />
+    <ClCompile Include="LockOn.cpp" />
+    <ClCompile Include="DeathParticle.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -262,6 +264,9 @@
     <ClInclude Include="GoalBox.h" />
     <ClInclude Include="Ground.h" />
     <ClInclude Include="GlobalVariables.h" />
+    <ClInclude Include="LockOn.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="DeathParticle.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\shaders\Basic.hlsli">
@@ -299,5 +304,10 @@
     <FxCompile Include="Resources\shaders\ParticleBoxVS.hlsl">
       <Filter>shaders</Filter>
     </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="MyEngine.rc">
+      <Filter>shaders</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

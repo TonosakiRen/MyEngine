@@ -5,6 +5,8 @@
 #include "DustParticle.h"
 #include "Collider.h"
 #include <optional>
+
+class LockOn;
 class Player :
     public GameObject
 {
@@ -43,8 +45,20 @@ public:
     void ParticleDraw();
     void SetInitialPos();
 
+    void SetLockOn(const LockOn* lockOn) {
+        lockOn_ = lockOn;
+    }
     WorldTransform* GetWorldTransform() {
         return &worldTransform_;
+    }
+
+
+    bool GetIsDrop() {
+        return isDrop_;
+    }
+
+    void SetIsDrop(bool isDrop) {
+        isDrop_ = isDrop;
     }
 public:
 
@@ -115,6 +129,12 @@ private:
         bool initialize = false;
     };
     WorkAttck workAttack_;
+
+    const LockOn* lockOn_;
+
+    bool isHited_ = false;
+
+    bool isDrop_ = false;
 public:
     //collider
     Collider collider;
