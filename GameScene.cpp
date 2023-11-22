@@ -69,9 +69,12 @@ void GameScene::Update(){
 	//SceneUpdate
 	(this->*SceneUpdateTable[static_cast<size_t>(scene_)])();
 
+	Vector3 axis = Normalize(Vector3{1.0f,1.0f,1.0f});
+	float angle = 0.44f;
 	
-	
-	
+	ImGui::Begin("MT4_1_1");
+	ImGui::Text();
+	ImGui::End();
 }
 
 void GameScene::TitleInitialize() {
