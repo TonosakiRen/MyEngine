@@ -39,5 +39,7 @@ void WorldTransform::Update() {
         matWorld_ *= parent_->matWorld_;
     }
 
-    constBuffer_.Copy(matWorld_);
+    if (constBuffer_.GetCPUData()) {
+        constBuffer_.Copy(matWorld_);
+    }
 }

@@ -9,22 +9,20 @@
 using namespace DirectX;
 using namespace Microsoft::WRL;
 
-DirectXCommon* Particle::sDirectXCommon = nullptr;
 ID3D12GraphicsCommandList* Particle::sCommandList = nullptr;
 std::unique_ptr<RootSignature> Particle::sRootSignature;
 std::unique_ptr<PipelineState> Particle::sPipelineState;
+Matrix4x4 Particle::billBordMatrix;
 
 Particle::Particle(uint32_t particleNum) : kParticleNum(particleNum) {
 }
 
 void Particle::StaticInitialize() {
-    sDirectXCommon = DirectXCommon::GetInstance();
     InitializeGraphicsPipeline();
 }
 
 void Particle::PreDraw(ID3D12GraphicsCommandList* commandList) {
     assert(Particle::sCommandList == nullptr);
-
     sCommandList = commandList;
 
     commandList->SetPipelineState(*sPipelineState);
@@ -76,14 +74,14 @@ void Particle::InitializeGraphicsPipeline() {
         rootparams[int(RootParameter::kMaterial)].InitAsConstantBufferView(1, 0, D3D12_SHADER_VISIBILITY_ALL);
 
         // スタティックサンプラー
-        CD3DX12_STATIC_SAMPLER_DESC samplerDesc =
-            CD3DX12_STATIC_SAMPLER_DESC(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR);
+        CD3DX12_STATIC_SAMPLER_DESC staticSamplerDesc(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR, D3D12_TEXTURE_ADDRESS_MODE_CLAMP, D3D12_TEXTURE_ADDRESS_MODE_CLAMP, D3D12_TEXTURE_ADDRESS_MODE_CLAMP);
+
 
         // ルートシグネチャの設定
         D3D12_ROOT_SIGNATURE_DESC rootSignatureDesc;
         rootSignatureDesc.pParameters = rootparams;
         rootSignatureDesc.NumParameters = _countof(rootparams);
-        rootSignatureDesc.pStaticSamplers = &samplerDesc;
+        rootSignatureDesc.pStaticSamplers = &staticSamplerDesc;
         rootSignatureDesc.NumStaticSamplers = 1;
         rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
@@ -177,6 +175,11 @@ void Particle::CreateMesh() {
 
     vertexBuffer_.Copy(vertices_.data(), sizeVB);
 
+    // 頂点バッファビューの作成
+    vbView_.BufferLocation = vertexBuffer_.GetGPUVirtualAddress();
+    vbView_.SizeInBytes = sizeVB;
+    vbView_.StrideInBytes = sizeof(vertices_[0]);
+
     // インデックスデータのサイズ
     UINT sizeIB = static_cast<UINT>(sizeof(uint16_t) * indices_.size());
 
@@ -192,27 +195,8 @@ void Particle::CreateMesh() {
     // インスタンシングデータのサイズ
     UINT sizeINB = static_cast<UINT>(sizeof(InstancingBufferData) * kParticleNum);
 
-    {
-        // ヒーププロパティ
-        CD3DX12_HEAP_PROPERTIES heapProps = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
-        // リソース設定
-        CD3DX12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(sizeINB);
+    instancingBuffer_.Create(sizeINB);
 
-        // インスタンシングバッファ生成
-        result = sDirectXCommon->GetDevice()->CreateCommittedResource(
-            &heapProps, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr,
-            IID_PPV_ARGS(&instancingBuff_));
-        assert(SUCCEEDED(result));
-    }
-
-    result = instancingBuff_->Map(0, nullptr, reinterpret_cast<void**>(&instanceMap));
-    if (SUCCEEDED(result)) {
-        particleDatas_.resize(sizeof(InstancingBufferData) * kParticleNum);
-        for (uint32_t index = 0; index < kParticleNum; ++index) {
-            particleDatas_[index].matWorld = MakeIdentity4x4();
-            instanceMap[index].matWorld = particleDatas_[index].matWorld;
-        }
-    }
 
     D3D12_SHADER_RESOURCE_VIEW_DESC instancingSrvDesc{};
     instancingSrvDesc.Format = DXGI_FORMAT_UNKNOWN;
@@ -223,22 +207,34 @@ void Particle::CreateMesh() {
     instancingSrvDesc.Buffer.StructureByteStride = sizeof(InstancingBufferData);
 
     srvHandle_ = DirectXCommon::GetInstance()->AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-    DirectXCommon::GetInstance()->GetDevice()->CreateShaderResourceView(instancingBuff_.Get(), &instancingSrvDesc, srvHandle_);
+    DirectXCommon::GetInstance()->GetDevice()->CreateShaderResourceView(instancingBuffer_, &instancingSrvDesc, srvHandle_);
 }
 
 void Particle::Initialize() {
-    assert(sDirectXCommon->GetDevice());
     material_.Initialize();
     CreateMesh();
 }
 
-void Particle::Draw(const std::vector<InstancingBufferData>& bufferData, const ViewProjection& viewProjection, const DirectionalLight& directionalLight, const Vector4& color, const uint32_t textureHadle) {
-    assert(sDirectXCommon->GetDevice());
+void Particle::Draw(const std::vector<InstancingBufferData>& bufferData, const ViewProjection& viewProjection, const Vector4& color, const uint32_t textureHadle) {
     assert(sCommandList);
     assert(!bufferData.empty());
 
+
+    billBordMatrix = viewProjection.GetMatView();
+    billBordMatrix.m[3][0] = 0.0f;
+    billBordMatrix.m[3][1] = 0.0f;
+    billBordMatrix.m[3][2] = 0.0f;
+
+    billBordMatrix = Inverse(billBordMatrix);
+
+    std::vector<Particle::InstancingBufferData> instancingBufferDatas;
+
+    for (const auto& data : bufferData) {
+        instancingBufferDatas.emplace_back(data.matWorld * billBordMatrix);
+    }
+
     //マッピング
-    memcpy(instanceMap, bufferData.data(), sizeof(bufferData[0]) * bufferData.size());
+    instancingBuffer_.Copy(instancingBufferDatas.data(), sizeof(instancingBufferDatas[0]) * instancingBufferDatas.size());
 
     material_.color_ = color;
     material_.Update();

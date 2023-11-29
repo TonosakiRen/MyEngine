@@ -6,12 +6,12 @@
 #include "Input.h"
 #include "Sprite.h"
 #include "DirectionalLight.h"
-#include "Particle.h"
-#include "ParticleBox.h"
 #include "GameObject.h"
 #include "Skydome.h"
 #include "Floor.h"
 #include "Player.h"
+#include "DustParticle.h"
+#include "WhiteParticle.h"
 
 #include <optional>
 class GameScene
@@ -49,6 +49,12 @@ private:
 	std::unique_ptr<GameObject> sphere_;
 
 	std::unique_ptr<Player> player_;
+
+	std::unique_ptr<DustParticle> dustParticle_;
+
+	std::unique_ptr<WhiteParticle> whiteParticle_;
+
+	Vector4 color = {1.0f,1.0f,1.0f,1.0f};
 
 	//Scene
 	enum class Scene {

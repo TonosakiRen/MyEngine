@@ -161,6 +161,9 @@
     <ClCompile Include="ShaderManager.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
+    <ClCompile Include="WhiteParticle.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -316,6 +319,9 @@
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="ShaderManager.h">
       <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="WhiteParticle.h">
+      <Filter>Game</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,36 +1,40 @@
-#include "DustParticle.h"
+#include "WhiteParticle.h"
 #include "ImGuiManager.h"
 
-DustParticle::DustParticle()
+WhiteParticle::WhiteParticle()
 {
-	particleBox_ = std::make_unique<ParticleBox>(kParticleNum);
+	particle_ = std::make_unique<Particle>(kParticleNum);
 }
 
-void DustParticle::Initialize(Vector3 minDirection, Vector3 maxDirection)
+void WhiteParticle::Initialize(Vector3 minDirection, Vector3 maxDirection)
 {
 
-	particleBox_->Initialize();
+	particle_->Initialize();
 	emitterWorldTransform_.SetIsScaleParent(false);
 	emitterWorldTransform_.Update();
 	SetDirection(minDirection, maxDirection);
+	emitBox_ = MakeOBB(emitterWorldTransform_.matWorld_);
+	emitBox_.size = { 1.0f,1.0f,1.0f };
 }
 
-void DustParticle::Update() {
+void WhiteParticle::Update() {
 
-	emitterWorldTransform_.Update();
 
 	if (isEmit_) {
 		for (size_t i = 0; i < EmitNum_; i++) {
 			for (size_t i = 0; i < kParticleNum; i++) {
 				if (particles[i].isActive_ == false) {
 					particles[i].isActive_ = true;
+
+					emitterWorldTransform_.Update();
+
 					if (emitterWorldTransform_.GetParent()) {
 						particles[i].direction_ = Normalize(Vector3{ Rand(minDirection_.x, maxDirection_.x) ,Rand(minDirection_.y,maxDirection_.y) ,Rand(minDirection_.z,maxDirection_.z) } *NormalizeMakeRotateMatrix(emitterWorldTransform_.GetParent()->matWorld_));
 					}
 					else {
 						particles[i].direction_ = Normalize(Vector3{ Rand(minDirection_.x, maxDirection_.x) ,Rand(minDirection_.y,maxDirection_.y) ,Rand(minDirection_.z,maxDirection_.z) });
 					}
-					particles[i].worldTransform_.translation_ = MakeTranslation(emitterWorldTransform_.matWorld_);
+					particles[i].worldTransform_.translation_ = MakeRandVector3(emitBox_);
 					particles[i].worldTransform_.quaternion_ = IdentityQuaternion();
 					particles[i].worldTransform_.scale_ = emitterWorldTransform_.scale_;
 					break;
@@ -40,11 +44,12 @@ void DustParticle::Update() {
 	}
 
 	for (size_t i = 0; i < kParticleNum; i++) {
-		float rotationSpeed = Radian(1.0f) * (float(i % 2) * 2.0f - 1.0f);
+		float rotationSpeed = Radian(2.0f) * (float(i % 2) * 2.0f - 1.0f);
 		if (particles[i].isActive_ == true) {
-			particles[i].worldTransform_.quaternion_ *= MakeRotateAxisAngleQuaternion({ 1.0f,1.0f,1.0f }, rotationSpeed);
+			particles[i].worldTransform_.quaternion_ *= MakeRotateAxisAngleQuaternion({ 0.0f,0.0f,1.0f }, rotationSpeed);
 			particles[i].worldTransform_.translation_ += particles[i].direction_ * speed_;
 			particles[i].worldTransform_.scale_ = particles[i].worldTransform_.scale_ - scaleSpeed_;
+			particles[i].worldTransform_.Update();
 			if (particles[i].worldTransform_.scale_.x <= 0.0f) {
 				particles[i].isActive_ = false;
 			}
@@ -54,23 +59,22 @@ void DustParticle::Update() {
 
 }
 
-void DustParticle::Draw(const ViewProjection& viewProjection,const DirectionalLight& directionalLight, Vector4 color)
+void WhiteParticle::Draw(const ViewProjection& viewProjection, Vector4 color, uint32_t textureHandle)
 {
 
 	emitterWorldTransform_.Update();
 
-	std::vector<ParticleBox::InstancingBufferData> instancingBufferDatas;
+	std::vector<Particle::InstancingBufferData> instancingBufferDatas;
 	instancingBufferDatas.reserve(kParticleNum);
 
 	for (size_t i = 0; i < kParticleNum; i++)
 	{
 		if (particles[i].isActive_) {
-			particles[i].worldTransform_.Update();
 			instancingBufferDatas.emplace_back(particles[i].worldTransform_.matWorld_);
 		}
 	}
 
 	if (!instancingBufferDatas.empty()) {
-		particleBox_->Draw(instancingBufferDatas, viewProjection, directionalLight, color);
+		particle_->Draw(instancingBufferDatas, viewProjection, color, textureHandle);
 	}
 }

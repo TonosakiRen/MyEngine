@@ -138,6 +138,23 @@ inline Vector3 GetZAxis(Matrix4x4 m) {
 	return { m.m[2][0],m.m[2][1],m.m[2][2] };
 }
 
+inline void SetXAxis(Matrix4x4& m, Vector3 v) {
+	m.m[0][0] = v.x;
+	m.m[0][1] = v.y;
+	m.m[0][2] = v.z;
+}
+inline void SetYAxis(Matrix4x4& m, Vector3 v) {
+	m.m[1][0] = v.x;
+	m.m[1][1] = v.y;
+	m.m[1][2] = v.z;
+}
+inline void SetZAxis(Matrix4x4& m, Vector3 v) {
+	m.m[2][0] = v.x;
+	m.m[2][1] = v.y;
+	m.m[2][2] = v.z;
+}
+
+
 //Vetor3
 //加算
 inline Vector3 Add(const Vector3& v1, const Vector3& v2) {
@@ -783,10 +800,19 @@ inline Matrix4x4 DirectionToDirection(const Vector3& from, const Vector3& to) {
 	Vector3 normalizeFrom = Normalize(from);
 	Vector3 normalizeTo = Normalize(to);
 
+	Vector3 cross = Cross(normalizeFrom, normalizeTo);
+	float cos = Dot(normalizeFrom, normalizeTo);
+	float sin = Length(cross);
+
 	Vector3 n;
 
-	if (Length(Cross(normalizeFrom, normalizeTo)) > 0) {
-		n = Normalize(Cross(normalizeFrom, normalizeTo));
+	if (Length(cross) > 0) {
+		n = Normalize(cross);
+	}
+	else if (normalizeFrom.x != 0.0f || normalizeFrom.z != 0.0f) {
+		n.x = normalizeFrom.y;
+		n.y = -normalizeFrom.x;
+		n.z = 0.0f;
 	}
 	else if (normalizeFrom.x != 0.0f || normalizeFrom.y != 0.0f) {
 		n.x = normalizeFrom.z;
@@ -794,14 +820,6 @@ inline Matrix4x4 DirectionToDirection(const Vector3& from, const Vector3& to) {
 		n.z = -normalizeFrom.x;
 
 	}
-	else if (normalizeFrom.x != 0.0f || normalizeFrom.z != 0.0f) {
-		n.x = normalizeFrom.y;
-		n.y = -normalizeFrom.x;
-		n.z = 0.0f;
-	}
-
-	float cos = Dot(normalizeFrom, normalizeTo);
-	float sin = Length(Cross(normalizeFrom, normalizeTo));
 
 	Matrix4x4 RotateMatrix = MakeIdentity4x4();
 	RotateMatrix.m[0][0] = n.x * n.x * (1.0f - cos) + cos;
@@ -1302,4 +1320,42 @@ inline bool Rand() { return bool(0 + (int)(rand() * (1 - 0 + 1.0) / (1.0 + RAND_
 
 inline void SRAND() {
 	srand((unsigned)time(NULL));
+}
+
+inline OBB MakeOBB(Vector3 pos, Matrix4x4 rotation, Vector3 size) {
+	OBB result;
+	result.center = pos;
+	result.orientations[0] = GetXAxis(rotation);
+	result.orientations[1] = GetYAxis(rotation);
+	result.orientations[2] = GetZAxis(rotation);
+	result.size = size;
+
+	return result;
+}
+
+inline OBB MakeOBB(Matrix4x4 worldMatrix) {
+	OBB result;
+	result.center = MakeTranslation(worldMatrix);
+
+	Matrix4x4 rotation = MakeIdentity4x4();
+	rotation = NormalizeMakeRotateMatrix(worldMatrix);
+	result.orientations[0] = GetXAxis(rotation);
+	result.orientations[1] = GetYAxis(rotation);
+	result.orientations[2] = GetZAxis(rotation);
+
+	result.size = MakeScale(worldMatrix);
+
+	return result;
+}
+
+inline Vector3 MakeRandVector3(OBB box) {
+	Vector3 result;
+	result = { Rand(-box.size.x ,box.size.x),Rand(-box.size.y ,box.size.y) ,Rand(-box.size.z,box.size.z) };
+	Matrix4x4 rotateMatrix = MakeIdentity4x4();
+	SetXAxis(rotateMatrix, box.orientations[0]);
+	SetYAxis(rotateMatrix, box.orientations[1]);
+	SetZAxis(rotateMatrix, box.orientations[2]);
+	result = result * rotateMatrix;
+	result = result + box.center;
+	return result;
 }

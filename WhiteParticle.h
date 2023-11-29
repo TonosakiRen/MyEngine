@@ -1,13 +1,13 @@
 #pragma once
-#include "ParticleBox.h"
-class DustParticle
+#include "Particle.h"
+class WhiteParticle
 {
 public:
-	static const uint32_t kParticleNum = 100;
-	DustParticle();
+	static const uint32_t kParticleNum = 300;
+	WhiteParticle();
 	void Initialize(Vector3 minDirection, Vector3 maxDirection);
 	void Update();
-	void Draw(const ViewProjection& viewProjection, const DirectionalLight& directionalLight, Vector4 color = { 1.0f,1.0f,1.0f,1.0f });
+	void Draw(const ViewProjection& viewProjection, Vector4 color = { 1.0f,1.0f,1.0f,1.0f }, uint32_t textureHandle = 0);
 	void SetDirection(Vector3 minDirection, Vector3 maxDirection) {
 		minDirection_ = minDirection;
 		maxDirection_ = maxDirection;
@@ -21,7 +21,7 @@ public:
 	void SetScaleSpeed(float scaleSpeed) {
 		scaleSpeed_ = scaleSpeed;
 	}
-	struct dustParticle {
+	struct deadLineParticle {
 		WorldTransform worldTransform_;
 		Vector3 direction_;
 		Vector3 velocity_;
@@ -29,13 +29,14 @@ public:
 	};
 public:
 	WorldTransform emitterWorldTransform_;
-	dustParticle particles[kParticleNum];
+	OBB emitBox_;
+	deadLineParticle particles[kParticleNum];
 	int EmitNum_ = 1;
 private:
-	float speed_ = 0.1f;
-	float scaleSpeed_ = 0.01f;
+	float speed_ = 0.05f;
+	float scaleSpeed_ = 0.03f;
 	bool isEmit_ = false;
-	std::unique_ptr<ParticleBox> particleBox_;
+	std::unique_ptr<Particle> particle_;
 	Vector3 minDirection_;
 	Vector3 maxDirection_;
 };

@@ -170,12 +170,12 @@ void Collider::MatrixUpdate()
 
 void Collider::Draw(Vector4 color)
 {
-#ifdef _DEBUG
+
 	if (isDrawCollider) {
 		MatrixUpdate();
 		cube_.Draw(worldTransform_, color);
 	}
-#endif // _DEBUG
+
 }
 
 bool Collider::ObbCollision(const OBB& obb1, const OBB& obb2)

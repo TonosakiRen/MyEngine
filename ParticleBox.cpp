@@ -1,15 +1,13 @@
 #include "ParticleBox.h"
 #include "externals/DirectXTex/DirectXTex.h"
 #include <d3dcompiler.h>
-#include "DirectXCommon.h"
 #include "ShaderManager.h"
+#include "DirectXCommon.h"
 
 #pragma comment(lib, "d3dcompiler.lib")
 
-using namespace DirectX;
 using namespace Microsoft::WRL;
 
-DirectXCommon* ParticleBox::sDirectXCommon = nullptr;
 ID3D12GraphicsCommandList* ParticleBox::sCommandList = nullptr;
 std::unique_ptr<RootSignature> ParticleBox::sRootSignature;
 std::unique_ptr<PipelineState> ParticleBox::sPipelineState;
@@ -18,7 +16,6 @@ ParticleBox::ParticleBox(uint32_t particleNum) : kParticleBoxNum(particleNum) {
 }
 
 void ParticleBox::StaticInitialize() {
-    sDirectXCommon = DirectXCommon::GetInstance();
     InitializeGraphicsPipeline();
 }
 
@@ -232,27 +229,7 @@ void ParticleBox::CreateMesh() {
     // インスタンシングデータのサイズ
     UINT sizeINB = static_cast<UINT>(sizeof(InstancingBufferData) * kParticleBoxNum);
 
-    {
-        // ヒーププロパティ
-        CD3DX12_HEAP_PROPERTIES heapProps = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
-        // リソース設定
-        CD3DX12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(sizeINB);
-
-        // インスタンシングバッファ生成
-        result = sDirectXCommon->GetDevice()->CreateCommittedResource(
-            &heapProps, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr,
-            IID_PPV_ARGS(&instancingBuff_));
-        assert(SUCCEEDED(result));
-    }
-
-    result = instancingBuff_->Map(0, nullptr, reinterpret_cast<void**>(&instanceMap));
-    if (SUCCEEDED(result)) {
-        particleDatas_.resize(sizeof(InstancingBufferData) * kParticleBoxNum);
-        for (uint32_t index = 0; index < kParticleBoxNum; ++index) {
-            particleDatas_[index].matWorld = MakeIdentity4x4();
-            instanceMap[index].matWorld = particleDatas_[index].matWorld;
-        }
-    }
+    instancingBuffer_.Create(sizeINB);
 
     D3D12_SHADER_RESOURCE_VIEW_DESC instancingSrvDesc{};
     instancingSrvDesc.Format = DXGI_FORMAT_UNKNOWN;
@@ -264,22 +241,20 @@ void ParticleBox::CreateMesh() {
     UINT incrementSize = DirectXCommon::GetInstance()->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
     srvHandle_ = DirectXCommon::GetInstance()->AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-    DirectXCommon::GetInstance()->GetDevice()->CreateShaderResourceView(instancingBuff_.Get(), &instancingSrvDesc, srvHandle_);
+    DirectXCommon::GetInstance()->GetDevice()->CreateShaderResourceView(instancingBuffer_, &instancingSrvDesc, srvHandle_);
 }
 
 void ParticleBox::Initialize() {
-    assert(sDirectXCommon->GetDevice());
     material_.Initialize();
     CreateMesh();
 }
 
 void ParticleBox::Draw(const std::vector<InstancingBufferData>& bufferData, const ViewProjection& viewProjection, const DirectionalLight& directionalLight, const Vector4& color, const uint32_t textureHadle) {
-    assert(sDirectXCommon->GetDevice());
     assert(sCommandList);
     assert(!bufferData.empty());
 
     //マッピング
-    memcpy(instanceMap, bufferData.data(), sizeof(bufferData[0]) * bufferData.size());
+    instancingBuffer_.Copy(bufferData.data(), sizeof(bufferData[0]) * bufferData.size());
 
     material_.color_ = color;
     material_.Update();

@@ -25,6 +25,10 @@ public:
 	void SetFarZ(float farZ) {
 		farZ_ = farZ;
 	}
+
+	const Matrix4x4 GetMatView() const {
+		return matView;
+	}
 public:
 	Vector3 translation_ = { 0.0f, 0.0f, -10.0f };
 	Vector3 target_ = { 0.0f,0.0f,0.0f };

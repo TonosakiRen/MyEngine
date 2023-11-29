@@ -1,5 +1,7 @@
 #include "CommandQueue.h"
 
+#include <Windows.h>
+#pragma comment(lib, "winmm.lib")
 #include "Helper.h"
 
 #include "DirectXCommon.h"
@@ -46,6 +48,7 @@ void CommandQueue::WaitForGPU() {
 
 void CommandQueue::UpdateFixFPS()
 {
+    timeBeginPeriod(1);
     std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
     std::chrono::microseconds elapsed =
         std::chrono::duration_cast<std::chrono::microseconds>(now - reference_);
@@ -65,6 +68,7 @@ void CommandQueue::UpdateFixFPS()
     elapsed = std::chrono::duration_cast<std::chrono::microseconds>(
         std::chrono::steady_clock::now() - reference_);
     reference_ = std::chrono::steady_clock::now();
+    timeEndPeriod(1);
 }
 
 void CommandQueue::Destroy() {

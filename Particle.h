@@ -15,12 +15,6 @@
 #include "RootSignature.h"
 #include "UploadBuffer.h"
 
-class DirectXCommon;
-
-struct InstancingBufferData {
-	Matrix4x4 matWorld;
-};
-
 class Particle
 {
 public:
@@ -40,6 +34,10 @@ public:
 		Vector2 uv;
 	};
 
+	struct InstancingBufferData {
+		Matrix4x4 matWorld;
+	};
+
 	static void StaticInitialize();
 	static void PreDraw(ID3D12GraphicsCommandList* commandList);
 	static void PostDraw();
@@ -47,20 +45,19 @@ public:
 
 	Particle(uint32_t particleNum);
 	void Initialize();
-	void Draw(const std::vector<InstancingBufferData>& bufferData, const ViewProjection& viewProjection, const DirectionalLight& directionalLight, const Vector4& color, const uint32_t textureHadle);
+	void Draw(const std::vector<InstancingBufferData>& bufferData, const ViewProjection& viewProjection, const Vector4& color, const uint32_t textureHadle);
 	void CreateMesh();
 
 public:
-	std::vector<InstancingBufferData> particleDatas_;
 	Material material_;
 
 private:
 	static void InitializeGraphicsPipeline();
 private:
-	static DirectXCommon* sDirectXCommon;
 	static ID3D12GraphicsCommandList* sCommandList;
 	static std::unique_ptr<RootSignature> sRootSignature;
 	static std::unique_ptr<PipelineState> sPipelineState;
+	static Matrix4x4 billBordMatrix;
 
 	D3D12_VERTEX_BUFFER_VIEW vbView_{};
 	D3D12_INDEX_BUFFER_VIEW ibView_{};
@@ -69,6 +66,5 @@ private:
 	std::vector<uint16_t> indices_;
 	UploadBuffer vertexBuffer_;
 	UploadBuffer indexBuffer_;
-	Microsoft::WRL::ComPtr<ID3D12Resource> instancingBuff_;
-	InstancingBufferData* instanceMap = nullptr;
+	UploadBuffer instancingBuffer_;
 };

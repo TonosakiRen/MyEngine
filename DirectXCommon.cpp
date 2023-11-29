@@ -57,7 +57,7 @@ void DirectXCommon::MainPreDraw() {
 	DescriptorHandle dsvH = mainDepthBuffer_.GetDSV();
 
 	commandContext_.SetRenderTarget(mainColorBuffer_.GetRTV(), mainDepthBuffer_.GetDSV());
-	
+
 	// 全画面クリア
 	commandContext_.ClearColor(mainColorBuffer_);
 	// 深度バッファクリア
@@ -125,13 +125,11 @@ void DirectXCommon::SwapChainPostDraw()
 	if (FAILED(result)) {
 		ComPtr<ID3D12DeviceRemovedExtendedData> dred;
 
-		result = device_->QueryInterface(IID_PPV_ARGS(&dred));
-		assert(SUCCEEDED(result));
+		Helper::AssertIfFailed(device_->QueryInterface(IID_PPV_ARGS(&dred)));
 
 		// 自動パンくず取得
 		D3D12_DRED_AUTO_BREADCRUMBS_OUTPUT autoBreadcrumbsOutput{};
-		result = dred->GetAutoBreadcrumbsOutput(&autoBreadcrumbsOutput);
-		assert(SUCCEEDED(result));
+		Helper::AssertIfFailed(dred->GetAutoBreadcrumbsOutput(&autoBreadcrumbsOutput));
 	}
 #endif
 
@@ -164,7 +162,7 @@ void DirectXCommon::InitializeDXGIDevice() {
 	Helper::AssertIfFailed(CreateDXGIFactory(IID_PPV_ARGS(&dxgiFactory_)));
 	//初期化の根本的な部分でエラーが出た場合はプログラングが間違っているか、
 	//どうにもできない場合が多いのでassertにしておく
-	
+
 	//使用するアダプタ用の変数、最初にnullptrを入れておく
 	ComPtr<IDXGIAdapter4> useAdapter = nullptr;
 	//良い順にアダプタを頼む
@@ -211,6 +209,9 @@ void DirectXCommon::InitializeDXGIDevice() {
 	const uint32_t desriptorSizeRTV = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	const uint32_t desriptorSizeDSV = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
+
+#ifdef _DEBUG
+
 	ComPtr<ID3D12InfoQueue> infoQueue = nullptr;
 	if (SUCCEEDED(device_->QueryInterface(IID_PPV_ARGS(&infoQueue)))) {
 		//やばいエラー前に止まる
@@ -236,6 +237,7 @@ void DirectXCommon::InitializeDXGIDevice() {
 		//指定したメッセージの表示を抑制する
 		infoQueue->PushStorageFilter(&filter);
 	}
+#endif
 
 }
 

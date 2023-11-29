@@ -54,13 +54,10 @@ public:
 	void CreateMesh();
 
 public:
-	std::vector<InstancingBufferData> particleDatas_;
-	uint32_t instanceNum_ = 0;
 	Material material_;
 private:
 	static void InitializeGraphicsPipeline();
 private:
-	static DirectXCommon* sDirectXCommon;
 	static ID3D12GraphicsCommandList* sCommandList;
 	static std::unique_ptr<RootSignature> sRootSignature;
 	static std::unique_ptr<PipelineState> sPipelineState;
@@ -72,6 +69,5 @@ private:
 	std::vector<uint16_t> indices_;
 	UploadBuffer vertexBuffer_;
 	UploadBuffer indexBuffer_;
-	Microsoft::WRL::ComPtr<ID3D12Resource> instancingBuff_;
-	InstancingBufferData* instanceMap = nullptr;
+	UploadBuffer instancingBuffer_;
 };
