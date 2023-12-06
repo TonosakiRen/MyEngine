@@ -109,7 +109,7 @@ void GameScene::Update(CommandContext& commandContext){
 	Quaternion mul2 = Multiply(q2, q1);
 	float norm = Norm(q1);
 	
-	ImGui::Begin("MT3_1_1");
+	ImGui::Begin("MT3_1_3");
 	ImGui::Text("%f  %f  %f  %f   : Identity", identity.x, identity.y, identity.z, identity.w);
 	ImGui::Text("%f  %f  %f  %f   : Conjugate", conj.x, conj.y, conj.z, conj.w);
 	ImGui::Text("%f  %f  %f  %f   : Inverse", inv.x, inv.y, inv.z, inv.w);
