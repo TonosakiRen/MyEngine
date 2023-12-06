@@ -12,6 +12,7 @@
 #include "Player.h"
 #include "DustParticle.h"
 #include "WhiteParticle.h"
+#include "Compute.h"
 
 #include <optional>
 class GameScene
@@ -22,7 +23,7 @@ public:
 	~GameScene();
 
 	void Initialize();
-	void Update();
+	void Update(CommandContext& commandContext);
 	void ModelDraw();
 	void ParticleDraw();
 	void ParticleBoxDraw();
@@ -55,6 +56,8 @@ private:
 	std::unique_ptr<WhiteParticle> whiteParticle_;
 
 	Vector4 color = {1.0f,1.0f,1.0f,1.0f};
+
+	std::unique_ptr<Compute> compute_;
 
 	//Scene
 	enum class Scene {

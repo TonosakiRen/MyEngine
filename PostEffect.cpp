@@ -7,6 +7,7 @@
 #include "TextureManager.h"
 #include "DWParam.h"
 #include "ShaderManager.h"
+#include "Renderer.h"
 
 using namespace DirectX;
 using namespace Microsoft::WRL;
@@ -111,7 +112,7 @@ void PostEffect::InitializeGraphicsPipeline() {
 		// レンダーターゲットのブレンド設定
 		D3D12_RENDER_TARGET_BLEND_DESC blenddesc{};
 		blenddesc.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
-		blenddesc.BlendEnable = true;
+		blenddesc.BlendEnable = false;
 		blenddesc.BlendOp = D3D12_BLEND_OP_ADD;
 		blenddesc.SrcBlend = D3D12_BLEND_SRC_ALPHA;
 		blenddesc.DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
@@ -134,7 +135,7 @@ void PostEffect::InitializeGraphicsPipeline() {
 		gpipeline.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 
 		gpipeline.NumRenderTargets = 1;                            // 描画対象は1つ
-		gpipeline.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB; // 0～255指定のRGBA
+		gpipeline.RTVFormats[0] = Renderer::GetInstance()->GetRTVFormat(Renderer::kMain); // 0～255指定のRGBA
 		gpipeline.SampleDesc.Count = 1; // 1ピクセルにつき1回サンプリング
 
 		gpipeline.pRootSignature = *sRootSignature;

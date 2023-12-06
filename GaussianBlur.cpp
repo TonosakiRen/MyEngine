@@ -105,7 +105,7 @@ void GaussianBlur::Render(CommandContext& commandContext)
     commandContext.ClearColor(horizontalBlurTexture_);
     commandContext.SetViewportAndScissorRect(0, 0, horizontalBlurTexture_.GetWidth(), horizontalBlurTexture_.GetHeight());
 
-    commandContext.SetRootSignature(*sRootSignature);
+    commandContext.SetGraphicsRootSignature(*sRootSignature);
 
     commandContext.SetVertexBuffer(0, vbView_);
     commandContext.SetIndexBuffer(ibView_);
@@ -122,7 +122,7 @@ void GaussianBlur::Render(CommandContext& commandContext)
     commandContext.SetRenderTarget(verticalBlurTexture_.GetRTV());
     commandContext.SetViewportAndScissorRect(0, 0, verticalBlurTexture_.GetWidth(), verticalBlurTexture_.GetHeight());
 
-    commandContext.SetRootSignature(*sRootSignature);
+    commandContext.SetGraphicsRootSignature(*sRootSignature);
     commandContext.SetPipelineState(*sVerticalBlurPipelineState);
     commandContext.SetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     commandContext.SetDescriptorTable(0, horizontalBlurTexture_.GetSRV());

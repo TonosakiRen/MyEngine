@@ -7,15 +7,16 @@
 #include "externals/DirectXTex/DirectXTex.h"
 #include "WinApp.h"
 #include "ShaderManager.h"
+#include "Renderer.h"
 
 #pragma comment(lib, "d3dcompiler.lib")
 
 using namespace DirectX;
 using namespace Microsoft::WRL;
-ID3D12GraphicsCommandList* Sprite::sCommandList = nullptr;
-std::unique_ptr<RootSignature> Sprite::sRootSignature;
-std::unique_ptr<PipelineState> Sprite::sPipelineState;
-Matrix4x4 Sprite::sMatProjection;
+ID3D12GraphicsCommandList* Sprite::commandList_ = nullptr;
+std::unique_ptr<RootSignature> Sprite::rootSignature_;
+std::unique_ptr<PipelineState> Sprite::pipelineState_;
+Matrix4x4 Sprite::matProjection_;
 
 void Sprite::StaticInitialize() {
 	ComPtr<IDxcBlob> vsBlob;    
@@ -30,8 +31,8 @@ void Sprite::StaticInitialize() {
 	psBlob = shaderManager->Compile(L"SpritePS.hlsl", ShaderManager::kPixel);
 	assert(psBlob != nullptr);
 
-	sRootSignature = std::make_unique<RootSignature>();
-	sPipelineState = std::make_unique<PipelineState>();
+	rootSignature_ = std::make_unique<RootSignature>();
+	pipelineState_ = std::make_unique<PipelineState>();
 
 	{
 
@@ -56,7 +57,7 @@ void Sprite::StaticInitialize() {
 		rootSignatureDesc.NumStaticSamplers = 1;
 		rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
-		sRootSignature->Create(rootSignatureDesc);
+		rootSignature_->Create(rootSignatureDesc);
 
 	}
 
@@ -96,7 +97,7 @@ void Sprite::StaticInitialize() {
 		gpipeline.BlendState.RenderTarget[0] = blenddesc;
 
 
-		gpipeline.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		gpipeline.DSVFormat = Renderer::GetInstance()->GetDSVFormat();
 
 
 		gpipeline.InputLayout.pInputElementDescs = inputLayout;
@@ -106,31 +107,31 @@ void Sprite::StaticInitialize() {
 		gpipeline.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 
 		gpipeline.NumRenderTargets = 1;
-		gpipeline.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+		gpipeline.RTVFormats[int(Renderer::kMain)] = Renderer::GetInstance()->GetRTVFormat(Renderer::kMain);
 		gpipeline.SampleDesc.Count = 1;
 
-		gpipeline.pRootSignature = *sRootSignature;
+		gpipeline.pRootSignature = *rootSignature_;
 
 		// グラフィックスパイプラインの生成
-		sPipelineState->Create(gpipeline);
+		pipelineState_->Create(gpipeline);
 
 	}
 
-	sMatProjection = MakeOrthograohicmatrix(0.0f, 0.0f, (float)WinApp::kWindowWidth, (float)WinApp::kWindowHeight,  0.0f, 1.0f);
+	matProjection_ = MakeOrthograohicmatrix(0.0f, 0.0f, (float)WinApp::kWindowWidth, (float)WinApp::kWindowHeight,  0.0f, 1.0f);
 }
 
 void Sprite::PreDraw(ID3D12GraphicsCommandList* commandList) {
-	assert(Sprite::sCommandList == nullptr);
+	assert(Sprite::commandList_ == nullptr);
 
-	sCommandList = commandList;
+	commandList_ = commandList;
 
-	commandList->SetPipelineState(*sPipelineState);
-	commandList->SetGraphicsRootSignature(*sRootSignature);
-	sCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+	commandList->SetPipelineState(*pipelineState_);
+	commandList->SetGraphicsRootSignature(*rootSignature_);
+	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 }
 
 void Sprite::PostDraw() {
-	Sprite::sCommandList = nullptr;
+	Sprite::commandList_ = nullptr;
 }
 
 Sprite* Sprite::Create(uint32_t textureHandle, Vector2 position, Vector4 color, Vector2 anchorpoint, bool isFlipX, bool isFlipY) {
@@ -202,17 +203,17 @@ void Sprite::Draw() {
 	ConstBufferData mapData;
 
 	mapData.color = color_;
-	mapData.mat = matWorld_ * sMatProjection;
+	mapData.mat = matWorld_ * matProjection_;
 
 	constBuffer_.Copy(mapData);
 
-	sCommandList->IASetVertexBuffers(0, 1, &vbView_);
+	commandList_->IASetVertexBuffers(0, 1, &vbView_);
 
-	sCommandList->SetGraphicsRootConstantBufferView(0, constBuffer_.GetGPUVirtualAddress());
+	commandList_->SetGraphicsRootConstantBufferView(0, constBuffer_.GetGPUVirtualAddress());
 
-	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(sCommandList, 1, textureHandle_);
+	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(commandList_, 1, textureHandle_);
 	
-	sCommandList->DrawInstanced(4, 1, 0, 0);
+	commandList_->DrawInstanced(4, 1, 0, 0);
 }
 
 void Sprite::TransferVertices() {

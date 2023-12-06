@@ -3,34 +3,35 @@
 #include <d3dcompiler.h>
 #include "ShaderManager.h"
 #include "DirectXCommon.h"
+#include "Renderer.h"
 
 #pragma comment(lib, "d3dcompiler.lib")
 
 using namespace Microsoft::WRL;
 
-ID3D12GraphicsCommandList* ParticleBox::sCommandList = nullptr;
-std::unique_ptr<RootSignature> ParticleBox::sRootSignature;
-std::unique_ptr<PipelineState> ParticleBox::sPipelineState;
+ID3D12GraphicsCommandList* ParticleBox::commandList_ = nullptr;
+std::unique_ptr<RootSignature> ParticleBox::rootSignature_;
+std::unique_ptr<PipelineState> ParticleBox::pipelineState_;
 
 ParticleBox::ParticleBox(uint32_t particleNum) : kParticleBoxNum(particleNum) {
 }
 
 void ParticleBox::StaticInitialize() {
-    InitializeGraphicsPipeline();
+    CreatePipeline();
 }
 
 void ParticleBox::PreDraw(ID3D12GraphicsCommandList* commandList) {
-    assert(ParticleBox::sCommandList == nullptr);
+    assert(ParticleBox::commandList_ == nullptr);
 
-    sCommandList = commandList;
+    commandList_ = commandList;
 
-    commandList->SetPipelineState(*sPipelineState);
-    commandList->SetGraphicsRootSignature(*sRootSignature);
+    commandList->SetPipelineState(*pipelineState_);
+    commandList->SetGraphicsRootSignature(*rootSignature_);
     commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 
 void ParticleBox::PostDraw() {
-    sCommandList = nullptr;
+    commandList_ = nullptr;
 }
 
 ParticleBox* ParticleBox::Create(uint32_t particleNum) {
@@ -42,10 +43,9 @@ ParticleBox* ParticleBox::Create(uint32_t particleNum) {
     return object3d;
 }
 
-void ParticleBox::InitializeGraphicsPipeline() {
+void ParticleBox::CreatePipeline() {
     ComPtr<IDxcBlob> vsBlob;
     ComPtr<IDxcBlob> psBlob;
-    ComPtr<ID3DBlob> errorBlob;
 
     auto shaderManager = ShaderManager::GetInstance();
 
@@ -55,8 +55,8 @@ void ParticleBox::InitializeGraphicsPipeline() {
     psBlob = shaderManager->Compile(L"ParticlePS.hlsl", ShaderManager::kPixel);
     assert(psBlob != nullptr);
 
-    sRootSignature = std::make_unique<RootSignature>();
-    sPipelineState = std::make_unique<PipelineState>();
+    rootSignature_ = std::make_unique<RootSignature>();
+    pipelineState_ = std::make_unique<PipelineState>();
 
     {
 
@@ -86,7 +86,7 @@ void ParticleBox::InitializeGraphicsPipeline() {
         rootSignatureDesc.NumStaticSamplers = 1;
         rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
-        sRootSignature->Create(rootSignatureDesc);
+        rootSignature_->Create(rootSignatureDesc);
 
     }
 
@@ -131,22 +131,23 @@ void ParticleBox::InitializeGraphicsPipeline() {
 
         gpipeline.BlendState.RenderTarget[0] = blenddesc;
 
-        gpipeline.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+        gpipeline.DSVFormat = Renderer::GetInstance()->GetDSVFormat();
 
         gpipeline.InputLayout.pInputElementDescs = inputLayout;
         gpipeline.InputLayout.NumElements = _countof(inputLayout);
 
         gpipeline.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 
-        gpipeline.NumRenderTargets = 1;
-        gpipeline.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+        gpipeline.NumRenderTargets = Renderer::kRenderTargetNum;
+        gpipeline.RTVFormats[int(Renderer::kMain)] = Renderer::GetInstance()->GetRTVFormat(Renderer::kMain);
+        gpipeline.RTVFormats[int(Renderer::kNormal)] = Renderer::GetInstance()->GetRTVFormat(Renderer::kNormal);
         gpipeline.SampleDesc.Count = 1;
 
 
-        gpipeline.pRootSignature = *sRootSignature;
+        gpipeline.pRootSignature = *rootSignature_;
 
         // グラフィックスパイプラインの生成
-        sPipelineState->Create(gpipeline);
+        pipelineState_->Create(gpipeline);
     }
 
 }
@@ -250,7 +251,7 @@ void ParticleBox::Initialize() {
 }
 
 void ParticleBox::Draw(const std::vector<InstancingBufferData>& bufferData, const ViewProjection& viewProjection, const DirectionalLight& directionalLight, const Vector4& color, const uint32_t textureHadle) {
-    assert(sCommandList);
+    assert(commandList_);
     assert(!bufferData.empty());
 
     //マッピング
@@ -259,14 +260,14 @@ void ParticleBox::Draw(const std::vector<InstancingBufferData>& bufferData, cons
     material_.color_ = color;
     material_.Update();
 
-    sCommandList->IASetVertexBuffers(0, 1, &vbView_);
-    sCommandList->IASetIndexBuffer(&ibView_);
-    sCommandList->SetGraphicsRootDescriptorTable(0, srvHandle_);
-    sCommandList->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
-    sCommandList->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kMaterial), material_.GetGPUVirtualAddress());
-    sCommandList->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kDirectionalLight), directionalLight.GetGPUVirtualAddress());
+    commandList_->IASetVertexBuffers(0, 1, &vbView_);
+    commandList_->IASetIndexBuffer(&ibView_);
+    commandList_->SetGraphicsRootDescriptorTable(0, srvHandle_);
+    commandList_->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
+    commandList_->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kMaterial), material_.GetGPUVirtualAddress());
+    commandList_->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kDirectionalLight), directionalLight.GetGPUVirtualAddress());
 
-    TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(sCommandList, static_cast<UINT>(RootParameter::kTexture), textureHadle);
+    TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(commandList_, static_cast<UINT>(RootParameter::kTexture), textureHadle);
 
-    sCommandList->DrawIndexedInstanced(static_cast<UINT>(indices_.size()), static_cast<UINT>(bufferData.size()), 0, 0, 0);
+    commandList_->DrawIndexedInstanced(static_cast<UINT>(indices_.size()), static_cast<UINT>(bufferData.size()), 0, 0, 0);
 }

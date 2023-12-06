@@ -21,7 +21,7 @@ struct VSOutput {
 VSOutput main(float32_t4 pos : POSITION, float32_t3 normal : NORMAL, float32_t2 uv : TEXCOORD) {
 	VSOutput output; // ピクセルシェーダーに渡す値
 	output.svpos = mul(pos, mul(gWorldTransform.world, mul(gViewProjection.view, gViewProjection.projection)));
-	output.normal = mul(float32_t4(normal.xyz,1.0f), gWorldTransform.world).xyz;
+	output.normal = mul(normal, (float32_t3x3)gWorldTransform.world);
 	output.uv = uv;
 	output.worldPosition = mul(pos, gWorldTransform.world).xyz;
 	return output;

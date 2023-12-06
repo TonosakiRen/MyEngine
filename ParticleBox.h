@@ -56,11 +56,11 @@ public:
 public:
 	Material material_;
 private:
-	static void InitializeGraphicsPipeline();
+	static void CreatePipeline();
 private:
-	static ID3D12GraphicsCommandList* sCommandList;
-	static std::unique_ptr<RootSignature> sRootSignature;
-	static std::unique_ptr<PipelineState> sPipelineState;
+	static ID3D12GraphicsCommandList* commandList_;
+	static std::unique_ptr<RootSignature> rootSignature_;
+	static std::unique_ptr<PipelineState> pipelineState_;
 
 	D3D12_VERTEX_BUFFER_VIEW vbView_{};
 	D3D12_INDEX_BUFFER_VIEW ibView_{};

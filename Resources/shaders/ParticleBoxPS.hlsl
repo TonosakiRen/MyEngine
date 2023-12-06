@@ -31,6 +31,7 @@ struct VSOutput {
 
 struct PixelShaderOutput {
 	float32_t4 color : SV_TARGET0;
+	float32_t4 normal : SV_TARGET1;
 };
 
 PixelShaderOutput main(VSOutput input) {
@@ -77,6 +78,9 @@ PixelShaderOutput main(VSOutput input) {
 		//output.color.xyz += fresnelColor * fresnel;
 
 	}
+
+	output.normal.xyz = (normal.xyz + 1.0f) * 0.5f;
+	output.normal.w = 1.0f;
 
 	return output;
 }

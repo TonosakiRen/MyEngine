@@ -125,4 +125,3 @@ void DepthBuffer::CreateViews() {
     device->CreateDepthStencilView(resource_.Get(), &dsvDesc, dsvHandle_);
     device->CreateShaderResourceView(resource_.Get(), &srvDesc, srvHandle_);
 }
-

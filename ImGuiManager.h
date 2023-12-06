@@ -2,6 +2,7 @@
 
 #include "WinApp.h"
 #include "externals/imgui/imgui.h"
+class CommandContext;
 class ImGuiManager
 {
 public:
@@ -9,8 +10,7 @@ public:
 	void Initialize(WinApp* winApp);
 	void Finalize();
 	void Begin();
-	void End();
-	void Draw();
+	void Draw(CommandContext& commandContext);
 
 private:
 	ImGuiManager() = default;

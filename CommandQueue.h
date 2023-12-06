@@ -11,7 +11,7 @@ public:
     ~CommandQueue();
 
     void Create();
-    void Execute(ID3D12GraphicsCommandList* commandList);
+    void Excute(ID3D12GraphicsCommandList* commandList);
     void Signal();
     void WaitForGPU();
     void UpdateFixFPS();

@@ -30,7 +30,8 @@ public:
     void CopyBufferRegion(GPUResource& dest, size_t destOffset, GPUResource& src, size_t srcOffset, size_t numBytes);
 
     void SetPipelineState(const PipelineState& pipelineState);
-    void SetRootSignature(const RootSignature& rootSignature);
+    void SetGraphicsRootSignature(const RootSignature& rootSignature);
+    void SetComputeRootSignature(const RootSignature& rootSignature);
 
     void ClearColor(ColorBuffer& target);
     void ClearColor(ColorBuffer& target, float clearColor[4]);
@@ -41,6 +42,7 @@ public:
     void SetRenderTargets(UINT numRTVs, const D3D12_CPU_DESCRIPTOR_HANDLE rtvs[], D3D12_CPU_DESCRIPTOR_HANDLE dsv);
     void SetRenderTarget(const D3D12_CPU_DESCRIPTOR_HANDLE rtv) { SetRenderTargets(1, &rtv); }
     void SetRenderTarget(const D3D12_CPU_DESCRIPTOR_HANDLE rtv, D3D12_CPU_DESCRIPTOR_HANDLE dsv) { SetRenderTargets(1, &rtv, dsv); }
+
 
     void SetViewport(const D3D12_VIEWPORT& viewport);
     void SetViewport(FLOAT x, FLOAT y, FLOAT w, FLOAT h, FLOAT minDepth = 0.0f, FLOAT maxDepth = 1.0f);
@@ -58,11 +60,15 @@ public:
     void SetConstants(UINT rootIndex, DWParam x, DWParam y, DWParam z);
     void SetConstants(UINT rootIndex, DWParam x, DWParam y, DWParam z, DWParam w);
     void SetConstantBuffer(UINT rootIndex, D3D12_GPU_VIRTUAL_ADDRESS address);
+    void SetComputeUAVBuffer(UINT rootIndex, D3D12_GPU_VIRTUAL_ADDRESS address);
     void SetDescriptorTable(UINT rootIndex, D3D12_GPU_DESCRIPTOR_HANDLE baseDescriptor);
 
     void SetVertexBuffer(UINT slot, const D3D12_VERTEX_BUFFER_VIEW& vbv);
     void SetVertexBuffer(UINT slot, UINT numViews, const D3D12_VERTEX_BUFFER_VIEW vbvs[]);
     void SetIndexBuffer(const D3D12_INDEX_BUFFER_VIEW& ibv);
+
+
+    void Dispatch(uint32_t x,uint32_t y,uint32_t z);
 
     void Draw(UINT vertexCount, UINT vertexStartOffset = 0);
     void DrawIndexed(UINT indexCount, UINT startIndexLocation = 0, INT baseVertexLocation = 0);
@@ -134,11 +140,19 @@ inline void CommandContext::SetPipelineState(const PipelineState& pipelineState)
     }
 }
 
-inline void CommandContext::SetRootSignature(const RootSignature& rootSignature) {
+inline void CommandContext::SetGraphicsRootSignature(const RootSignature& rootSignature) {
     ID3D12RootSignature* rs = rootSignature;
     if (rootSignature_ != rs) {
         rootSignature_ = rs;
         commandList_->SetGraphicsRootSignature(rootSignature_);
+    }
+}
+
+inline void CommandContext::SetComputeRootSignature(const RootSignature& rootSignature) {
+    ID3D12RootSignature* rs = rootSignature;
+    if (rootSignature_ != rs) {
+        rootSignature_ = rs;
+        commandList_->SetComputeRootSignature(rootSignature_);
     }
 }
 
@@ -169,6 +183,7 @@ inline void CommandContext::SetRenderTargets(UINT numRTVs, const D3D12_CPU_DESCR
 inline void CommandContext::SetRenderTargets(UINT numRTVs, const D3D12_CPU_DESCRIPTOR_HANDLE rtvs[], D3D12_CPU_DESCRIPTOR_HANDLE dsv) {
     commandList_->OMSetRenderTargets(numRTVs, rtvs, FALSE, &dsv);
 }
+
 
 inline void CommandContext::SetViewport(const D3D12_VIEWPORT& viewport) {
     commandList_->RSSetViewports(1, &viewport);
@@ -247,6 +262,11 @@ inline void CommandContext::SetConstantBuffer(UINT rootIndex, D3D12_GPU_VIRTUAL_
     commandList_->SetGraphicsRootConstantBufferView(rootIndex, address);
 }
 
+inline void CommandContext::SetComputeUAVBuffer(UINT rootIndex, D3D12_GPU_VIRTUAL_ADDRESS address)
+{
+    commandList_->SetComputeRootUnorderedAccessView(rootIndex, address);
+}
+
 inline void CommandContext::SetDescriptorTable(UINT rootIndex, D3D12_GPU_DESCRIPTOR_HANDLE baseDescriptor) {
     commandList_->SetGraphicsRootDescriptorTable(rootIndex, baseDescriptor);
 }
@@ -261,6 +281,12 @@ inline void CommandContext::SetVertexBuffer(UINT slot, UINT numViews, const D3D1
 
 inline void CommandContext::SetIndexBuffer(const D3D12_INDEX_BUFFER_VIEW& ibv) {
     commandList_->IASetIndexBuffer(&ibv);
+}
+
+inline void CommandContext::Dispatch(uint32_t x, uint32_t y, uint32_t z)
+{
+    FlushResourceBarriers();
+    commandList_->Dispatch(x,y,z);
 }
 
 inline void CommandContext::Draw(UINT vertexCount, UINT vertexStartOffset) {

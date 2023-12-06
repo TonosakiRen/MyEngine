@@ -1,6 +1,8 @@
 #include "GameScene.h"
 #include "externals/imgui/imgui.h"
 #include <cassert>
+#include "CommandContext.h"
+#include "Renderer.h"
 
 void (GameScene::* GameScene::SceneUpdateTable[])() = {
 	&GameScene::TitleUpdate,
@@ -41,9 +43,10 @@ void GameScene::Initialize() {
 	floor_->Initialize("floor", &viewProjection_, &directionalLight_);
 	sphere_ = std::make_unique<GameObject>();
 	sphere_->Initialize("sphere", &viewProjection_, &directionalLight_);
-
+	sphere_->SetPosition({ 0.0f,8.0f,0.0f });
+	sphere_->UpdateMatrix();
 	player_ = std::make_unique<Player>();
-	player_->Initialize("player", &viewProjection_, &directionalLight_);
+	player_->Initialize("box1x1", &viewProjection_, &directionalLight_);
 
 	dustParticle_ = std::make_unique<DustParticle>();
 	dustParticle_->SetIsEmit(true);
@@ -52,9 +55,13 @@ void GameScene::Initialize() {
 	whiteParticle_ = std::make_unique<WhiteParticle>();
 	whiteParticle_->SetIsEmit(true);
 	whiteParticle_->Initialize(Vector3{ -1.0f,-1.0f,-1.0f }, Vector3{ 1.0f,1.0f,1.0f });
+
+	compute_ = std::make_unique<Compute>();
+	compute_->Initialize();
 }
 
-void GameScene::Update(){
+void GameScene::Update(CommandContext& commandContext){
+	Collider::SwitchIsDrawCollider();
 	//camera light
 	{
 		// camera
@@ -66,59 +73,32 @@ void GameScene::Update(){
 		directionalLight_.direction_ = Normalize(directionalLight_.direction_);
 		directionalLight_.Update();
 	}
-	Collider::SwitchIsDrawCollider();
-	dustParticle_->Update();
-	ImGui::DragFloat4("a",&color.x,0.01f,0.0f,1.0f);
-	//Scene初期化
-	if (sceneRequest_) {
-	whiteParticle_->Update();
-		scene_ = sceneRequest_.value();
-		(this->*SceneInitializeTable[static_cast<size_t>(scene_)])();
-		sceneRequest_ = std::nullopt;
+	//Scene
+	{
+		//Scene初期化
+		if (sceneRequest_) {
+			whiteParticle_->Update();
+			scene_ = sceneRequest_.value();
+			(this->*SceneInitializeTable[static_cast<size_t>(scene_)])();
+			sceneRequest_ = std::nullopt;
+		}
+		//SceneUpdate
+		(this->*SceneUpdateTable[static_cast<size_t>(scene_)])();
 	}
-	//SceneUpdate
-	(this->*SceneUpdateTable[static_cast<size_t>(scene_)])();
+
+	ImGui::DragFloat4("a",&color.x,0.01f,0.0f,1.0f);
 	
 	auto io = ImGui::GetIO();
 	ImGui::Text("%f", io.Framerate);
 
-	//Vector3 axis = Normalize(Vector3{ 1.0f,1.0f,1.0f });
-	//float angle = 0.44f;
-	//Matrix4x4 rotateMatrix = MakeRotateAxisAngle(axis, angle);
-	//ImGui::Begin("MT3_1_1");
-	//ImGui::Text("%f  %f  %f  %f", rotateMatrix.m[0][0], rotateMatrix.m[0][1], rotateMatrix.m[0][2], rotateMatrix.m[0][3]);
-	//ImGui::Text("%f  %f  %f  %f", rotateMatrix.m[1][0], rotateMatrix.m[1][1], rotateMatrix.m[1][2], rotateMatrix.m[1][3]);
-	//ImGui::Text("%f  %f  %f  %f", rotateMatrix.m[2][0], rotateMatrix.m[2][1], rotateMatrix.m[2][2], rotateMatrix.m[2][3]);
-	//ImGui::Text("%f  %f  %f  %f", rotateMatrix.m[3][0], rotateMatrix.m[3][1], rotateMatrix.m[3][2], rotateMatrix.m[3][3]);
-	//ImGui::End();
+	compute_->Dispatch(commandContext);
+	uint32_t* date = static_cast<uint32_t*>(compute_->GetData());
 
-	Vector3 from0 = Normalize(Vector3{ 1.0f,0.7f,0.5f });
-	Vector3 to0 = -from0;
-	Vector3 from1 = Normalize(Vector3{ -0.6f,0.9f,0.2f });
-	Vector3 to1 = Normalize(Vector3{ 0.4f,0.7f,-0.5f });
+	int a = date[1];
+	ImGui::Text("%d", int(a));
 
-	Matrix4x4 rotateMatrix0 = DirectionToDirection(Normalize(Vector3{ 1.0f,0.0f,0.0f }),Normalize(Vector3{-1.0f,0.0f,0.0f}));
-	Matrix4x4 rotateMatrix1 = DirectionToDirection(from0, to0);
-	Matrix4x4 rotateMatrix2 = DirectionToDirection(from1, to1);
-
-	ImGui::Begin("MT3_1_1");
-	ImGui::Text("%f  %f  %f  %f", rotateMatrix0.m[0][0], rotateMatrix0.m[0][1], rotateMatrix0.m[0][2], rotateMatrix0.m[0][3]);
-	ImGui::Text("%f  %f  %f  %f", rotateMatrix0.m[1][0], rotateMatrix0.m[1][1], rotateMatrix0.m[1][2], rotateMatrix0.m[1][3]);
-	ImGui::Text("%f  %f  %f  %f", rotateMatrix0.m[2][0], rotateMatrix0.m[2][1], rotateMatrix0.m[2][2], rotateMatrix0.m[2][3]);
-	ImGui::Text("%f  %f  %f  %f", rotateMatrix0.m[3][0], rotateMatrix0.m[3][1], rotateMatrix0.m[3][2], rotateMatrix0.m[3][3]);
-
-	ImGui::Text("");
-	ImGui::Text("%f  %f  %f  %f", rotateMatrix1.m[0][0], rotateMatrix1.m[0][1], rotateMatrix1.m[0][2], rotateMatrix1.m[0][3]);
-	ImGui::Text("%f  %f  %f  %f", rotateMatrix1.m[1][0], rotateMatrix1.m[1][1], rotateMatrix1.m[1][2], rotateMatrix1.m[1][3]);
-	ImGui::Text("%f  %f  %f  %f", rotateMatrix1.m[2][0], rotateMatrix1.m[2][1], rotateMatrix1.m[2][2], rotateMatrix1.m[2][3]);
-	ImGui::Text("%f  %f  %f  %f", rotateMatrix1.m[3][0], rotateMatrix1.m[3][1], rotateMatrix1.m[3][2], rotateMatrix1.m[3][3]);
-
-	ImGui::Text("");
-	ImGui::Text("%f  %f  %f  %f", rotateMatrix2.m[0][0], rotateMatrix2.m[0][1], rotateMatrix2.m[0][2], rotateMatrix2.m[0][3]);
-	ImGui::Text("%f  %f  %f  %f", rotateMatrix2.m[1][0], rotateMatrix2.m[1][1], rotateMatrix2.m[1][2], rotateMatrix2.m[1][3]);
-	ImGui::Text("%f  %f  %f  %f", rotateMatrix2.m[2][0], rotateMatrix2.m[2][1], rotateMatrix2.m[2][2], rotateMatrix2.m[2][3]);
-	ImGui::Text("%f  %f  %f  %f", rotateMatrix2.m[3][0], rotateMatrix2.m[3][1], rotateMatrix2.m[3][2], rotateMatrix2.m[3][3]);
-	ImGui::End();
+	a;
+	
 }
 
 void GameScene::TitleInitialize() {
@@ -154,6 +134,7 @@ void GameScene::ModelDraw()
 		skydome_->Draw();
 		floor_->Draw();
 		player_->Draw();
+		sphere_->Draw();
 		break;
 	default:
 		break;
@@ -223,7 +204,7 @@ void GameScene::Draw(CommandContext& commandContext) {
 	PreSpriteDraw();
 	Sprite::PostDraw();
 
-	DirectXCommon::GetInstance()->ClearMainDepthBuffer();
+	Renderer::GetInstance()->ClearMainDepthBuffer();
 
 	//3Dオブジェクト描画
 	Model::PreDraw(commandContext);

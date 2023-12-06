@@ -110,7 +110,7 @@ void Bloom::Render(CommandContext& commandContext, uint32_t level)
     commandContext.ClearColor(luminanceTexture_);
     commandContext.SetViewportAndScissorRect(0, 0, luminanceTexture_.GetWidth(), luminanceTexture_.GetHeight());
 
-    commandContext.SetRootSignature(rootSignature_);
+    commandContext.SetGraphicsRootSignature(rootSignature_);
 
     commandContext.SetVertexBuffer(0, vbView_);
     commandContext.SetIndexBuffer(ibView_);
@@ -131,7 +131,7 @@ void Bloom::Render(CommandContext& commandContext, uint32_t level)
     commandContext.SetRenderTarget(originalTexture_->GetRTV());
     commandContext.SetViewportAndScissorRect(0, 0, originalTexture_->GetWidth(), originalTexture_->GetHeight());
 
-    commandContext.SetRootSignature(rootSignature_);
+    commandContext.SetGraphicsRootSignature(rootSignature_);
     commandContext.SetPipelineState(additivePipelineState_);
     commandContext.SetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     commandContext.SetConstants(0, float(intensity_));

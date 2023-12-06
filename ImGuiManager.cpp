@@ -2,6 +2,8 @@
 #include "externals/imgui/imgui_impl_dx12.h"
 #include "externals/imgui/imgui_impl_win32.h"
 #include "DescriptorHandle.h"
+#include "SwapChain.h"
+#include "CommandContext.h"
 #include "DirectXCommon.h"
 ImGuiManager* ImGuiManager::GetInstance() {
 	static ImGuiManager instance;
@@ -45,14 +47,11 @@ void ImGuiManager::Begin() {
 	ImGui::NewFrame();
 }
 
-void ImGuiManager::End() {
+void ImGuiManager::Draw(CommandContext& commandContext) {
 
 	// 描画前準備
 	ImGui::Render();
-}
-
-void ImGuiManager::Draw() {
 
 	// 描画コマンドを発行
-	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), *DirectXCommon::GetInstance()->GetCommandContext());
+	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandContext);
 }

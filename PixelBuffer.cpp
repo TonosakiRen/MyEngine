@@ -4,6 +4,7 @@
 
 
 #include "Helper.h"
+#include <assert.h>
 
 #include "DirectXCommon.h"
 

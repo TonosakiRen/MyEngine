@@ -6,29 +6,30 @@
 #pragma comment(lib, "d3dcompiler.lib")
 #include "TextureManager.h"
 #include "ShaderManager.h"
+#include "Renderer.h"
 
 using namespace DirectX;
 using namespace Microsoft::WRL;
 
-ID3D12GraphicsCommandList* Model::sCommandList = nullptr;
-std::unique_ptr<RootSignature> Model::sRootSignature;
-std::unique_ptr<PipelineState> Model::sPipelineState;
+ID3D12GraphicsCommandList* Model::commandList_ = nullptr;
+std::unique_ptr<RootSignature> Model::rootSignature_;
+std::unique_ptr<PipelineState> Model::pipelineState_;
 void Model::StaticInitialize() {
-    InitializeGraphicsPipeline();
+    CreatePipeline();
 }
 
 void Model::PreDraw(ID3D12GraphicsCommandList* commandList) {
-    assert(Model::sCommandList == nullptr);
+    assert(Model::commandList_ == nullptr);
 
-    sCommandList = commandList;
+    commandList_ = commandList;
 
-    commandList->SetPipelineState(*sPipelineState);
-    commandList->SetGraphicsRootSignature(*sRootSignature);
+    commandList->SetPipelineState(*pipelineState_);
+    commandList->SetGraphicsRootSignature(*rootSignature_);
     commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 
 void Model::PostDraw() {
-    sCommandList = nullptr;
+    commandList_ = nullptr;
 }
 
 Model* Model::Create() {
@@ -50,7 +51,7 @@ Model* Model::Create(std::string name) {
     return object3d;
 }
 
-void Model::InitializeGraphicsPipeline() {
+void Model::CreatePipeline() {
     HRESULT result = S_FALSE;
     ComPtr<IDxcBlob> vsBlob;    
     ComPtr<IDxcBlob> psBlob;    
@@ -64,8 +65,8 @@ void Model::InitializeGraphicsPipeline() {
     psBlob = shaderManager->Compile(L"BasicPS.hlsl", ShaderManager::kPixel);
     assert(psBlob != nullptr);
 
-    sRootSignature = std::make_unique<RootSignature>();
-    sPipelineState = std::make_unique<PipelineState>();
+    rootSignature_ = std::make_unique<RootSignature>();
+    pipelineState_ = std::make_unique<PipelineState>();
 
     {
 
@@ -93,7 +94,7 @@ void Model::InitializeGraphicsPipeline() {
         rootSignatureDesc.NumStaticSamplers = 1;
         rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
-        sRootSignature->Create(rootSignatureDesc);
+        rootSignature_->Create(rootSignatureDesc);
 
     }
 
@@ -140,7 +141,7 @@ void Model::InitializeGraphicsPipeline() {
         gpipeline.BlendState.RenderTarget[0] = blenddesc;
 
         // 深度バッファのフォーマット
-        gpipeline.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+        gpipeline.DSVFormat = Renderer::GetInstance()->GetDSVFormat();
 
         // 頂点レイアウトの設定
         gpipeline.InputLayout.pInputElementDescs = inputLayout;
@@ -149,14 +150,15 @@ void Model::InitializeGraphicsPipeline() {
         // 図形の形状設定（三角形）
         gpipeline.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 
-        gpipeline.NumRenderTargets = 1;                            // 描画対象は1つ
-        gpipeline.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB; // 0～255指定のRGBA
+        gpipeline.NumRenderTargets = Renderer::kRenderTargetNum;
+        gpipeline.RTVFormats[int(Renderer::kMain)] = Renderer::GetInstance()->GetRTVFormat(Renderer::kMain);
+        gpipeline.RTVFormats[int(Renderer::kNormal)] = Renderer::GetInstance()->GetRTVFormat(Renderer::kNormal);// 0～255指定のRGBA
         gpipeline.SampleDesc.Count = 1; // 1ピクセルにつき1回サンプリング
 
-        gpipeline.pRootSignature = *sRootSignature;
+        gpipeline.pRootSignature = *rootSignature_;
 
         // グラフィックスパイプラインの生成
-        sPipelineState->Create(gpipeline);
+        pipelineState_->Create(gpipeline);
     }
 }
 
@@ -344,51 +346,51 @@ void Model::Initialize(std::string name) {
 void Model::Draw(const WorldTransform& worldTransform, const ViewProjection& viewProjection,const DirectionalLight& directionalLight, const Material& material,uint32_t textureHadle) {
 
     // 頂点バッファの設定
-    sCommandList->IASetVertexBuffers(0, 1, &vbView_);
+    commandList_->IASetVertexBuffers(0, 1, &vbView_);
 
     // インデックスバッファの設定
-    sCommandList->IASetIndexBuffer(&ibView_);
+    commandList_->IASetIndexBuffer(&ibView_);
 
     // CBVをセット（ワールド行列）
-    sCommandList->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kWorldTransform),worldTransform.GetGPUVirtualAddress());
+    commandList_->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kWorldTransform),worldTransform.GetGPUVirtualAddress());
 
     // CBVをセット（ビュープロジェクション行列）
-    sCommandList->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kViewProjection),viewProjection.GetGPUVirtualAddress());
+    commandList_->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kViewProjection),viewProjection.GetGPUVirtualAddress());
 
     // CBVをセット（ライト）
-    sCommandList->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kDirectionalLight), directionalLight.GetGPUVirtualAddress());
+    commandList_->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kDirectionalLight), directionalLight.GetGPUVirtualAddress());
 
     // CBVをセット（マテリアル）
-    sCommandList->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kMaterial), material.GetGPUVirtualAddress());
+    commandList_->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kMaterial), material.GetGPUVirtualAddress());
 
     // SRVをセット
-    TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(sCommandList, static_cast<UINT>(RootParameter::kTexture), textureHadle);
+    TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(commandList_, static_cast<UINT>(RootParameter::kTexture), textureHadle);
 
     // 描画コマンド
-    sCommandList->DrawIndexedInstanced(static_cast<UINT>(indices_.size()), 1, 0, 0, 0);
+    commandList_->DrawIndexedInstanced(static_cast<UINT>(indices_.size()), 1, 0, 0, 0);
 }
 
 void Model::Draw(const WorldTransform& worldTransform, const ViewProjection& viewProjection, const DirectionalLight& directionalLight, const Material& material) {
-    assert(sCommandList);
+    assert(commandList_);
 
     // 頂点バッファの設定
-    sCommandList->IASetVertexBuffers(0, 1, &vbView_);
+    commandList_->IASetVertexBuffers(0, 1, &vbView_);
 
     // CBVをセット（ワールド行列）
-    sCommandList->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kWorldTransform), worldTransform.GetGPUVirtualAddress());
+    commandList_->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kWorldTransform), worldTransform.GetGPUVirtualAddress());
 
     // CBVをセット（ビュープロジェクション行列）
-    sCommandList->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
+    commandList_->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
 
     // CBVをセット（ライト）
-    sCommandList->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kDirectionalLight), directionalLight.GetGPUVirtualAddress());
+    commandList_->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kDirectionalLight), directionalLight.GetGPUVirtualAddress());
 
     // CBVをセット（マテリアル）
-    sCommandList->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kMaterial), material.GetGPUVirtualAddress());
+    commandList_->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kMaterial), material.GetGPUVirtualAddress());
 
     // SRVをセット
-    TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(sCommandList, static_cast<UINT>(RootParameter::kTexture), uvHandle_);
+    TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(commandList_, static_cast<UINT>(RootParameter::kTexture), uvHandle_);
 
     // 描画コマンド
-    sCommandList->DrawInstanced(static_cast<UINT>(vertices_.size()), 1, 0, 0);
+    commandList_->DrawInstanced(static_cast<UINT>(vertices_.size()), 1, 0, 0);
 }

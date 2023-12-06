@@ -804,7 +804,7 @@ inline Matrix4x4 DirectionToDirection(const Vector3& from, const Vector3& to) {
 	float cos = Dot(normalizeFrom, normalizeTo);
 	float sin = Length(cross);
 
-	Vector3 n;
+	Vector3 n = {0.0f,0.0f,0.0f};
 
 	if (Length(cross) > 0) {
 		n = Normalize(cross);
@@ -1267,6 +1267,7 @@ inline Quaternion RotateMatrixToQuaternion(Matrix4x4 m) {
 			w
 		);
 	}
+	assert(false);
 }
 
 inline float Dot(const Quaternion& lhs, const Quaternion& rhs) noexcept {

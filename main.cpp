@@ -1,43 +1,35 @@
 #include <Windows.h>
 #include "WinApp.h"
-#include "DirectXCommon.h"
 #include "TextureManager.h"
 #include "GameScene.h"
-#include "ImGuiManager.h"
 #include "Particle.h"
 #include "ParticleBox.h"
 #include "PostEffect.h"
 #include "GaussianBlur.h"
 #include "ShaderManager.h"
+#include "Renderer.h"
+#include "Compute.h"
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	WinApp* win = nullptr;
-	DirectXCommon* dxCommon = nullptr;
-	ShaderManager* shderManager = nullptr;
+	Renderer* renderer = nullptr;
 	//汎用機能
 	GameScene* gameScene = nullptr;
 	Input* input = nullptr;
-	ImGuiManager* imguiManager = nullptr;
 
 	// ゲームウィンドウの作成
 	win = WinApp::GetInstance();
 	win->CreateGameWindow();
 
-	// DirectX初期化処理
-	dxCommon = DirectXCommon::GetInstance();
-	dxCommon->Initialize();
+	renderer = Renderer::GetInstance();
+	renderer->Initialize();
 
-	// DirectXCompiler初期化
-	shderManager = ShaderManager::GetInstance();
-	shderManager->Initialize();
 
 	// 汎用機能
 #pragma region 汎用機能初期化
 	input = Input::GetInstance();
 	input->Initialize(win->GetHInstance(), win->GetHwnd());
 
-	imguiManager = ImGuiManager::GetInstance();
-	imguiManager->Initialize(win);
 	// テクスチャマネージャの初期化
 	TextureManager::GetInstance()->Initialize();
 	TextureManager::Load("white1x1.png");
@@ -51,10 +43,11 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	PostEffect::StaticInitialize();
 	GaussianBlur::StaticInitialize();
-	dxCommon->InitializePostEffect();
 
 	//　スプライト静的初期化
 	Sprite::StaticInitialize();
+
+	Compute::StaticInitialize();
 
 
 #pragma endregion 変数
@@ -70,37 +63,33 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 			break;
 		}
 
-		// ImGui受付開始
-		imguiManager->Begin();
+		renderer->BeginFrame();
 
 		// 入力関連の毎フレーム処理
 		input->Update();
 
 		// ゲームシーンの毎フレーム処理
-		gameScene->Update();
-		imguiManager->End();
-
+		gameScene->Update(renderer->GetCommandContext());
 
 		// 描画開始
-		dxCommon->MainPreDraw();
+		renderer->BeginMainRender();
+
 		// ゲームシーンの描画
-		gameScene->Draw(*dxCommon->GetCommandContext());
+		gameScene->Draw(renderer->GetCommandContext());
 		
-		dxCommon->MainPostDraw();
+		renderer->EndMainRender();
 
-		dxCommon->SwapChainPreDraw();
+		renderer->BeginUIRender();
 
-		gameScene->UIDraw(*dxCommon->GetCommandContext());
+		gameScene->UIDraw(renderer->GetCommandContext());
 
-		// ImGui描画
-		imguiManager->Draw();
+		renderer->EndUIRender();
 
-		dxCommon->SwapChainPostDraw();
 	}
 
 
 	// ImGui解放
-	imguiManager->Finalize();
+	renderer->Shutdown();
 	// ゲームウィンドウの破棄
 	win->TerminateGameWindow();
 

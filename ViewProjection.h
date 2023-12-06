@@ -31,13 +31,13 @@ public:
 	}
 public:
 	Vector3 translation_ = { 0.0f, 0.0f, -10.0f };
-	Vector3 target_ = { 0.0f,0.0f,0.0f };
+	Vector3 rotation_ = { 0.0f,0.0f,0.0f };
 	Vector3 shakeValue_ = { 0.0f,0.0f,0.0f };
 private:
 	float fovAngleY_ = 45.0f * std::numbers::pi_v <float> / 180.0f;
 	float aspectRatio_ = (float)16 / (float)9;
-	float nearZ_ = 0.1f;
-	float farZ_ = 1000.0f;
+	float nearZ_ = 20.0f;
+	float farZ_ = 100.0f;
 
 	Matrix4x4 matView;
 	Matrix4x4 matProjection;

@@ -50,10 +50,10 @@ public:
 	Vector2 texSize_ = { 100.0f, 100.0f };
 
 private:
-	static ID3D12GraphicsCommandList* sCommandList;
-	static std::unique_ptr<RootSignature> sRootSignature;
-	static std::unique_ptr<PipelineState> sPipelineState;
-	static Matrix4x4 sMatProjection;
+	static ID3D12GraphicsCommandList* commandList_;
+	static std::unique_ptr<RootSignature> rootSignature_;
+	static std::unique_ptr<PipelineState> pipelineState_;
+	static Matrix4x4 matProjection_;
 
 private: 
 	UploadBuffer vertexBuffer_;

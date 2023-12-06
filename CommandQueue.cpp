@@ -3,7 +3,7 @@
 #include <Windows.h>
 #pragma comment(lib, "winmm.lib")
 #include "Helper.h"
-
+#include <assert.h>
 #include "DirectXCommon.h"
 
 CommandQueue::~CommandQueue() {
@@ -29,7 +29,7 @@ void CommandQueue::Create() {
     reference_ = std::chrono::steady_clock::now();
 }
 
-void CommandQueue::Execute(ID3D12GraphicsCommandList* commandList) {
+void CommandQueue::Excute(ID3D12GraphicsCommandList* commandList) {
     ID3D12CommandList* ppCmdList[] = {commandList};
     commandQueue_->ExecuteCommandLists(_countof(ppCmdList), ppCmdList);
 }

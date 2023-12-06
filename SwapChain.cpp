@@ -1,6 +1,7 @@
 #include "SwapChain.h"
 
 #include "Helper.h"
+#include <assert.h>
 
 #include "DirectXCommon.h"
 

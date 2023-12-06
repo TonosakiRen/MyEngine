@@ -6,42 +6,51 @@
 #include "ColorBuffer.h"
 #include "DepthBuffer.h"
 #include "Bloom.h"
+#include "PostEffect.h"
 
 class Renderer
 {
 public:
 
+    enum RenderTargetType {
+        kMain,
+        kNormal,
+
+        kRenderTargetNum
+    };
+
 	static Renderer* GetInstance();
 
     void Initialize();
-    void Reset();
-    void BeginRender();
-    void EndRender();
+    void BeginFrame();
+    void BeginMainRender();
+    void EndMainRender();
+    void BeginUIRender();
+    void EndUIRender();
     void Shutdown();
 
     SwapChain& GetSwapChain() { return swapChain_; }
-    CommandContext& GetCommandContext() { return commandContexts_[swapChain_.GetBufferIndex()]; }
-    Bloom& GetBloom() { return bloom; }
+    CommandContext& GetCommandContext() { return commandContext_; }
+    Bloom& GetBloom() { return bloom_; }
 
-    DXGI_FORMAT GetSwapChainRTVFormat() const { return swapChain_.GetColorBuffer().GetFormat(); }
-    DXGI_FORMAT GetMainBufferRTVFormat() const { return mainColorBuffer_.GetFormat(); }
-    DXGI_FORMAT GetMainDepthDSVFormat() const { return mainDepthBuffer_.GetFormat(); }
+    DXGI_FORMAT GetRTVFormat(RenderTargetType rtvType) { return colorBuffers_[rtvType].GetFormat(); }
+    DXGI_FORMAT GetDSVFormat() { return mainDepthBuffer_.GetFormat(); }
+
+    void ClearMainDepthBuffer() { commandContext_.ClearDepth(mainDepthBuffer_); }
 
 private:
     Renderer() = default;
     Renderer(const Renderer&) = delete;
     Renderer& operator=(const Renderer&) = delete;
 
-    void InitializePostEffect();
 
     DirectXCommon* graphics_ = nullptr;
     SwapChain swapChain_;
-    CommandContext commandContexts_[SwapChain::kNumBuffers];
+    CommandContext commandContext_;
 
-    ColorBuffer mainColorBuffer_;
+    ColorBuffer colorBuffers_[kRenderTargetNum];
     DepthBuffer mainDepthBuffer_;
-    RootSignature postEffectRootSignature_;
-    PipelineState postEffectPipelineState_;
-    Bloom bloom;
+    Bloom bloom_;
+    PostEffect postEffect_;
 };
 

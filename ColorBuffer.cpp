@@ -13,7 +13,7 @@ void ColorBuffer::CreateFromSwapChain(ID3D12Resource* resource) {
     //RTVの設定SRGBにするため
     D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
     rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;//出力結果をSRGBに変換して書き込む
-    rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;//2dtextureとして書き込む
+    rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;//2DTextureとして書き込む
 
     graphics->GetDevice()->CreateRenderTargetView(resource_.Get(), &rtvDesc, rtvHandle_);
 }

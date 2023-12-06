@@ -49,11 +49,11 @@ public:
 	void CreateMesh();
 
 private: 
-	static void InitializeGraphicsPipeline();
+	static void CreatePipeline();
 private:
-	static ID3D12GraphicsCommandList* sCommandList;
-	static std::unique_ptr<RootSignature> sRootSignature;
-	static std::unique_ptr<PipelineState> sPipelineState;
+	static ID3D12GraphicsCommandList* commandList_;
+	static std::unique_ptr<RootSignature> rootSignature_;
+	static std::unique_ptr<PipelineState> pipelineState_;
 
 	UploadBuffer vertexBuffer_;
 	UploadBuffer indexBuffer_;

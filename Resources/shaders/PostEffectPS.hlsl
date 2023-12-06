@@ -20,5 +20,6 @@ SamplerState smp : register(s0);
 float32_t4 main(VSOutput input) : SV_TARGET{
 	PixelShaderOutput output;
 	output.color = tex.Sample(smp, input.uv);
+	output.color = output.color * 2.0f - 1.0f;
 	return output.color;
 }
