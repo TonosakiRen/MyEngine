@@ -63,4 +63,5 @@ void DeferredRenderer::CreatePipeline()
 
 	pipelineState_.Create(desc);
 
+	
 }

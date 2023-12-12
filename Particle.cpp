@@ -26,7 +26,6 @@ void Particle::PreDraw(ID3D12GraphicsCommandList* commandList, const ViewProject
     assert(Particle::commandList_ == nullptr);
     commandList_ = commandList;
 
-
     billBordMatrix = viewProjection.GetMatView();
     billBordMatrix.m[3][0] = 0.0f;
     billBordMatrix.m[3][1] = 0.0f;
