@@ -14,6 +14,7 @@
 #include "PipelineState.h"
 #include "RootSignature.h"
 #include "UploadBuffer.h"
+#include "Mesh.h"
 
 class DirectXCommon;
 
@@ -28,25 +29,13 @@ public:
 		kMaterial,
 	};
 
-	struct VertexData {
-		Vector3 pos;    
-		Vector3 normal;
-		Vector2 uv;     
-	};
-
 	static void StaticInitialize();
-	static void PreDraw(ID3D12GraphicsCommandList* commandList);
+	static void PreDraw(ID3D12GraphicsCommandList* commandList, const ViewProjection& viewProjection, const DirectionalLight& directionalLight);
 	static void PostDraw();
-	static Model* Create();
-	static Model* Create(std::string name);
 
-	void Initialize();
-	void Initialize(std::string name);
+	static void Draw(uint32_t modelHandle,const WorldTransform& worldTransform, const Material& material);
 
-	void Draw(const WorldTransform& worldTransform, const ViewProjection& viewProjection, const DirectionalLight& directionalLight, const Material& material, uint32_t textureHadle);
-	void Draw(const WorldTransform& worldTransform, const ViewProjection& viewProjection, const DirectionalLight& directionalLight, const Material& material);
-
-	void CreateMesh();
+	static void Draw(uint32_t modelHandle, const WorldTransform& worldTransform, const Material& material, uint32_t textureHadle);
 
 private: 
 	static void CreatePipeline();
@@ -54,16 +43,5 @@ private:
 	static ID3D12GraphicsCommandList* commandList_;
 	static std::unique_ptr<RootSignature> rootSignature_;
 	static std::unique_ptr<PipelineState> pipelineState_;
-
-	UploadBuffer vertexBuffer_;
-	UploadBuffer indexBuffer_;
-	
-	D3D12_VERTEX_BUFFER_VIEW vbView_{};
-	D3D12_INDEX_BUFFER_VIEW ibView_{};
-	std::vector<VertexData> vertices_;
-	std::vector<uint16_t> indices_;
-	bool isModelLoad_ = false;
-	uint32_t uvHandle_;
-	std::string name_;
 };
 

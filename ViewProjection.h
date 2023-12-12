@@ -33,6 +33,8 @@ public:
 	Vector3 translation_ = { 0.0f, 0.0f, -10.0f };
 	Vector3 rotation_ = { 0.0f,0.0f,0.0f };
 	Vector3 shakeValue_ = { 0.0f,0.0f,0.0f };
+
+	float orthographicValue_ = 1.0f;
 private:
 	float fovAngleY_ = 45.0f * std::numbers::pi_v <float> / 180.0f;
 	float aspectRatio_ = (float)16 / (float)9;

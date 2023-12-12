@@ -1,10 +1,10 @@
 #include "Floor.h"
 #include "ImGuiManager.h"
-void Floor::Initialize(const std::string name, ViewProjection* viewProjection, DirectionalLight* directionalLight)
+void Floor::Initialize(const std::string name)
 {
-	GameObject::Initialize(name, viewProjection, directionalLight);
+	GameObject::Initialize(name);
 	material_.enableLighting_ = false;
-	collider_.Initialize(&worldTransform_,name, viewProjection, directionalLight,{20.0f, 1.0f, 1.0f});
+	collider_.Initialize(&worldTransform_,name,{20.0f, 1.0f, 1.0f});
 }
 
 void Floor::Update()

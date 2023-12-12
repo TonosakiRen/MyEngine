@@ -79,9 +79,7 @@ void Renderer::EndMainRender() {
     //bloom_.Render(commandContext_);
 
     commandContext_.TransitionResource(colorBuffers_[kNormal], D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
-
     commandContext_.TransitionResource(colorBuffers_[kMain], D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
-    commandContext_.TransitionResource(swapChain_.GetColorBuffer(), D3D12_RESOURCE_STATE_RENDER_TARGET);
 }
 
 void Renderer::BeginUIRender()
@@ -89,11 +87,12 @@ void Renderer::BeginUIRender()
 
     commandContext_.SetViewportAndScissorRect(0, 0, colorBuffers_[kMain].GetWidth(), colorBuffers_[kMain].GetHeight());
 
+    commandContext_.TransitionResource(swapChain_.GetColorBuffer(), D3D12_RESOURCE_STATE_RENDER_TARGET);
     commandContext_.SetRenderTarget(swapChain_.GetRTV());
     commandContext_.ClearColor(swapChain_.GetColorBuffer());
 
     PostEffect::PreDraw(commandContext_);
-    postEffect_.Draw(colorBuffers_[kNormal].GetSRV());
+    postEffect_.Draw(colorBuffers_[kMain].GetSRV());
     PostEffect::PostDraw();
 }
 

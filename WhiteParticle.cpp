@@ -59,7 +59,7 @@ void WhiteParticle::Update() {
 
 }
 
-void WhiteParticle::Draw(const ViewProjection& viewProjection, Vector4 color, uint32_t textureHandle)
+void WhiteParticle::Draw(Vector4 color, uint32_t textureHandle)
 {
 
 	emitterWorldTransform_.Update();
@@ -75,6 +75,6 @@ void WhiteParticle::Draw(const ViewProjection& viewProjection, Vector4 color, ui
 	}
 
 	if (!instancingBufferDatas.empty()) {
-		particle_->Draw(instancingBufferDatas, viewProjection, color, textureHandle);
+		particle_->Draw(instancingBufferDatas, color, textureHandle);
 	}
 }

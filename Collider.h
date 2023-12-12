@@ -1,5 +1,6 @@
 #pragma once
 #include "GameObject.h"
+#include <string>
 class Collider
 {
 public:
@@ -7,9 +8,9 @@ public:
 	static bool isDrawCollider;
 	static void SwitchIsDrawCollider();
 
-	void Initialize(WorldTransform* objectWorldTransform, const std::string name, ViewProjection* viewProjection, DirectionalLight* directionalLight, Vector3 initialScale = { 1.0f,1.0f,1.0f }, Vector3 initialPos = { 0.0f,0.0f,0.0f });
+	void Initialize(WorldTransform* objectWorldTransform, const std::string name, Vector3 initialScale = { 1.0f,1.0f,1.0f }, Vector3 initialPos = { 0.0f,0.0f,0.0f });
 	//ただの四角形用
-	void Initialize(const std::string name, ViewProjection* viewProjection, DirectionalLight* directionalLight);
+	void Initialize(const std::string name);
 	bool Collision(Collider& colliderB);
 	bool Collision(Collider& colliderB, Vector3& minAxis, float& minOverlap);
 	bool Collision(Collider& colliderB, Vector3& pushBuckVector);

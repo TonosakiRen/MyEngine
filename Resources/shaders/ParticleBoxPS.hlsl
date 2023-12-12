@@ -46,7 +46,7 @@ PixelShaderOutput main(VSOutput input) {
 	float32_t4 texColor = tex.Sample(smp, tranformedUV.xy);
 	output.color.xyz += gMaterial.materialcolor.xyz * texColor.xyz;
 
-	if (gMaterial.enableLighting != 0) {
+	/*if (gMaterial.enableLighting != 0) {*/
 		//// 陰
 		//float32_t NdotL = dot(normal, -normalize(gDirectionLight.direction));
 		//float32_t cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
@@ -77,7 +77,7 @@ PixelShaderOutput main(VSOutput input) {
 		////output.color.xyz = lerp(1.0f - fresnel, output.color.xyz, fresnelColor);
 		//output.color.xyz += fresnelColor * fresnel;
 
-	}
+	//}
 
 	output.normal.xyz = (normal.xyz + 1.0f) * 0.5f;
 	output.normal.w = 1.0f;

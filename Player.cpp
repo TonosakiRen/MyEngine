@@ -1,10 +1,10 @@
 #include "Player.h"
 #include "ImGuiManager.h"
-void Player::Initialize(const std::string name, ViewProjection* viewProjection, DirectionalLight* directionalLight)
+void Player::Initialize(const std::string name)
 {
-	GameObject::Initialize(name,viewProjection, directionalLight);
+	GameObject::Initialize(name);
 	input_ = Input::GetInstance();
-	collider_.Initialize(&worldTransform_,name, viewProjection, directionalLight);
+	collider_.Initialize(&worldTransform_,name);
 	worldTransform_.translation_ = { 0.0f,2.0f,0.0f };
 	velocisity_ = { 0.0f,0.0f,0.0f };
 	acceleration_ = { 0.0f,-0.05f,0.0f };
@@ -52,5 +52,5 @@ void Player::Collision(Collider& otherCollider)
 
 void Player::Draw() {
 	collider_.Draw();
-	GameObject::Draw();
+	GameObject::Draw({1.0f,0.0f,0.0f});
 }

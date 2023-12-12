@@ -22,12 +22,24 @@ void Particle::StaticInitialize() {
     CreatePipeline();
 }
 
-void Particle::PreDraw(ID3D12GraphicsCommandList* commandList) {
+void Particle::PreDraw(ID3D12GraphicsCommandList* commandList, const ViewProjection& viewProjection) {
     assert(Particle::commandList_ == nullptr);
     commandList_ = commandList;
 
+
+    billBordMatrix = viewProjection.GetMatView();
+    billBordMatrix.m[3][0] = 0.0f;
+    billBordMatrix.m[3][1] = 0.0f;
+    billBordMatrix.m[3][2] = 0.0f;
+
+    billBordMatrix = Inverse(billBordMatrix);
+
     commandList->SetPipelineState(*pipelineState_);
     commandList->SetGraphicsRootSignature(*rootSignature_);
+
+    // CBVをセット（ビュープロジェクション行列）
+    commandList_->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
+
     commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 
@@ -216,17 +228,9 @@ void Particle::Initialize() {
     CreateMesh();
 }
 
-void Particle::Draw(const std::vector<InstancingBufferData>& bufferData, const ViewProjection& viewProjection, const Vector4& color, const uint32_t textureHadle) {
+void Particle::Draw(const std::vector<InstancingBufferData>& bufferData, const Vector4& color, const uint32_t textureHadle) {
     assert(commandList_);
     assert(!bufferData.empty());
-
-
-    billBordMatrix = viewProjection.GetMatView();
-    billBordMatrix.m[3][0] = 0.0f;
-    billBordMatrix.m[3][1] = 0.0f;
-    billBordMatrix.m[3][2] = 0.0f;
-
-    billBordMatrix = Inverse(billBordMatrix);
 
     std::vector<Particle::InstancingBufferData> instancingBufferDatas;
 
@@ -243,7 +247,6 @@ void Particle::Draw(const std::vector<InstancingBufferData>& bufferData, const V
     commandList_->IASetVertexBuffers(0, 1, &vbView_);
     commandList_->IASetIndexBuffer(&ibView_);
     commandList_->SetGraphicsRootDescriptorTable(0, srvHandle_);
-    commandList_->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
     commandList_->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kMaterial), material_.GetGPUVirtualAddress());
 
     TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(commandList_, static_cast<UINT>(RootParameter::kTexture), textureHadle);

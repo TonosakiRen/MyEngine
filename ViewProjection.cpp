@@ -3,6 +3,7 @@
 #include "Input.h"
 #include "ImGuiManager.h"
 
+
 void ViewProjection::Initialize() {
     constBuffer_.Create((sizeof(ConstBufferData) + 0xff) & ~0xff);
     Update();
@@ -16,6 +17,7 @@ void ViewProjection::Update() {
 
     // 透視投影による射影行列の生成
     matProjection = MakePerspectiveFovMatrix(fovAngleY_, aspectRatio_, nearZ_, farZ_);
+    //matProjection = MakeOrthograohicmatrix(-16.0f * orthographicValue_, 9.0f * orthographicValue_,16.0f * orthographicValue_, -9.0f * orthographicValue_, 1.0f, farZ_);
 
     // 定数バッファに書き込み
     ConstBufferData bufferData;
@@ -47,6 +49,8 @@ void ViewProjection::DebugMove() {
     ImGui::Begin("Camera");
     ImGui::DragFloat3("target", &rotation_.x, 0.01f);
     ImGui::DragFloat3("translation", &translation_.x, 0.01f);
+    ImGui::DragFloat("orthographicValue_", &orthographicValue_, 0.01f);
+    orthographicValue_ = clamp(orthographicValue_, 0.01f, INFINITE);
     ImGui::End();
 #endif // _DEBUG
 
@@ -67,5 +71,7 @@ void ViewProjection::DebugMove() {
         Matrix4x4 rotMat = MakeRotateXYZMatrix(rotation_);
         Vector3 cameraZ = GetZAxis(rotMat) * (static_cast<float>(wheel / 120) * 0.5f);
         translation_ += cameraZ;
+        //orthographicValue_ -= static_cast<float>(wheel / 120) * 0.01f;
+        orthographicValue_ = clamp(orthographicValue_, 0.01f, INFINITE);
     }
 }

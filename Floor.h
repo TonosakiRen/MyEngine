@@ -6,7 +6,7 @@ class Floor :
 {
 public:
 
-    void Initialize(const std::string name, ViewProjection* viewProjection, DirectionalLight* directionalLight);
+    void Initialize(const std::string name);
     void Update();
     void Draw();
 public:

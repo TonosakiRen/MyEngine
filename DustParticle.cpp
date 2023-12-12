@@ -54,7 +54,7 @@ void DustParticle::Update() {
 
 }
 
-void DustParticle::Draw(const ViewProjection& viewProjection,const DirectionalLight& directionalLight, Vector4 color)
+void DustParticle::Draw( Vector4 color)
 {
 
 	emitterWorldTransform_.Update();
@@ -71,6 +71,6 @@ void DustParticle::Draw(const ViewProjection& viewProjection,const DirectionalLi
 	}
 
 	if (!instancingBufferDatas.empty()) {
-		particleBox_->Draw(instancingBufferDatas, viewProjection, directionalLight, color);
+		particleBox_->Draw(instancingBufferDatas, color);
 	}
 }

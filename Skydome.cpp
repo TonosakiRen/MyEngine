@@ -1,8 +1,8 @@
 #include "Skydome.h"
 
-void Skydome::Initialize(const std::string name, ViewProjection* viewProjection, DirectionalLight* directionalLight)
+void Skydome::Initialize(const std::string name)
 {
-	GameObject::Initialize(name, viewProjection, directionalLight);
+	GameObject::Initialize(name);
 	material_.enableLighting_ = false;
 	material_.Update();
 	worldTransform_.scale_ = worldTransform_.scale_ * 50.0f;

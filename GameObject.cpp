@@ -1,32 +1,12 @@
 #include "GameObject.h"
+#include "ModelManager.h"
+#include "Model.h"
 
-GameObject* GameObject::Create(const std::string name, ViewProjection* viewProjection, DirectionalLight* directionalLight) {
-	GameObject* object3d = new GameObject();
-	assert(object3d);
-
-	object3d->Initialize(name, viewProjection, directionalLight);
-
-	return object3d;
-}
-
-
-void GameObject::Initialize(const std::string name, ViewProjection* viewProjection, DirectionalLight* directionalLight)
+void GameObject::Initialize(const std::string name)
 {
-	loadObj_ = true;
-	model_.Initialize(name);
+	modelHandle_ = ModelManager::Load(name);
 	worldTransform_.Initialize();
 	material_.Initialize();
-	SetViewProjection(viewProjection);
-	SetDirectionalLight(directionalLight);
-}
-
-void GameObject::Initialize(ViewProjection* viewProjection, DirectionalLight* directionalLight)
-{
-	model_.Initialize();
-	worldTransform_.Initialize();
-	material_.Initialize();
-	SetViewProjection(viewProjection);
-	SetDirectionalLight(directionalLight);
 }
 
 void GameObject::UpdateMatrix()
@@ -36,32 +16,30 @@ void GameObject::UpdateMatrix()
 
 void GameObject::Draw(uint32_t textureHandle, Vector4 color)
 {
-	if (loadObj_ == true) {
-		material_.color_ = color;
-		material_.Update();
-		model_.Draw(worldTransform_, *viewProjection_, *directionalLight_, material_);
-	}
-	else {
-		material_.color_ = color;
-		material_.Update();
-		model_.Draw(worldTransform_, *viewProjection_, *directionalLight_, material_, textureHandle);
-	}
+	material_.color_ = color;
+	material_.Update();
+	Model::Draw(modelHandle_, worldTransform_, material_, textureHandle);
+}
 
+void GameObject::Draw(Vector4 color)
+{
+	material_.color_ = color;
+	material_.Update();
+	Model::Draw(modelHandle_, worldTransform_,  material_);
 }
 
 void GameObject::Draw(const WorldTransform& worldTransform, Vector4 color)
 {
-	if (loadObj_ == true) {
-		material_.color_ = color;
-		material_.Update();
-		model_.Draw(worldTransform, *viewProjection_, *directionalLight_, material_);
-	}
-	else {
-		material_.color_ = color;
-		material_.Update();
-		model_.Draw(worldTransform, *viewProjection_, *directionalLight_, material_, 0);
-	}
+	material_.color_ = color;
+	material_.Update();
+	Model::Draw(modelHandle_, worldTransform, material_);
+}
 
+void GameObject::Draw(const WorldTransform& worldTransform, uint32_t textureHandle, Vector4 color)
+{
+	material_.color_ = color;
+	material_.Update();
+	Model::Draw(modelHandle_, worldTransform, material_, textureHandle);
 }
 
 void GameObject::UpdateMaterial(Vector4 color)

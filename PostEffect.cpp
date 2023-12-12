@@ -215,8 +215,6 @@ void PostEffect::Draw(DescriptorHandle srvHandle) {
 	// SRVをセット
 	sCommandList->SetGraphicsRootDescriptorTable(static_cast<UINT>(RootParameter::kTexture), srvHandle);
 
-	/*  TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(sCommandList, 1, 0);*/
-
 	  // 描画コマンド
 	sCommandList->DrawIndexedInstanced(static_cast<UINT>(indices_.size()), 1, 0, 0, 0);
 }

@@ -53,6 +53,9 @@
     <Filter Include="Engine\Rederer">
       <UniqueIdentifier>{bc96998d-67d7-46d7-a091-775a2021acfe}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine\Model">
+      <UniqueIdentifier>{e753ea71-5e5a-45da-9668-ac1bf955a527}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="externals\imgui\imgui.cpp">
@@ -148,9 +151,6 @@
     <ClCompile Include="Material.cpp">
       <Filter>Engine\GameComponent</Filter>
     </ClCompile>
-    <ClCompile Include="Model.cpp">
-      <Filter>Engine\GameComponent</Filter>
-    </ClCompile>
     <ClCompile Include="Sprite.cpp">
       <Filter>Engine\GameComponent</Filter>
     </ClCompile>
@@ -204,6 +204,16 @@
     </ClCompile>
     <ClCompile Include="Renderer.cpp">
       <Filter>Engine\Rederer</Filter>
+    </ClCompile>
+    <ClCompile Include="DeferredRenderer.cpp" />
+    <ClCompile Include="ModelManager.cpp">
+      <Filter>Engine\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Model.cpp">
+      <Filter>Engine\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Mesh.cpp">
+      <Filter>Engine\Model</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -306,9 +316,6 @@
     <ClInclude Include="Material.h">
       <Filter>Engine\GameComponent</Filter>
     </ClInclude>
-    <ClInclude Include="Model.h">
-      <Filter>Engine\GameComponent</Filter>
-    </ClInclude>
     <ClInclude Include="Sprite.h">
       <Filter>Engine\GameComponent</Filter>
     </ClInclude>
@@ -365,6 +372,16 @@
     </ClInclude>
     <ClInclude Include="Renderer.h">
       <Filter>Engine\Rederer</Filter>
+    </ClInclude>
+    <ClInclude Include="DeferredRenderer.h" />
+    <ClInclude Include="ModelManager.h">
+      <Filter>Engine\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Model.h">
+      <Filter>Engine\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>Engine\Model</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -425,6 +442,9 @@
       <Filter>shaders</Filter>
     </FxCompile>
     <FxCompile Include="Resources\shaders\CS.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\DeferredRenderingCS.hlsl">
       <Filter>shaders</Filter>
     </FxCompile>
   </ItemGroup>

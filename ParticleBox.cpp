@@ -20,13 +20,17 @@ void ParticleBox::StaticInitialize() {
     CreatePipeline();
 }
 
-void ParticleBox::PreDraw(ID3D12GraphicsCommandList* commandList) {
+void ParticleBox::PreDraw(ID3D12GraphicsCommandList* commandList, const ViewProjection& viewProjection, const DirectionalLight& directionalLight) {
     assert(ParticleBox::commandList_ == nullptr);
 
     commandList_ = commandList;
 
     commandList->SetPipelineState(*pipelineState_);
     commandList->SetGraphicsRootSignature(*rootSignature_);
+    // CBVをセット（ビュープロジェクション行列）
+    commandList_->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
+    // CBVをセット（ライト）
+    commandList_->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kDirectionalLight), directionalLight.GetGPUVirtualAddress());
     commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 
@@ -250,7 +254,7 @@ void ParticleBox::Initialize() {
     CreateMesh();
 }
 
-void ParticleBox::Draw(const std::vector<InstancingBufferData>& bufferData, const ViewProjection& viewProjection, const DirectionalLight& directionalLight, const Vector4& color, const uint32_t textureHadle) {
+void ParticleBox::Draw(const std::vector<InstancingBufferData>& bufferData, const Vector4& color, const uint32_t textureHadle) {
     assert(commandList_);
     assert(!bufferData.empty());
 
@@ -263,10 +267,8 @@ void ParticleBox::Draw(const std::vector<InstancingBufferData>& bufferData, cons
     commandList_->IASetVertexBuffers(0, 1, &vbView_);
     commandList_->IASetIndexBuffer(&ibView_);
     commandList_->SetGraphicsRootDescriptorTable(0, srvHandle_);
-    commandList_->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
     commandList_->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kMaterial), material_.GetGPUVirtualAddress());
-    commandList_->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kDirectionalLight), directionalLight.GetGPUVirtualAddress());
-
+ 
     TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(commandList_, static_cast<UINT>(RootParameter::kTexture), textureHadle);
 
     commandList_->DrawIndexedInstanced(static_cast<UINT>(indices_.size()), static_cast<UINT>(bufferData.size()), 0, 0, 0);

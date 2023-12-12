@@ -18,7 +18,7 @@ void Collider::SwitchIsDrawCollider()
 	ImGui::End();
 }
 
-void Collider::Initialize(WorldTransform* objectWorldTransform, const std::string name, ViewProjection* viewProjection, DirectionalLight* directionalLight, Vector3 initialScale, Vector3 initialPos)
+void Collider::Initialize(WorldTransform* objectWorldTransform, const std::string name, Vector3 initialScale, Vector3 initialPos)
 {
 	worldTransform_.Initialize();
 	worldTransform_.SetParent(objectWorldTransform);
@@ -26,7 +26,7 @@ void Collider::Initialize(WorldTransform* objectWorldTransform, const std::strin
 	worldTransform_.translation_ = initialPos;
 	cube_.SetEnableLighting(false);
 	name_ = name;
-	cube_.Initialize(viewProjection, directionalLight);
+	cube_.Initialize("box1x1");
 }
 
 void Collider::AdjustmentScale()
@@ -43,11 +43,11 @@ void Collider::AdjustmentScale()
 	MatrixUpdate();
 }
 
-void Collider::Initialize(const std::string name, ViewProjection* viewProjection, DirectionalLight* directionalLight)
+void Collider::Initialize(const std::string name)
 {
 	worldTransform_.Initialize();
 	name_ = name;
-	cube_.Initialize(viewProjection, directionalLight);
+	cube_.Initialize("box1x1");
 	cube_.SetEnableLighting(false);
 }
 
@@ -173,7 +173,7 @@ void Collider::Draw(Vector4 color)
 
 	if (isDrawCollider) {
 		MatrixUpdate();
-		cube_.Draw(worldTransform_, color);
+		cube_.Draw(worldTransform_ ,color);
 	}
 
 }

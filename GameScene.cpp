@@ -38,15 +38,15 @@ void GameScene::Initialize() {
 	sprite_.reset(Sprite::Create(textureHandle_, { 0.0f,0.0f }));
 
 	skydome_ = std::make_unique<Skydome>();
-	skydome_->Initialize("skydome", &viewProjection_, &directionalLight_);
+	skydome_->Initialize("skydome");
 	floor_ = std::make_unique<Floor>();
-	floor_->Initialize("floor", &viewProjection_, &directionalLight_);
+	floor_->Initialize("floor");
 	sphere_ = std::make_unique<GameObject>();
-	sphere_->Initialize("sphere", &viewProjection_, &directionalLight_);
+	sphere_->Initialize("sphere");
 	sphere_->SetPosition({ 0.0f,8.0f,0.0f });
 	sphere_->UpdateMatrix();
 	player_ = std::make_unique<Player>();
-	player_->Initialize("box1x1", &viewProjection_, &directionalLight_);
+	player_->Initialize("box1x1");
 
 	dustParticle_ = std::make_unique<DustParticle>();
 	dustParticle_->SetIsEmit(true);
@@ -97,27 +97,7 @@ void GameScene::Update(CommandContext& commandContext){
 	int a = date[1];
 	ImGui::Text("%d", int(a));
 
-	a;
 
-	Quaternion q1 = { 2.0f,3.0f,4.0f,1.0f };
-	Quaternion q2 = { 1.0f,3.0f,5.0f,2.0f };
-	Quaternion identity = IdentityQuaternion();
-	Quaternion conj = Conjugate(q1);
-	Quaternion inv = Inverse(q1);
-	Quaternion normal = Normalize(q1);
-	Quaternion mul1 = Multiply(q1, q2);
-	Quaternion mul2 = Multiply(q2, q1);
-	float norm = Norm(q1);
-	
-	ImGui::Begin("MT3_1_3");
-	ImGui::Text("%f  %f  %f  %f   : Identity", identity.x, identity.y, identity.z, identity.w);
-	ImGui::Text("%f  %f  %f  %f   : Conjugate", conj.x, conj.y, conj.z, conj.w);
-	ImGui::Text("%f  %f  %f  %f   : Inverse", inv.x, inv.y, inv.z, inv.w);
-	ImGui::Text("%f  %f  %f  %f   : Normalize", normal.x, normal.y, normal.z, normal.w);
-	ImGui::Text("%f  %f  %f  %f   : Multiply(q1,q2)", mul1.x, mul1.y, mul1.z, mul1.w);
-	ImGui::Text("%f  %f  %f  %f   : Multiply(q2,q1)", mul2.x, mul2.y, mul2.z, mul2.w);
-	ImGui::Text("%f               : Norm", norm);
-	ImGui::End();
 }
 
 void GameScene::TitleInitialize() {
@@ -168,7 +148,7 @@ void GameScene::ParticleDraw()
 	case GameScene::Scene::Title:
 		break;
 	case GameScene::Scene::InGame:
-		whiteParticle_->Draw(viewProjection_, color);
+		whiteParticle_->Draw(color);
 		break;
 	default:
 		break;
@@ -182,7 +162,7 @@ void GameScene::ParticleBoxDraw()
 	case GameScene::Scene::Title:
 		break;
 	case GameScene::Scene::InGame:
-		//dustParticle_->Draw(viewProjection_, directionalLight_);
+		dustParticle_->Draw();
 		break;
 	default:
 		break;
@@ -226,17 +206,17 @@ void GameScene::Draw(CommandContext& commandContext) {
 	Renderer::GetInstance()->ClearMainDepthBuffer();
 
 	//3Dオブジェクト描画
-	Model::PreDraw(commandContext);
+	Model::PreDraw(commandContext, viewProjection_, directionalLight_);
 	ModelDraw();
 	Model::PostDraw();
 
 	//Particle描画
-	Particle::PreDraw(commandContext);
+	Particle::PreDraw(commandContext,viewProjection_);
 	ParticleDraw();
 	Particle::PostDraw();
 
 	//Particle描画
-	ParticleBox::PreDraw(commandContext);
+	ParticleBox::PreDraw(commandContext, viewProjection_, directionalLight_);
 	ParticleBoxDraw();
 	ParticleBox::PostDraw();
 
