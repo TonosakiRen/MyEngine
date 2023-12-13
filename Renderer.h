@@ -8,6 +8,11 @@
 #include "Bloom.h"
 #include "PostEffect.h"
 
+#include "DeferredRenderer.h"
+
+class viewProjection;
+class DirectionalLights;
+
 class Renderer
 {
 public:
@@ -25,6 +30,7 @@ public:
     void BeginFrame();
     void BeginMainRender();
     void EndMainRender();
+    void deferredRender(const ViewProjection& viewProjection, const DirectionalLights& directionalLight);
     void BeginUIRender();
     void EndUIRender();
     void Shutdown();
@@ -50,6 +56,11 @@ private:
 
     ColorBuffer colorBuffers_[kRenderTargetNum];
     DepthBuffer mainDepthBuffer_;
+
+    ColorBuffer* resultBuffer_ = nullptr;
+
+    DeferredRenderer deferredRenderer_;
+
     Bloom bloom_;
     PostEffect postEffect_;
 };

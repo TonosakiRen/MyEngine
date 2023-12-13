@@ -8,7 +8,7 @@
 #include <vector>
 #include <wrl.h>
 #include "Mymath.h"
-#include "DirectionalLight.h"
+#include "DirectionalLights.h"
 #include "Material.h"
 #include "DescriptorHandle.h"
 #include "PipelineState.h"
@@ -43,7 +43,7 @@ public:
 	};
 
 	static void StaticInitialize();
-	static void PreDraw(ID3D12GraphicsCommandList* commandList, const ViewProjection& viewProjection, const DirectionalLight& directionalLight);
+	static void PreDraw(ID3D12GraphicsCommandList* commandList, const ViewProjection& viewProjection, const DirectionalLights& directionalLight);
 	static void PostDraw();
 	static ParticleBox* Create(uint32_t particleNum);
 

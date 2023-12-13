@@ -5,6 +5,7 @@
 #include <string>
 #include <unordered_map>
 #include <wrl.h>
+#include <vector>
 #include "Mesh.h"
 #include "DescriptorHandle.h"
 
@@ -15,10 +16,14 @@ public:
 
 	struct ModelIndex {
 		std::string name;
-		Mesh mesh;
+		std::vector<Mesh> meshes;
+		uint32_t meshNum = 0;
 	};
 
+
 	static uint32_t Load(const std::string& fileName);
+
+	static std::vector<Mesh> CreateMeshes(const std::string& fileName);
 
 	static ModelManager* GetInstance();
 

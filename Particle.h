@@ -2,7 +2,7 @@
 #include "TextureManager.h"
 #include "ViewProjection.h"
 #include "WorldTransform.h"
-#include "DirectionalLight.h"
+#include "DirectionalLights.h"
 #include <Windows.h>
 #include <d3d12.h>
 #include "externals/DirectXTex/d3dx12.h"

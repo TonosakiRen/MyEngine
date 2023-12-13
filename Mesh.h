@@ -5,6 +5,7 @@
 #include <vector>
 class Mesh
 {
+	friend class ModelManager;
 public:
 
 	struct VertexData {
@@ -13,10 +14,12 @@ public:
 		Vector2 uv;
 	};
 
-	void Create(std::string name);
-
 	D3D12_VERTEX_BUFFER_VIEW* GetVbView() {
 		return &vbView_;
+	}
+
+	D3D12_INDEX_BUFFER_VIEW* GetIbView() {
+		return &ibView_;
 	}
 
 	UINT GetSize() {
@@ -29,8 +32,11 @@ public:
 
 private:
 	UploadBuffer vertexBuffer_;
+	UploadBuffer indexBuffer_;
 	D3D12_VERTEX_BUFFER_VIEW vbView_{};
+	D3D12_INDEX_BUFFER_VIEW ibView_{};
 	std::vector<VertexData> vertices_;
+	std::vector<uint32_t> indices_;
 
 	std::string name_;
 	uint32_t uvHandle_ = 0;

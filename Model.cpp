@@ -19,7 +19,7 @@ void Model::StaticInitialize() {
     CreatePipeline();
 }
 
-void Model::PreDraw(ID3D12GraphicsCommandList* commandList, const ViewProjection& viewProjection, const DirectionalLight& directionalLight) {
+void Model::PreDraw(ID3D12GraphicsCommandList* commandList, const ViewProjection& viewProjection, const DirectionalLights& directionalLight) {
     assert(Model::commandList_ == nullptr);
 
     commandList_ = commandList;
@@ -30,7 +30,7 @@ void Model::PreDraw(ID3D12GraphicsCommandList* commandList, const ViewProjection
     // CBVをセット（ビュープロジェクション行列）
     commandList_->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
     // CBVをセット（ライト）
-    commandList_->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kDirectionalLight), directionalLight.GetGPUVirtualAddress());
+    commandList_->SetGraphicsRootConstantBufferView(static_cast<UINT>(RootParameter::kDirectionalLights), directionalLight.GetGPUVirtualAddress());
 
     commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }

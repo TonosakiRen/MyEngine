@@ -28,9 +28,8 @@ void GameScene::Initialize() {
 	viewProjection_.translation_.z = -27.0f;
 
 
-	directionalLight_.Initialize();
-	directionalLight_.direction_ = { 1.0f, -1.0f, 1.0f };
-	directionalLight_.Update();
+	directionalLights_.Initialize();
+	directionalLights_.Update();
 
 
 	textureHandle_ = TextureManager::Load("uvChecker.png");
@@ -68,10 +67,10 @@ void GameScene::Update(CommandContext& commandContext){
 		viewProjection_.DebugMove();
 		viewProjection_.Update();
 		// light
-		ImGui::DragFloat3("light", &directionalLight_.direction_.x, 0.01f);
-		ImGui::DragFloat4("lightcolor", &directionalLight_.color_.x, 0.01f);
-		directionalLight_.direction_ = Normalize(directionalLight_.direction_);
-		directionalLight_.Update();
+		ImGui::DragFloat3("light", &directionalLights_.lights_[0].direction.x, 0.01f);
+		ImGui::DragFloat4("lightcolor", &directionalLights_.lights_[0].color.x, 0.01f);
+		directionalLights_.lights_[0].direction = Normalize(directionalLights_.lights_[0].direction);
+		directionalLights_.Update();
 	}
 	//Scene
 	{
@@ -133,7 +132,7 @@ void GameScene::ModelDraw()
 		skydome_->Draw();
 		floor_->Draw();
 		player_->Draw();
-		sphere_->Draw();
+		//sphere_->Draw();
 		break;
 	default:
 		break;
@@ -206,7 +205,7 @@ void GameScene::Draw(CommandContext& commandContext) {
 	Renderer::GetInstance()->ClearMainDepthBuffer();
 
 	//3Dオブジェクト描画
-	Model::PreDraw(commandContext, viewProjection_, directionalLight_);
+	Model::PreDraw(commandContext, viewProjection_, directionalLights_);
 	ModelDraw();
 	Model::PostDraw();
 
@@ -216,7 +215,7 @@ void GameScene::Draw(CommandContext& commandContext) {
 	Particle::PostDraw();
 
 	//Particle描画
-	ParticleBox::PreDraw(commandContext, viewProjection_, directionalLight_);
+	ParticleBox::PreDraw(commandContext, viewProjection_, directionalLights_);
 	ParticleBoxDraw();
 	ParticleBox::PostDraw();
 

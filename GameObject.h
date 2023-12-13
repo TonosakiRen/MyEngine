@@ -2,9 +2,8 @@
 #include "ViewProjection.h"
 #include "Material.h"
 #include "WorldTransform.h"
-#include "DirectionalLight.h"
+#include "DirectionalLights.h"
 #include "ViewProjection.h"
-#include "DirectionalLight.h"
 #include <string>
 class GameObject
 {

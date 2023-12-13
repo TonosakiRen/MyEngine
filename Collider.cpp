@@ -2,7 +2,7 @@
 #include "ImGuiManager.h"
 #include "Input.h"
 
-bool Collider::isDrawCollider = true;
+bool Collider::isDrawCollider = false;
 
 void Collider::SwitchIsDrawCollider()
 {
@@ -24,7 +24,6 @@ void Collider::Initialize(WorldTransform* objectWorldTransform, const std::strin
 	worldTransform_.SetParent(objectWorldTransform);
 	worldTransform_.scale_ = initialScale;
 	worldTransform_.translation_ = initialPos;
-	cube_.SetEnableLighting(false);
 	name_ = name;
 	cube_.Initialize("box1x1");
 }

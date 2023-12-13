@@ -110,7 +110,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="DeferredRenderer.cpp" />
     <ClCompile Include="DepthBuffer.cpp" />
     <ClCompile Include="DescriptorHeap.cpp" />
-    <ClCompile Include="DirectionalLight.cpp" />
+    <ClCompile Include="DirectionalLights.cpp" />
     <ClCompile Include="DirectXCommon.cpp" />
     <ClCompile Include="DustParticle.cpp" />
     <ClCompile Include="DWParam.cpp" />
@@ -166,7 +166,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="DepthBuffer.h" />
     <ClInclude Include="DescriptorHandle.h" />
     <ClInclude Include="DescriptorHeap.h" />
-    <ClInclude Include="DirectionalLight.h" />
+    <ClInclude Include="DirectionalLights.h" />
     <ClInclude Include="DirectXCommon.h" />
     <ClInclude Include="DustParticle.h" />
     <ClInclude Include="DWParam.h" />
@@ -243,7 +243,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="Resources\shaders\DeferredRenderingCS.hlsl">
+    <FxCompile Include="Resources\shaders\DeferredRenderingPS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>

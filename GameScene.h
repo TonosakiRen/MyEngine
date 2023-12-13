@@ -5,7 +5,7 @@
 #include "WorldTransform.h"
 #include "Input.h"
 #include "Sprite.h"
-#include "DirectionalLight.h"
+#include "DirectionalLights.h"
 #include "GameObject.h"
 #include "Skydome.h"
 #include "Floor.h"
@@ -32,13 +32,20 @@ public:
 	void Draw(CommandContext& commandContext);
 	void UIDraw(CommandContext& commandContext);
 
+	const DirectionalLights& GetDirectionalLights() {
+		return directionalLights_;
+	}
+
+	const ViewProjection& GetViewProjection() {
+		return viewProjection_;
+	}
 
 private: 
 	DirectXCommon* dxCommon_ = nullptr;
 	Input* input_ = nullptr;
 	
 	ViewProjection viewProjection_;
-	DirectionalLight directionalLight_;
+	DirectionalLights directionalLights_;
 
 	uint32_t textureHandle_;
 

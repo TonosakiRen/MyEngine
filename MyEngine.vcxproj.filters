@@ -142,7 +142,7 @@
     <ClCompile Include="DescriptorHeap.cpp">
       <Filter>Engine\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="DirectionalLight.cpp">
+    <ClCompile Include="DirectionalLights.cpp">
       <Filter>Engine\GameComponent</Filter>
     </ClCompile>
     <ClCompile Include="GlobalVariables.cpp">
@@ -307,7 +307,7 @@
     <ClInclude Include="DescriptorHeap.h">
       <Filter>Engine\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="DirectionalLight.h">
+    <ClInclude Include="DirectionalLights.h">
       <Filter>Engine\GameComponent</Filter>
     </ClInclude>
     <ClInclude Include="GlobalVariables.h">
@@ -444,7 +444,7 @@
     <FxCompile Include="Resources\shaders\CS.hlsl">
       <Filter>shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Resources\shaders\DeferredRenderingCS.hlsl">
+    <FxCompile Include="Resources\shaders\DeferredRenderingPS.hlsl">
       <Filter>shaders</Filter>
     </FxCompile>
   </ItemGroup>

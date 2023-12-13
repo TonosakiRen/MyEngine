@@ -8,7 +8,7 @@
 #include <vector>
 #include <wrl.h>
 #include "Mymath.h"
-#include "DirectionalLight.h"
+#include "DirectionalLights.h"
 #include "Material.h"
 #include <string>
 #include "PipelineState.h"
@@ -32,23 +32,16 @@ public:
 		Vector2 uv;
 	};
 
-	static void StaticInitialize();
-	static void PreDraw(ID3D12GraphicsCommandList* commandList);
-	static void PostDraw();
-	static PostEffect* Create();
-
 	void Initialize();
 
-	void Draw(DescriptorHandle srvHandle);
+	void Draw(DescriptorHandle srvHandle, ID3D12GraphicsCommandList* sCommandList);
 
+private:
 	void CreateMesh();
-
+	void CreatePipeline();
 private:
-	static void InitializeGraphicsPipeline();
-private:
-	static ID3D12GraphicsCommandList* sCommandList;
-	static std::unique_ptr<RootSignature> sRootSignature;
-	static std::unique_ptr<PipelineState> sPipelineState;
+	RootSignature rootSignature_;
+	PipelineState pipelineState_;
 
 	D3D12_VERTEX_BUFFER_VIEW vbView_{};
 	D3D12_INDEX_BUFFER_VIEW ibView_{};
@@ -56,7 +49,7 @@ private:
 	std::vector<uint16_t> indices_;
 	UploadBuffer vertexBuffer_;
 	UploadBuffer indexBuffer_;
-	uint32_t uvHandle_;
+
 	float constant_ = 1.0f;
 };
 

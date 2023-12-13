@@ -42,6 +42,8 @@ void Renderer::Initialize() {
     bloom_.Initialize(&colorBuffers_[kMain]);
     postEffect_.Initialize();
 
+    deferredRenderer_.Initialize(&colorBuffers_[kMain], &colorBuffers_[kNormal], &mainDepthBuffer_);
+
     // ImGuiを初期化
     auto imguiManager = ImGuiManager::GetInstance();
     imguiManager->Initialize(window);
@@ -72,28 +74,33 @@ void Renderer::BeginMainRender() {
 
 void Renderer::EndMainRender() {
 
-    //深度Bufferを読み取りにする
-    commandContext_.TransitionResource(mainDepthBuffer_, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
-
     // メインカラーバッファにブルームをかける
     //bloom_.Render(commandContext_);
 
-    commandContext_.TransitionResource(colorBuffers_[kNormal], D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
-    commandContext_.TransitionResource(colorBuffers_[kMain], D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+    resultBuffer_ = deferredRenderer_.GetResult();
+
+    commandContext_.TransitionResource(*resultBuffer_, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+}
+
+void Renderer::deferredRender(const ViewProjection& viewProjection, const DirectionalLights& directionalLight)
+{
+    deferredRenderer_.Render(commandContext_, viewProjection, directionalLight);
 }
 
 void Renderer::BeginUIRender()
 {
 
-    commandContext_.SetViewportAndScissorRect(0, 0, colorBuffers_[kMain].GetWidth(), colorBuffers_[kMain].GetHeight());
+    commandContext_.SetViewportAndScissorRect(0, 0, resultBuffer_->GetWidth(), resultBuffer_->GetHeight());
 
     commandContext_.TransitionResource(swapChain_.GetColorBuffer(), D3D12_RESOURCE_STATE_RENDER_TARGET);
     commandContext_.SetRenderTarget(swapChain_.GetRTV());
     commandContext_.ClearColor(swapChain_.GetColorBuffer());
 
-    PostEffect::PreDraw(commandContext_);
-    postEffect_.Draw(colorBuffers_[kMain].GetSRV());
-    PostEffect::PostDraw();
+    //コピーできないよん
+    //commandContext_.CopyBuffer(swapChain_.GetColorBuffer(), *resultBuffer_);
+
+    postEffect_.Draw(resultBuffer_->GetSRV(),commandContext_);
+
 }
 
 void Renderer::EndUIRender()

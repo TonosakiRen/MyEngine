@@ -20,7 +20,7 @@ void ParticleBox::StaticInitialize() {
     CreatePipeline();
 }
 
-void ParticleBox::PreDraw(ID3D12GraphicsCommandList* commandList, const ViewProjection& viewProjection, const DirectionalLight& directionalLight) {
+void ParticleBox::PreDraw(ID3D12GraphicsCommandList* commandList, const ViewProjection& viewProjection, const DirectionalLights& directionalLight) {
     assert(ParticleBox::commandList_ == nullptr);
 
     commandList_ = commandList;

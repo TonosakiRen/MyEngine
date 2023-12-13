@@ -8,7 +8,6 @@ void Player::Initialize(const std::string name)
 	worldTransform_.translation_ = { 0.0f,2.0f,0.0f };
 	velocisity_ = { 0.0f,0.0f,0.0f };
 	acceleration_ = { 0.0f,-0.05f,0.0f };
-	material_.enableLighting_ = false;
 }
 
 void Player::Update()
@@ -22,6 +21,12 @@ void Player::Update()
 	if (input_->PushKey(DIK_D)) {
 		move.x += 0.3f;
 	}
+	if (input_->PushKey(DIK_S)) {
+		move.z -= 0.3f;
+	}
+	if (input_->PushKey(DIK_W)) {
+		move.z += 0.3f;
+	}
 
 	if (input_->TriggerKey(DIK_SPACE)) {
 		velocisity_.y = 1.0f;
@@ -31,6 +36,7 @@ void Player::Update()
 
 	ImGui::Begin("Player");
 	ImGui::DragFloat3("translation", &worldTransform_.translation_.x, 0.1f);
+	ImGui::DragFloat3("sca", &worldTransform_.scale_.x, 0.1f);
 	ImGui::End();
 
 	collider_.AdjustmentScale();
@@ -42,9 +48,9 @@ void Player::Update()
 
 void Player::Collision(Collider& otherCollider)
 {
-	Vector3 puchBackVector;
-	if (collider_.Collision(otherCollider, puchBackVector)) {
-		worldTransform_.translation_ += puchBackVector;
+	Vector3 pushBackVector;
+	if (collider_.Collision(otherCollider, pushBackVector)) {
+		worldTransform_.translation_ += pushBackVector;
 		worldTransform_.Update();
 	}
 

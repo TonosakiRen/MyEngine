@@ -41,7 +41,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	Particle::StaticInitialize();
 	ParticleBox::StaticInitialize();
 
-	PostEffect::StaticInitialize();
 	GaussianBlur::StaticInitialize();
 
 	//　スプライト静的初期化
@@ -77,6 +76,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		// ゲームシーンの描画
 		gameScene->Draw(renderer->GetCommandContext());
 		
+		renderer->deferredRender(gameScene->GetViewProjection(), gameScene->GetDirectionalLights());
+
 		renderer->EndMainRender();
 
 		renderer->BeginUIRender();

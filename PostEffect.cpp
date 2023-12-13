@@ -12,42 +12,9 @@
 using namespace DirectX;
 using namespace Microsoft::WRL;
 
-ID3D12GraphicsCommandList* PostEffect::sCommandList = nullptr;
-std::unique_ptr<RootSignature> PostEffect::sRootSignature;
-std::unique_ptr<PipelineState> PostEffect::sPipelineState;
-
-void PostEffect::StaticInitialize() {
-	InitializeGraphicsPipeline();
-}
-
-void PostEffect::PreDraw(ID3D12GraphicsCommandList* commandList) {
-	assert(PostEffect::sCommandList == nullptr);
-
-	sCommandList = commandList;
-
-	commandList->SetPipelineState(*sPipelineState);
-	commandList->SetGraphicsRootSignature(*sRootSignature);
-	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-}
-
-void PostEffect::PostDraw() {
-	sCommandList = nullptr;
-}
-
-PostEffect* PostEffect::Create() {
-	PostEffect* object3d = new PostEffect();
-	assert(object3d);
-
-	// 初期化
-	object3d->Initialize();
-
-	return object3d;
-}
-
-void PostEffect::InitializeGraphicsPipeline() {
+void PostEffect::CreatePipeline() {
 	ComPtr<IDxcBlob> vsBlob;
 	ComPtr<IDxcBlob> psBlob;
-	ComPtr<ID3DBlob> errorBlob;
 
 	auto shaderManager = ShaderManager::GetInstance();
 
@@ -56,9 +23,6 @@ void PostEffect::InitializeGraphicsPipeline() {
 
 	psBlob = shaderManager->Compile(L"PostEffectPS.hlsl", ShaderManager::kPixel);
 	assert(psBlob != nullptr);
-
-	sRootSignature = std::make_unique<RootSignature>();
-	sPipelineState = std::make_unique<PipelineState>();
 
 	{
 
@@ -83,7 +47,7 @@ void PostEffect::InitializeGraphicsPipeline() {
 		rootSignatureDesc.NumStaticSamplers = 1;
 		rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
-		sRootSignature->Create(rootSignatureDesc);
+		rootSignature_.Create(rootSignatureDesc);
 
 	}
 
@@ -124,9 +88,6 @@ void PostEffect::InitializeGraphicsPipeline() {
 		// ブレンドステートの設定
 		gpipeline.BlendState.RenderTarget[0] = blenddesc;
 
-		// 深度バッファのフォーマット
-		//gpipeline.DSVFormat = nullptr;
-
 		// 頂点レイアウトの設定
 		gpipeline.InputLayout.pInputElementDescs = inputLayout;
 		gpipeline.InputLayout.NumElements = _countof(inputLayout);
@@ -138,10 +99,10 @@ void PostEffect::InitializeGraphicsPipeline() {
 		gpipeline.RTVFormats[0] = Renderer::GetInstance()->GetRTVFormat(Renderer::kMain); // 0～255指定のRGBA
 		gpipeline.SampleDesc.Count = 1; // 1ピクセルにつき1回サンプリング
 
-		gpipeline.pRootSignature = *sRootSignature;
+		gpipeline.pRootSignature = rootSignature_;
 
 		// グラフィックスパイプラインの生成
-		sPipelineState->Create(gpipeline);
+		pipelineState_.Create(gpipeline);
 	}
 }
 
@@ -193,29 +154,32 @@ void PostEffect::CreateMesh() {
 }
 
 void PostEffect::Initialize() {
-	// nullptrチェック
-
 	// メッシュ生成
+	CreatePipeline();
 	CreateMesh();
 }
 
-void PostEffect::Draw(DescriptorHandle srvHandle) {
+void PostEffect::Draw(DescriptorHandle srvHandle, ID3D12GraphicsCommandList* commandList) {
+
+	commandList->SetPipelineState(pipelineState_);
+	commandList->SetGraphicsRootSignature(rootSignature_);
+	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	// 頂点バッファの設定
-	sCommandList->IASetVertexBuffers(0, 1, &vbView_);
+	commandList->IASetVertexBuffers(0, 1, &vbView_);
 
 	// インデックスバッファの設定
-	sCommandList->IASetIndexBuffer(&ibView_);
+	commandList->IASetIndexBuffer(&ibView_);
 
 	DWParam constant = constant_;
 
 	// CBVをセット（ワールド行列）
-	sCommandList->SetGraphicsRoot32BitConstant(static_cast<UINT>(RootParameter::Constant), constant.v.u, 0);
+	commandList->SetGraphicsRoot32BitConstant(static_cast<UINT>(RootParameter::Constant), constant.v.u, 0);
 
 	// SRVをセット
-	sCommandList->SetGraphicsRootDescriptorTable(static_cast<UINT>(RootParameter::kTexture), srvHandle);
+	commandList->SetGraphicsRootDescriptorTable(static_cast<UINT>(RootParameter::kTexture), srvHandle);
 
 	  // 描画コマンド
-	sCommandList->DrawIndexedInstanced(static_cast<UINT>(indices_.size()), 1, 0, 0, 0);
+	commandList->DrawIndexedInstanced(static_cast<UINT>(indices_.size()), 1, 0, 0, 0);
 }
 

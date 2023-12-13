@@ -2,14 +2,18 @@
 #include <d3d12.h>
 #include "Mymath.h"
 #include "UploadBuffer.h"
+#include <vector>
 
-class DirectionalLight
+class DirectionalLights
 {
 public:
-	struct ConstBufferData {
-		Vector4 color;
-		Vector3 direction;
-		float intensity;
+
+	static const uint32_t  lightNum = 1;
+
+	struct DirectionalLight {
+		Vector4 color = { 1.0f, 1.0f, 1.0f,1.0f };
+		Vector3 direction = { 1.0f, -1.0f, 1.0f };
+		float intensity = 1.0f;
 	};
 
 	void Initialize();
@@ -19,9 +23,7 @@ public:
 		return constBuffer_.GetGPUVirtualAddress();
 	}
 public:
-	Vector4 color_ = { 1.0f, 1.0f, 1.0f,1.0f };
-	Vector3 direction_ = { 1.0f, -1.0f, 1.0f };
-	float intensity_ = 1.0f;
+	std::vector<DirectionalLight> lights_;
 private:
 	UploadBuffer constBuffer_;
 };
