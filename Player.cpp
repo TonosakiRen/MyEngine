@@ -58,5 +58,5 @@ void Player::Collision(Collider& otherCollider)
 
 void Player::Draw() {
 	collider_.Draw();
-	GameObject::Draw({1.0f,0.0f,0.0f});
+	GameObject::Draw({1.0f,1.0f,1.0f});
 }

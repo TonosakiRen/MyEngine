@@ -36,7 +36,7 @@ private:
 	D3D12_VERTEX_BUFFER_VIEW vbView_{};
 	D3D12_INDEX_BUFFER_VIEW ibView_{};
 	std::vector<VertexData> vertices_;
-	std::vector<uint32_t> indices_;
+	std::vector<uint16_t> indices_;
 
 	std::string name_;
 	uint32_t uvHandle_ = 0;

@@ -34,7 +34,11 @@ void GameScene::Initialize() {
 
 	textureHandle_ = TextureManager::Load("uvChecker.png");
 
-	sprite_.reset(Sprite::Create(textureHandle_, { 0.0f,0.0f }));
+	sprite_ = std::make_unique<Sprite>();
+	sprite_->Initialize(textureHandle_, { 0.0f,0.0f });
+
+	player_ = std::make_unique<Player>();
+	player_->Initialize("box1x1");
 
 	skydome_ = std::make_unique<Skydome>();
 	skydome_->Initialize("skydome");
@@ -44,8 +48,6 @@ void GameScene::Initialize() {
 	sphere_->Initialize("sphere");
 	sphere_->SetPosition({ 0.0f,8.0f,0.0f });
 	sphere_->UpdateMatrix();
-	player_ = std::make_unique<Player>();
-	player_->Initialize("box1x1");
 
 	dustParticle_ = std::make_unique<DustParticle>();
 	dustParticle_->SetIsEmit(true);
@@ -102,15 +104,7 @@ void GameScene::Update(CommandContext& commandContext){
 	Vector3 rotateByQuaternion = RotateVector(pointY, rotation);
 	Vector3 rotateByMatrix = Transform(pointY, rotateMatrix);
 
-	ImGui::Begin("01-04");
-	ImGui::Text("rotation  %f %f %f %f", rotation.x, rotation.y, rotation.z, rotation.w);
-	ImGui::Text("rotateMatrix  %f %f %f %f", rotateMatrix.m[0][0], rotateMatrix.m[0][1], rotateMatrix.m[0][2], rotateMatrix.m[0][3]);
-	ImGui::Text("rotateMatrix  %f %f %f %f", rotateMatrix.m[1][0], rotateMatrix.m[1][1], rotateMatrix.m[1][2], rotateMatrix.m[1][3]);
-	ImGui::Text("rotateMatrix  %f %f %f %f", rotateMatrix.m[2][0], rotateMatrix.m[2][1], rotateMatrix.m[2][2], rotateMatrix.m[2][3]);
-	ImGui::Text("rotateMatrix  %f %f %f %f", rotateMatrix.m[3][0], rotateMatrix.m[3][1], rotateMatrix.m[3][2], rotateMatrix.m[3][3]);
-	ImGui::Text("rotateByQuaternion  %f %f %f ", rotateByQuaternion.x, rotateByQuaternion.y, rotateByQuaternion.z);
-	ImGui::Text("rotateByMatrix  %f %f %f ", rotateByMatrix.x, rotateByMatrix.y, rotateByMatrix.z);
-	ImGui::End();
+	
 }
 
 void GameScene::TitleInitialize() {

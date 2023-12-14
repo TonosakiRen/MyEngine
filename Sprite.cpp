@@ -134,29 +134,13 @@ void Sprite::PostDraw() {
 	Sprite::commandList_ = nullptr;
 }
 
-Sprite* Sprite::Create(uint32_t textureHandle, Vector2 position, Vector4 color, Vector2 anchorpoint, bool isFlipX, bool isFlipY) {
+void Sprite::Initialize(uint32_t textureHandle, Vector2 position, Vector4 color, Vector2 anchorpoint, bool isFlipX, bool isFlipY) {
+
 	Vector2 size = { 100.0f, 100.0f };
 
 	const D3D12_RESOURCE_DESC& resDesc = TextureManager::GetInstance()->GetResoureDesc(textureHandle);
 	size = { (float)resDesc.Width, (float)resDesc.Height };
-	
-	Sprite* sprite = new Sprite(textureHandle, position, size, color, anchorpoint, isFlipX, isFlipY);
-	if (sprite == nullptr) {
-		return nullptr;
-	}
 
-	if (!sprite->Initialize()) {
-		delete sprite;
-		assert(0);
-		return nullptr;
-	}
-
-	return sprite;
-}
-
-Sprite::Sprite() {}
-
-Sprite::Sprite(uint32_t textureHandle, Vector2 position, Vector2 size, Vector4 color, Vector2 anchorpoint,bool isFlipX, bool isFlipY) {
 	position_ = position;
 	size_ = size;
 	anchorPoint_ = anchorpoint;
@@ -166,9 +150,6 @@ Sprite::Sprite(uint32_t textureHandle, Vector2 position, Vector2 size, Vector4 c
 	isFlipX_ = isFlipX;
 	isFlipY_ = isFlipY;
 	texSize_ = size;
-}
-
-bool Sprite::Initialize() {
 
 	resourceDesc_ = TextureManager::GetInstance()->GetResoureDesc(textureHandle_);
 
@@ -183,8 +164,6 @@ bool Sprite::Initialize() {
 	vbView_.StrideInBytes = sizeof(VertexData);
 
 	constBuffer_.Create((sizeof(ConstBufferData) + 0xff) & ~0xff);
-
-	return true;
 }
 
 void Sprite::SetTextureHandle(uint32_t textureHandle) {

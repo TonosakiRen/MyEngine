@@ -27,11 +27,8 @@ public:
 	static void StaticInitialize();
 	static void PreDraw(ID3D12GraphicsCommandList* cmdList);
 	static void PostDraw();
-	static Sprite* Create(uint32_t textureHandle, Vector2 position, Vector4 color = { 1, 1, 1, 1 }, Vector2 anchorpoint = { 0.5f, 0.5f }, bool isFlipX = false, bool isFlipY = false);
-
-	Sprite();
-	Sprite(uint32_t textureHandle, Vector2 position, Vector2 size, Vector4 color, Vector2 anchorpoint, bool isFlipX, bool isFlipY);
-	bool Initialize();
+	
+	void Initialize(uint32_t textureHandle, Vector2 position, Vector4 color = { 1, 1, 1, 1 }, Vector2 anchorpoint = { 0.5f, 0.5f }, bool isFlipX = false, bool isFlipY = false);
 
 	void SetTextureHandle(uint32_t textureHandle);
 	uint32_t GetTextureHandle() { return textureHandle_; }

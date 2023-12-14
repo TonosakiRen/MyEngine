@@ -38,7 +38,7 @@ public:
 private:
 	float fovAngleY_ = 45.0f * std::numbers::pi_v <float> / 180.0f;
 	float aspectRatio_ = (float)16 / (float)9;
-	float nearZ_ = 20.0f;
+	float nearZ_ = 5.0f;
 	float farZ_ = 100.0f;
 
 	Matrix4x4 matView;

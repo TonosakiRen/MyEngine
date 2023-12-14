@@ -22,8 +22,8 @@ std::vector<Mesh> ModelManager::CreateMeshes(const std::string& fileName)
     std::vector<Vector3> positions;//位置
     std::vector<Vector3> normals;//法線
     std::vector<Vector2> texcoords;//テクスチャ座標
-    std::vector<uint32_t> indexes; //index
-    std::unordered_map<std::string, uint32_t> vertexDefinitionMap;
+    std::vector<uint16_t> indexes; //index
+    std::unordered_map<std::string, uint16_t> vertexDefinitionMap;
     std::string directoryPath = "Resources/models/" + fileName + "/";
     std::ifstream file(directoryPath + fileName + ".obj"); //ファイルを開く
     assert(file.is_open());//とりあえず開けなったら止める
@@ -36,14 +36,14 @@ std::vector<Mesh> ModelManager::CreateMeshes(const std::string& fileName)
         if (identifier == "v") {
             Vector3 position;
             s >> position.x >> position.y >> position.z;
-            position.z *= -1.0f;
+           /* position.z *= -1.0f;*/
             /*position.w = 1.0f;*/
             positions.push_back(position);
         }
         else if (identifier == "vn") {
             Vector3 normal;
             s >> normal.x >> normal.y >> normal.z;
-            normal.z *= -1.0f;
+           /* normal.z *= -1.0f;*/
             normals.push_back(normal);
         }
         else if (identifier == "vt") {
@@ -53,7 +53,6 @@ std::vector<Mesh> ModelManager::CreateMeshes(const std::string& fileName)
             texcoords.push_back(texcoord);
         }
         else if (identifier == "f") {
-            Mesh::VertexData triangle[3];
             // 面の頂点を取得
             std::vector<std::string> vertexDefinitions;
             while (true) {
@@ -65,7 +64,7 @@ std::vector<Mesh> ModelManager::CreateMeshes(const std::string& fileName)
                 vertexDefinitions.emplace_back(std::move(vertexDefinition));
             }
             assert(vertexDefinitions.size() > 2);
-            std::vector<uint32_t> face(vertexDefinitions.size());
+            std::vector<uint16_t> face(vertexDefinitions.size());
             for (uint32_t i = 0; i < vertexDefinitions.size(); ++i) {
                 // 頂点が登録済み
                 if (vertexDefinitionMap.contains(vertexDefinitions[i])) {
@@ -73,13 +72,13 @@ std::vector<Mesh> ModelManager::CreateMeshes(const std::string& fileName)
                 }
                 else {
                     std::istringstream v(vertexDefinitions[i]);
-                    uint32_t elementIndices[3];
+                    uint16_t elementIndices[3] = {0,0,0};
                     bool useElement[3]{};
                     for (int32_t element = 0; element < 3; ++element) {
                         std::string index;
                         std::getline(v, index, '/');//区切りでインデックスを読んでいく
                         if (!index.empty()) {
-                            elementIndices[element] = static_cast<uint32_t>(std::stoi(index)) - 1;
+                            elementIndices[element] = static_cast<uint16_t>(std::stoi(index)) - 1;
                             useElement[element] = true;
                         }
                     }
@@ -91,13 +90,17 @@ std::vector<Mesh> ModelManager::CreateMeshes(const std::string& fileName)
                     if (useElement[2]) {
                         vertex.normal = normals[elementIndices[2]];
                     }
-                    face[i] = vertexDefinitionMap[vertexDefinitions[i]] = static_cast<uint32_t>(meshes[0].vertices_.size() - 1);
-
+                    face[i] = vertexDefinitionMap[vertexDefinitions[i]] = static_cast<uint16_t>(meshes[0].vertices_.size() - 1);
                 }
             }
 
 
             for (uint32_t i = 0; i < face.size() - 2; ++i) {
+                //反対から
+               /* meshes[0].indices_.emplace_back(face[i + 2ull]);
+                meshes[0].indices_.emplace_back(face[i + 1ull]);
+                meshes[0].indices_.emplace_back(face[0]);*/
+
                 meshes[0].indices_.emplace_back(face[0]);
                 meshes[0].indices_.emplace_back(face[i + 1ull]);
                 meshes[0].indices_.emplace_back(face[i + 2ull]);
@@ -142,7 +145,7 @@ std::vector<Mesh> ModelManager::CreateMeshes(const std::string& fileName)
     meshes[0].vbView_.StrideInBytes = sizeof(meshes[0].vertices_[0]);
 
     // インデックスデータのサイズ
-    UINT sizeIB = static_cast<UINT>(sizeof(uint32_t) * meshes[0].indices_.size());
+    UINT sizeIB = static_cast<UINT>(sizeof(uint16_t) * meshes[0].indices_.size());
 
     meshes[0].indexBuffer_.Create(sizeIB);
 
