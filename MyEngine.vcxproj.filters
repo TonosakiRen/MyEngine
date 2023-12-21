@@ -56,6 +56,9 @@
     <Filter Include="Engine\Model">
       <UniqueIdentifier>{e753ea71-5e5a-45da-9668-ac1bf955a527}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine\Camera">
+      <UniqueIdentifier>{710ab866-965f-482b-9785-109a42b2dfbe}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="externals\imgui\imgui.cpp">
@@ -151,9 +154,6 @@
     <ClCompile Include="Sprite.cpp">
       <Filter>Engine\GameComponent</Filter>
     </ClCompile>
-    <ClCompile Include="ViewProjection.cpp">
-      <Filter>Engine\GameComponent</Filter>
-    </ClCompile>
     <ClCompile Include="WorldTransform.cpp">
       <Filter>Engine\GameComponent</Filter>
     </ClCompile>
@@ -223,8 +223,15 @@
     <ClCompile Include="Wall.cpp">
       <Filter>Game</Filter>
     </ClCompile>
-    <ClCompile Include="DebugCamera.cpp" />
-    <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Camera.cpp">
+      <Filter>Engine\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="DebugCamera.cpp">
+      <Filter>Engine\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="ViewProjection.cpp">
+      <Filter>Engine\Camera</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -329,9 +336,6 @@
     <ClInclude Include="Sprite.h">
       <Filter>Engine\GameComponent</Filter>
     </ClInclude>
-    <ClInclude Include="ViewProjection.h">
-      <Filter>Engine\GameComponent</Filter>
-    </ClInclude>
     <ClInclude Include="WorldTransform.h">
       <Filter>Engine\GameComponent</Filter>
     </ClInclude>
@@ -401,8 +405,15 @@
     <ClInclude Include="Wall.h">
       <Filter>Game</Filter>
     </ClInclude>
-    <ClInclude Include="DebugCamera.h" />
-    <ClInclude Include="Camera.h" />
+    <ClInclude Include="Camera.h">
+      <Filter>Engine\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugCamera.h">
+      <Filter>Engine\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="ViewProjection.h">
+      <Filter>Engine\Camera</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\shaders\Basic.hlsli">
