@@ -13,11 +13,9 @@ void Bloom::Initialize(ColorBuffer* originalTexture)
     // メッシュ生成
     CreateMesh();
 
-	originalTexture_ = originalTexture;
-
     luminanceTexture_.Create(
-        originalTexture_->GetWidth(),
-        originalTexture_->GetHeight(),
+        originalTexture->GetWidth(),
+        originalTexture->GetHeight(),
         originalTexture->GetFormat());
 
     gaussianBlurs_[0].Initialize(&luminanceTexture_);
@@ -60,7 +58,7 @@ void Bloom::Initialize(ColorBuffer* originalTexture)
         };
 
 
-        DXGI_FORMAT format = originalTexture_->GetFormat();
+        DXGI_FORMAT format = originalTexture->GetFormat();
 
         D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc{};
         psoDesc.pRootSignature = rootSignature_;
@@ -94,7 +92,7 @@ void Bloom::Initialize(ColorBuffer* originalTexture)
 
 }
 
-void Bloom::Render(CommandContext& commandContext, uint32_t level)
+void Bloom::Render(CommandContext& commandContext, ColorBuffer* originalTexture, uint32_t level)
 {
     assert(level <= kMaxLevel);
     if (threshold_ == 0.0f) {
@@ -104,7 +102,7 @@ void Bloom::Render(CommandContext& commandContext, uint32_t level)
         threshold_ = 1.00001f;
     }
 
-    commandContext.TransitionResource(*originalTexture_, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+    commandContext.TransitionResource(*originalTexture, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
     commandContext.TransitionResource(luminanceTexture_, D3D12_RESOURCE_STATE_RENDER_TARGET);
     commandContext.SetRenderTarget(luminanceTexture_.GetRTV());
     commandContext.ClearColor(luminanceTexture_);
@@ -119,7 +117,7 @@ void Bloom::Render(CommandContext& commandContext, uint32_t level)
     commandContext.SetPipelineState(luminacePipelineState_);
     commandContext.SetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     commandContext.SetConstants(0, float(threshold_), float(knee_));
-    commandContext.SetDescriptorTable(1, originalTexture_->GetSRV());
+    commandContext.SetDescriptorTable(1, originalTexture->GetSRV());
     commandContext.DrawIndexed(static_cast<UINT>(indices_.size()), 0, 0);
 
    
@@ -127,9 +125,9 @@ void Bloom::Render(CommandContext& commandContext, uint32_t level)
         gaussianBlurs_[i].Render(commandContext);
     }
 
-    commandContext.TransitionResource(*originalTexture_, D3D12_RESOURCE_STATE_RENDER_TARGET);
-    commandContext.SetRenderTarget(originalTexture_->GetRTV());
-    commandContext.SetViewportAndScissorRect(0, 0, originalTexture_->GetWidth(), originalTexture_->GetHeight());
+    commandContext.TransitionResource(*originalTexture, D3D12_RESOURCE_STATE_RENDER_TARGET);
+    commandContext.SetRenderTarget(originalTexture->GetRTV());
+    commandContext.SetViewportAndScissorRect(0, 0, originalTexture->GetWidth(), originalTexture->GetHeight());
 
     commandContext.SetGraphicsRootSignature(rootSignature_);
     commandContext.SetPipelineState(additivePipelineState_);
@@ -140,7 +138,7 @@ void Bloom::Render(CommandContext& commandContext, uint32_t level)
     }
     commandContext.DrawIndexed(static_cast<UINT>(indices_.size()), 0, 0);
 
-    commandContext.TransitionResource(*originalTexture_, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+    commandContext.TransitionResource(*originalTexture, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 }
 
 

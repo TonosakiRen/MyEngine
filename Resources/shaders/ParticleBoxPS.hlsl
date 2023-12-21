@@ -1,6 +1,6 @@
 struct ViewProjection {
-	float32_t4x4 view;
-	float32_t4x4 projection;
+	float32_t4x4 viewProjection;
+	float32_t4x4 inverseViewProjection;
 	float32_t3 viewPosition;
 };
 ConstantBuffer<ViewProjection> gViewProjection  : register(b1);

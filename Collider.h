@@ -14,6 +14,7 @@ public:
 	bool Collision(Collider& colliderB);
 	bool Collision(Collider& colliderB, Vector3& minAxis, float& minOverlap);
 	bool Collision(Collider& colliderB, Vector3& pushBuckVector);
+	bool SphereCollision(Vector3 position1,Vector3 size1, Vector3 position2, Vector3 size2);
 	void AdjustmentScale();
 	void MatrixUpdate();
 	void Draw(Vector4 color = { 1.0f,1.0f,1.0f,1.0f });

@@ -14,7 +14,9 @@ public:
 public:
     Collider collider_;
 private:
+    WorldTransform modelWorldTransform_;
     Vector3 velocisity_;
     Vector3 acceleration_;
+    Vector3 modelSize_;
     Input* input_;
 };

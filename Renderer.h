@@ -9,6 +9,7 @@
 #include "PostEffect.h"
 
 #include "DeferredRenderer.h"
+#include "EdgeRenderer.h"
 
 class viewProjection;
 class DirectionalLights;
@@ -18,7 +19,7 @@ class Renderer
 public:
 
     enum RenderTargetType {
-        kMain,
+        kColor,
         kNormal,
 
         kRenderTargetNum
@@ -57,9 +58,10 @@ private:
     ColorBuffer colorBuffers_[kRenderTargetNum];
     DepthBuffer mainDepthBuffer_;
 
-    ColorBuffer* resultBuffer_ = nullptr;
+    ColorBuffer resultBuffer_;
 
     DeferredRenderer deferredRenderer_;
+    EdgeRenderer edgeRenderer_;
 
     Bloom bloom_;
     PostEffect postEffect_;

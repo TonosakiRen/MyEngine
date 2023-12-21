@@ -96,7 +96,7 @@ void PostEffect::CreatePipeline() {
 		gpipeline.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 
 		gpipeline.NumRenderTargets = 1;                            // 描画対象は1つ
-		gpipeline.RTVFormats[0] = Renderer::GetInstance()->GetRTVFormat(Renderer::kMain); // 0～255指定のRGBA
+		gpipeline.RTVFormats[0] = Renderer::GetInstance()->GetRTVFormat(Renderer::kColor); // 0～255指定のRGBA
 		gpipeline.SampleDesc.Count = 1; // 1ピクセルにつき1回サンプリング
 
 		gpipeline.pRootSignature = rootSignature_;

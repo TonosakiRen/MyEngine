@@ -8,24 +8,41 @@
 #include <vector>
 #include "Mesh.h"
 #include "DescriptorHandle.h"
+#include "UploadBuffer.h"
 
 class ModelManager
 {
 public:
 	static const size_t kNumModels = 256;
 
+	struct VertexData {
+		Vector3 pos;
+		Vector3 normal;
+		Vector2 uv;
+	};
+
 	struct ModelIndex {
 		std::string name;
 		std::vector<Mesh> meshes;
+		UploadBuffer vertexBuffer_;
+		std::vector<VertexData> vertices_;
+		D3D12_VERTEX_BUFFER_VIEW vbView_{};
+		//model全体のsize
+		Vector3 modelSize{};
+		Vector3 modelCenter{};
 		uint32_t meshNum = 0;
 	};
 
 
 	static uint32_t Load(const std::string& fileName);
 
-	static std::vector<Mesh> CreateMeshes(const std::string& fileName);
+	static void CreateMeshes(ModelIndex& modelIndex);
 
 	static ModelManager* GetInstance();
+
+	Vector3 GetModelSize(uint32_t modelHandle);
+
+	Vector3 GetModelCenter(uint32_t modelHandle);
 
 	void DrawInstanced(ID3D12GraphicsCommandList* commandList,uint32_t modelHandle,UINT textureRootParamterIndex);
 

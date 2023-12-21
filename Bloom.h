@@ -17,12 +17,11 @@ public:
 
     void Initialize(ColorBuffer* originalTexture);
     void CreateMesh();
-    void Render(CommandContext& commandContext, uint32_t level = kMaxLevel);
+    void Render(CommandContext& commandContext, ColorBuffer* originalTexture, uint32_t level = kMaxLevel);
 
     void SetThreshold(float threshold) { threshold_ = threshold; }
     void SetKnee(float knee) { knee_ = knee; }
 
-    ColorBuffer& GetResult() { return *originalTexture_; }
 
     ColorBuffer& GetLuminanceTexture() { return luminanceTexture_; }
 
@@ -31,7 +30,6 @@ private:
     PipelineState luminacePipelineState_;
     PipelineState additivePipelineState_;
 
-    ColorBuffer* originalTexture_;
     ColorBuffer luminanceTexture_;
     GaussianBlur gaussianBlurs_[kMaxLevel];
 

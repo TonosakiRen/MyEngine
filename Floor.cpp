@@ -9,7 +9,6 @@ void Floor::Initialize(const std::string name)
 void Floor::Update()
 {
 	collider_.AdjustmentScale();
-	ImGui::DragFloat3("a", &worldTransform_.translation_.x, 0.01f);
 	UpdateMatrix();
 }
 

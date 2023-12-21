@@ -42,7 +42,7 @@ void DustParticle::Update() {
 	for (size_t i = 0; i < kParticleNum; i++) {
 		float rotationSpeed = Radian(1.0f) * (float(i % 2) * 2.0f - 1.0f);
 		if (particles[i].isActive_ == true) {
-			particles[i].worldTransform_.quaternion_ *= MakeRotateAxisAngleQuaternion({ 1.0f,1.0f,1.0f }, rotationSpeed);
+			particles[i].worldTransform_.quaternion_ *= MakeFromAngleAxis({ 1.0f,1.0f,1.0f }, rotationSpeed);
 			particles[i].worldTransform_.translation_ += particles[i].direction_ * speed_;
 			particles[i].worldTransform_.scale_ = particles[i].worldTransform_.scale_ - scaleSpeed_;
 			if (particles[i].worldTransform_.scale_.x <= 0.0f) {

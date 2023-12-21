@@ -13,25 +13,23 @@ using namespace Microsoft::WRL;
 RootSignature DeferredRenderer::rootSignature_;
 PipelineState DeferredRenderer::pipelineState_;
 
-void DeferredRenderer::Initialize(ColorBuffer* originalTexture, ColorBuffer* normalTexture, DepthBuffer* depthTexture)
+void DeferredRenderer::Initialize(ColorBuffer* colorTexture, ColorBuffer* normalTexture, DepthBuffer* depthTexture)
 {
-	originalTexture_ = originalTexture;
 	normalTexture_ = normalTexture;
 	depthTexture_ = depthTexture;
+	colorTexture_ = colorTexture;
 	CreatePipeline();
 	CreateMesh();
-	resultTexture_.Create(originalTexture_->GetWidth(), originalTexture_->GetHeight(), originalTexture_->GetFormat());
 	
 }
 
-void DeferredRenderer::Render(CommandContext& commandContext, const ViewProjection& viewProjection, const DirectionalLights& directionalLight)
+void DeferredRenderer::Render(CommandContext& commandContext,ColorBuffer* originalBuffer, const ViewProjection& viewProjection, const DirectionalLights& directionalLight)
 {
-	commandContext.TransitionResource(resultTexture_, D3D12_RESOURCE_STATE_RENDER_TARGET);
-	commandContext.SetRenderTarget(resultTexture_.GetRTV());
-	commandContext.ClearColor(resultTexture_);
-	commandContext.SetViewportAndScissorRect(0, 0, resultTexture_.GetWidth(), resultTexture_.GetHeight());
+	commandContext.TransitionResource(*originalBuffer, D3D12_RESOURCE_STATE_RENDER_TARGET);
+	commandContext.SetRenderTarget(originalBuffer->GetRTV());
+	commandContext.SetViewportAndScissorRect(0, 0, originalBuffer->GetWidth(), originalBuffer->GetHeight());
 
-	commandContext.TransitionResource(*originalTexture_, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+	commandContext.TransitionResource(*colorTexture_, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 	commandContext.TransitionResource(*normalTexture_, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 	commandContext.TransitionResource(*depthTexture_, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
@@ -39,13 +37,11 @@ void DeferredRenderer::Render(CommandContext& commandContext, const ViewProjecti
 	commandContext.SetGraphicsRootSignature(rootSignature_);
 	commandContext.SetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kColorTexture), originalTexture_->GetSRV());
+	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kColorTexture), colorTexture_->GetSRV());
 	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kNormalTexture), normalTexture_->GetSRV());
 	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kDepthTexture), depthTexture_->GetSRV());
 	commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
 	commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kDirectionalLights), directionalLight.GetGPUVirtualAddress());
-
-	directionalLight.lights_[0].direction;
 
 	commandContext.SetVertexBuffer(0, vbView_);
 	commandContext.SetIndexBuffer(ibView_);
@@ -142,7 +138,7 @@ void DeferredRenderer::CreatePipeline()
 		gpipeline.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 
 		gpipeline.NumRenderTargets = 1;                            // 描画対象は1つ
-		gpipeline.RTVFormats[0] = Renderer::GetInstance()->GetRTVFormat(Renderer::kMain); // 0～255指定のRGBA
+		gpipeline.RTVFormats[0] = Renderer::GetInstance()->GetRTVFormat(Renderer::kColor); // 0～255指定のRGBA
 		gpipeline.SampleDesc.Count = 1; // 1ピクセルにつき1回サンプリング
 
 		gpipeline.pRootSignature = rootSignature_;

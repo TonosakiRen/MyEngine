@@ -2,17 +2,22 @@
 #include "DirectXCommon.h"
 #include "Model.h"
 #include "ViewProjection.h"
+#include "DebugCamera.h"
+#include "Camera.h"
 #include "WorldTransform.h"
 #include "Input.h"
 #include "Sprite.h"
 #include "DirectionalLights.h"
+#include "Compute.h"
 #include "GameObject.h"
+
 #include "Skydome.h"
 #include "Floor.h"
 #include "Player.h"
 #include "DustParticle.h"
 #include "WhiteParticle.h"
-#include "Compute.h"
+#include "Wall.h"
+
 
 #include <optional>
 class GameScene
@@ -37,14 +42,17 @@ public:
 	}
 
 	const ViewProjection& GetViewProjection() {
-		return viewProjection_;
+		return *currentViewProjection_;
 	}
 
 private: 
 	DirectXCommon* dxCommon_ = nullptr;
 	Input* input_ = nullptr;
+
+	std::unique_ptr <DebugCamera> debugCamera_;
+	ViewProjection* currentViewProjection_ = nullptr;
 	
-	ViewProjection viewProjection_;
+	std::unique_ptr<Camera> camera_;
 	DirectionalLights directionalLights_;
 
 	uint32_t textureHandle_;
@@ -61,6 +69,8 @@ private:
 	std::unique_ptr<DustParticle> dustParticle_;
 
 	std::unique_ptr<WhiteParticle> whiteParticle_;
+
+	std::vector<std::unique_ptr<Wall>> walls_;
 
 	Vector4 color = {1.0f,1.0f,1.0f,1.0f};
 

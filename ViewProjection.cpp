@@ -4,6 +4,24 @@
 #include "ImGuiManager.h"
 
 
+bool ViewProjection::isUseDebugCamera = true;
+
+void ViewProjection::SwitchIsUseDebugCamera()
+{
+#ifdef _DEBUG
+    ImGui::Begin("switchDebugCamera");
+    if (ImGui::Button("SwitchDebugDraw")) {
+        if (ViewProjection::isUseDebugCamera == false) {
+            ViewProjection::isUseDebugCamera = true;
+        }
+        else {
+            ViewProjection::isUseDebugCamera = false;
+        }
+    }
+    ImGui::End();
+#endif 
+}
+
 void ViewProjection::Initialize() {
     constBuffer_.Create((sizeof(ConstBufferData) + 0xff) & ~0xff);
     Update();
@@ -13,7 +31,7 @@ void ViewProjection::Update() {
 
     // ビュー行列の生成
     Vector3 tranlation = translation_ + Vector3{ Rand(-shakeValue_.x,shakeValue_.x),Rand(-shakeValue_.y,shakeValue_.y) ,Rand(-shakeValue_.z,shakeValue_.z) };
-    matView = MakeViewMatirx(rotation_, tranlation);
+    matView = MakeViewMatirx(quaternion_, tranlation);
 
     // 透視投影による射影行列の生成
     matProjection = MakePerspectiveFovMatrix(fovAngleY_, aspectRatio_, nearZ_, farZ_);
@@ -21,8 +39,9 @@ void ViewProjection::Update() {
 
     // 定数バッファに書き込み
     ConstBufferData bufferData;
-    bufferData.view = matView;
-    bufferData.projection = matProjection;
+    Matrix4x4 viewProjection = matView * matProjection;
+    bufferData.viewProjection = viewProjection;
+    bufferData.inverseViewProjection = Inverse(viewProjection);
     bufferData.viewPosition = translation_;
 
     constBuffer_.Copy(bufferData);
@@ -38,40 +57,4 @@ bool ViewProjection::Shake(Vector3 shakeValue, int& frame)
     frame = 0;
     shakeValue_ = { 0.0f,0.0f,0.0f };
     return false;
-}
-
-void ViewProjection::DebugMove() {
-    Input* input = Input::GetInstance();
-
-    Vector2 mouseMove = input->GetMouseMove();
-    float wheel = input->GetWheel();
-#ifdef _DEBUG
-    ImGui::Begin("Camera");
-    ImGui::DragFloat3("target", &rotation_.x, 0.01f);
-    ImGui::DragFloat3("translation", &translation_.x, 0.01f);
-    ImGui::DragFloat("orthographicValue_", &orthographicValue_, 0.01f);
-    orthographicValue_ = clamp(orthographicValue_, 0.01f, INFINITE);
-    ImGui::End();
-#endif // _DEBUG
-
-
-
-    if (input->IsPressMouse(1)) {
-        float rot = static_cast<float>(M_PI / 180.0f);
-        rotation_.x += rot * mouseMove.y * 0.1f;
-        rotation_.y += rot * mouseMove.x * 0.1f;
-    }
-    else if (input->IsPressMouse(2)) {
-        Matrix4x4 rotMat = MakeRotateXYZMatrix(rotation_);
-        Vector3 cameraX = GetXAxis(rotMat) * static_cast<float>(-mouseMove.x) * 0.01f;
-        Vector3 cameraY = GetYAxis(rotMat) * static_cast<float>(mouseMove.y) * 0.01f;
-        translation_ += cameraX + cameraY;
-    }
-    else if (wheel != 0) {
-        Matrix4x4 rotMat = MakeRotateXYZMatrix(rotation_);
-        Vector3 cameraZ = GetZAxis(rotMat) * (static_cast<float>(wheel / 120) * 0.5f);
-        translation_ += cameraZ;
-        //orthographicValue_ -= static_cast<float>(wheel / 120) * 0.01f;
-        orthographicValue_ = clamp(orthographicValue_, 0.01f, INFINITE);
-    }
 }

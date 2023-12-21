@@ -124,9 +124,6 @@
     <ClCompile Include="PostEffect.cpp">
       <Filter>Engine\PostEffect</Filter>
     </ClCompile>
-    <ClCompile Include="Collider.cpp">
-      <Filter>Engine\Collider</Filter>
-    </ClCompile>
     <ClCompile Include="CommandContext.cpp">
       <Filter>Engine\Graphics</Filter>
     </ClCompile>
@@ -205,7 +202,6 @@
     <ClCompile Include="Renderer.cpp">
       <Filter>Engine\Rederer</Filter>
     </ClCompile>
-    <ClCompile Include="DeferredRenderer.cpp" />
     <ClCompile Include="ModelManager.cpp">
       <Filter>Engine\Model</Filter>
     </ClCompile>
@@ -215,6 +211,20 @@
     <ClCompile Include="Mesh.cpp">
       <Filter>Engine\Model</Filter>
     </ClCompile>
+    <ClCompile Include="Collider.cpp">
+      <Filter>Engine\PostEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="DeferredRenderer.cpp">
+      <Filter>Engine\PostEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="EdgeRenderer.cpp">
+      <Filter>Engine\PostEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="Wall.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="DebugCamera.cpp" />
+    <ClCompile Include="Camera.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -373,7 +383,6 @@
     <ClInclude Include="Renderer.h">
       <Filter>Engine\Rederer</Filter>
     </ClInclude>
-    <ClInclude Include="DeferredRenderer.h" />
     <ClInclude Include="ModelManager.h">
       <Filter>Engine\Model</Filter>
     </ClInclude>
@@ -383,6 +392,17 @@
     <ClInclude Include="Mesh.h">
       <Filter>Engine\Model</Filter>
     </ClInclude>
+    <ClInclude Include="DeferredRenderer.h">
+      <Filter>Engine\PostEffect</Filter>
+    </ClInclude>
+    <ClInclude Include="EdgeRenderer.h">
+      <Filter>Engine\PostEffect</Filter>
+    </ClInclude>
+    <ClInclude Include="Wall.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugCamera.h" />
+    <ClInclude Include="Camera.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\shaders\Basic.hlsli">
@@ -445,6 +465,15 @@
       <Filter>shaders</Filter>
     </FxCompile>
     <FxCompile Include="Resources\shaders\DeferredRenderingPS.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\MultiplyPS.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\EdgePS.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\EdgeVS.hlsl">
       <Filter>shaders</Filter>
     </FxCompile>
   </ItemGroup>

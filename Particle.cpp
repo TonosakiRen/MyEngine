@@ -108,6 +108,9 @@ void Particle::CreatePipeline() {
           {
            "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT,
            D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+            {
+           "NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT,
+           D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
           {
            "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,    0, D3D12_APPEND_ALIGNED_ELEMENT,
            D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
@@ -146,8 +149,9 @@ void Particle::CreatePipeline() {
 
         gpipeline.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 
-        gpipeline.NumRenderTargets = 1;
-        gpipeline.RTVFormats[int(Renderer::kMain)] = Renderer::GetInstance()->GetRTVFormat(Renderer::kMain);
+        gpipeline.NumRenderTargets = Renderer::kRenderTargetNum;
+        gpipeline.RTVFormats[int(Renderer::kColor)] = Renderer::GetInstance()->GetRTVFormat(Renderer::kColor);
+        gpipeline.RTVFormats[int(Renderer::kNormal)] = Renderer::GetInstance()->GetRTVFormat(Renderer::kNormal);
         gpipeline.SampleDesc.Count = 1;
 
 
@@ -166,15 +170,19 @@ void Particle::CreateMesh() {
 
     //左下
     vertices_[0].pos = { -0.5f,-0.5f,0.0f };
+    vertices_[0].normal = { 0.0f,0.0f,-1.0f };
     vertices_[0].uv = { 0.0f,1.0f };
     //左上
     vertices_[1].pos = { -0.5f,0.5f,0.0f };
+    vertices_[1].normal = { 0.0f,0.0f,-1.0f };
     vertices_[1].uv = { 0.0f,0.0f };
     //右上
     vertices_[2].pos = { 0.5f,0.5f,0.0f };
+    vertices_[2].normal = { 0.0f,0.0f,-1.0f };
     vertices_[2].uv = { 1.0f,0.0f };
     //右下
     vertices_[3].pos = { 0.5f,-0.5f,0.0f };
+    vertices_[3].normal = { 0.0f,0.0f,-1.0f };
     vertices_[3].uv = { 1.0f,1.0f };
 
     // 頂点インデックスの設定

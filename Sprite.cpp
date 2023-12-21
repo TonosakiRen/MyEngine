@@ -107,7 +107,7 @@ void Sprite::StaticInitialize() {
 		gpipeline.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 
 		gpipeline.NumRenderTargets = 1;
-		gpipeline.RTVFormats[int(Renderer::kMain)] = Renderer::GetInstance()->GetRTVFormat(Renderer::kMain);
+		gpipeline.RTVFormats[int(Renderer::kColor)] = Renderer::GetInstance()->GetRTVFormat(Renderer::kColor);
 		gpipeline.SampleDesc.Count = 1;
 
 		gpipeline.pRootSignature = *rootSignature_;

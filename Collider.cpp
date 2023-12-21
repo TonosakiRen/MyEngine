@@ -6,6 +6,7 @@ bool Collider::isDrawCollider = false;
 
 void Collider::SwitchIsDrawCollider()
 {
+#ifdef _DEBUG
 	ImGui::Begin("Collider");
 	if (ImGui::Button("SwitchColliderDraw")) {
 		if (Collider::isDrawCollider == false) {
@@ -16,6 +17,7 @@ void Collider::SwitchIsDrawCollider()
 		}
 	}
 	ImGui::End();
+#endif 
 }
 
 void Collider::Initialize(WorldTransform* objectWorldTransform, const std::string name, Vector3 initialScale, Vector3 initialPos)
@@ -37,7 +39,7 @@ void Collider::AdjustmentScale()
 	ImGui::DragFloat3("scale", &worldTransform_.scale_.x, 0.1f);
 	ImGui::DragFloat3("translation", &worldTransform_.translation_.x, 0.1f);
 	ImGui::End();
-#endif // _DEBUG
+#endif
 
 	MatrixUpdate();
 }
@@ -59,8 +61,13 @@ bool Collider::Collision(Collider& colliderB, Vector3& minAxis, float& minOverla
 	OBB obb2;
 	obb1.center = MakeTranslation(worldTransform_.matWorld_);
 	obb2.center = MakeTranslation(colliderB.worldTransform_.matWorld_);
-	obb1.size = MakeScale(worldTransform_.matWorld_);
-	obb2.size = MakeScale(colliderB.worldTransform_.matWorld_);
+	obb1.size = MakeScale(worldTransform_.matWorld_) / 2.0f;
+	obb2.size = MakeScale(colliderB.worldTransform_.matWorld_) / 2.0f;
+	if (!SphereCollision(obb1.center, obb1.size, obb2.center, obb2.size)) {
+		minAxis = { 0.0f,0.0f,0.0f };
+		minOverlap = 0.0f;
+		return false;
+	}
 	Matrix4x4 rotateMatrix1 = NormalizeMakeRotateMatrix(worldTransform_.matWorld_);
 	Matrix4x4 rotateMatrix2 = NormalizeMakeRotateMatrix(colliderB.worldTransform_.matWorld_);
 	obb1.orientations[0] = GetXAxis(rotateMatrix1);
@@ -81,8 +88,12 @@ bool Collider::Collision(Collider& colliderB, Vector3& pushBuckVector)
 	OBB obb2;
 	obb1.center = MakeTranslation(worldTransform_.matWorld_);
 	obb2.center = MakeTranslation(colliderB.worldTransform_.matWorld_);
-	obb1.size = MakeScale(worldTransform_.matWorld_);
-	obb2.size = MakeScale(colliderB.worldTransform_.matWorld_);
+	obb1.size = MakeScale(worldTransform_.matWorld_) / 2.0f;
+	obb2.size = MakeScale(colliderB.worldTransform_.matWorld_) / 2.0f;
+	if (!SphereCollision(obb1.center, obb1.size, obb2.center, obb2.size)) {
+ 		pushBuckVector = { 0.0f,0.0f,0.0f };
+		return false;
+	}
 	Matrix4x4 rotateMatrix1 = NormalizeMakeRotateMatrix(worldTransform_.matWorld_);
 	Matrix4x4 rotateMatrix2 = NormalizeMakeRotateMatrix(colliderB.worldTransform_.matWorld_);
 	obb1.orientations[0] = GetXAxis(rotateMatrix1);
@@ -110,6 +121,17 @@ bool Collider::Collision(Collider& colliderB, Vector3& pushBuckVector)
 	return false;
 }
 
+bool Collider::SphereCollision(Vector3 position1, Vector3 size1, Vector3 position2, Vector3 size2)
+{
+	float radius1 = Length(size1) ;
+	float radius2 = Length(size2) ;
+	float distance = Length(position1 - position2);
+	if (distance < radius2 + radius1) {
+		return true;
+	}
+	return false;
+}
+
 bool Collider::Collision(Collider& colliderB)
 {
 
@@ -119,8 +141,11 @@ bool Collider::Collision(Collider& colliderB)
 	OBB obb2;
 	obb1.center = MakeTranslation(worldTransform_.matWorld_);
 	obb2.center = MakeTranslation(colliderB.worldTransform_.matWorld_);
-	obb1.size = MakeScale(worldTransform_.matWorld_);
-	obb2.size = MakeScale(colliderB.worldTransform_.matWorld_);
+	obb1.size = MakeScale(worldTransform_.matWorld_) / 2.0f;
+	obb2.size = MakeScale(colliderB.worldTransform_.matWorld_) / 2.0f;
+	if (!SphereCollision(obb1.center, obb1.size, obb2.center, obb2.size)) {
+		return false;
+	}
 	Matrix4x4 rotateMatrix1 = NormalizeMakeRotateMatrix(worldTransform_.matWorld_);
 	Matrix4x4 rotateMatrix2 = NormalizeMakeRotateMatrix(colliderB.worldTransform_.matWorld_);
 	obb1.orientations[0] = GetXAxis(rotateMatrix1);

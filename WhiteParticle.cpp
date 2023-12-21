@@ -27,6 +27,7 @@ void WhiteParticle::Update() {
 					particles[i].isActive_ = true;
 
 					emitterWorldTransform_.Update();
+					emitBox_ = MakeOBB(emitterWorldTransform_.matWorld_);
 
 					if (emitterWorldTransform_.GetParent()) {
 						particles[i].direction_ = Normalize(Vector3{ Rand(minDirection_.x, maxDirection_.x) ,Rand(minDirection_.y,maxDirection_.y) ,Rand(minDirection_.z,maxDirection_.z) } *NormalizeMakeRotateMatrix(emitterWorldTransform_.GetParent()->matWorld_));
@@ -46,7 +47,7 @@ void WhiteParticle::Update() {
 	for (size_t i = 0; i < kParticleNum; i++) {
 		float rotationSpeed = Radian(2.0f) * (float(i % 2) * 2.0f - 1.0f);
 		if (particles[i].isActive_ == true) {
-			particles[i].worldTransform_.quaternion_ *= MakeRotateAxisAngleQuaternion({ 0.0f,0.0f,1.0f }, rotationSpeed);
+			particles[i].worldTransform_.quaternion_ *= MakeFromAngleAxis({ 0.0f,0.0f,1.0f }, rotationSpeed);
 			particles[i].worldTransform_.translation_ += particles[i].direction_ * speed_;
 			particles[i].worldTransform_.scale_ = particles[i].worldTransform_.scale_ - scaleSpeed_;
 			particles[i].worldTransform_.Update();

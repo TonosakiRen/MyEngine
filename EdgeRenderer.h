@@ -13,16 +13,14 @@ class ViewProjection;
 class DirectionalLights;
 
 
-class DeferredRenderer
+class EdgeRenderer
 {
 public:
 	enum class RootParameter {
 		kColorTexture,
 		kNormalTexture,
 		kDepthTexture,
-		
-		kViewProjection,
-		kDirectionalLights,
+		kEdgeColor,
 
 		ParameterNum
 	};
@@ -31,21 +29,25 @@ public:
 		Vector4 pos;
 		Vector2 uv;
 	};
-	void Initialize(ColorBuffer* originalTexture, ColorBuffer* normalTexture, DepthBuffer* depthTexture);
-	void Render(CommandContext& commandContext, ColorBuffer* originalBuffer_, const ViewProjection& viewProjection, const DirectionalLights& directionalLight);
+	void Initialize(ColorBuffer* originalTexture,ColorBuffer* normalTexture, DepthBuffer* depthTexture);
+	void Render(CommandContext& commandContext, ColorBuffer* originalTexture);
 
 private:
 	void CreatePipeline();
 	void CreateMesh();
 private:
-	static PipelineState pipelineState_;
-	static RootSignature rootSignature_;
-	ColorBuffer* colorTexture_;
+	PipelineState edgePipelineState_;
+	PipelineState multiplyPipeline_;
+	RootSignature edgeRootSignature_;
+	RootSignature multiplyRootSignature_;
+
 	ColorBuffer* normalTexture_;
 	DepthBuffer* depthTexture_;
-	
+
+	ColorBuffer edgeTexture_;
+
 	DescriptorHandle uavHandle_;
-	
+
 
 	D3D12_VERTEX_BUFFER_VIEW vbView_{};
 	D3D12_INDEX_BUFFER_VIEW ibView_{};
@@ -54,6 +56,8 @@ private:
 	UploadBuffer vertexBuffer_;
 	UploadBuffer indexBuffer_;
 
-	
+	Vector3 edgeColor_ = { 0.0f,0.0f,0.0f };
+
+
 };
 
