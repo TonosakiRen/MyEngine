@@ -7,7 +7,9 @@ class Camera :
 public:
 	void Initialize();
 	void Initialize(Vector3 position, Quaternion rotation);
-	void Update(float playerX);
+	void Update(Vector3 playerPos);
+	Vector3 GetOffset();
 private:
-	float savePlayerX = 0.0f;
+	Vector3 savePlayerPos;
+	Vector3 interTarget_;
 };

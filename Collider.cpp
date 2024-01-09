@@ -1,5 +1,6 @@
 #include "Collider.h"
 #include "ImGuiManager.h"
+#include "ModelManager.h"
 #include "Input.h"
 
 bool Collider::isDrawCollider = false;
@@ -26,6 +27,16 @@ void Collider::Initialize(WorldTransform* objectWorldTransform, const std::strin
 	worldTransform_.SetParent(objectWorldTransform);
 	worldTransform_.scale_ = initialScale;
 	worldTransform_.translation_ = initialPos;
+	name_ = name;
+	cube_.Initialize("box1x1");
+}
+
+void Collider::Initialize(WorldTransform* objectWorldTransform, const std::string name,uint32_t modelHandle)
+{
+	worldTransform_.Initialize();
+	worldTransform_.SetParent(objectWorldTransform);
+	worldTransform_.scale_ = ModelManager::GetInstance()->GetModelSize(modelHandle);
+	worldTransform_.translation_ = ModelManager::GetInstance()->GetModelCenter(modelHandle);
 	name_ = name;
 	cube_.Initialize("box1x1");
 }

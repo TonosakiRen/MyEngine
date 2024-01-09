@@ -97,6 +97,24 @@ public:
 	static float easing(float t, float start, float end);
 
 	/// <summary>
+	/// イージングで数がほしいとき
+	/// </summary>
+	/// <param name="t">t</param>
+	/// <param name="start">スタート</param>
+	/// <param name="end">終わり</param>
+	/// <returns></returns>
+	static Vector2 easing(float t, Vector2 start, Vector2 end);
+
+	/// <summary>
+	/// イージングで数がほしいとき
+	/// </summary>
+	/// <param name="t">t</param>
+	/// <param name="start">スタート</param>
+	/// <param name="end">終わり</param>
+	/// <returns></returns>
+	static Vector3 easing(float t, Vector3 start, Vector3 end);
+
+	/// <summary>
 	/// イージング
 	/// </summary>
 	/// <param name="t">t</param>

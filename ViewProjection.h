@@ -5,8 +5,6 @@
 #include "UploadBuffer.h"
 
 class ViewProjection {
-	friend class DebugCamera;
-	friend class Camera;
 public:
 
 	static bool isUseDebugCamera;
@@ -35,7 +33,16 @@ public:
 	const Matrix4x4 GetMatView() const {
 		return matView;
 	}
-private:
+
+	const Matrix4x4 GetMatProjection() const {
+		return matProjection;
+	}
+
+	const Quaternion GetQuaternion() const {
+		return quaternion_;
+	}
+
+protected:
 	Vector3 translation_ = { 0.0f, 7.0f, -27.0f };
 	Quaternion quaternion_ = { 0.0f, 0.0f, 0.0f,1.0f };
 	Vector3 shakeValue_ = { 0.0f,0.0f,0.0f };

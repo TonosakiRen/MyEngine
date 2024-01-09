@@ -9,12 +9,15 @@ class GameObject
 {
 public:
 	void Initialize(const std::string name);
+	void Initialize(uint32_t modelHandle);
 	void UpdateMatrix();
 	void UpdateMaterial(Vector4 color = { 1.0f,1.0f,1.0f,1.0f });
 	void Draw(uint32_t textureHandle ,Vector4 color = { 1.0f,1.0f,1.0f,1.0f } );
 	void Draw(Vector4 color = { 1.0f,1.0f,1.0f,1.0f });
 	void Draw(const WorldTransform& worldTransform, uint32_t textureHandle, Vector4 color = { 1.0f,1.0f,1.0f,1.0f });
 	void Draw(const WorldTransform& worldTransform, Vector4 color = { 1.0f,1.0f,1.0f,1.0f });
+
+	void Draw(uint32_t modelHandle, const WorldTransform& worldTransform, Vector4 color = { 1.0f,1.0f,1.0f,1.0f });
 
 	void SetEnableLighting(bool enableLighting) {
 		material_.enableLighting_ = enableLighting;

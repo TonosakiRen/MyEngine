@@ -25,6 +25,21 @@ float Easing::easing(float t, float start, float end) {
 	return((1.0f - t) * start + t * end);
 }
 
+Vector2 Easing::easing(float t, Vector2 start, Vector2 end) {
+	Vector2 result;
+	result.x = (1.0f - t) * start.x + t * end.x;
+	result.y = (1.0f - t) * start.y + t * end.y;
+	return result;
+}
+
+Vector3 Easing::easing(float t, Vector3 start, Vector3 end) {
+	Vector3 result;
+	result.x = (1.0f - t) * start.x + t * end.x;
+	result.y = (1.0f - t) * start.y + t * end.y;
+	result.z = (1.0f - t) * start.z + t * end.z;
+	return result;
+}
+
 Vector2 Easing::easing(float& t, Vector2 start, Vector2 end, float speed, EasingMode easingMode, bool isAdd) {
 	if (isAdd == true) {
 		t += speed;

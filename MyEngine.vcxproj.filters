@@ -59,6 +59,15 @@
     <Filter Include="Engine\Camera">
       <UniqueIdentifier>{710ab866-965f-482b-9785-109a42b2dfbe}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine\ShadowMap">
+      <UniqueIdentifier>{b9271c4f-423e-4db1-ba89-ece7173cd88c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Sprite">
+      <UniqueIdentifier>{d9b5e0ee-de14-446b-a90f-a801d58a45fd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Light">
+      <UniqueIdentifier>{57d802ba-7fc0-4bf1-b234-87825c0658ba}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="externals\imgui\imgui.cpp">
@@ -142,16 +151,10 @@
     <ClCompile Include="DescriptorHeap.cpp">
       <Filter>Engine\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="DirectionalLights.cpp">
-      <Filter>Engine\GameComponent</Filter>
-    </ClCompile>
     <ClCompile Include="GlobalVariables.cpp">
       <Filter>Engine\GameComponent</Filter>
     </ClCompile>
     <ClCompile Include="Material.cpp">
-      <Filter>Engine\GameComponent</Filter>
-    </ClCompile>
-    <ClCompile Include="Sprite.cpp">
       <Filter>Engine\GameComponent</Filter>
     </ClCompile>
     <ClCompile Include="WorldTransform.cpp">
@@ -205,14 +208,8 @@
     <ClCompile Include="ModelManager.cpp">
       <Filter>Engine\Model</Filter>
     </ClCompile>
-    <ClCompile Include="Model.cpp">
-      <Filter>Engine\Model</Filter>
-    </ClCompile>
     <ClCompile Include="Mesh.cpp">
       <Filter>Engine\Model</Filter>
-    </ClCompile>
-    <ClCompile Include="Collider.cpp">
-      <Filter>Engine\PostEffect</Filter>
     </ClCompile>
     <ClCompile Include="DeferredRenderer.cpp">
       <Filter>Engine\PostEffect</Filter>
@@ -232,6 +229,34 @@
     <ClCompile Include="ViewProjection.cpp">
       <Filter>Engine\Camera</Filter>
     </ClCompile>
+    <ClCompile Include="Collider.cpp">
+      <Filter>Engine\Collider</Filter>
+    </ClCompile>
+    <ClCompile Include="ShadowMap.cpp">
+      <Filter>Engine\ShadowMap</Filter>
+    </ClCompile>
+    <ClCompile Include="Sprite.cpp">
+      <Filter>Engine\Sprite</Filter>
+    </ClCompile>
+    <ClCompile Include="Model.cpp">
+      <Filter>Engine\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="SpotLights.cpp">
+      <Filter>Engine\Light</Filter>
+    </ClCompile>
+    <ClCompile Include="PointLights.cpp">
+      <Filter>Engine\Light</Filter>
+    </ClCompile>
+    <ClCompile Include="DirectionalLights.cpp">
+      <Filter>Engine\Light</Filter>
+    </ClCompile>
+    <ClCompile Include="Enemy.cpp" />
+    <ClCompile Include="EnemyBullet.cpp" />
+    <ClCompile Include="EnemyBulletManager.cpp" />
+    <ClCompile Include="PlayerBullet.cpp" />
+    <ClCompile Include="PlayerBulletManager.cpp" />
+    <ClCompile Include="BoxArea.cpp" />
+    <ClCompile Include="ExplodeParticle.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -324,16 +349,10 @@
     <ClInclude Include="DescriptorHeap.h">
       <Filter>Engine\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="DirectionalLights.h">
-      <Filter>Engine\GameComponent</Filter>
-    </ClInclude>
     <ClInclude Include="GlobalVariables.h">
       <Filter>Engine\GameComponent</Filter>
     </ClInclude>
     <ClInclude Include="Material.h">
-      <Filter>Engine\GameComponent</Filter>
-    </ClInclude>
-    <ClInclude Include="Sprite.h">
       <Filter>Engine\GameComponent</Filter>
     </ClInclude>
     <ClInclude Include="WorldTransform.h">
@@ -414,23 +433,34 @@
     <ClInclude Include="ViewProjection.h">
       <Filter>Engine\Camera</Filter>
     </ClInclude>
+    <ClInclude Include="ShadowMap.h">
+      <Filter>Engine\ShadowMap</Filter>
+    </ClInclude>
+    <ClInclude Include="Sprite.h">
+      <Filter>Engine\Sprite</Filter>
+    </ClInclude>
+    <ClInclude Include="PointLights.h">
+      <Filter>Engine\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="SpotLights.h">
+      <Filter>Engine\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectionalLights.h">
+      <Filter>Engine\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="Enemy.h" />
+    <ClInclude Include="EnemyBullet.h" />
+    <ClInclude Include="EnemyBulletManager.h" />
+    <ClInclude Include="PlayerBullet.h" />
+    <ClInclude Include="PlayerBulletManager.h" />
+    <ClInclude Include="BoxArea.h" />
+    <ClInclude Include="ExplodeParticle.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\shaders\Basic.hlsli">
-      <Filter>shaders</Filter>
-    </None>
-    <None Include="Resources\shaders\Particle.hlsli">
-      <Filter>shaders</Filter>
-    </None>
-    <None Include="Resources\shaders\Sprite.hlsli">
-      <Filter>shaders</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="Resources\shaders\BasicPS.hlsl">
+    <FxCompile Include="Resources\shaders\ModelPS.hlsl">
       <Filter>shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Resources\shaders\BasicVS.hlsl">
+    <FxCompile Include="Resources\shaders\ModelVS.hlsl">
       <Filter>shaders</Filter>
     </FxCompile>
     <FxCompile Include="Resources\shaders\ParticlePS.hlsl">
@@ -485,6 +515,12 @@
       <Filter>shaders</Filter>
     </FxCompile>
     <FxCompile Include="Resources\shaders\EdgeVS.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\ShadowMapPS.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\ShadowMapVS.hlsl">
       <Filter>shaders</Filter>
     </FxCompile>
   </ItemGroup>

@@ -4,7 +4,7 @@
 #include "ImGuiManager.h"
 
 
-bool ViewProjection::isUseDebugCamera = true;
+bool ViewProjection::isUseDebugCamera = false;
 
 void ViewProjection::SwitchIsUseDebugCamera()
 {

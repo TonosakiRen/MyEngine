@@ -8,7 +8,7 @@
 using namespace DirectX;
 
 uint32_t ModelManager::Load(const std::string& fileName) {
-	return ModelManager::GetInstance()->LoadInternal(fileName);
+    return ModelManager::GetInstance()->LoadInternal(fileName);
 }
 
 void ModelManager::CreateMeshes(ModelIndex& modelIndex)
@@ -23,9 +23,10 @@ void ModelManager::CreateMeshes(ModelIndex& modelIndex)
     std::unordered_map<std::string, uint32_t> vertexDefinitionMap;
     std::string directoryPath = "Resources/models/" + modelIndex.name + "/";
     std::ifstream file(directoryPath + modelIndex.name + ".obj"); //ファイルを開く
+    std::unordered_map<std::string, uint32_t> materialHandles;
     int multiMeshIndex = -1;
     Vector3 minModelSize{};
-    Vector3 maxModelSize{};
+    Vector3 maxModelSize{ FLT_MIN,FLT_MIN,FLT_MIN };
     assert(file.is_open());//とりあえず開けなったら止める
 
     while (std::getline(file, line)) {
@@ -33,10 +34,17 @@ void ModelManager::CreateMeshes(ModelIndex& modelIndex)
         std::istringstream s(line);
         s >> identifier;//先頭の識別子を読む
         if (identifier == "usemtl") {
+            std::string identifier2;
+            s >> identifier2;
             indexes.clear();
             multiMeshIndex++;
-            if (modelIndex.meshes.size() <= multiMeshIndex) {
-                modelIndex.meshes.emplace_back();
+            modelIndex.meshes.emplace_back();
+            auto it = materialHandles.find(identifier2);
+            if (it != materialHandles.end()) {
+                modelIndex.meshes[multiMeshIndex].uvHandle_ = it->second;
+            }
+            else {
+                modelIndex.meshes[multiMeshIndex].uvHandle_ = 0;
             }
         }
         else if (identifier == "v") {
@@ -48,26 +56,26 @@ void ModelManager::CreateMeshes(ModelIndex& modelIndex)
             if (minModelSize.x > position.x) {
                 minModelSize.x = position.x;
             }
-            else if(maxModelSize.x < position.x){
+            if (maxModelSize.x < position.x) {
                 maxModelSize.x = position.x;
             }
             if (minModelSize.y > position.y) {
                 minModelSize.y = position.y;
             }
-            else if (maxModelSize.y < position.y) {
+            if (maxModelSize.y < position.y) {
                 maxModelSize.y = position.y;
             }
             if (minModelSize.z > position.z) {
                 minModelSize.z = position.z;
             }
-            else if (maxModelSize.z < position.z) {
+            if (maxModelSize.z < position.z) {
                 maxModelSize.z = position.z;
-            }  
+            }
         }
         else if (identifier == "vn") {
             Vector3 normal;
             s >> normal.x >> normal.y >> normal.z;
-           /* normal.z *= -1.0f;*/
+            normal.z *= -1.0f;
             normals.push_back(normal);
         }
         else if (identifier == "vt") {
@@ -96,7 +104,7 @@ void ModelManager::CreateMeshes(ModelIndex& modelIndex)
                 }
                 else {
                     std::istringstream v(vertexDefinitions[i]);
-                    uint32_t elementIndices[3] = {0,0,0};
+                    uint32_t elementIndices[3] = { 0,0,0 };
                     bool useElement[3]{};
                     for (int32_t element = 0; element < 3; ++element) {
                         std::string index;
@@ -134,43 +142,53 @@ void ModelManager::CreateMeshes(ModelIndex& modelIndex)
             std::string uvFilePass;//構築するMaterialData
             std::string line;//fileから読んだ１行を格納するもの
             std::ifstream file("Resources/models/" + modelIndex.name + "/" + modelIndex.name + ".mtl"); //ファイルを開く
+            std::string materialName;
             assert(file.is_open());//とりあえず開けなかったら止める
             while (std::getline(file, line)) {
                 std::string identifier;
                 std::istringstream s(line);
                 s >> identifier;
                 //identifierに応じた処理
-                if (identifier == "map_Kd") {
-                    std::string textureFilename;
-                    s >> textureFilename;
-                    //連結してファイルパスにする
-                    uvFilePass = directoryPath + textureFilename;
-                    auto& mesh = modelIndex.meshes.emplace_back();
-                    mesh.uvHandle_ = TextureManager::LoadUv(textureFilename, uvFilePass);
+                if (identifier == "newmtl") {
+                    std::string identifier2;
+                    s >> identifier2;
+                    materialName = identifier2;
+
                 }
+                else
+                    if (identifier == "map_Kd") {
+                        std::string textureFilename;
+                        s >> textureFilename;
+                        //連結してファイルパスにする
+                        uvFilePass = directoryPath + textureFilename;
+
+                        uint32_t uvHandle = TextureManager::LoadUv(textureFilename, uvFilePass);
+                        materialHandles.insert({ materialName , uvHandle });
+
+                    }
             }
         }
     }
 
     modelIndex.modelSize = (maxModelSize - minModelSize);
-    modelIndex.modelCenter = maxModelSize - Vector3(modelIndex.modelSize / 2.0f) ;
+    modelIndex.modelCenter = maxModelSize - Vector3(modelIndex.modelSize / 2.0f);
     //もしmodelの原点を一番下にしていたら
-    if (minModelSize.y < 0.5f || minModelSize.y < -0.5f) {
+    if (minModelSize.y < 0.5f && minModelSize.y > -0.5f) {
         modelIndex.modelCenter.y = minModelSize.y;
     }
-    
-        // 頂点データのサイズ
-        UINT sizeVB = static_cast<UINT>(sizeof(VertexData) * modelIndex.vertices_.size());
 
-        modelIndex.vertexBuffer_.Create(sizeVB);
+    // 頂点データのサイズ
+    UINT sizeVB = static_cast<UINT>(sizeof(VertexData) * modelIndex.vertices_.size());
 
-        modelIndex.vertexBuffer_.Copy(modelIndex.vertices_.data(), sizeVB);
+    modelIndex.vertexBuffer_.Create(sizeVB);
 
-        // 頂点バッファビューの作成
-        modelIndex.vbView_.BufferLocation = modelIndex.vertexBuffer_.GetGPUVirtualAddress();
-        modelIndex.vbView_.SizeInBytes = sizeVB;
-        modelIndex.vbView_.StrideInBytes = sizeof(modelIndex.vertices_[0]);
-       
+    modelIndex.vertexBuffer_.Copy(modelIndex.vertices_.data(), sizeVB);
+
+    // 頂点バッファビューの作成
+    modelIndex.vbView_.BufferLocation = modelIndex.vertexBuffer_.GetGPUVirtualAddress();
+    modelIndex.vbView_.SizeInBytes = sizeVB;
+    modelIndex.vbView_.StrideInBytes = sizeof(modelIndex.vertices_[0]);
+
     for (auto& mesh : modelIndex.meshes) {
 
         // インデックスデータのサイズ
@@ -190,48 +208,80 @@ void ModelManager::CreateMeshes(ModelIndex& modelIndex)
 
 
 ModelManager* ModelManager::GetInstance() {
-	static ModelManager instance;
-	return &instance;
+    static ModelManager instance;
+    return &instance;
 }
 
-void ModelManager::DrawInstanced(ID3D12GraphicsCommandList* commandList, uint32_t modelHandle, UINT textureRootParamterIndex) {
-	assert(modelHandle < kNumModels);
+void ModelManager::DrawInstanced(CommandContext* commandContext, uint32_t modelHandle)
+{
+    assert(modelHandle < kNumModels);
+    // 頂点バッファの設定
+    commandContext->SetVertexBuffer(0, 1, &models_[modelHandle].vbView_);
+
+    for (auto& mesh : models_[modelHandle].meshes) {
+
+        // インデックスバッファの設定
+        commandContext->SetIndexBuffer(*mesh.GetIbView());
+        // 描画コマンド
+        commandContext->DrawIndexedInstanced(static_cast<UINT>(mesh.indices_.size()), 1, 0, 0, 0);
+    }
+}
+
+void ModelManager::DrawInstanced(CommandContext* commandContext, uint32_t modelHandle, UINT textureRootParamterIndex) {
+    assert(modelHandle < kNumModels);
 
     // 頂点バッファの設定
-    commandList->IASetVertexBuffers(0, 1, &models_[modelHandle].vbView_);
+    commandContext->SetVertexBuffer(0, 1, &models_[modelHandle].vbView_);
 
     for (auto& mesh : models_[modelHandle].meshes) {
         // srvセット
-        TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(commandList, textureRootParamterIndex, mesh.GetUv());
+        TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(commandContext, textureRootParamterIndex, mesh.GetUv());
         // インデックスバッファの設定
-        commandList->IASetIndexBuffer(mesh.GetIbView());
+        commandContext->SetIndexBuffer(*mesh.GetIbView());
         // 描画コマンド
-        commandList->DrawIndexedInstanced(static_cast<UINT>(mesh.indices_.size()), 1, 0, 0, 0);
+        commandContext->DrawIndexedInstanced(static_cast<UINT>(mesh.indices_.size()), 1, 0, 0, 0);
+    }
+}
+
+void ModelManager::DrawInstanced(CommandContext* commandContext, uint32_t modelHandle, UINT textureRootParamterIndex, uint32_t textureHandle)
+{
+    assert(modelHandle < kNumModels);
+
+    // 頂点バッファの設定
+    commandContext->SetVertexBuffer(0, 1, &models_[modelHandle].vbView_);
+
+    for (auto& mesh : models_[modelHandle].meshes) {
+        // srvセット
+        TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(commandContext, textureRootParamterIndex, textureHandle);
+        // インデックスバッファの設定
+        commandContext->SetIndexBuffer(*mesh.GetIbView());
+        // 描画コマンド
+        commandContext->DrawIndexedInstanced(static_cast<UINT>(mesh.indices_.size()), 1, 0, 0, 0);
     }
 }
 
 uint32_t ModelManager::LoadInternal(const std::string& name) {
 
-	assert(useModelCount_ < kNumModels);
-	uint32_t handle = useModelCount_;
+    assert(useModelCount_ < kNumModels);
+    uint32_t handle = useModelCount_;
 
-	// 読み込み済みmodelを検索
-	auto it = std::find_if(models_.begin(), models_.end(), [&](const auto& texture) {return texture.name == name; });
+    // 読み込み済みmodelを検索
+    auto it = std::find_if(models_.begin(), models_.end(), [&](const auto& texture) {return texture.name == name; });
 
-	if (it != models_.end()) {
-		// 読み込み済みmodelの要素番号を取得
-		handle = static_cast<uint32_t>(std::distance(models_.begin(), it));
-		return handle;
-	}
+    if (it != models_.end()) {
+        // 読み込み済みmodelの要素番号を取得
+        handle = static_cast<uint32_t>(std::distance(models_.begin(), it));
+        return handle;
+    }
 
-	// 書き込むmodelの参照
-	ModelIndex& modelIndex = models_.at(useModelCount_);
-	modelIndex.name = name;
+    // 書き込むmodelの参照
+    ModelIndex& modelIndex = models_.at(useModelCount_);
+    modelIndex.name = name;
 
-	CreateMeshes(modelIndex);
+    CreateMeshes(modelIndex);
 
-	useModelCount_++;
-	return handle;
+    useModelCount_++;
+    return handle;
 }
 
 Vector3 ModelManager::GetModelSize(uint32_t modelHandle)

@@ -31,7 +31,35 @@ public:
 	bool IsPressMouse(int32_t mouseNumber);
 	const std::array<BYTE, 256>& GetAllKey() { return key_; }
 
-	bool PushBotton(int gamePadButton) {
+	bool TriggerRightTrigger() {
+		if (xInputState_.Gamepad.bRightTrigger > XINPUT_GAMEPAD_TRIGGER_THRESHOLD && preXInputState_.Gamepad.bRightTrigger < XINPUT_GAMEPAD_TRIGGER_THRESHOLD) {
+			return true;
+		}
+		return false;
+	}
+
+	bool TriggerLeftTrigger() {
+		if (xInputState_.Gamepad.bLeftTrigger > XINPUT_GAMEPAD_TRIGGER_THRESHOLD && preXInputState_.Gamepad.bLeftTrigger < XINPUT_GAMEPAD_TRIGGER_THRESHOLD) {
+			return true;
+		}
+		return false;
+	}
+
+	bool PushRightTrigger() {
+		if (xInputState_.Gamepad.bRightTrigger > XINPUT_GAMEPAD_TRIGGER_THRESHOLD ) {
+			return true;
+		}
+		return false;
+	}
+
+	bool PushLeftTrigger() {
+		if (xInputState_.Gamepad.bLeftTrigger > XINPUT_GAMEPAD_TRIGGER_THRESHOLD ) {
+			return true;
+		}
+		return false;
+	}
+
+	bool PushButton(int gamePadButton) {
 		if (xInputState_.Gamepad.wButtons & gamePadButton) {
 			return true;
 		}

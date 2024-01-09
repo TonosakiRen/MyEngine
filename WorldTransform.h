@@ -63,8 +63,8 @@ public:
 	Quaternion quaternion_ = IdentityQuaternion();
 	Vector3 translation_ = { 0.0f,0.0f,0.0f };
 	Matrix4x4 matWorld_;
-private:
 	WorldTransform* parent_ = nullptr;
+private:
 	bool isScaleParent_ = true;
 	bool isRotateParent_ = true;
 
