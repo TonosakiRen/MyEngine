@@ -203,6 +203,24 @@ void GameScene::Update(CommandContext& commandContext){
 	ImGui::DragFloat3("emitterPos", &whiteParticle_->emitterWorldTransform_.translation_.x, 0.01f);
 	ImGui::End();
 	whiteParticle_->Update();
+	Quaternion rotation0 = MakeFromAngleAxis({ 0.71f,0.71f,0.0f }, 0.3f);
+	Quaternion rotation1 = MakeFromAngleAxis({ 0.71f,0.0f,0.71f }, 3.141592f);
+
+	Quaternion interpolate0 = Slerp(0.0f,rotation0, rotation1);
+	Quaternion interpolate1 = Slerp(0.3f, rotation0, rotation1);
+	Quaternion interpolate2 = Slerp(0.5f, rotation0, rotation1);
+	Quaternion interpolate3 = Slerp(0.7f, rotation0, rotation1);
+	Quaternion interpolate4 = Slerp(1.0f, rotation0, rotation1);
+
+
+
+	ImGui::Begin("MT4_1_5");
+	ImGui::Text("%f ,%f ,%f ,%f : interpolate0 , Slerp(q0,q1,0.0f)", interpolate0.x, interpolate0.y, interpolate0.z, interpolate0.w);
+	ImGui::Text("%f ,%f ,%f ,%f : interpolate1 , Slerp(q0,q1,0.3f)", interpolate1.x, interpolate1.y, interpolate1.z, interpolate1.w);
+	ImGui::Text("%f ,%f ,%f ,%f : interpolate2 , Slerp(q0,q1,0.5f)", interpolate2.x, interpolate2.y, interpolate2.z, interpolate2.w);
+	ImGui::Text("%f ,%f ,%f ,%f : interpolate3 , Slerp(q0,q1,0.7f)", interpolate3.x, interpolate3.y, interpolate3.z, interpolate3.w);
+	ImGui::Text("%f ,%f ,%f ,%f : interpolate4 , Slerp(q0,q1,1.0f)", interpolate4.x, interpolate4.y, interpolate4.z, interpolate4.w);
+	ImGui::End();
 }
 
 void GameScene::TitleInitialize() {
