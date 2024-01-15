@@ -4,7 +4,7 @@
 // Help:
 // - Read FAQ at http://dearimgui.org/faq
 // - Newcomers, read 'Programmer guide' below for notes on how to setup Dear ImGui in your codebase.
-// - Call and read ImGui::ShowDemoWindow() in imgui_demo.cpp. All applications in examples/ are doing that.
+// - Call and read ImGui::ShowDemoWindow() in imgui_demo.cpp. All s in examples/ are doing that.
 // Read imgui.cpp for details, links and comments.
 
 // Resources:
@@ -195,7 +195,7 @@ CODE
  - Dear ImGui is an implementation of the IMGUI paradigm (immediate-mode graphical user interface, a term coined by Casey Muratori).
    You can learn about IMGUI principles at http://www.johno.se/book/imgui.html, http://mollyrocket.com/861 & more links in Wiki.
  - Dear ImGui is a "single pass" rasterizing implementation of the IMGUI paradigm, aimed at ease of use and high-performances.
-   For every application frame, your UI code will be called only once. This is in contrast to e.g. Unity's implementation of an IMGUI,
+   For every  frame, your UI code will be called only once. This is in contrast to e.g. Unity's implementation of an IMGUI,
    where the UI code is called multiple times ("multiple passes") from a single entry point. There are pros and cons to both approaches.
  - Our origin is on the top-left. In axis aligned bounding boxes, Min = top-left, Max = bottom-right.
  - This codebase is also optimized to yield decent performances with typical "Debug" builds settings.
@@ -231,15 +231,15 @@ CODE
  - When using Dear ImGui, your programming IDE is your friend: follow the declaration of variables, functions and types to find comments about them.
  - Dear ImGui never touches or knows about your GPU state. The only function that knows about GPU is the draw function that you provide.
    Effectively it means you can create widgets at any time in your code, regardless of considerations of being in "update" vs "render"
-   phases of your own application. All rendering information is stored into command-lists that you will retrieve after calling ImGui::Render().
- - Refer to the backends and demo applications in the examples/ folder for instruction on how to setup your code.
+   phases of your own . All rendering information is stored into command-lists that you will retrieve after calling ImGui::Render().
+ - Refer to the backends and demo s in the examples/ folder for instruction on how to setup your code.
  - If you are running over a standard OS with a common graphics API, you should be able to use unmodified imgui_impl_*** files from the examples/ folder.
 
 
  HOW A SIMPLE APPLICATION MAY LOOK LIKE
  --------------------------------------
  EXHIBIT 1: USING THE EXAMPLE BACKENDS (= imgui_impl_XXX.cpp files from the backends/ folder).
- The sub-folders in examples/ contain examples applications following this structure.
+ The sub-folders in examples/ contain examples s following this structure.
 
      // Application init: create a dear imgui context, setup some options, load fonts
      ImGui::CreateContext();
@@ -260,7 +260,7 @@ CODE
          ImGui_ImplWin32_NewFrame();
          ImGui::NewFrame();
 
-         // Any application code here
+         // Any  code here
          ImGui::Text("Hello, world!");
 
          // Render dear imgui into screen
@@ -311,7 +311,7 @@ CODE
         // (So you want to try calling NewFrame() as early as you can in your main loop to be able to use Dear ImGui everywhere)
         ImGui::NewFrame();
 
-        // Most of your application code here
+        // Most of your  code here
         ImGui::Text("Hello, world!");
         MyGameUpdate(); // may use any Dear ImGui functions, e.g. ImGui::Begin("My window"); ImGui::Text("Hello, world!"); ImGui::End();
         MyGameRender(); // may use any Dear ImGui functions as well!
@@ -328,9 +328,9 @@ CODE
      // Shutdown
      ImGui::DestroyContext();
 
- To decide whether to dispatch mouse/keyboard inputs to Dear ImGui to the rest of your application,
+ To decide whether to dispatch mouse/keyboard inputs to Dear ImGui to the rest of your ,
  you should read the 'io.WantCaptureMouse', 'io.WantCaptureKeyboard' and 'io.WantTextInput' flags!
- Please read the FAQ and example applications for details about this!
+ Please read the FAQ and example s for details about this!
 
 
  HOW A SIMPLE RENDERING FUNCTION MAY LOOK LIKE
@@ -370,8 +370,8 @@ CODE
                  //   (some elements visible outside their bounds) but you can fix that once everything else works!
                  // - Clipping coordinates are provided in imgui coordinates space:
                  //   - For a given viewport, draw_data->DisplayPos == viewport->Pos and draw_data->DisplaySize == viewport->Size
-                 //   - In a single viewport application, draw_data->DisplayPos == (0,0) and draw_data->DisplaySize == io.DisplaySize, but always use GetMainViewport()->Pos/Size instead of hardcoding those values.
-                 //   - In the interest of supporting multi-viewport applications (see 'docking' branch on github),
+                 //   - In a single viewport , draw_data->DisplayPos == (0,0) and draw_data->DisplaySize == io.DisplaySize, but always use GetMainViewport()->Pos/Size instead of hardcoding those values.
+                 //   - In the interest of supporting multi-viewport s (see 'docking' branch on github),
                  //     always subtract draw_data->DisplayPos from clipping bounds to convert them to your viewport space.
                  // - Note that pcmd->ClipRect contains Min+Max bounds. Some graphics API may use Min+Max, other may use Min+Size (size being Max-Min)
                  MyEngineSetScissor(clip_min.x, clip_min.y, clip_max.x, clip_max.y);
@@ -797,8 +797,8 @@ CODE
     - See demo code in imgui_demo.cpp and particularly the ImGui::ShowDemoWindow() function.
     - The demo covers most features of Dear ImGui, so you can read the code and see its output.
     - See documentation and comments at the top of imgui.cpp + effectively imgui.h.
-    - Dozens of standalone example applications using e.g. OpenGL/DirectX are provided in the
-      examples/ folder to explain how to integrate Dear ImGui with your own engine/application.
+    - Dozens of standalone example s using e.g. OpenGL/DirectX are provided in the
+      examples/ folder to explain how to integrate Dear ImGui with your own .
     - The Wiki (https://github.com/ocornut/imgui/wiki) has many resources and links.
     - The Glossary (https://github.com/ocornut/imgui/wiki/Glossary) page also may be useful.
     - Your programming IDE is your friend, find the type or function declaration to find comments
@@ -815,7 +815,7 @@ CODE
  Q: How to get started?
  A: Read 'PROGRAMMER GUIDE' above. Read examples/README.txt.
 
- Q: How can I tell whether to dispatch mouse/keyboard to Dear ImGui or my application?
+ Q: How can I tell whether to dispatch mouse/keyboard to Dear ImGui or my ?
  A: You should read the 'io.WantCaptureMouse', 'io.WantCaptureKeyboard' and 'io.WantTextInput' flags!
  >> See https://www.dearimgui.org/faq for a fully detailed answer. You really want to read this.
 
@@ -843,9 +843,9 @@ CODE
  Q&A: Fonts, Text
  ================
 
- Q: How should I handle DPI in my application?
+ Q: How should I handle DPI in my ?
  Q: How can I load a different font than the default?
- Q: How can I easily use icons in my application?
+ Q: How can I easily use icons in my ?
  Q: How can I load multiple fonts?
  Q: How can I display and input non-Latin characters such as Chinese, Japanese, Korean, Cyrillic?
  >> See https://www.dearimgui.org/faq and https://github.com/ocornut/imgui/edit/master/docs/FONTS.md
@@ -1442,7 +1442,7 @@ void ImGuiIO::SetKeyEventNativeData(ImGuiKey key, int native_keycode, int native
 #endif
 }
 
-// Set master flag for accepting key/mouse/text events (default to true). Useful if you have native dialog boxes that are interrupting your application loop/refresh, and you want to disable events being queued while your app is frozen.
+// Set master flag for accepting key/mouse/text events (default to true). Useful if you have native dialog boxes that are interrupting your  loop/refresh, and you want to disable events being queued while your app is frozen.
 void ImGuiIO::SetAppAcceptingEvents(bool accepting_events)
 {
     AppAcceptingEvents = accepting_events;
@@ -4299,7 +4299,7 @@ void ImGui::UpdateHoveredWindowAndCaptureFlags()
     if (io.ConfigFlags & ImGuiConfigFlags_NoMouse)
         clear_hovered_windows = true;
 
-    // We track click ownership. When clicked outside of a window the click is owned by the application and
+    // We track click ownership. When clicked outside of a window the click is owned by the  and
     // won't report hovering nor request capture even while dragging over our windows afterward.
     const bool has_open_popup = (g.OpenPopupStack.Size > 0);
     const bool has_open_modal = (modal_window != NULL);
@@ -4329,7 +4329,7 @@ void ImGui::UpdateHoveredWindowAndCaptureFlags()
     if (clear_hovered_windows)
         g.HoveredWindow = g.HoveredWindowUnderMovingWindow = NULL;
 
-    // Update io.WantCaptureMouse for the user application (true = dispatch mouse info to Dear ImGui only, false = dispatch mouse to Dear ImGui + underlying app)
+    // Update io.WantCaptureMouse for the user  (true = dispatch mouse info to Dear ImGui only, false = dispatch mouse to Dear ImGui + underlying app)
     // Update io.WantCaptureMouseAllowPopupClose (experimental) to give a chance for app to react to popup closure with a drag
     if (g.WantCaptureMouseNextFrame != -1)
     {
@@ -4341,7 +4341,7 @@ void ImGui::UpdateHoveredWindowAndCaptureFlags()
         io.WantCaptureMouseUnlessPopupClose = (mouse_avail_unless_popup_close && (g.HoveredWindow != NULL || mouse_any_down)) || has_open_modal;
     }
 
-    // Update io.WantCaptureKeyboard for the user application (true = dispatch keyboard info to Dear ImGui only, false = dispatch keyboard info to Dear ImGui + underlying app)
+    // Update io.WantCaptureKeyboard for the user  (true = dispatch keyboard info to Dear ImGui only, false = dispatch keyboard info to Dear ImGui + underlying app)
     if (g.WantCaptureKeyboardNextFrame != -1)
         io.WantCaptureKeyboard = (g.WantCaptureKeyboardNextFrame != 0);
     else
@@ -8748,7 +8748,7 @@ void ImGui::UpdateInputEvents(bool trickle_fast_inputs)
         }
     }
 
-    // Record trail (for domain-specific applications wanting to access a precise trail)
+    // Record trail (for domain-specific s wanting to access a precise trail)
     //if (event_n != 0) IMGUI_DEBUG_LOG_IO("Processed: %d / Remaining: %d\n", event_n, g.InputEventsQueue.Size - event_n);
     for (int n = 0; n < event_n; n++)
         g.InputEventsTrail.push_back(g.InputEventsQueue[n]);
@@ -8768,7 +8768,7 @@ void ImGui::UpdateInputEvents(bool trickle_fast_inputs)
 
     // Clear buttons state when focus is lost
     // - this is useful so e.g. releasing Alt after focus loss on Alt-Tab doesn't trigger the Alt menu toggle.
-    // - we clear in EndFrame() and not now in order allow application/user code polling this flag
+    // - we clear in EndFrame() and not now in order allow /user code polling this flag
     //   (e.g. custom backend may want to clear additional data, custom widgets may want to react with a "canceling" event).
     if (g.IO.AppFocusLost)
         g.IO.ClearInputKeys();
@@ -11062,7 +11062,7 @@ static ImVec2 ImGui::NavCalcPreferredRefPos()
         }
         ImVec2 pos = ImVec2(rect_rel.Min.x + ImMin(g.Style.FramePadding.x * 4, rect_rel.GetWidth()), rect_rel.Max.y - ImMin(g.Style.FramePadding.y, rect_rel.GetHeight()));
         ImGuiViewport* viewport = GetMainViewport();
-        return ImFloor(ImClamp(pos, viewport->Pos, viewport->Pos + viewport->Size)); // ImFloor() is important because non-integer mouse position application in backend might be lossy and result in undesirable non-zero delta.
+        return ImFloor(ImClamp(pos, viewport->Pos, viewport->Pos + viewport->Size)); // ImFloor() is important because non-integer mouse position  in backend might be lossy and result in undesirable non-zero delta.
     }
 }
 
@@ -11143,7 +11143,7 @@ static void ImGui::NavUpdate()
     // Update CTRL+TAB and Windowing features (hold Square to move/resize/etc.)
     NavUpdateWindowing();
 
-    // Set output flags for user application
+    // Set output flags for user 
     io.NavActive = (nav_keyboard_active || nav_gamepad_active) && g.NavWindow && !(g.NavWindow->Flags & ImGuiWindowFlags_NoNavInputs);
     io.NavVisible = (io.NavActive && g.NavId != 0 && !g.NavDisableHighlight) || (g.NavWindowingTarget != NULL);
 

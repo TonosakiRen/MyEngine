@@ -1,5 +1,5 @@
 #include "TextureManager.h"
-#include "externals/DirectXTex/DirectXTex.h"
+#include <DirectXTex.h>
 #include <cassert>
 #include "DirectXCommon.h"
 using namespace DirectX;

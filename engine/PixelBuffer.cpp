@@ -1,6 +1,6 @@
 #include "PixelBuffer.h"
 
-#include "Externals/DirectXTex/d3dx12.h"
+#include <d3dx12.h>
 
 
 #include "Helper.h"

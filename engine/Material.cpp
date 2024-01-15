@@ -1,5 +1,5 @@
 #include "Material.h"
-#include "externals/DirectXTex/d3dx12.h"
+#include <d3dx12.h>
 
 void Material::Initialize() {
     constBuffer_.Create((sizeof(ConstBufferData) + 0xff) & ~0xff);

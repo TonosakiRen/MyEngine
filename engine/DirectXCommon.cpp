@@ -121,7 +121,7 @@ void DirectXCommon::CreateDevice() {
 		//抑制するメッセージのID
 		D3D12_MESSAGE_ID denyIds[] = {
 			//Windows11でのDXGIデバックレイヤーとDX12デバッグレイヤーの相方作用バグによるエラーメッセージ
-			//https://stackoverflow.com/questions/69805245/directx-12-application-is-crashing-in-windows-11
+			//https://stackoverflow.com/questions/69805245/directx-12--is-crashing-in-windows-11
 			D3D12_MESSAGE_ID_RESOURCE_BARRIER_MISMATCHING_COMMAND_LIST_TYPE
 		};
 		//抑制するレベル

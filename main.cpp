@@ -10,6 +10,10 @@
 #include "Renderer.h"
 #include "Compute.h"
 #include "ShadowMap.h"
+#include "Input.h"
+#include "Model.h"
+#include "Sprite.h"
+
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	WinApp* win = nullptr;

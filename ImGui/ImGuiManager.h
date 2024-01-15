@@ -1,7 +1,7 @@
 #pragma once
 
 #include "WinApp.h"
-#include "externals/imgui/imgui.h"
+#include <imgui.h>
 class CommandContext;
 class ImGuiManager
 {

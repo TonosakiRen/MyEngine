@@ -1,6 +1,6 @@
 #include "GlobalVariables.h"
 #include "ImGuiManager.h"
-#include "externals/nlohmann/json.hpp"
+#include <json.hpp>
 #include <iostream>
 #include <fstream>
 #include <assert.h>

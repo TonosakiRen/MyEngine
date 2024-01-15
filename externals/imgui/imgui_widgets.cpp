@@ -4672,7 +4672,7 @@ bool ImGui::InputTextEx(const char* label, const char* hint, char* buf, int buf_
         value_changed = true;
     }
 
-    // Release active ID at the end of the function (so e.g. pressing Return still does a final application of the value)
+    // Release active ID at the end of the function (so e.g. pressing Return still does a final  of the value)
     if (clear_active_id && g.ActiveId == id)
         ClearActiveID();
 

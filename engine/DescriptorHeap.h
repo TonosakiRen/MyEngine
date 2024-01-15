@@ -6,7 +6,7 @@
 #include <cstdint>
 
 #include "DescriptorHandle.h"
-#include "externals/DirectXTex/d3dx12.h"
+#include <d3dx12.h>
 
 class DescriptorHeap {
 public:

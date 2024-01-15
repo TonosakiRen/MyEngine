@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Externals/DirectXTex/d3dx12.h"
+#include <d3dx12.h>
 
 #include <winnt.h>
 

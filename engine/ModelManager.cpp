@@ -1,5 +1,5 @@
 #include "ModelManager.h"
-#include "externals/DirectXTex/DirectXTex.h"
+#include <DirectXTex.h>
 #include <cassert>
 #include "DirectXCommon.h"
 #include "TextureManager.h"

@@ -3,7 +3,6 @@
 #include "Material.h"
 #include "WorldTransform.h"
 #include "DirectionalLights.h"
-#include "ViewProjection.h"
 #include <string>
 class GameObject
 {

@@ -1,5 +1,5 @@
 #include "PostEffect.h"
-#include "externals/DirectXTex/DirectXTex.h"
+#include <DirectXTex.h>
 #include <d3dcompiler.h>
 #include <fstream>
 #include <sstream>

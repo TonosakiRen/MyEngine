@@ -44,10 +44,14 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(ProjectDir)..\External|\nlohmann;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)externals\imgui;$(SolutionDir)externals\nlohmann;$(SolutionDir)externals\DirectXTex;$(IncludePath)</IncludePath>
+    <OutDir>$(SolutionDir)..\Generated\Outputs\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)..\Generated\Obj\$(ProjectName)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(ProjectDir)..\External|\nlohmann;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)externals\imgui;$(SolutionDir)externals\nlohmann;$(SolutionDir)externals\DirectXTex;$(IncludePath)</IncludePath>
+    <OutDir>$(SolutionDir)..\Generated\Outputs\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)..\Generated\Obj\$(ProjectName)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -58,6 +62,7 @@
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <AdditionalIncludeDirectories>$(ProjectDir)application;$(ProjectDir)audio;$(ProjectDir)engine;$(ProjectDir)ImGui;$(ProjectDir)math;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -84,6 +89,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <AdditionalIncludeDirectories>$(ProjectDir)application;$(ProjectDir)audio;$(ProjectDir)engine;$(ProjectDir)ImGui;$(ProjectDir)math;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -102,29 +108,30 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Audio.cpp" />
-    <ClCompile Include="Bloom.cpp" />
-    <ClCompile Include="BoxArea.cpp" />
-    <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="Collider.cpp" />
-    <ClCompile Include="ColorBuffer.cpp" />
-    <ClCompile Include="CommandContext.cpp" />
-    <ClCompile Include="CommandQueue.cpp" />
-    <ClCompile Include="Compute.cpp" />
-    <ClCompile Include="DebugCamera.cpp" />
-    <ClCompile Include="DeferredRenderer.cpp" />
-    <ClCompile Include="DepthBuffer.cpp" />
-    <ClCompile Include="DescriptorHeap.cpp" />
-    <ClCompile Include="DirectionalLights.cpp" />
-    <ClCompile Include="DirectXCommon.cpp" />
-    <ClCompile Include="DustParticle.cpp" />
-    <ClCompile Include="DWParam.cpp" />
-    <ClCompile Include="Easing.cpp" />
-    <ClCompile Include="EdgeRenderer.cpp" />
-    <ClCompile Include="Enemy.cpp" />
-    <ClCompile Include="EnemyBullet.cpp" />
-    <ClCompile Include="EnemyBulletManager.cpp" />
-    <ClCompile Include="ExplodeParticle.cpp" />
+    <ClCompile Include="audio\Audio.cpp" />
+    <ClCompile Include="engine\Bloom.cpp" />
+    <ClCompile Include="application\BoxArea.cpp" />
+    <ClCompile Include="application\Camera.cpp" />
+    <ClCompile Include="engine\Collider.cpp" />
+    <ClCompile Include="engine\ColorBuffer.cpp" />
+    <ClCompile Include="engine\CommandContext.cpp" />
+    <ClCompile Include="engine\CommandQueue.cpp" />
+    <ClCompile Include="application\Compute.cpp" />
+    <ClCompile Include="engine\DebugCamera.cpp" />
+    <ClCompile Include="engine\DeferredRenderer.cpp" />
+    <ClCompile Include="engine\DepthBuffer.cpp" />
+    <ClCompile Include="engine\DescriptorHeap.cpp" />
+    <ClCompile Include="engine\DirectionalLights.cpp" />
+    <ClCompile Include="engine\DirectXCommon.cpp" />
+    <ClCompile Include="application\DustParticle.cpp" />
+    <ClCompile Include="engine\DWParam.cpp" />
+    <ClCompile Include="ImGui\ImGuiManager.cpp" />
+    <ClCompile Include="math\Easing.cpp" />
+    <ClCompile Include="engine\EdgeRenderer.cpp" />
+    <ClCompile Include="application\Enemy.cpp" />
+    <ClCompile Include="application\EnemyBullet.cpp" />
+    <ClCompile Include="application\EnemyBulletManager.cpp" />
+    <ClCompile Include="application\ExplodeParticle.cpp" />
     <ClCompile Include="externals\imgui\imgui.cpp" />
     <ClCompile Include="externals\imgui\imgui_demo.cpp" />
     <ClCompile Include="externals\imgui\imgui_draw.cpp" />
@@ -132,69 +139,71 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="externals\imgui\imgui_impl_win32.cpp" />
     <ClCompile Include="externals\imgui\imgui_tables.cpp" />
     <ClCompile Include="externals\imgui\imgui_widgets.cpp" />
-    <ClCompile Include="Floor.cpp" />
-    <ClCompile Include="GameObject.cpp" />
-    <ClCompile Include="GameScene.cpp" />
-    <ClCompile Include="GaussianBlur.cpp" />
-    <ClCompile Include="GlobalVariables.cpp" />
-    <ClCompile Include="Helper.cpp" />
-    <ClCompile Include="ImGuiManager.cpp" />
-    <ClCompile Include="Input.cpp" />
+    <ClCompile Include="application\Floor.cpp" />
+    <ClCompile Include="engine\GameObject.cpp" />
+    <ClCompile Include="application\GameScene.cpp" />
+    <ClCompile Include="engine\GaussianBlur.cpp" />
+    <ClCompile Include="engine\GlobalVariables.cpp" />
+    <ClCompile Include="engine\Helper.cpp" />
+    <ClCompile Include="engine\Input.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Material.cpp" />
-    <ClCompile Include="Mesh.cpp" />
-    <ClCompile Include="Model.cpp" />
-    <ClCompile Include="ModelManager.cpp" />
-    <ClCompile Include="Particle.cpp" />
-    <ClCompile Include="ParticleBox.cpp" />
-    <ClCompile Include="PipelineState.cpp" />
-    <ClCompile Include="PixelBuffer.cpp" />
-    <ClCompile Include="Player.cpp" />
-    <ClCompile Include="PlayerBullet.cpp" />
-    <ClCompile Include="PlayerBulletManager.cpp" />
-    <ClCompile Include="PointLights.cpp" />
-    <ClCompile Include="PostEffect.cpp" />
-    <ClCompile Include="Renderer.cpp" />
-    <ClCompile Include="RootSignature.cpp" />
-    <ClCompile Include="ShaderManager.cpp" />
-    <ClCompile Include="ShadowMap.cpp" />
-    <ClCompile Include="Skydome.cpp" />
-    <ClCompile Include="SpotLights.cpp" />
-    <ClCompile Include="Sprite.cpp" />
-    <ClCompile Include="SwapChain.cpp" />
-    <ClCompile Include="TextureManager.cpp" />
-    <ClCompile Include="UploadBuffer.cpp" />
-    <ClCompile Include="ViewProjection.cpp" />
-    <ClCompile Include="Wall.cpp" />
-    <ClCompile Include="WhiteParticle.cpp" />
-    <ClCompile Include="WinApp.cpp" />
-    <ClCompile Include="WorldTransform.cpp" />
+    <ClCompile Include="engine\Material.cpp" />
+    <ClCompile Include="engine\Mesh.cpp" />
+    <ClCompile Include="engine\Model.cpp" />
+    <ClCompile Include="engine\ModelManager.cpp" />
+    <ClCompile Include="engine\Particle.cpp" />
+    <ClCompile Include="engine\ParticleBox.cpp" />
+    <ClCompile Include="engine\PipelineState.cpp" />
+    <ClCompile Include="engine\PixelBuffer.cpp" />
+    <ClCompile Include="application\Player.cpp" />
+    <ClCompile Include="application\PlayerBullet.cpp" />
+    <ClCompile Include="application\PlayerBulletManager.cpp" />
+    <ClCompile Include="engine\PointLights.cpp" />
+    <ClCompile Include="engine\PostEffect.cpp" />
+    <ClCompile Include="engine\Renderer.cpp" />
+    <ClCompile Include="engine\RootSignature.cpp" />
+    <ClCompile Include="engine\ShaderManager.cpp" />
+    <ClCompile Include="engine\ShadowMap.cpp" />
+    <ClCompile Include="application\Skydome.cpp" />
+    <ClCompile Include="engine\SpotLights.cpp" />
+    <ClCompile Include="engine\Sprite.cpp" />
+    <ClCompile Include="engine\StructuredBuffer.cpp" />
+    <ClCompile Include="engine\SwapChain.cpp" />
+    <ClCompile Include="engine\TextureManager.cpp" />
+    <ClCompile Include="engine\TileBasedRendering.cpp" />
+    <ClCompile Include="engine\UploadBuffer.cpp" />
+    <ClCompile Include="engine\ViewProjection.cpp" />
+    <ClCompile Include="application\Wall.cpp" />
+    <ClCompile Include="application\WhiteParticle.cpp" />
+    <ClCompile Include="engine\WinApp.cpp" />
+    <ClCompile Include="engine\WorldTransform.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Audio.h" />
-    <ClInclude Include="Bloom.h" />
-    <ClInclude Include="BoxArea.h" />
-    <ClInclude Include="Camera.h" />
-    <ClInclude Include="Collider.h" />
-    <ClInclude Include="ColorBuffer.h" />
-    <ClInclude Include="CommandContext.h" />
-    <ClInclude Include="CommandQueue.h" />
-    <ClInclude Include="Compute.h" />
-    <ClInclude Include="DebugCamera.h" />
-    <ClInclude Include="DeferredRenderer.h" />
-    <ClInclude Include="DepthBuffer.h" />
-    <ClInclude Include="DescriptorHandle.h" />
-    <ClInclude Include="DescriptorHeap.h" />
-    <ClInclude Include="DirectionalLights.h" />
-    <ClInclude Include="DirectXCommon.h" />
-    <ClInclude Include="DustParticle.h" />
-    <ClInclude Include="DWParam.h" />
-    <ClInclude Include="Easing.h" />
-    <ClInclude Include="EdgeRenderer.h" />
-    <ClInclude Include="Enemy.h" />
-    <ClInclude Include="EnemyBullet.h" />
-    <ClInclude Include="EnemyBulletManager.h" />
-    <ClInclude Include="ExplodeParticle.h" />
+    <ClInclude Include="audio\Audio.h" />
+    <ClInclude Include="engine\Bloom.h" />
+    <ClInclude Include="application\BoxArea.h" />
+    <ClInclude Include="application\Camera.h" />
+    <ClInclude Include="engine\Collider.h" />
+    <ClInclude Include="engine\ColorBuffer.h" />
+    <ClInclude Include="engine\CommandContext.h" />
+    <ClInclude Include="engine\CommandQueue.h" />
+    <ClInclude Include="application\Compute.h" />
+    <ClInclude Include="engine\DebugCamera.h" />
+    <ClInclude Include="engine\DeferredRenderer.h" />
+    <ClInclude Include="engine\DepthBuffer.h" />
+    <ClInclude Include="engine\DescriptorHandle.h" />
+    <ClInclude Include="engine\DescriptorHeap.h" />
+    <ClInclude Include="engine\DirectionalLights.h" />
+    <ClInclude Include="engine\DirectXCommon.h" />
+    <ClInclude Include="application\DustParticle.h" />
+    <ClInclude Include="engine\DWParam.h" />
+    <ClInclude Include="ImGui\ImGuiManager.h" />
+    <ClInclude Include="math\Easing.h" />
+    <ClInclude Include="engine\EdgeRenderer.h" />
+    <ClInclude Include="application\Enemy.h" />
+    <ClInclude Include="application\EnemyBullet.h" />
+    <ClInclude Include="application\EnemyBulletManager.h" />
+    <ClInclude Include="application\ExplodeParticle.h" />
     <ClInclude Include="externals\imgui\imconfig.h" />
     <ClInclude Include="externals\imgui\imgui.h" />
     <ClInclude Include="externals\imgui\imgui_impl_dx12.h" />
@@ -203,44 +212,45 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="externals\imgui\imstb_rectpack.h" />
     <ClInclude Include="externals\imgui\imstb_textedit.h" />
     <ClInclude Include="externals\imgui\imstb_truetype.h" />
-    <ClInclude Include="Floor.h" />
-    <ClInclude Include="GameObject.h" />
-    <ClInclude Include="GameScene.h" />
-    <ClInclude Include="GaussianBlur.h" />
-    <ClInclude Include="GlobalVariables.h" />
-    <ClInclude Include="GPUResource.h" />
-    <ClInclude Include="Helper.h" />
-    <ClInclude Include="ImGuiManager.h" />
-    <ClInclude Include="Input.h" />
-    <ClInclude Include="Material.h" />
-    <ClInclude Include="Mesh.h" />
-    <ClInclude Include="Model.h" />
-    <ClInclude Include="ModelManager.h" />
-    <ClInclude Include="Mymath.h" />
-    <ClInclude Include="Particle.h" />
-    <ClInclude Include="ParticleBox.h" />
-    <ClInclude Include="PipelineState.h" />
-    <ClInclude Include="PixelBuffer.h" />
-    <ClInclude Include="Player.h" />
-    <ClInclude Include="PlayerBullet.h" />
-    <ClInclude Include="PlayerBulletManager.h" />
-    <ClInclude Include="PointLights.h" />
-    <ClInclude Include="PostEffect.h" />
-    <ClInclude Include="Renderer.h" />
-    <ClInclude Include="RootSignature.h" />
-    <ClInclude Include="ShaderManager.h" />
-    <ClInclude Include="ShadowMap.h" />
-    <ClInclude Include="Skydome.h" />
-    <ClInclude Include="SpotLights.h" />
-    <ClInclude Include="Sprite.h" />
-    <ClInclude Include="SwapChain.h" />
-    <ClInclude Include="TextureManager.h" />
-    <ClInclude Include="UploadBuffer.h" />
-    <ClInclude Include="ViewProjection.h" />
-    <ClInclude Include="Wall.h" />
-    <ClInclude Include="WhiteParticle.h" />
-    <ClInclude Include="WinApp.h" />
-    <ClInclude Include="WorldTransform.h" />
+    <ClInclude Include="application\Floor.h" />
+    <ClInclude Include="engine\GameObject.h" />
+    <ClInclude Include="application\GameScene.h" />
+    <ClInclude Include="engine\GaussianBlur.h" />
+    <ClInclude Include="engine\GlobalVariables.h" />
+    <ClInclude Include="engine\GPUResource.h" />
+    <ClInclude Include="engine\Helper.h" />
+    <ClInclude Include="engine\Input.h" />
+    <ClInclude Include="engine\Material.h" />
+    <ClInclude Include="engine\Mesh.h" />
+    <ClInclude Include="engine\Model.h" />
+    <ClInclude Include="engine\ModelManager.h" />
+    <ClInclude Include="math\Mymath.h" />
+    <ClInclude Include="engine\Particle.h" />
+    <ClInclude Include="engine\ParticleBox.h" />
+    <ClInclude Include="engine\PipelineState.h" />
+    <ClInclude Include="engine\PixelBuffer.h" />
+    <ClInclude Include="application\Player.h" />
+    <ClInclude Include="application\PlayerBullet.h" />
+    <ClInclude Include="application\PlayerBulletManager.h" />
+    <ClInclude Include="engine\PointLights.h" />
+    <ClInclude Include="engine\PostEffect.h" />
+    <ClInclude Include="engine\Renderer.h" />
+    <ClInclude Include="engine\RootSignature.h" />
+    <ClInclude Include="engine\ShaderManager.h" />
+    <ClInclude Include="engine\ShadowMap.h" />
+    <ClInclude Include="application\Skydome.h" />
+    <ClInclude Include="engine\SpotLights.h" />
+    <ClInclude Include="engine\Sprite.h" />
+    <ClInclude Include="engine\StructuredBuffer.h" />
+    <ClInclude Include="engine\SwapChain.h" />
+    <ClInclude Include="engine\TextureManager.h" />
+    <ClInclude Include="engine\TileBasedRendering.h" />
+    <ClInclude Include="engine\UploadBuffer.h" />
+    <ClInclude Include="engine\ViewProjection.h" />
+    <ClInclude Include="application\Wall.h" />
+    <ClInclude Include="application\WhiteParticle.h" />
+    <ClInclude Include="engine\WinApp.h" />
+    <ClInclude Include="engine\WorldTransform.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\EdgePS.hlsl">
