@@ -234,7 +234,7 @@ void GameScene::TitleInitialize() {
 }
 void GameScene::TitleUpdate() {
 
-	if (input_->TriggerKey(DIK_SPACE) || input_->TriggerButton(XINPUT_GAMEPAD_A)) {
+	if (input_->TriggerKey(DIK_SPACE) || input_->TriggerButton(XINPUT_GAMEPAD_A) || input_->TriggerKey(DIK_A)) {
 
 		sceneRequest_ = Scene::InGame;
 	}
