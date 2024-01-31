@@ -9,11 +9,11 @@
 #include "DirectionalLights.h"
 #include "PointLights.h"
 #include "SpotLights.h"
+#include "LightNumBuffer.h"
+#include "ShadowSpotLights.h"
+#include "TileBasedRendering.h"
 
 using namespace Microsoft::WRL;
-
-RootSignature DeferredRenderer::rootSignature_;
-PipelineState DeferredRenderer::pipelineState_;
 
 void DeferredRenderer::Initialize(ColorBuffer* colorTexture, ColorBuffer* normalTexture, DepthBuffer* depthTexture)
 {
@@ -22,12 +22,9 @@ void DeferredRenderer::Initialize(ColorBuffer* colorTexture, ColorBuffer* normal
 	colorTexture_ = colorTexture;
 	CreatePipeline();
 	CreateMesh();
-	lightNumBuffer_.Create(sizeof(LightNum));
-	LightNum lightNum{DirectionalLights::lightNum,PointLights::lightNum,SpotLights::lightNum};
-	lightNumBuffer_.Copy(lightNum);
 }
 
-void DeferredRenderer::Render(CommandContext& commandContext,ColorBuffer* originalBuffer, const ViewProjection& viewProjection, const DirectionalLights& directionalLight, const PointLights& pointLights, const SpotLights& spotLights)
+void DeferredRenderer::Render(CommandContext& commandContext, ColorBuffer* originalBuffer, const ViewProjection& viewProjection, DirectionalLights& directionalLight, const PointLights& pointLights, const SpotLights& spotLights, const ShadowSpotLights& shadowSpotLights, const LightNumBuffer& lightNumBuffer, const TileBasedRendering& tileBasedRendering)
 {
 	commandContext.TransitionResource(*originalBuffer, D3D12_RESOURCE_STATE_RENDER_TARGET);
 	commandContext.SetRenderTarget(originalBuffer->GetRTV());
@@ -44,13 +41,23 @@ void DeferredRenderer::Render(CommandContext& commandContext,ColorBuffer* origin
 	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kColorTexture), colorTexture_->GetSRV());
 	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kNormalTexture), normalTexture_->GetSRV());
 	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kDepthTexture), depthTexture_->GetSRV());
-	commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
-	commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kDirectionalLights), directionalLight.lights_[0].constBuffer_.GetGPUVirtualAddress());
+
+	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kDirectionalLights), directionalLight.srvHandle_);
 	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kPointLights), pointLights.srvHandle_);
 	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kSpotLights), spotLights.srvHandle_);
+	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kShadowSpotLights), shadowSpotLights.srvHandle_);
 
-	commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kLightNum),lightNumBuffer_.GetGPUVirtualAddress());
-	
+
+	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::k2DTextures), DirectXCommon::GetInstance()->GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV).GetDiscriptorStartHandle());
+
+	commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
+	commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kLightNum), lightNumBuffer.GetGPUVirtualAddress());
+
+	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kTBRInformation), tileBasedRendering.structureBuffer_.GetSRV());
+
+	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kTBRPointLightIndex), tileBasedRendering.pointLightIndexBuffer_.GetSRV());
+	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kTBRSpotLightIndex), tileBasedRendering.spotLightIndexBuffer_.GetSRV());
+	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kTBRShadowSpotLightIndex), tileBasedRendering.shadowSpotLightIndexBuffer_.GetSRV());
 
 	commandContext.SetVertexBuffer(0, vbView_);
 	commandContext.SetIndexBuffer(ibView_);
@@ -75,13 +82,25 @@ void DeferredRenderer::CreatePipeline()
 
 	{
 
-		CD3DX12_DESCRIPTOR_RANGE ranges[5]{};
+		CD3DX12_DESCRIPTOR_RANGE ranges[12]{};
 		ranges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
 		ranges[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1);
 		ranges[2].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 2);
 
 		ranges[3].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 3);
 		ranges[4].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 4);
+		ranges[5].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 5);
+		ranges[6].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 6);
+
+		ranges[7].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, DirectXCommon::GetInstance()->DirectXCommon::kSrvHeapDescriptorNum, 0, 1);
+
+		ranges[8].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1,7);
+
+		ranges[8].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 8);
+
+		ranges[9].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 9);
+		ranges[10].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 10);
+		ranges[11].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 11);
 
 		CD3DX12_ROOT_PARAMETER rootParameters[(int)RootParameter::ParameterNum]{};
 		rootParameters[(int)RootParameter::kColorTexture].InitAsDescriptorTable(1, &ranges[(int)RootParameter::kColorTexture]);
@@ -89,13 +108,23 @@ void DeferredRenderer::CreatePipeline()
 		rootParameters[(int)RootParameter::kDepthTexture].InitAsDescriptorTable(1, &ranges[(int)RootParameter::kDepthTexture]);
 		rootParameters[(int)RootParameter::kViewProjection].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_ALL);
 
-		rootParameters[(int)RootParameter::kDirectionalLights].InitAsConstantBufferView(1, 0, D3D12_SHADER_VISIBILITY_ALL);
-		rootParameters[(int)RootParameter::kPointLights].InitAsDescriptorTable(1, &ranges[3]);
-		rootParameters[(int)RootParameter::kSpotLights].InitAsDescriptorTable(1, &ranges[4]);
+		rootParameters[(int)RootParameter::kDirectionalLights].InitAsDescriptorTable(1, &ranges[3]);
+		rootParameters[(int)RootParameter::kPointLights].InitAsDescriptorTable(1, &ranges[4]);
+		rootParameters[(int)RootParameter::kSpotLights].InitAsDescriptorTable(1, &ranges[5]);
+		rootParameters[(int)RootParameter::kShadowSpotLights].InitAsDescriptorTable(1, &ranges[6]);
 
-		rootParameters[(int)RootParameter::kLightNum].InitAsConstantBufferView(2, 0, D3D12_SHADER_VISIBILITY_ALL);
-		
-		
+		rootParameters[(int)RootParameter::k2DTextures].InitAsDescriptorTable(1, &ranges[7]);
+
+
+		rootParameters[(int)RootParameter::kLightNum].InitAsConstantBufferView(1, 0, D3D12_SHADER_VISIBILITY_ALL);
+
+		rootParameters[(int)RootParameter::kTBRInformation].InitAsDescriptorTable(1, &ranges[8]);
+
+		rootParameters[(int)RootParameter::kTBRPointLightIndex].InitAsDescriptorTable(1, &ranges[9]);
+		rootParameters[(int)RootParameter::kTBRSpotLightIndex].InitAsDescriptorTable(1, &ranges[10]);
+		rootParameters[(int)RootParameter::kTBRShadowSpotLightIndex].InitAsDescriptorTable(1, &ranges[11]);
+
+
 		// スタティックサンプラー
 		CD3DX12_STATIC_SAMPLER_DESC samplerDesc =
 			CD3DX12_STATIC_SAMPLER_DESC(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR);
@@ -165,12 +194,12 @@ void DeferredRenderer::CreatePipeline()
 
 	}
 
-	
+
 }
 
 void DeferredRenderer::CreateMesh()
 {
-	
+
 
 	vertices_.resize(4);
 

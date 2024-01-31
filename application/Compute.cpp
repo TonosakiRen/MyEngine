@@ -7,16 +7,10 @@
 
 using namespace Microsoft::WRL;
 
-RootSignature Compute::rootSignature_;
-PipelineState Compute::pipelineState_;
-
-void Compute::StaticInitialize()
-{
-	CreatePipeline();
-}
-
 void Compute::Initialize()
 {
+	CreatePipeline();
+
 	auto device = DirectXCommon::GetInstance()->GetDevice();
 	CD3DX12_RESOURCE_DESC desc = CD3DX12_RESOURCE_DESC::Buffer(UINT64(sizeof(uint32_t) * kNum), D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
 	D3D12_HEAP_PROPERTIES heapProps(D3D12_HEAP_TYPE_DEFAULT);

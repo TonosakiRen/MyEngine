@@ -10,7 +10,7 @@ class SpotLights
 {
 public:
 
-	static const uint32_t  lightNum = 3;
+	static const uint32_t  lightNum = 4;
 
 	struct SpotLight {
 		Vector4 color = { 1.0f, 1.0f, 1.0f,1.0f };

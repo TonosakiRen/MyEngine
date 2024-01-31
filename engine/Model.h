@@ -31,6 +31,7 @@ public:
 	};
 
 	static void StaticInitialize();
+	static void Finalize();
 	static void PreDraw(CommandContext* commandContext, const ViewProjection& viewProjection, const DirectionalLights& directionalLights);
 	static void PostDraw();
 
@@ -43,6 +44,5 @@ private:
 	static CommandContext* commandContext_;
 	static std::unique_ptr<RootSignature> rootSignature_;
 	static std::unique_ptr<PipelineState> pipelineState_;
-	static std::unique_ptr<PipelineState> wireFramePipelineState_;
 };
 

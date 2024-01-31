@@ -13,6 +13,9 @@ class ViewProjection;
 class DirectionalLights;
 class PointLights;
 class SpotLights;
+class ShadowSpotLights;
+class LightNumBuffer;
+class TileBasedRendering;
 
 class DeferredRenderer
 {
@@ -21,14 +24,23 @@ public:
 		kColorTexture,
 		kNormalTexture,
 		kDepthTexture,
-		
+
 		kViewProjection,
 		kDirectionalLights,
 		kPointLights,
 		kSpotLights,
+		kShadowSpotLights,
+
+		k2DTextures,
 
 		kLightNum,
-		
+
+		kTBRInformation,
+
+		kTBRPointLightIndex,
+		kTBRSpotLightIndex,
+		kTBRShadowSpotLightIndex,
+
 		ParameterNum
 	};
 
@@ -37,14 +49,14 @@ public:
 		Vector2 uv;
 	};
 	void Initialize(ColorBuffer* originalTexture, ColorBuffer* normalTexture, DepthBuffer* depthTexture);
-	void Render(CommandContext& commandContext, ColorBuffer* originalBuffer_, const ViewProjection& viewProjection, const DirectionalLights& directionalLight,const PointLights& pointLights, const SpotLights& spotLights);
+	void Render(CommandContext& commandContext, ColorBuffer* originalBuffer_, const ViewProjection& viewProjection, DirectionalLights& directionalLight, const PointLights& pointLights, const SpotLights& spotLights, const ShadowSpotLights& shadowSpotLights, const LightNumBuffer& lightNumBuffer, const TileBasedRendering& tileBasedRendering);
 
 private:
 	void CreatePipeline();
 	void CreateMesh();
 private:
-	static PipelineState pipelineState_;
-	static RootSignature rootSignature_;
+	PipelineState pipelineState_;
+	RootSignature rootSignature_;
 	ColorBuffer* colorTexture_;
 	ColorBuffer* normalTexture_;
 	DepthBuffer* depthTexture_;
@@ -55,7 +67,6 @@ private:
 		int32_t spotLightNum;
 	};
 
-	UploadBuffer lightNumBuffer_;
 
 	D3D12_VERTEX_BUFFER_VIEW vbView_{};
 	D3D12_INDEX_BUFFER_VIEW ibView_{};
@@ -64,6 +75,6 @@ private:
 	UploadBuffer vertexBuffer_;
 	UploadBuffer indexBuffer_;
 
-	
+
 };
 

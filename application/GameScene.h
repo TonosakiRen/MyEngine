@@ -6,10 +6,12 @@
 #include "Camera.h"
 #include "WorldTransform.h"
 #include "Input.h"
+#include "Audio.h"
 #include "Sprite.h"
 #include "DirectionalLights.h"
 #include "PointLights.h"
 #include "SpotLights.h"
+#include "ShadowSpotLights.h"
 #include "Compute.h"
 #include "GameObject.h"
 
@@ -38,28 +40,42 @@ public:
 	void Update(CommandContext& commandContext);
 	void ModelDraw();
 	void ShadowDraw();
+	void SpotLightShadowDraw();
 	void ParticleDraw();
 	void ParticleBoxDraw();
 	void PreSpriteDraw();
 	void PostSpriteDraw();
 	void Draw(CommandContext& commandContext);
 	void ShadowMapDraw(CommandContext& commandContext);
+	void SpotLightShadowMapDraw(CommandContext& commandContext);
 	void UIDraw(CommandContext& commandContext);
 
 	DirectionalLights& GetDirectionalLights() {
-		return directionalLights_;
+		return *directionalLights_.get();
 	}
 
 	PointLights& GetPointLights() {
-		return pointLights_;
+		return *pointLights_.get();
 	}
 
 	SpotLights& GetSpotLights() {
-		return spotLights_;
+		return *spotLights_.get();
+	}
+
+	ShadowSpotLights& GetShadowSpotLights() {
+		return *shadowSpotLights_.get();
 	}
 
 	const ViewProjection& GetViewProjection() {
 		return *currentViewProjection_;
+	}
+
+	bool GetIsSceneChange() {
+		return isSceneChange_;
+	}
+
+	void SetIsSceneChange(bool is) {
+		isSceneChange_ = is;
 	}
 
 private: 
@@ -70,14 +86,15 @@ private:
 	ViewProjection* currentViewProjection_ = nullptr;
 	
 	std::unique_ptr<Camera> camera_;
-	DirectionalLights directionalLights_;
-	PointLights pointLights_;
-	SpotLights spotLights_;
+	std::unique_ptr <DirectionalLights> directionalLights_;
+	std::unique_ptr < PointLights> pointLights_;
+	std::unique_ptr < SpotLights> spotLights_;
+	std::unique_ptr < ShadowSpotLights> shadowSpotLights_;
 
 	uint32_t textureHandle_;
 
 	std::unique_ptr<Sprite>sprite_;
-	WorldTransform spriteTransform_;
+	std::unique_ptr < WorldTransform >spriteTransform_;
 
 	std::unique_ptr<Skydome> skydome_;
 	std::unique_ptr<BoxArea> boxArea_;
@@ -109,6 +126,11 @@ private:
 	//Enemyが出現するフレーム
 	uint32_t enemySpawnFrame_ = 0;
 
+	GameObject title_;
+	float titleT_;
+	bool isTitleUp_ = false;
+	Sprite pushSpace_;
+
 	//Scene
 	enum class Scene {
 		Title,
@@ -117,11 +139,13 @@ private:
 		SceneNum
 	};
 
-	Scene scene_ = Scene::InGame;
-	Scene nextScene = Scene::InGame;
+	Scene scene_ = Scene::Title;
+	Scene nextScene = Scene::Title;
 	static void (GameScene::* SceneInitializeTable[])();
 	static void (GameScene::* SceneUpdateTable[])();
-	std::optional<Scene> sceneRequest_ = Scene::InGame;
+	std::optional<Scene> sceneRequest_ = std::nullopt;
+	bool isSceneChange_ = false;
+	bool isInitialSceneChange = false;
 
 	//タイトル
 	void TitleInitialize();

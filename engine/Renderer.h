@@ -10,9 +10,13 @@
 
 #include "DeferredRenderer.h"
 #include "EdgeRenderer.h"
+#include "LightNumBuffer.h"
+#include "TileBasedRendering.h"
+#include "Transition.h"
 
-class viewProjection;
+class ViewProjection;
 class DirectionalLights;
+class ShadowSpotLights;
 
 class Renderer
 {
@@ -25,47 +29,62 @@ public:
         kRenderTargetNum
     };
 
-	static Renderer* GetInstance();
+    static Renderer* GetInstance();
 
     void Initialize();
     void BeginFrame();
     void BeginMainRender();
     void EndMainRender();
-    void DeferredRender(const ViewProjection& viewProjection, const DirectionalLights& directionalLight, const PointLights& pointLights, const SpotLights& spotLights);
+    void DeferredRender(const ViewProjection& viewProjection, DirectionalLights& directionalLight, const PointLights& pointLights, const SpotLights& spotLights, ShadowSpotLights& shadowSpotLights);
     void BeginShadowMapRender(DirectionalLights& directionalLights);
     void EndShadowMapRender(DirectionalLights& directionalLights);
+    void BeginSpotLightShadowMapRender(ShadowSpotLights& shadowSpotLights);
+    void EndSpotLightShadowMapRender(ShadowSpotLights& shadowSpotLights);
     void BeginUIRender();
     void EndUIRender();
     void Shutdown();
 
-    SwapChain& GetSwapChain() { return swapChain_; }
+    SwapChain& GetSwapChain() { return *swapChain_; }
     CommandContext& GetCommandContext() { return commandContext_; }
-    Bloom& GetBloom() { return bloom_; }
 
-    DXGI_FORMAT GetRTVFormat(RenderTargetType rtvType) { return colorBuffers_[rtvType].GetFormat(); }
-    DXGI_FORMAT GetDSVFormat() { return mainDepthBuffer_.GetFormat(); }
+    void StartTransition() {
+        transition_->StartTransition();
+    };
 
-    void ClearMainDepthBuffer() { commandContext_.ClearDepth(mainDepthBuffer_); }
+    bool GetIsNextScene() {
+        return transition_->getIsNextScene();
+    }
+
+    DXGI_FORMAT GetRTVFormat(RenderTargetType rtvType) { return colorBuffers_[rtvType]->GetFormat(); }
+    DXGI_FORMAT GetDSVFormat() { return mainDepthBuffer_->GetFormat(); }
+
+    void ClearMainDepthBuffer() { commandContext_.ClearDepth(*mainDepthBuffer_); }
 
 private:
     Renderer() = default;
     Renderer(const Renderer&) = delete;
     Renderer& operator=(const Renderer&) = delete;
 
-
     DirectXCommon* graphics_ = nullptr;
-    SwapChain swapChain_;
+    std::unique_ptr<SwapChain> swapChain_;
     CommandContext commandContext_;
 
-    ColorBuffer colorBuffers_[kRenderTargetNum];
-    DepthBuffer mainDepthBuffer_;
+    std::unique_ptr<ColorBuffer> colorBuffers_[kRenderTargetNum];
+    std::unique_ptr<DepthBuffer> mainDepthBuffer_;
 
-    ColorBuffer resultBuffer_;
+    std::unique_ptr<ColorBuffer> resultBuffer_;
 
-    DeferredRenderer deferredRenderer_;
-    EdgeRenderer edgeRenderer_;
+    std::unique_ptr<DeferredRenderer> deferredRenderer_;
+    std::unique_ptr<EdgeRenderer> edgeRenderer_;
 
-    Bloom bloom_;
-    PostEffect postEffect_;
+    std::unique_ptr<Bloom> bloom_;
+    std::unique_ptr<PostEffect> postEffect_;
+
+    std::unique_ptr<LightNumBuffer> lightNumBuffer_;
+
+    std::unique_ptr<TileBasedRendering> tileBasedRendering_;
+
+    std::unique_ptr<Transition> transition_;
+
 };
 

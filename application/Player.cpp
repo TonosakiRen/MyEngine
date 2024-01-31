@@ -127,6 +127,17 @@ void Player::Move(const ViewProjection& viewProjection)
 	velocity_ += acceleration_;
 	worldTransform_.translation_ += velocity_;
 
+	static float cycle = 60.0f;
+	static float time = 0.0f;
+	// 1フレームでのパラメータ加算値
+	const float kFroatStep = 2.0f * std::numbers::pi_v<float> / cycle;
+	// パラメータを1ステップ分加算
+	time += kFroatStep;
+	// 2πを超えたら0に戻すw
+	time = std::fmod(time, 2.0f * std::numbers::pi_v<float>);
+	// 浮遊を座標に反映
+	worldTransform_.translation_.y = 3.0f + (std::sin(time) * 0.3f);
+	
 	worldTransform_.translation_ += move;
 	worldTransform_.translation_.x = clamp(worldTransform_.translation_.x , -25.0f + modelSize_.x / 2.0f , 25.0f - modelSize_.x / 2.0f);
 	worldTransform_.translation_.y = clamp(worldTransform_.translation_.y, modelSize_.y / 2.0f, FLT_MAX);

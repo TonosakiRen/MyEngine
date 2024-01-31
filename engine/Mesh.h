@@ -3,16 +3,18 @@
 #include "Mymath.h"
 #include "UploadBuffer.h"
 #include <vector>
+#include <memory>
 class Mesh
 {
 	friend class ModelManager;
 public:
+	
 
-	D3D12_INDEX_BUFFER_VIEW* GetIbView() {
+	const D3D12_INDEX_BUFFER_VIEW* GetIbView() const {
 		return &ibView_;
 	}
 
-	uint32_t GetUv() {
+	const uint32_t GetUv() const{
 		return uvHandle_;
 	}
 

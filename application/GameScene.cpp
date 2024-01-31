@@ -6,6 +6,8 @@
 #include "ModelManager.h"
 #include "TextureManager.h"
 #include "ShadowMap.h"
+#include "SpotLightShadowMap.h"
+#include "WinApp.h"
 
 void (GameScene::* GameScene::SceneUpdateTable[])() = {
 	&GameScene::TitleUpdate,
@@ -38,30 +40,37 @@ void GameScene::Initialize() {
 
 	currentViewProjection_ = debugCamera_.get();
 
-	directionalLights_.Initialize();
-	directionalLights_.Update();
+	directionalLights_ = std::make_unique<DirectionalLights>();
+	directionalLights_->Initialize();
+	directionalLights_->Update();
 
-	pointLights_.Initialize();
-	pointLights_.Update();
+	pointLights_ = std::make_unique<PointLights>();
+	pointLights_->Initialize();
+	pointLights_->Update();
 
-	spotLights_.Initialize();
-	spotLights_.Update();
+	shadowSpotLights_ = std::make_unique<ShadowSpotLights>();
+	shadowSpotLights_->Initialize();
+	shadowSpotLights_->Update();
 
-	textureHandle_ = TextureManager::Load("uvChecker.png");
+	spotLights_ = std::make_unique<SpotLights>();
+	spotLights_->Initialize();
+	spotLights_->Update();
+
+	//textureHandle_ = TextureManager::Load("uvChecker.png");
 
 	sprite_ = std::make_unique<Sprite>();
 	sprite_->Initialize(textureHandle_, { 0.0f,0.0f });
 
 	walls_.resize(3);
 	uint32_t wallModelHandle_ = ModelManager::Load("wall");
-	float sizeX = ModelManager::GetInstance()->ModelManager::GetModelSize(wallModelHandle_).x;
-	walls_[0] = std::make_unique<Wall>();
-	walls_[0]->Initialize({ -sizeX ,-1.6f,0.0f});
-	walls_[1] = std::make_unique<Wall>();
-	walls_[1]->Initialize({ 0.0f,-1.6f,0.0f });
-	walls_[2] = std::make_unique<Wall>();
-	walls_[2]->Initialize({ +sizeX,-1.6f,0.0f });
-	
+	//float sizeX = ModelManager::GetInstance()->ModelManager::GetModelSize(wallModelHandle_).x;
+	//walls_[0] = std::make_unique<Wall>();
+	//walls_[0]->Initialize({ -0.0f ,-1.6f,0.0f});
+	//walls_[1] = std::make_unique<Wall>();
+	//walls_[1]->Initialize({ 0.0f,-1.6f,0.0f });
+	//walls_[2] = std::make_unique<Wall>();
+	//walls_[2]->Initialize({ -0.0f ,-1.6f,0.0f });
+
 	skydome_ = std::make_unique<Skydome>();
 	skydome_->Initialize("skydome");
 	floor_ = std::make_unique<Floor>();
@@ -79,7 +88,7 @@ void GameScene::Initialize() {
 	dustParticle_->Initialize(Vector3{ -1.0f,-1.0f,-1.0f }, Vector3{ 1.0f,1.0f,1.0f });
 
 	explodeParticle_ = std::make_unique<ExplodeParticle>();
-	explodeParticle_->Initialize(Vector3{ -1.0f,-1.0f,-1.0f }, Vector3{ 1.0f,1.0f,1.0f },&pointLights_);
+	explodeParticle_->Initialize(Vector3{ -1.0f,-1.0f,-1.0f }, Vector3{ 1.0f,1.0f,1.0f }, pointLights_.get());
 
 	whiteParticle_ = std::make_unique<WhiteParticle>();
 	whiteParticle_->SetIsEmit(true);
@@ -95,6 +104,12 @@ void GameScene::Initialize() {
 
 	player_ = std::make_unique<Player>();
 	player_->Initialize("sphere", playerBulletManager_.get());
+
+
+	title_.Initialize("title");
+	title_.GetWorldTransform()->translation_ = {0.0f,3.0f,0.0f};
+	title_.UpdateMatrix();
+	pushSpace_.Initialize(TextureManager::Load("pushSpace.png"), { WinApp::kWindowWidth / 2.0f,WinApp::kWindowHeight / 2.0f + 300.0f });
 }
 
 void GameScene::Update(CommandContext& commandContext){
@@ -121,66 +136,74 @@ void GameScene::Update(CommandContext& commandContext){
 		// light
 #ifdef _DEBUG
 		ImGui::Begin("DirectionalLight");
-		ImGui::DragFloat3("lightDirection", &directionalLights_.lights_[0].direction.x, 0.01f);
-		ImGui::DragFloat3("lightPosition", &directionalLights_.lights_[0].position.x, 1.0f);
-		ImGui::DragFloat4("lightColor", &directionalLights_.lights_[0].color.x, 1.0f,0.0f,255.0f);
-		ImGui::DragFloat("intensity", &directionalLights_.lights_[0].intensity, 0.01f, 0.0f);
+		ImGui::DragFloat3("lightDirection", &directionalLights_->lights_[0].direction.x, 0.01f);
+		ImGui::DragFloat3("lightPosition", &directionalLights_->lights_[0].position.x, 1.0f);
+		ImGui::DragFloat4("lightColor", &directionalLights_->lights_[0].color.x, 1.0f,0.0f,255.0f);
+		ImGui::DragFloat("intensity", &directionalLights_->lights_[0].intensity, 0.01f, 0.0f);
 		ImGui::End();
 #endif
-		directionalLights_.lights_[0].direction = Normalize(directionalLights_.lights_[0].direction);
-		directionalLights_.Update();
+		directionalLights_->lights_[0].direction = Normalize(directionalLights_->lights_[0].direction);
+		directionalLights_->Update();
 
 #ifdef _DEBUG
 		ImGui::Begin("pointLight");
 
-		ImGui::DragFloat3("lightPosition", &pointLights_.lights_[0].worldTransform.translation_.x, 0.01f);
-		ImGui::DragFloat3("lightColor", &pointLights_.lights_[0].color.x, 1.0f, 0.0f, 255.0f);
-		ImGui::DragFloat("intensity", &pointLights_.lights_[0].intensity, 0.01f, 0.0f);
-		ImGui::DragFloat("radius", &pointLights_.lights_[0].radius, 0.01f, 0.0f);
-		ImGui::DragFloat("decay", &pointLights_.lights_[0].decay, 0.01f, 0.0f);
+		ImGui::DragFloat3("lightPosition", &pointLights_->lights_[0].worldTransform.translation_.x, 0.01f);
+		ImGui::DragFloat3("lightColor", &pointLights_->lights_[0].color.x, 1.0f, 0.0f, 255.0f);
+		ImGui::DragFloat("intensity", &pointLights_->lights_[0].intensity, 0.01f, 0.0f);
+		ImGui::DragFloat("radius", &pointLights_->lights_[0].radius, 0.01f, 0.0f);
+		ImGui::DragFloat("decay", &pointLights_->lights_[0].decay, 0.01f, 0.0f);
 		ImGui::End();
 
 		ImGui::Begin("pointLight2");
-		ImGui::DragFloat3("lightPosition", &pointLights_.lights_[1].worldTransform.translation_.x, 0.01f);
-		ImGui::DragFloat3("lightColor", &pointLights_.lights_[1].color.x, 1.0f, 0.0f, 255.0f);
-		ImGui::DragFloat("intensity", &pointLights_.lights_[1].intensity, 0.01f, 0.0f);
-		ImGui::DragFloat("radius", &pointLights_.lights_[1].radius, 0.01f, 0.0f);
-		ImGui::DragFloat("decay", &pointLights_.lights_[1].decay, 0.01f, 0.0f);
+		ImGui::DragFloat3("lightPosition", &pointLights_->lights_[1].worldTransform.translation_.x, 0.01f);
+		ImGui::DragFloat3("lightColor", &pointLights_->lights_[1].color.x, 1.0f, 0.0f, 255.0f);
+		ImGui::DragFloat("intensity", &pointLights_->lights_[1].intensity, 0.01f, 0.0f);
+		ImGui::DragFloat("radius", &pointLights_->lights_[1].radius, 0.01f, 0.0f);
+		ImGui::DragFloat("decay", &pointLights_->lights_[1].decay, 0.01f, 0.0f);
 		ImGui::End();
 #endif
-		pointLights_.Update();
+		pointLights_->Update();
 
 #ifdef _DEBUG
 		ImGui::Begin("spotLight");
-		ImGui::DragFloat3("lightPosition", &spotLights_.lights_[0].worldTransform.translation_.x, 0.01f);
-		ImGui::DragFloat3("lightColor", &spotLights_.lights_[0].color.x, 1.0f, 0.0f, 255.0f);
-		ImGui::DragFloat("intensity", &spotLights_.lights_[0].intensity, 0.01f, 0.0f);
-		ImGui::DragFloat3("direction", &spotLights_.lights_[0].direction.x, 0.01f, 0.0f);
-		ImGui::DragFloat("distance", &spotLights_.lights_[0].distance, 0.01f, 0.0f);
-		ImGui::DragFloat("decay", &spotLights_.lights_[0].decay, 0.01f, 0.0f);
-		ImGui::DragFloat("cosAngle", &spotLights_.lights_[0].cosAngle, Radian(1.0f), 0.0f, Radian(179.0f));
+		ImGui::DragFloat3("lightPosition", &spotLights_->lights_[0].worldTransform.translation_.x, 0.01f);
+		ImGui::DragFloat3("lightColor", &spotLights_->lights_[0].color.x, 1.0f, 0.0f, 255.0f);
+		ImGui::DragFloat("intensity", &spotLights_->lights_[0].intensity, 0.01f, 0.0f);
+		ImGui::DragFloat3("direction", &spotLights_->lights_[0].direction.x, 0.01f, 0.0f);
+		ImGui::DragFloat("distance", &spotLights_->lights_[0].distance, 0.01f, 0.0f);
+		ImGui::DragFloat("decay", &spotLights_->lights_[0].decay, 0.01f, 0.0f);
+		ImGui::DragFloat("cosAngle", &spotLights_->lights_[0].cosAngle, Radian(1.0f), 0.0f, Radian(179.0f));
 		ImGui::End();
 
 		ImGui::Begin("spotLight2");
-		ImGui::DragFloat3("lightPosition", &spotLights_.lights_[1].worldTransform.translation_.x, 0.01f);
-		ImGui::DragFloat3("lightColor", &spotLights_.lights_[1].color.x, 1.0f, 0.0f, 255.0f);
-		ImGui::DragFloat("intensity", &spotLights_.lights_[1].intensity, 0.01f, 0.0f);
-		ImGui::DragFloat3("direction", &spotLights_.lights_[1].direction.x, 0.01f, 0.0f);
-		ImGui::DragFloat("distance", &spotLights_.lights_[1].distance, 0.01f, 0.0f);
-		ImGui::DragFloat("decay", &spotLights_.lights_[1].decay, 0.01f, 0.0f);
-		ImGui::DragFloat("cosAngle", &spotLights_.lights_[1].cosAngle, Radian(1.0f), 0.0f, Radian(179.0f));
+		ImGui::DragFloat3("lightPosition", &spotLights_->lights_[1].worldTransform.translation_.x, 0.01f);
+		ImGui::DragFloat3("lightColor", &spotLights_->lights_[1].color.x, 1.0f, 0.0f, 255.0f);
+		ImGui::DragFloat("intensity", &spotLights_->lights_[1].intensity, 0.01f, 0.0f);
+		ImGui::DragFloat3("direction", &spotLights_->lights_[1].direction.x, 0.01f, 0.0f);
+		ImGui::DragFloat("distance", &spotLights_->lights_[1].distance, 0.01f, 0.0f);
+		ImGui::DragFloat("decay", &spotLights_->lights_[1].decay, 0.01f, 0.0f);
+		ImGui::DragFloat("cosAngle", &spotLights_->lights_[1].cosAngle, Radian(1.0f), 0.0f, Radian(179.0f));
 		ImGui::End();
 #endif
-		spotLights_.lights_[0].direction = Normalize(spotLights_.lights_[0].direction);
-		spotLights_.Update();
+		spotLights_->lights_[0].direction = Normalize(spotLights_->lights_[0].direction);
+		spotLights_->Update();
 	}
 	//Scene
 	{
 		//Scene初期化
 		if (sceneRequest_) {
-			scene_ = sceneRequest_.value();
-			(this->*SceneInitializeTable[static_cast<size_t>(scene_)])();
-			sceneRequest_ = std::nullopt;
+			if (!isInitialSceneChange) {
+				isInitialSceneChange = true;
+				isSceneChange_ = true;
+			}
+			
+			if (isSceneChange_ == false) {
+				isInitialSceneChange = false;
+				scene_ = sceneRequest_.value();
+				(this->*SceneInitializeTable[static_cast<size_t>(scene_)])();
+				sceneRequest_ = std::nullopt;
+			}
 		}
 		//SceneUpdate
 		(this->*SceneUpdateTable[static_cast<size_t>(scene_)])();
@@ -191,17 +214,18 @@ void GameScene::Update(CommandContext& commandContext){
 		compute_->Dispatch(commandContext);
 		uint32_t* date = static_cast<uint32_t*>(compute_->GetData());
 
-		int a = date[1];
+		int a = date[2];
 #ifdef _DEBUG
 		ImGui::Text("%d", int(a));
 		#endif
 	}
-	
+#ifdef _DEBUG
 	//パーティクル
 	ImGui::Begin("particle");
 	ImGui::DragFloat4("particleColor", &color.x, 0.01f, 0.0f, 1.0f);
 	ImGui::DragFloat3("emitterPos", &whiteParticle_->emitterWorldTransform_.translation_.x, 0.01f);
 	ImGui::End();
+#endif
 	whiteParticle_->Update();
 }
 
@@ -210,19 +234,32 @@ void GameScene::TitleInitialize() {
 }
 void GameScene::TitleUpdate() {
 
-	if (input_->TriggerKey(DIK_P)) {
+	if (input_->TriggerKey(DIK_SPACE) || input_->TriggerButton(XINPUT_GAMEPAD_A)) {
+
 		sceneRequest_ = Scene::InGame;
 	}
+	if (titleT_ >= 0.5f) {
+		isTitleUp_ = false;
+	}
+	if (titleT_ <= -0.5f) {
+		isTitleUp_ = true;
+	}
+
+	if (isTitleUp_) {
+		titleT_ += 0.03f;
+	}
+	else {
+		titleT_ -= 0.03f;
+	}
+	title_.GetWorldTransform()->translation_.y = 4.0f + titleT_;
+	
+	title_.UpdateMatrix();
 
 }
 void GameScene::InGameInitialize() {
 
 }
 void GameScene::InGameUpdate() {
-
-	if (input_->TriggerKey(DIK_P)) {
-		sceneRequest_ = Scene::Title;
-	}
 
 	boxArea_->Update();
 
@@ -256,7 +293,7 @@ void GameScene::InGameUpdate() {
 	const int spawnInterval = 300;
 	if (enemySpawnFrame_ <= 0) {
 		enemySpawnFrame_ = spawnInterval;
-		EnemySpawn({ 0.0f,1.0f,0.0f });
+		EnemySpawn({ 0.0f,3.0f,0.0f });
 	}
 	enemySpawnFrame_--;
 }
@@ -302,6 +339,7 @@ void GameScene::ModelDraw()
 	switch (scene_)
 	{
 	case GameScene::Scene::Title:
+		title_.Draw();
 		break;
 	case GameScene::Scene::InGame:
 		boxArea_->Draw();
@@ -322,6 +360,21 @@ void GameScene::ModelDraw()
 }
 
 void GameScene::ShadowDraw()
+{
+	switch (scene_)
+	{
+	case GameScene::Scene::Title:
+		break;
+	case GameScene::Scene::InGame:
+		player_->Draw();
+		sphere_->Draw();
+		break;
+	default:
+		break;
+	}
+}
+
+void GameScene::SpotLightShadowDraw()
 {
 	switch (scene_)
 	{
@@ -383,6 +436,7 @@ void GameScene::PostSpriteDraw()
 	switch (scene_)
 	{
 	case GameScene::Scene::Title:
+		pushSpace_.Draw();
 		break;
 	case GameScene::Scene::InGame:
 		//sprite_->Draw();
@@ -403,7 +457,7 @@ void GameScene::Draw(CommandContext& commandContext) {
 	Renderer::GetInstance()->ClearMainDepthBuffer();
 
 	//3Dオブジェクト描画
-	Model::PreDraw(&commandContext, *currentViewProjection_ , directionalLights_);
+	Model::PreDraw(&commandContext, *currentViewProjection_ , *directionalLights_.get());
 	ModelDraw();
 	Model::PostDraw();
 
@@ -421,9 +475,16 @@ void GameScene::Draw(CommandContext& commandContext) {
 
 void GameScene::ShadowMapDraw(CommandContext& commandContext)
 {
-	ShadowMap::PreDraw(&commandContext, directionalLights_);
+	ShadowMap::PreDraw(&commandContext, *directionalLights_.get());
 	ShadowDraw();
 	ShadowMap::PostDraw();
+}
+
+void GameScene::SpotLightShadowMapDraw(CommandContext& commandContext)
+{
+	SpotLightShadowMap::PreDraw(&commandContext, *shadowSpotLights_.get());
+	SpotLightShadowDraw();
+	SpotLightShadowMap::PostDraw();
 }
 
 void GameScene::UIDraw(CommandContext& commandContext)

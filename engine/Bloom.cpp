@@ -138,7 +138,6 @@ void Bloom::Render(CommandContext& commandContext, ColorBuffer* originalTexture,
     }
     commandContext.DrawIndexed(static_cast<UINT>(indices_.size()), 0, 0);
 
-    commandContext.TransitionResource(*originalTexture, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 }
 
 

@@ -71,6 +71,9 @@
     <Filter Include="Game\Enemy">
       <UniqueIdentifier>{4b27e529-b8ea-403d-8046-a62c3e892ca9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine\Framework">
+      <UniqueIdentifier>{fc8df7ad-608f-4e6d-9af3-f46f532d9f7d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="externals\imgui\imgui.cpp">
@@ -278,6 +281,24 @@
     <ClCompile Include="ImGui\ImGuiManager.cpp">
       <Filter>Engine\ImGui</Filter>
     </ClCompile>
+    <ClCompile Include="engine\SpotLightShadowMap.cpp">
+      <Filter>Engine\ShadowMap</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\ShadowSpotLights.cpp">
+      <Filter>Engine\Light</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\LightNumBuffer.cpp">
+      <Filter>Engine\Light</Filter>
+    </ClCompile>
+    <ClCompile Include="Framework.cpp">
+      <Filter>Engine\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="MyGame.cpp">
+      <Filter>Engine\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\Transition.cpp">
+      <Filter>Engine\PostEffect</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -424,9 +445,6 @@
     <ClInclude Include="engine\Renderer.h">
       <Filter>Engine\Rederer</Filter>
     </ClInclude>
-    <ClInclude Include="engine\ModelManager.h">
-      <Filter>Engine\Model</Filter>
-    </ClInclude>
     <ClInclude Include="engine\Model.h">
       <Filter>Engine\Model</Filter>
     </ClInclude>
@@ -494,6 +512,27 @@
     <ClInclude Include="ImGui\ImGuiManager.h">
       <Filter>Engine\ImGui</Filter>
     </ClInclude>
+    <ClInclude Include="engine\SpotLightShadowMap.h">
+      <Filter>Engine\ShadowMap</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\ShadowSpotLights.h">
+      <Filter>Engine\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\LightNumBuffer.h">
+      <Filter>Engine\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\ModelManager.h">
+      <Filter>Engine\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Framework.h">
+      <Filter>Engine\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="MyGame.h">
+      <Filter>Engine\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Transition.h">
+      <Filter>Engine\PostEffect</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\ModelPS.hlsl">
@@ -560,6 +599,18 @@
       <Filter>shaders</Filter>
     </FxCompile>
     <FxCompile Include="Resources\shaders\ShadowMapVS.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\SpotLightShadowMapPS.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\SpotLightShadowMapVS.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\TransitionPS.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\TransitionVS.hlsl">
       <Filter>shaders</Filter>
     </FxCompile>
   </ItemGroup>

@@ -3,6 +3,8 @@
 #include "ModelManager.h"
 #include "ShaderManager.h"
 #include "Renderer.h"
+#include "LightNumBuffer.h"
+#include "DirectionalLights.h"
 
 using namespace Microsoft::WRL;
 
@@ -10,21 +12,31 @@ bool ShadowMap::isDrawShadowMap = false;
 CommandContext* ShadowMap::commandContext_ = nullptr;
 std::unique_ptr<RootSignature> ShadowMap::rootSignature_;
 std::unique_ptr<PipelineState> ShadowMap::pipelineState_;
+DirectionalLights* ShadowMap::directionalLights_;
 void ShadowMap::StaticInitialize() {
     CreatePipeline();
 }
 
-void ShadowMap::PreDraw(CommandContext* commandContext, const DirectionalLights& directionalLight) {
+void ShadowMap::Finalize()
+{
+    rootSignature_.reset();
+    pipelineState_.reset();
+}
+
+void ShadowMap::PreDraw(CommandContext* commandContext, DirectionalLights& directionalLight) {
     assert(ShadowMap::commandContext_ == nullptr);
 
     commandContext_ = commandContext;
+    directionalLights_ = &directionalLight;
     isDrawShadowMap = true;
 
     commandContext_->SetPipelineState(*pipelineState_);
     commandContext_->SetGraphicsRootSignature(*rootSignature_);
 
-    // CBVをセット（ライト）
-    commandContext_->SetConstantBuffer(static_cast<UINT>(RootParameter::kDirectionalLights), directionalLight.lights_[0].constBuffer_.GetGPUVirtualAddress());
+    for (int i = 0; i < DirectionalLights::lightNum; i++) {
+        commandContext_->TransitionResource(directionalLights_->lights_[i].shadowMap_, D3D12_RESOURCE_STATE_DEPTH_WRITE);
+        commandContext_->ClearDepth(directionalLights_->lights_[i].shadowMap_);
+    }
 
     commandContext_->SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
@@ -49,10 +61,10 @@ void ShadowMap::CreatePipeline() {
 
     {
 
-         // ルートパラメータ
+        // ルートパラメータ
         CD3DX12_ROOT_PARAMETER rootparams[int(RootParameter::parameterNum)] = {};
         rootparams[int(RootParameter::kWorldTransform)].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_ALL);
-        rootparams[int(RootParameter::kDirectionalLights)].InitAsConstantBufferView(1, 0, D3D12_SHADER_VISIBILITY_ALL);
+        rootparams[(int)RootParameter::kDirectionalLight].InitAsConstantBufferView(1, 0, D3D12_SHADER_VISIBILITY_ALL);
 
         // スタティックサンプラー
         CD3DX12_STATIC_SAMPLER_DESC samplerDesc =
@@ -114,6 +126,10 @@ void ShadowMap::Draw(uint32_t modelHandle, const WorldTransform& worldTransform)
     // CBVをセット（ワールド行列）
     commandContext_->SetConstantBuffer(static_cast<UINT>(RootParameter::kWorldTransform), worldTransform.GetGPUVirtualAddress());
 
-    ModelManager::GetInstance()->DrawInstanced(commandContext_, modelHandle);
+    for (int i = 0; i < DirectionalLights::lightNum; i++) {
+        commandContext_->SetDepthStencil(directionalLights_->lights_[i].shadowMap_.GetDSV());
+        commandContext_->SetConstantBuffer(static_cast<UINT>(RootParameter::kDirectionalLight), directionalLights_->lights_[i].constBuffer_.GetGPUVirtualAddress());
+        ModelManager::GetInstance()->DrawInstanced(commandContext_, modelHandle);
+    }
 }
 

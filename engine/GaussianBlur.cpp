@@ -7,9 +7,6 @@
 using namespace Microsoft::WRL;
 
 ID3D12GraphicsCommandList* GaussianBlur::sCommandList = nullptr;
-std::unique_ptr<RootSignature> GaussianBlur::sRootSignature;
-std::unique_ptr<PipelineState> GaussianBlur::sHorizontalBlurPipelineState;
-std::unique_ptr<PipelineState> GaussianBlur::sVerticalBlurPipelineState;
 uint32_t GaussianBlur::gbInstanceCount = 0;
 
 GaussianBlur::GaussianBlur() {
@@ -22,17 +19,13 @@ GaussianBlur::~GaussianBlur()
     gbInstanceCount--;
 }
 
-void GaussianBlur::StaticInitialize() {
-    InitializeGraphicsPipeline();
-}
-
 void GaussianBlur::CreateMesh()
 {
 
     vertices_.resize(4);
 
     //左下
-    vertices_[0].pos = { -1.0f,-1.0f,0.0f,1.0f};
+    vertices_[0].pos = { -1.0f,-1.0f,0.0f,1.0f };
     vertices_[0].uv = { 0.0f,1.0f };
     //左上
     vertices_[1].pos = { -1.0f,1.0f,0.0f,1.0f };
@@ -77,6 +70,8 @@ void GaussianBlur::CreateMesh()
 void GaussianBlur::Initialize(ColorBuffer* originalTexture)
 {
     assert(originalTexture);
+
+    InitializeGraphicsPipeline();
 
     // メッシュ生成
     CreateMesh();
@@ -141,7 +136,7 @@ void GaussianBlur::InitializeGraphicsPipeline()
 
     auto shaderManager = ShaderManager::GetInstance();
 
-    horizontalVsBlob = shaderManager->Compile(L"HorizontalGaussianBlurVS.hlsl",ShaderManager::kVertex);
+    horizontalVsBlob = shaderManager->Compile(L"HorizontalGaussianBlurVS.hlsl", ShaderManager::kVertex);
     assert(horizontalVsBlob != nullptr);
 
     verticalVsBlob = shaderManager->Compile(L"VerticalGaussianBlurVS.hlsl", ShaderManager::kVertex);
@@ -200,7 +195,7 @@ void GaussianBlur::InitializeGraphicsPipeline()
         gpipeline.SampleMask = D3D12_DEFAULT_SAMPLE_MASK; // 標準設定
         // ラスタライザステート
         gpipeline.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-        
+
         // ブレンドステートの設定
         gpipeline.BlendState = Helper::BlendDisable;
 

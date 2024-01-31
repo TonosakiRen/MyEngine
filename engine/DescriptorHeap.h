@@ -25,10 +25,14 @@ public:
     DescriptorHandle GetDiscriptorHandle(uint32_t index) {
         DescriptorHandle handle;
         handle.cpu_ = CD3DX12_CPU_DESCRIPTOR_HANDLE(
-        descriptorStart_, index,
-        descriptorSize_);
+            descriptorStart_, index,
+            descriptorSize_);
 
         return handle;
+    }
+
+    DescriptorHandle GetDiscriptorStartHandle() {
+        return descriptorStart_;
     }
 
 private:

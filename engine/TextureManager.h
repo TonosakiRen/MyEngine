@@ -7,6 +7,7 @@
 #include <wrl.h>
 #include "GPUResource.h"
 #include "DescriptorHandle.h"
+#include <memory>
 
 class TextureManager
 {
@@ -26,11 +27,14 @@ public:
 	static TextureManager* GetInstance();
 
 	void Initialize(std::string directoryPath = "Resources/textures/");
+	void Finalize();
 
 	const D3D12_RESOURCE_DESC GetResoureDesc(uint32_t textureHandle);
 
 	void SetGraphicsRootDescriptorTable(
 		CommandContext* commandList, UINT rootParamIndex, uint32_t textureHandle);
+
+	DescriptorHandle GetSRV(const std::string& fileName);
 
 private:
 	TextureManager() = default;
@@ -41,11 +45,10 @@ private:
 	ID3D12Device* device_;
 	UINT sDescriptorHandleIncrementSize_ = 0u;
 	std::string directoryPath_;
-	std::array<Texture, kNumTextures> textures_;
+	std::unique_ptr<std::array<Texture, kNumTextures>> textures_;
 	uint32_t useTextureCount_ = 0;
 
 	uint32_t LoadInternal(const std::string& fileName);
 	uint32_t LoadUvInternal(const std::string& fileName,const std::string& filePass);
 	
 };
-

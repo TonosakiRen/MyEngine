@@ -1,8 +1,7 @@
 #pragma once
 #include "GameObject.h"
 #include "Collider.h"
-class Wall :
-    public GameObject
+class Wall 
 {
 public:
 
@@ -10,5 +9,5 @@ public:
     void Update();
     void Draw();
 public:
-    Collider collider_;
+    
 };

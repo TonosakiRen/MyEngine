@@ -26,6 +26,8 @@ private:
     WorldTransform worldTransform3DReticle_;
     Sprite sprite2DReticle_;
     WorldTransform modelWorldTransform_;
+    WorldTransform leftHandWorldTransform_;
+    WorldTransform rightHandWorldTransform_;
     Vector3 velocity_;
     Vector3 acceleration_;
     Vector3 modelSize_;

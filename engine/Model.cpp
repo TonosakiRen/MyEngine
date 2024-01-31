@@ -9,8 +9,15 @@ using namespace Microsoft::WRL;
 CommandContext* Model::commandContext_ = nullptr;
 std::unique_ptr<RootSignature> Model::rootSignature_;
 std::unique_ptr<PipelineState> Model::pipelineState_;
+
 void Model::StaticInitialize() {
     CreatePipeline();
+}
+
+void Model::Finalize()
+{
+    rootSignature_.reset();
+    pipelineState_.reset();
 }
 
 void Model::PreDraw(CommandContext* commandContext, const ViewProjection& viewProjection, const DirectionalLights& directionalLights) {

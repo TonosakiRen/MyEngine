@@ -7,16 +7,15 @@
 class Compute
 {
 public:
-	static void StaticInitialize();
 	void Initialize();
 	void Dispatch(CommandContext& commandContext);
 	void* GetData();
 	void UnMap();
 private:
-	static void CreatePipeline();
+	void CreatePipeline();
 private:
-	static PipelineState pipelineState_;
-	static RootSignature rootSignature_;
+	PipelineState pipelineState_;
+	RootSignature rootSignature_;
 	GPUResource rwStructureBuffer_;
 	GPUResource copyBuffer_;
 	void* data_;

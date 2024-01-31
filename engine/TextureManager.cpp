@@ -14,7 +14,14 @@ uint32_t TextureManager::LoadUv(const std::string& fileName , const std::string&
 
 TextureManager* TextureManager::GetInstance() {
 	static TextureManager instance;
+	if (!instance.textures_) {
+		instance.textures_ = std::make_unique<std::array<Texture, kNumTextures>>();
+	}
 	return &instance;
+}
+
+DescriptorHandle TextureManager::GetSRV(const std::string& fileName) {
+	return (*textures_)[TextureManager::GetInstance()->LoadInternal(fileName)].srvHandle;
 }
 
 void TextureManager::Initialize(std::string directoryPath) {
@@ -27,15 +34,21 @@ void TextureManager::Initialize(std::string directoryPath) {
 	
 }
 
+void TextureManager::Finalize() {
+
+	textures_.reset();
+
+}
+
 const D3D12_RESOURCE_DESC TextureManager::GetResoureDesc(uint32_t textureHandle) {
 	assert(textureHandle < kNumTextures);
-	return textures_[textureHandle].resource->GetDesc();
+	return (*textures_)[textureHandle].resource->GetDesc();
 }
 
 void TextureManager::SetGraphicsRootDescriptorTable(CommandContext* commandContext, UINT rootParamIndex,uint32_t textureHandle) { // デスクリプタヒープの配列
 	assert(textureHandle < kNumTextures);
 	// シェーダリソースビューをセット
-	commandContext->SetDescriptorTable(rootParamIndex, textures_[textureHandle].srvHandle);
+	commandContext->SetDescriptorTable(rootParamIndex, (*textures_)[textureHandle].srvHandle);
 }
 
 uint32_t TextureManager::LoadInternal(const std::string& fileName) {
@@ -44,16 +57,16 @@ uint32_t TextureManager::LoadInternal(const std::string& fileName) {
 	uint32_t handle = useTextureCount_;
 
 	// 読み込み済みテクスチャを検索
-	auto it = std::find_if(textures_.begin(), textures_.end(),[&](const auto& texture) {return texture.name == fileName;});
+	auto it = std::find_if(textures_->begin(), textures_->end(),[&](const auto& texture) {return texture.name == fileName;});
 
-	if (it != textures_.end()) {
+	if (it != textures_->end()) {
 		// 読み込み済みテクスチャの要素番号を取得
-		handle = static_cast<uint32_t>(std::distance(textures_.begin(), it));
+		handle = static_cast<uint32_t>(std::distance(textures_->begin(), it));
 		return handle;
 	}
 
 	// 書き込むテクスチャの参照
-	Texture& texture = textures_.at(useTextureCount_);
+	Texture& texture = textures_->at(useTextureCount_);
 	texture.name = fileName;
 
 	// ディレクトリパスとファイル名を連結してフルパスを得る
@@ -109,6 +122,11 @@ uint32_t TextureManager::LoadInternal(const std::string& fileName) {
 
 	assert(SUCCEEDED(result));
 
+#ifdef _DEBUG
+	texture.resource->SetName(L"Texture");
+#endif // _DEBUG
+
+
 	// テクスチャバッファにデータ転送
 	for (size_t i = 0; i < metadata.mipLevels; i++) {
 		const Image* img = scratchImg.GetImage(i, 0, 0); 
@@ -150,16 +168,16 @@ uint32_t TextureManager::LoadUvInternal(const std::string& fileName, const std::
 	uint32_t handle = useTextureCount_;
 
 	// 読み込み済みテクスチャを検索
-	auto it = std::find_if(textures_.begin(), textures_.end(), [&](const auto& texture) {return texture.name == fileName; });
+	auto it = std::find_if(textures_->begin(), textures_->end(), [&](const auto& texture) {return texture.name == fileName; });
 
-	if (it != textures_.end()) {
+	if (it != textures_->end()) {
 		// 読み込み済みテクスチャの要素番号を取得
-		handle = static_cast<uint32_t>(std::distance(textures_.begin(), it));
+		handle = static_cast<uint32_t>(std::distance(textures_->begin(), it));
 		return handle;
 	}
 
 	// 書き込むテクスチャの参照
-	Texture& texture = textures_.at(useTextureCount_);
+	Texture& texture = textures_->at(useTextureCount_);
 	texture.name = fileName;
 
 	// ディレクトリパスとファイル名を連結してフルパスを得る
@@ -214,6 +232,9 @@ uint32_t TextureManager::LoadUvInternal(const std::string& fileName, const std::
 		nullptr, IID_PPV_ARGS(texture.resource.GetAddressOf()));
 
 	assert(SUCCEEDED(result));
+#ifdef _DEBUG
+	texture.resource->SetName(L"Texture");
+#endif // _DEBUG
 
 	// テクスチャバッファにデータ転送
 	for (size_t i = 0; i < metadata.mipLevels; i++) {

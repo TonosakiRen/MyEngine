@@ -25,6 +25,12 @@ void CommandContext::SetDescriptorHeap()
     commandList_->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
 }
 
+void CommandContext::ShutDown()
+{
+    commandAllocator_.Reset();
+    commandList_.Reset();
+}
+
 void CommandContext::Close() {
     FlushResourceBarriers();
     Helper::AssertIfFailed(commandList_->Close());
