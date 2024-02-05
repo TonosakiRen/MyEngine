@@ -46,8 +46,8 @@ void TileBasedRendering::Update(const PointLights& pointLights,const SpotLights&
     for (uint32_t i = 0; i < PointLights::lightNum;i++) {
         if (pointLights.lights_[i].isActive) {
             for (uint32_t j = 0; j < kTileNum; j++) {
-                tilesInformation_[j];
-                pointLights.lights_[i];
+                //tilesInformation_[j];
+                //pointLights.lights_[i];
                 //当たった
                 if (true) {
                     tilesInformation_[j].pointLightNum++;
@@ -60,8 +60,8 @@ void TileBasedRendering::Update(const PointLights& pointLights,const SpotLights&
     for (uint32_t i = 0; i < SpotLights::lightNum; i++) {
         if (spotLights.lights_[i].isActive) {
             for (uint32_t j = 0; j < kTileNum; j++) {
-                tilesInformation_[j];
-                spotLights.lights_[i];
+                //tilesInformation_[j];
+                //spotLights.lights_[i];
                 //当たった
                 if (true) {
                     tilesInformation_[j].spotLightNum++;
@@ -74,8 +74,8 @@ void TileBasedRendering::Update(const PointLights& pointLights,const SpotLights&
     for (uint32_t i = 0; i < ShadowSpotLights::lightNum; i++) {
         if (shadowSpotLights.lights_[i].isActive) {
             for (uint32_t j = 0; j < kTileNum; j++) {
-                tilesInformation_[j];
-                shadowSpotLights.lights_[i];
+                //tilesInformation_[j];
+                //shadowSpotLights.lights_[i];
                 //当たった
                 if (true) {
                     tilesInformation_[j].shadowSpotLightNum++;

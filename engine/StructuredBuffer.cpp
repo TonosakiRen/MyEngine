@@ -13,7 +13,7 @@ void StructuredBuffer::Create(size_t bufferSize , UINT numElements)
     srvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
     srvDesc.Buffer.FirstElement = 0;
     srvDesc.Buffer.NumElements = numElements;
-    srvDesc.Buffer.StructureByteStride = bufferSize;
+    srvDesc.Buffer.StructureByteStride = UINT(bufferSize);
 
     srvHandle_ = DirectXCommon::GetInstance()->AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
     DirectXCommon::GetInstance()->GetDevice()->CreateShaderResourceView(resource_.Get(), &srvDesc, srvHandle_);

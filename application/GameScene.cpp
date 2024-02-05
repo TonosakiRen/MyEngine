@@ -97,7 +97,7 @@ void GameScene::Update(CommandContext& commandContext){
 		}
 		
 		// light
-#ifdef _DEBUG
+#ifdef USE_IMGUI
 		ImGui::Begin("DirectionalLight");
 		ImGui::DragFloat3("lightDirection", &directionalLights_->lights_[0].direction.x, 0.01f);
 		ImGui::DragFloat3("lightPosition", &directionalLights_->lights_[0].position.x, 1.0f);
@@ -108,7 +108,7 @@ void GameScene::Update(CommandContext& commandContext){
 		directionalLights_->lights_[0].direction = Normalize(directionalLights_->lights_[0].direction);
 		directionalLights_->Update();
 
-#ifdef _DEBUG
+#ifdef USE_IMGUI
 		ImGui::Begin("pointLight");
 
 		ImGui::DragFloat3("lightPosition", &pointLights_->lights_[0].worldTransform.translation_.x, 0.01f);
@@ -128,7 +128,7 @@ void GameScene::Update(CommandContext& commandContext){
 #endif
 		pointLights_->Update();
 
-#ifdef _DEBUG
+#ifdef USE_IMGUI
 		ImGui::Begin("spotLight");
 		ImGui::DragFloat3("lightPosition", &spotLights_->lights_[0].worldTransform.translation_.x, 0.01f);
 		ImGui::DragFloat3("lightColor", &spotLights_->lights_[0].color.x, 1.0f, 0.0f, 255.0f);
