@@ -52,7 +52,7 @@ public:
     };
 
     bool GetIsNextScene() {
-        return transition_->getIsNextScene();
+        return transition_->GetIsNextScene();
     }
 
     DXGI_FORMAT GetRTVFormat(RenderTargetType rtvType) { return colorBuffers_[rtvType]->GetFormat(); }

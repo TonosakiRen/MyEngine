@@ -112,6 +112,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="application\BaseScene.cpp" />
+    <ClCompile Include="application\GamePlayScene.cpp" />
+    <ClCompile Include="application\MyGame.cpp" />
+    <ClCompile Include="application\SceneManager.cpp" />
+    <ClCompile Include="application\TitleScene.cpp" />
     <ClCompile Include="audio\Audio.cpp" />
     <ClCompile Include="engine\Bloom.cpp" />
     <ClCompile Include="application\BoxArea.cpp" />
@@ -129,11 +134,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\DirectXCommon.cpp" />
     <ClCompile Include="application\DustParticle.cpp" />
     <ClCompile Include="engine\DWParam.cpp" />
+    <ClCompile Include="engine\Framework.cpp" />
     <ClCompile Include="engine\LightNumBuffer.cpp" />
     <ClCompile Include="engine\ShadowSpotLights.cpp" />
     <ClCompile Include="engine\SpotLightShadowMap.cpp" />
     <ClCompile Include="engine\Transition.cpp" />
-    <ClCompile Include="Framework.cpp" />
     <ClCompile Include="ImGui\ImGuiManager.cpp" />
     <ClCompile Include="math\Easing.cpp" />
     <ClCompile Include="engine\EdgeRenderer.cpp" />
@@ -182,13 +187,16 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\TileBasedRendering.cpp" />
     <ClCompile Include="engine\UploadBuffer.cpp" />
     <ClCompile Include="engine\ViewProjection.cpp" />
-    <ClCompile Include="application\Wall.cpp" />
     <ClCompile Include="application\WhiteParticle.cpp" />
     <ClCompile Include="engine\WinApp.cpp" />
     <ClCompile Include="engine\WorldTransform.cpp" />
-    <ClCompile Include="MyGame.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="application\BaseScene.h" />
+    <ClInclude Include="application\GamePlayScene.h" />
+    <ClInclude Include="application\MyGame.h" />
+    <ClInclude Include="application\SceneManager.h" />
+    <ClInclude Include="application\TitleScene.h" />
     <ClInclude Include="audio\Audio.h" />
     <ClInclude Include="engine\Bloom.h" />
     <ClInclude Include="application\BoxArea.h" />
@@ -207,11 +215,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\DirectXCommon.h" />
     <ClInclude Include="application\DustParticle.h" />
     <ClInclude Include="engine\DWParam.h" />
+    <ClInclude Include="engine\Framework.h" />
     <ClInclude Include="engine\LightNumBuffer.h" />
     <ClInclude Include="engine\ShadowSpotLights.h" />
     <ClInclude Include="engine\SpotLightShadowMap.h" />
     <ClInclude Include="engine\Transition.h" />
-    <ClInclude Include="Framework.h" />
     <ClInclude Include="ImGui\ImGuiManager.h" />
     <ClInclude Include="math\Easing.h" />
     <ClInclude Include="engine\EdgeRenderer.h" />
@@ -262,11 +270,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\TileBasedRendering.h" />
     <ClInclude Include="engine\UploadBuffer.h" />
     <ClInclude Include="engine\ViewProjection.h" />
-    <ClInclude Include="application\Wall.h" />
     <ClInclude Include="application\WhiteParticle.h" />
     <ClInclude Include="engine\WinApp.h" />
     <ClInclude Include="engine\WorldTransform.h" />
-    <ClInclude Include="MyGame.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\EdgePS.hlsl">
@@ -378,6 +384,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ProjectReference Include="externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">
       <Project>{371b9fa9-4c90-4ac6-a123-aced756d6c77}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="MyEngine.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

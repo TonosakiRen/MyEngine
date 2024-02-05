@@ -2,6 +2,7 @@
 #include "Input.h"
 #include "Audio.h"
 #include "WinApp.h"
+#include "SceneManager.h"
 bool Framework::endRequest_ = false;
 
 void Framework::Run()
@@ -40,6 +41,7 @@ void Framework::Initialize()
 
 void Framework::Finalize()
 {
+
 	// ゲームウィンドウの破棄
 	win->TerminateGameWindow();
 }

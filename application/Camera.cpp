@@ -64,6 +64,11 @@ void Camera::Update(Vector3 playerPos)
 	 ViewProjection::Update();
 }
 
+void Camera::Update()
+{
+	ViewProjection::Update();
+}
+
 Vector3 Camera::GetOffset()
 {
 	//追従対象からカメラまでのオフセット

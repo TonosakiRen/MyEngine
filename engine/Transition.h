@@ -30,13 +30,13 @@ public:
 
 	void Initialize(ColorBuffer& resultBuffer);
 
-	void Draw(ColorBuffer& resultBuffer,const DescriptorHandle& textureBuffer, CommandContext& commandContext);
+	void Draw(ColorBuffer& resultBuffer, const DescriptorHandle& textureBuffer, CommandContext& commandContext);
 
 	void StartTransition() {
 		isTransition_ = true;
 	};
 
-	bool getIsNextScene() {
+	bool GetIsNextScene() {
 		return isNextScene_;
 	}
 
@@ -60,4 +60,3 @@ private:
 	bool isNextScene_ = false;
 	bool isTransition_ = false;
 };
-

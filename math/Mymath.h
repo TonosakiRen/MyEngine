@@ -6,6 +6,52 @@
 #include<cstdlib>
 #include<ctime>
 
+#pragma region	struct定義
+
+struct Vector2 {
+	float x = 0.0f;
+	float y = 0.0f;
+};
+struct Vector3 {
+	float x = 0.0f;
+	float y = 0.0f;
+	float z = 0.0f;
+};
+struct Vector4 {
+	float x = 0.0f;
+	float y = 0.0f;
+	float z = 0.0f;
+	float w = 0.0f;
+};
+struct Matrix4x4 {
+	float m[4][4];
+};
+struct Quaternion {
+	float x = 0.0f;
+	float y = 0.0f;
+	float z = 0.0f;
+	float w = 1.0f;
+};
+struct Line {
+	Vector3 origin{}; //始点
+	Vector3 diff{};//終点への差分ベクトル
+};
+struct Ray {
+	Vector3 origin{}; //始点
+	Vector3 diff{};//終点への差分ベクトル
+};
+struct Segment {
+	Vector3 origin{}; //始点
+	Vector3 diff{};//終点への差分ベクトル
+};
+struct OBB {
+	Vector3 center{};          // 中心点
+	Vector3 orientations[3]{}; // 座標軸、正規化、直交座標
+	Vector3 size{};            // 座標軸方向の長さの半分。中心から面までの距離
+};
+#pragma endregion
+
+
 #pragma region 数学関係関数
 inline float clamp(float num, float min, float max) {
 	if (num < min) {
@@ -55,52 +101,47 @@ inline bool Rand() { return bool(0 + (int)(rand() * (1 - 0 + 1.0) / (1.0 + RAND_
 inline void SRAND() {
 	srand((unsigned)time(NULL));
 }
+inline Vector4 HSVA(float h, float s, float v, float a) {
+	float r = v, g = v, b = v;
+	if (s > 0.0f) {
+		h = std::fmod(h, 1.0f);
+		h *= 6.0f;
+		int32_t i = int32_t(h);
+		float f = h - float(i);
+		switch (i) {
+		default:
+		case 0:
+			g *= 1.0f - s * (1.0f - f);
+			b *= 1.0f - s;
+			break;
+		case 1:
+			r *= 1.0f - s * f;
+			b *= 1.0f - s;
+			break;
+		case 2:
+			r *= 1.0f - s;
+			b *= 1.0f - s * (1.0f - f);
+			break;
+		case 3:
+			r *= 1.0f - s;
+			g *= 1.0f - s * f;
+			break;
+		case 4:
+			r *= 1.0f - s * (1.0f - f);
+			g *= 1.0f - s;
+			break;
+		case 5:
+			g *= 1.0f - s;
+			b *= 1.0f - s * f;
+			break;
+		}
+	}
+	return { r, g, b, a };
+}
+
+
 #pragma endregion
 
-#pragma region	struct定義
-
-struct Vector2 {
-	float x = 0.0f;
-	float y = 0.0f;
-};
-struct Vector3 {
-	float x = 0.0f;
-	float y = 0.0f;
-	float z = 0.0f;
-};
-struct Vector4 {
-	float x = 0.0f;
-	float y = 0.0f;
-	float z = 0.0f;
-	float w = 0.0f;
-};
-struct Matrix4x4 {
-	float m[4][4];
-};
-struct Quaternion {
-	float x = 0.0f;
-	float y = 0.0f;
-	float z = 0.0f;
-	float w = 1.0f;
-};
-struct Line {
-	Vector3 origin{}; //始点
-	Vector3 diff{};//終点への差分ベクトル
-};
-struct Ray {
-	Vector3 origin{}; //始点
-	Vector3 diff{};//終点への差分ベクトル
-};
-struct Segment {
-	Vector3 origin{}; //始点
-	Vector3 diff{};//終点への差分ベクトル
-};
-struct OBB {
-	Vector3 center{};          // 中心点
-	Vector3 orientations[3]{}; // 座標軸、正規化、直交座標
-	Vector3 size{};            // 座標軸方向の長さの半分。中心から面までの距離
-};
-#pragma endregion
 
 #pragma region	Vector2
 #pragma region 演算子のオーバーロード

@@ -2,6 +2,11 @@
 #include <d3dx12.h>
 
 void Material::Initialize() {
+    color_ = { 1.0f, 1.0f, 1.0f,1.0f };
+    scale_ = { 1.0f,1.0f,1.0f };
+    rotation_ = { 0.0f,0.0f,0.0f };
+    translation_ = { 0.0f,0.0f,0.0f };
+    enableLighting_ = true;
     constBuffer_.Create((sizeof(ConstBufferData) + 0xff) & ~0xff);
     uvTransform_ = MakeIdentity4x4();
     Update();

@@ -8,6 +8,7 @@ public:
 	void Initialize();
 	void Initialize(Vector3 position, Quaternion rotation);
 	void Update(Vector3 playerPos);
+	void Update();
 	Vector3 GetOffset();
 private:
 	Vector3 savePlayerPos;

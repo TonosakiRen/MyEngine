@@ -42,6 +42,18 @@ public:
 		return quaternion_;
 	}
 
+	void SetTranslation(const Vector3& translation) {
+		translation_ = translation;
+	}
+
+	void SetQuaternion(const Vector3& euler) {
+		quaternion_ = MakeFromEulerAngle(euler);
+	}
+
+	void SetQuaternion(const Quaternion& quaternion) {
+		quaternion_ = quaternion;
+	}
+
 protected:
 	Vector3 translation_ = { 0.0f, 7.0f, -27.0f };
 	Quaternion quaternion_ = { 0.0f, 0.0f, 0.0f,1.0f };

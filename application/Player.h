@@ -3,6 +3,7 @@
 #include "Input.h"
 #include "Collider.h"
 #include "Sprite.h"
+#include "Mymath.h"
 class PlayerBulletManager;
 class Player :
     public GameObject
@@ -18,6 +19,9 @@ public:
     void Fire();
     void Move(const ViewProjection& viewProjection);
     void ReticleUpdate(const ViewProjection& viewProjection);
+    const WorldTransform& GetWorldTransform() const {
+        return worldTransform_;
+    }
 public:
     Collider collider_;
 private:

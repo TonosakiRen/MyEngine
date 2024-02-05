@@ -37,7 +37,7 @@ void ExplodeParticle::Update() {
 							pointLights_->lights_[j].worldTransform.translation_ = {0.0f,0.0f,0.0f};
 							pointLights_->lights_[j].worldTransform.parent_ = &particles[i].worldTransform_;
 							pointLights_->lights_[j].isActive = true;
-							pointLights_->lights_[j].color = { Rand(0.0f,1.0f),Rand(0.0f,1.0f) ,Rand(0.0f,1.0f) ,1.0f };
+							pointLights_->lights_[j].color = HSVA(Rand(0.0f, 1.0f),1.0f,1.0f,1.0f);
 							pointLights_->lights_[j].radius = pointLightRadius_;
 							pointLights_->lights_[j].intensity = 3.0f;
 							pointLights_->lights_[j].decay = 1.0f;

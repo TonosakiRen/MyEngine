@@ -19,6 +19,9 @@ void SpotLights::Initialize() {
         srvHandle_ = DirectXCommon::GetInstance()->AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
         DirectXCommon::GetInstance()->GetDevice()->CreateShaderResourceView(structureBuffer_, &srvDesc, srvHandle_);
         Update();
+        lights_[0].worldTransform.translation_.x = 8.0f;
+        lights_[0].worldTransform.translation_.y = 17.0f;
+
     
 }
 

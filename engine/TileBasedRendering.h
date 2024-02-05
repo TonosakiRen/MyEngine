@@ -24,9 +24,9 @@ public:
 		uint32_t shadowSpotLightNum = 0;
 	};
 
-	static const int kTileWidth = 16;
-	static const int kTileHeight = 9;
-	static const int kTileNum = kTileWidth * kTileHeight;
+	static const uint32_t kTileWidth = 16;
+	static const uint32_t kTileHeight = 9;
+	static const uint32_t kTileNum = kTileWidth * kTileHeight;
 	void Initialize();
 	void Update(const PointLights& pointLights,const SpotLights& spotLights,const ShadowSpotLights& shadowSpotLights);
 public:

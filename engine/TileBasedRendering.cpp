@@ -117,7 +117,6 @@ void TileBasedRendering::Update(const PointLights& pointLights,const SpotLights&
     }
 
     structureBuffer_.Copy(bufferData.data(), sizeof(bufferData[0]) * bufferData.size());
-
     pointLightIndexBuffer_.Copy(pointLightIndex);
     spotLightIndexBuffer_.Copy(spotLightLightIndex);
     shadowSpotLightIndexBuffer_.Copy(shadowSpotLightLightIndex);

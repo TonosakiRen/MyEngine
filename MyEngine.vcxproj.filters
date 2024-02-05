@@ -74,6 +74,21 @@
     <Filter Include="Engine\Framework">
       <UniqueIdentifier>{fc8df7ad-608f-4e6d-9af3-f46f532d9f7d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game\Scene">
+      <UniqueIdentifier>{6d4f3c8c-9564-4272-adf6-b3958391d2c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Particle">
+      <UniqueIdentifier>{1820220b-483d-485b-968f-ded23a5732e3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Player">
+      <UniqueIdentifier>{f806b664-fb89-4bdb-be9b-d5f92a9288a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameObject">
+      <UniqueIdentifier>{4e8e28e5-583d-4062-ae34-dc0664ed07aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Stage">
+      <UniqueIdentifier>{1ec4e05a-a67a-4a6f-88ca-56453d6b836d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="externals\imgui\imgui.cpp">
@@ -99,27 +114,6 @@
     </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="application\GameScene.cpp">
-      <Filter>Game</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\GameObject.cpp">
-      <Filter>Game</Filter>
-    </ClCompile>
-    <ClCompile Include="application\Skydome.cpp">
-      <Filter>Game</Filter>
-    </ClCompile>
-    <ClCompile Include="application\Floor.cpp">
-      <Filter>Game</Filter>
-    </ClCompile>
-    <ClCompile Include="application\DustParticle.cpp">
-      <Filter>Game</Filter>
-    </ClCompile>
-    <ClCompile Include="application\Player.cpp">
-      <Filter>Game</Filter>
-    </ClCompile>
-    <ClCompile Include="application\WhiteParticle.cpp">
-      <Filter>Game</Filter>
     </ClCompile>
     <ClCompile Include="audio\Audio.cpp">
       <Filter>Engine\Audio</Filter>
@@ -220,9 +214,6 @@
     <ClCompile Include="engine\EdgeRenderer.cpp">
       <Filter>Engine\PostEffect</Filter>
     </ClCompile>
-    <ClCompile Include="application\Wall.cpp">
-      <Filter>Game</Filter>
-    </ClCompile>
     <ClCompile Include="application\Camera.cpp">
       <Filter>Engine\Camera</Filter>
     </ClCompile>
@@ -253,16 +244,6 @@
     <ClCompile Include="engine\DirectionalLights.cpp">
       <Filter>Engine\Light</Filter>
     </ClCompile>
-    <ClCompile Include="engine\TileBasedRendering.cpp" />
-    <ClCompile Include="application\BoxArea.cpp">
-      <Filter>Game</Filter>
-    </ClCompile>
-    <ClCompile Include="application\PlayerBullet.cpp">
-      <Filter>Game</Filter>
-    </ClCompile>
-    <ClCompile Include="application\PlayerBulletManager.cpp">
-      <Filter>Game</Filter>
-    </ClCompile>
     <ClCompile Include="application\Enemy.cpp">
       <Filter>Game\Enemy</Filter>
     </ClCompile>
@@ -290,14 +271,59 @@
     <ClCompile Include="engine\LightNumBuffer.cpp">
       <Filter>Engine\Light</Filter>
     </ClCompile>
-    <ClCompile Include="Framework.cpp">
-      <Filter>Engine\Framework</Filter>
-    </ClCompile>
-    <ClCompile Include="MyGame.cpp">
-      <Filter>Engine\Framework</Filter>
-    </ClCompile>
     <ClCompile Include="engine\Transition.cpp">
       <Filter>Engine\PostEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\Framework.cpp">
+      <Filter>Engine\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="application\MyGame.cpp">
+      <Filter>Engine\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="application\GamePlayScene.cpp">
+      <Filter>Game\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="application\BaseScene.cpp">
+      <Filter>Game\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="application\SceneManager.cpp">
+      <Filter>Game\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="application\TitleScene.cpp">
+      <Filter>Game\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\TileBasedRendering.cpp">
+      <Filter>Engine\Light</Filter>
+    </ClCompile>
+    <ClCompile Include="application\DustParticle.cpp">
+      <Filter>Game\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="application\WhiteParticle.cpp">
+      <Filter>Game\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="application\Player.cpp">
+      <Filter>Game\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="application\PlayerBullet.cpp">
+      <Filter>Game\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="application\PlayerBulletManager.cpp">
+      <Filter>Game\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\GameObject.cpp">
+      <Filter>Game\GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="application\GameScene.cpp">
+      <Filter>Game\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="application\BoxArea.cpp">
+      <Filter>Game\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="application\Floor.cpp">
+      <Filter>Game\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="application\Skydome.cpp">
+      <Filter>Game\Stage</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -324,27 +350,6 @@
     </ClInclude>
     <ClInclude Include="externals\imgui\imstb_truetype.h">
       <Filter>ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="application\GameScene.h">
-      <Filter>Game</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\GameObject.h">
-      <Filter>Game</Filter>
-    </ClInclude>
-    <ClInclude Include="application\Skydome.h">
-      <Filter>Game</Filter>
-    </ClInclude>
-    <ClInclude Include="application\Floor.h">
-      <Filter>Game</Filter>
-    </ClInclude>
-    <ClInclude Include="application\DustParticle.h">
-      <Filter>Game</Filter>
-    </ClInclude>
-    <ClInclude Include="application\Player.h">
-      <Filter>Game</Filter>
-    </ClInclude>
-    <ClInclude Include="application\WhiteParticle.h">
-      <Filter>Game</Filter>
     </ClInclude>
     <ClInclude Include="audio\Audio.h">
       <Filter>Engine\Audio</Filter>
@@ -457,9 +462,6 @@
     <ClInclude Include="engine\EdgeRenderer.h">
       <Filter>Engine\PostEffect</Filter>
     </ClInclude>
-    <ClInclude Include="application\Wall.h">
-      <Filter>Game</Filter>
-    </ClInclude>
     <ClInclude Include="application\Camera.h">
       <Filter>Engine\Camera</Filter>
     </ClInclude>
@@ -483,16 +485,6 @@
     </ClInclude>
     <ClInclude Include="engine\DirectionalLights.h">
       <Filter>Engine\Light</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\TileBasedRendering.h" />
-    <ClInclude Include="application\BoxArea.h">
-      <Filter>Game</Filter>
-    </ClInclude>
-    <ClInclude Include="application\PlayerBullet.h">
-      <Filter>Game</Filter>
-    </ClInclude>
-    <ClInclude Include="application\PlayerBulletManager.h">
-      <Filter>Game</Filter>
     </ClInclude>
     <ClInclude Include="application\EnemyBullet.h">
       <Filter>Game\Enemy</Filter>
@@ -524,14 +516,59 @@
     <ClInclude Include="engine\ModelManager.h">
       <Filter>Engine\Model</Filter>
     </ClInclude>
-    <ClInclude Include="Framework.h">
-      <Filter>Engine\Framework</Filter>
-    </ClInclude>
-    <ClInclude Include="MyGame.h">
-      <Filter>Engine\Framework</Filter>
-    </ClInclude>
     <ClInclude Include="engine\Transition.h">
       <Filter>Engine\PostEffect</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Framework.h">
+      <Filter>Engine\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="application\MyGame.h">
+      <Filter>Engine\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="application\GamePlayScene.h">
+      <Filter>Game\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="application\BaseScene.h">
+      <Filter>Game\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="application\SceneManager.h">
+      <Filter>Game\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="application\TitleScene.h">
+      <Filter>Game\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\TileBasedRendering.h">
+      <Filter>Engine\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="application\DustParticle.h">
+      <Filter>Game\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="application\WhiteParticle.h">
+      <Filter>Game\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Player.h">
+      <Filter>Game\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="application\PlayerBullet.h">
+      <Filter>Game\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="application\PlayerBulletManager.h">
+      <Filter>Game\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="application\GameScene.h">
+      <Filter>Game\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\GameObject.h">
+      <Filter>Game\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="application\BoxArea.h">
+      <Filter>Game\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Floor.h">
+      <Filter>Game\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Skydome.h">
+      <Filter>Game\Stage</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -613,5 +650,10 @@
     <FxCompile Include="Resources\shaders\TransitionVS.hlsl">
       <Filter>shaders</Filter>
     </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="MyEngine.rc">
+      <Filter>shaders</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

@@ -30,6 +30,8 @@ void MyGame::Initialize()
 
 	modelManager = ModelManager::GetInstance();
 
+	sceneManager = SceneManager::GetInstance();
+
 
 	// 3Dオブジェクト静的初期化
 	Model::StaticInitialize();
@@ -49,6 +51,7 @@ void MyGame::Initialize()
 void MyGame::Finalize()
 {
 
+	sceneManager->Finalize();
 	modelManager->Finalize();
 	textureManager->Finalize();
 	Model::Finalize();
@@ -78,9 +81,8 @@ void MyGame::Update()
 	// ゲームシーンの毎フレーム処理
 	gameScene->Update(renderer->GetCommandContext());
 	
-	if (gameScene->GetIsSceneChange()) {
+	if (sceneManager->GetNextScene()) {
 		renderer->StartTransition();
-		gameScene->SetIsSceneChange(!renderer->GetIsNextScene());
 	};
 
 }

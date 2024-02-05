@@ -4,6 +4,7 @@ class Renderer;
 class GameScene;
 class TextureManager;
 class ModelManager;
+class SceneManager;
 
 class MyGame : public Framework
 {
@@ -18,5 +19,6 @@ public:
 	Renderer* renderer = nullptr;
 	TextureManager* textureManager = nullptr;
 	ModelManager* modelManager = nullptr;
+	SceneManager* sceneManager = nullptr;
 };
 

@@ -164,7 +164,7 @@ void Transition::Initialize(ColorBuffer& resultBuffer) {
 	isNextScene_ = false;
 }
 
-void Transition::Draw(ColorBuffer& resultBuffer,const DescriptorHandle& textureBuffer, CommandContext& commandContext) {
+void Transition::Draw(ColorBuffer& resultBuffer, const DescriptorHandle& textureBuffer, CommandContext& commandContext) {
 
 	if (isTransition_) {
 
@@ -187,7 +187,7 @@ void Transition::Draw(ColorBuffer& resultBuffer,const DescriptorHandle& textureB
 				t_ = clamp(t_, 0.0f, 1.0f);
 			}
 		}
-		
+
 
 
 		commandContext.CopyBuffer(saveResultBuffer_, resultBuffer);
@@ -206,7 +206,7 @@ void Transition::Draw(ColorBuffer& resultBuffer,const DescriptorHandle& textureB
 		commandContext.SetIndexBuffer(ibView_);
 
 		// CBVをセット（ワールド行列）
-		commandContext.SetConstant(static_cast<UINT>(RootParameter::kT),0,t_);
+		commandContext.SetConstant(static_cast<UINT>(RootParameter::kT), 0, t_);
 
 		// SRVをセット
 		commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kTexture), textureBuffer);
@@ -219,4 +219,3 @@ void Transition::Draw(ColorBuffer& resultBuffer,const DescriptorHandle& textureB
 	}
 
 }
-

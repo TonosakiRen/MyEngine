@@ -1,7 +1,9 @@
 #pragma once
+#include <memory>
 class WinApp;
 class Input;
 class Audio;
+class SceneManager;
 class Framework
 {
 public:
@@ -22,6 +24,5 @@ public:
 	WinApp* win = nullptr;
 	Input* input = nullptr;
 	Audio* audio = nullptr;
-
 };
 

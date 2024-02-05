@@ -53,7 +53,7 @@ void Enemy::Draw()
 void Enemy::Fire()
 {
 	Vector3 position = MakeTranslation(worldTransform_.matWorld_);
-	Vector3 playerPos = MakeTranslation(player_->GetWorldTransform()->matWorld_);
+	Vector3 playerPos = MakeTranslation(player_->GetWorldTransform().matWorld_);
 	Vector3 direction = Normalize(playerPos - position);
 	enemyBulletManager_->PopEnemyBullet(position,direction);
 }

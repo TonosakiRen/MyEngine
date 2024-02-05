@@ -36,6 +36,7 @@ public:
 		kLightNum,
 
 		kTBRInformation,
+		kTileNum,
 
 		kTBRPointLightIndex,
 		kTBRSpotLightIndex,
