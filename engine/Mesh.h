@@ -9,9 +9,18 @@ class Mesh
 	friend class ModelManager;
 public:
 	
+	struct VertexData {
+		Vector3 pos;
+		Vector3 normal;
+		Vector2 uv;
+	};
 
 	const D3D12_INDEX_BUFFER_VIEW* GetIbView() const {
 		return &ibView_;
+	}
+
+	const D3D12_VERTEX_BUFFER_VIEW* GetVbView() const {
+		return &vbView_;
 	}
 
 	const uint32_t GetUv() const{
@@ -19,6 +28,9 @@ public:
 	}
 
 private:
+	UploadBuffer vertexBuffer_;
+	std::vector<VertexData> vertices_;
+	D3D12_VERTEX_BUFFER_VIEW vbView_{};
 
 	UploadBuffer indexBuffer_;
 	D3D12_INDEX_BUFFER_VIEW ibView_{};

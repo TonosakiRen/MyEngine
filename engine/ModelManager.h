@@ -16,18 +16,9 @@ class ModelManager
 public:
 	static const size_t kNumModels = 256;
 
-	struct VertexData {
-		Vector3 pos;
-		Vector3 normal;
-		Vector2 uv;
-	};
-
 	struct ModelIndex {
 		std::string name;
 		std::vector<Mesh> meshes;
-		UploadBuffer vertexBuffer_;
-		std::vector<VertexData> vertices_;
-		D3D12_VERTEX_BUFFER_VIEW vbView_{};
 		//model全体のsize
 		Vector3 modelSize{};
 		Vector3 modelCenter{};

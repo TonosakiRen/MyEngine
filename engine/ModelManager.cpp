@@ -42,7 +42,7 @@ void ModelManager::CreateMeshes(ModelIndex& modelIndex)
 			aiVector3D& normal = mesh->mNormals[vertexIndex];
 			aiVector3D& texcoord = mesh->mTextureCoords[0][vertexIndex];
 
-			VertexData vertex;
+			Mesh::VertexData vertex;
 			vertex.pos = { position.x,position.y,position.z };
 			vertex.normal = { normal.x,normal.y,normal.z };
 			vertex.uv = { texcoord.x,texcoord.y };
@@ -69,7 +69,7 @@ void ModelManager::CreateMeshes(ModelIndex& modelIndex)
 				maxModelSize.z = position.z;
 			}
 
-			modelIndex.vertices_.push_back(vertex);
+			modelIndex.meshes[meshIndex].vertices_.push_back(vertex);
 		}
 
 		for (uint32_t faceIndex = 0; faceIndex < mesh->mNumFaces; ++faceIndex) {
@@ -263,19 +263,21 @@ void ModelManager::CreateMeshes(ModelIndex& modelIndex)
 		modelIndex.modelCenter.y = minModelSize.y;
 	}
 
-	// 頂点データのサイズ
-	UINT sizeVB = static_cast<UINT>(sizeof(VertexData) * modelIndex.vertices_.size());
-
-	modelIndex.vertexBuffer_.Create(sizeVB);
-
-	modelIndex.vertexBuffer_.Copy(modelIndex.vertices_.data(), sizeVB);
-
-	// 頂点バッファビューの作成
-	modelIndex.vbView_.BufferLocation = modelIndex.vertexBuffer_->GetGPUVirtualAddress();
-	modelIndex.vbView_.SizeInBytes = sizeVB;
-	modelIndex.vbView_.StrideInBytes = sizeof(modelIndex.vertices_[0]);
 
 	for (auto& mesh : modelIndex.meshes) {
+
+		// 頂点データのサイズ
+		UINT sizeVB = static_cast<UINT>(sizeof(Mesh::VertexData) * mesh.vertices_.size());
+
+		mesh.vertexBuffer_.Create(sizeVB);
+
+		mesh.vertexBuffer_.Copy(mesh.vertices_.data(), sizeVB);
+
+		// 頂点バッファビューの作成
+		mesh.vbView_.BufferLocation = mesh.vertexBuffer_->GetGPUVirtualAddress();
+		mesh.vbView_.SizeInBytes = sizeVB;
+		mesh.vbView_.StrideInBytes = sizeof(mesh.vertices_[0]);
+
 
 		// インデックスデータのサイズ
 		UINT sizeIB = static_cast<UINT>(sizeof(uint32_t) * mesh.indices_.size());
@@ -311,10 +313,11 @@ void ModelManager::DrawInstanced(CommandContext* commandContext, uint32_t modelH
 	assert(modelHandle < kNumModels);
 
 	const auto& modelItem = (*models_)[modelHandle];
-	// 頂点バッファの設定
-	commandContext->SetVertexBuffer(0, 1, &modelItem.vbView_);
 
 	for (const auto& mesh : modelItem.meshes) {
+
+		// 頂点バッファの設定
+		commandContext->SetVertexBuffer(0, 1, mesh.GetVbView());
 
 		// インデックスバッファの設定
 		commandContext->SetIndexBuffer(*mesh.GetIbView());
@@ -327,12 +330,12 @@ void ModelManager::DrawInstanced(CommandContext* commandContext, uint32_t modelH
 	assert(modelHandle < kNumModels);
 
 	const auto& modelItem = (*models_)[modelHandle];
-	// 頂点バッファの設定
-	commandContext->SetVertexBuffer(0, 1, &modelItem.vbView_);
 
 	for (const auto& mesh : modelItem.meshes) {
 		// srvセット
 		TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(commandContext, textureRootParamterIndex, mesh.GetUv());
+		// 頂点バッファの設定
+		commandContext->SetVertexBuffer(0, 1, mesh.GetVbView());
 		// インデックスバッファの設定
 		commandContext->SetIndexBuffer(*mesh.GetIbView());
 		// 描画コマンド
@@ -344,12 +347,12 @@ void ModelManager::DrawInstanced(CommandContext* commandContext, uint32_t modelH
 	assert(modelHandle < kNumModels);
 
 	const auto& modelItem = (*models_)[modelHandle];
-	// 頂点バッファの設定
-	commandContext->SetVertexBuffer(0, 1, &modelItem.vbView_);
 
 	for (const auto& mesh : modelItem.meshes) {
 		// srvセット
 		commandContext->SetDescriptorTable(textureRootParamterIndex, descriptorHandle);
+		// 頂点バッファの設定
+		commandContext->SetVertexBuffer(0, 1, mesh.GetVbView());
 		// インデックスバッファの設定
 		commandContext->SetIndexBuffer(*mesh.GetIbView());
 		// 描画コマンド
@@ -363,12 +366,12 @@ void ModelManager::DrawInstanced(CommandContext* commandContext, uint32_t modelH
 	assert(modelHandle < kNumModels);
 
 	const auto& modelItem = (*models_)[modelHandle];
-	// 頂点バッファの設定
-	commandContext->SetVertexBuffer(0, 1, &modelItem.vbView_);
-
+	
 	for (const auto& mesh : modelItem.meshes) {
 		// srvセット
 		TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(commandContext, textureRootParamterIndex, textureHandle);
+		// 頂点バッファの設定
+		commandContext->SetVertexBuffer(0, 1, mesh.GetVbView());
 		// インデックスバッファの設定
 		commandContext->SetIndexBuffer(*mesh.GetIbView());
 		// 描画コマンド
@@ -415,12 +418,13 @@ void ModelManager::DrawInstancing(CommandContext* commandContext, uint32_t model
 	assert(modelHandle < kNumModels);
 
 	const auto& modelItem = (*models_)[modelHandle];
-	// 頂点バッファの設定
-	commandContext->SetVertexBuffer(0, 1, &modelItem.vbView_);
+	
 
 	for (const auto& mesh : modelItem.meshes) {
 		// srvセット
 		TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(commandContext, textureRootParamterIndex, mesh.GetUv());
+		// 頂点バッファの設定
+		commandContext->SetVertexBuffer(0, 1, mesh.GetVbView());
 		// インデックスバッファの設定
 		commandContext->SetIndexBuffer(*mesh.GetIbView());
 		// 描画コマンド
