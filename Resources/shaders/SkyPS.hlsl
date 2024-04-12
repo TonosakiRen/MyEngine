@@ -58,7 +58,7 @@ PixelShaderOutput main(VSOutput input) {
 		output.color.xyz = HSVToRGB(hsva.xyz);
 	}
 
-	output.color += tex.Sample(smp, input.uv);
+	output.color += tex.Sample(smp, input.uv * 3.5f);
 
 	output.normal = float32_t4(0.0f, 0.0f, 0.0f, 1.0f);
 

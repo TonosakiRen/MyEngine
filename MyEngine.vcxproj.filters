@@ -92,6 +92,9 @@
     <Filter Include="Engine\Sky">
       <UniqueIdentifier>{a3a8fdc8-5621-4fdb-8d80-dd550fe2da83}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine\Animation">
+      <UniqueIdentifier>{49f097c0-c68c-4793-a54b-3b5dc154bdc0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="externals\imgui\imgui.cpp">
@@ -337,7 +340,6 @@
     <ClCompile Include="engine\DefaultStructuredBuffer.cpp">
       <Filter>Engine\GPUResource</Filter>
     </ClCompile>
-    <ClCompile Include="application\SphereLights.cpp" />
     <ClCompile Include="engine\RwStructuredBuffer.cpp">
       <Filter>Engine\GPUResource</Filter>
     </ClCompile>
@@ -355,6 +357,12 @@
     </ClCompile>
     <ClCompile Include="application\Skybox.cpp">
       <Filter>Game\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="application\SphereLights.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\AnimationManager.cpp">
+      <Filter>Engine\Animation</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -610,7 +618,6 @@
     <ClInclude Include="engine\DefaultStructuredBuffer.h">
       <Filter>Engine\GPUResource</Filter>
     </ClInclude>
-    <ClInclude Include="application\SphereLights.h" />
     <ClInclude Include="engine\RwStructuredBuffer.h">
       <Filter>Engine\GPUResource</Filter>
     </ClInclude>
@@ -628,6 +635,12 @@
     </ClInclude>
     <ClInclude Include="application\Skybox.h">
       <Filter>Game\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="application\SphereLights.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\AnimationManager.h">
+      <Filter>Engine\Animation</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

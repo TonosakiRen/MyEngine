@@ -16,7 +16,7 @@ class ModelManager
 public:
 	static const size_t kNumModels = 256;
 
-	struct ModelIndex {
+	struct ModelData {
 		std::string name;
 		std::vector<Mesh> meshes;
 		//model全体のsize
@@ -28,7 +28,7 @@ public:
 
 	static uint32_t Load(const std::string& fileName);
 
-	static void CreateMeshes(ModelIndex& modelIndex);
+	static void CreateMeshes(ModelData& modelIndex);
 
 	static ModelManager* GetInstance();
 
@@ -50,7 +50,7 @@ private:
 	ModelManager(const ModelManager&) = delete;
 	ModelManager& operator=(const ModelManager&) = delete;
 
-	std::unique_ptr<std::array<ModelIndex, kNumModels>> models_;
+	std::unique_ptr<std::array<ModelData, kNumModels>> models_;
 	uint32_t useModelCount_ = 0;
 
 	uint32_t LoadInternal(const std::string& fileName);

@@ -17,7 +17,7 @@ uint32_t ModelManager::Load(const std::string& fileName) {
 	return ModelManager::GetInstance()->LoadInternal(fileName);
 }
 
-void ModelManager::CreateMeshes(ModelIndex& modelIndex)
+void ModelManager::CreateMeshes(ModelData& modelIndex)
 {
 	HRESULT result = S_FALSE;
 
@@ -140,7 +140,7 @@ void ModelManager::Finalize()
 ModelManager* ModelManager::GetInstance() {
 	static ModelManager instance;
 	if (!instance.models_) {
-		instance.models_ = std::make_unique<std::array<ModelIndex, kNumModels>>();
+		instance.models_ = std::make_unique<std::array<ModelData, kNumModels>>();
 	}
 	return &instance;
 }

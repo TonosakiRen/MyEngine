@@ -172,6 +172,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\SphereLights.cpp" />
     <ClCompile Include="application\TitleScene.cpp" />
     <ClCompile Include="audio\Audio.cpp" />
+    <ClCompile Include="engine\AnimationManager.cpp" />
     <ClCompile Include="engine\AreaLights.cpp" />
     <ClCompile Include="engine\Bloom.cpp" />
     <ClCompile Include="application\BoxArea.cpp" />
@@ -262,6 +263,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\SphereLights.h" />
     <ClInclude Include="application\TitleScene.h" />
     <ClInclude Include="audio\Audio.h" />
+    <ClInclude Include="engine\AnimationManager.h" />
     <ClInclude Include="engine\AreaLights.h" />
     <ClInclude Include="engine\Bloom.h" />
     <ClInclude Include="application\BoxArea.h" />
