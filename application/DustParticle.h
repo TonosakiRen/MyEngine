@@ -1,5 +1,5 @@
 #pragma once
-#include "ParticleBox.h"
+#include "ParticleModel.h"
 class DustParticle
 {
 public:
@@ -21,7 +21,7 @@ public:
 	void SetScaleSpeed(float scaleSpeed) {
 		scaleSpeed_ = scaleSpeed;
 	}
-	struct dustParticle {
+	struct Particle {
 		WorldTransform worldTransform_;
 		Vector3 direction_;
 		Vector3 velocity_;
@@ -29,13 +29,13 @@ public:
 	};
 public:
 	WorldTransform emitterWorldTransform_;
-	dustParticle particles[kParticleNum];
+	Particle particles[kParticleNum];
 	int EmitNum_ = 1;
 private:
 	float speed_ = 0.1f;
 	float scaleSpeed_ = 0.01f;
 	bool isEmit_ = false;
-	std::unique_ptr<ParticleBox> particleBox_;
+	std::unique_ptr<ParticleModel> particle_;
 	Vector3 minDirection_;
 	Vector3 maxDirection_;
 };

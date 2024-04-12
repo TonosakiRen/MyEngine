@@ -1,6 +1,7 @@
 #include "GameObject.h"
 #include "ModelManager.h"
 #include "Model.h"
+#include "Sky.h"
 #include "ShadowMap.h"
 #include "SpotLightShadowMap.h"
 
@@ -66,6 +67,11 @@ void GameObject::Draw(const WorldTransform& worldTransform, Vector4 color)
 		material_.Update();
 		Model::Draw(modelHandle_, worldTransform, material_);
 	}
+}
+
+void GameObject::SkyDraw()
+{
+	Sky::Draw(modelHandle_, worldTransform_);
 }
 
 void GameObject::Draw(const WorldTransform& worldTransform, uint32_t textureHandle, Vector4 color)

@@ -55,6 +55,10 @@ void TitleScene::ModelDraw()
 	title_->Draw();
 }
 
+void TitleScene::SkyDraw()
+{
+}
+
 void TitleScene::ShadowDraw()
 {
 

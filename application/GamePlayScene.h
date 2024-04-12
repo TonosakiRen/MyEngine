@@ -5,6 +5,7 @@
 #include "MyMath.h"
 
 #include  "Skydome.h"
+#include  "Skybox.h"
 #include  "BoxArea.h"
 #include  "Floor.h"
 #include  "Player.h"
@@ -14,6 +15,7 @@
 #include  "WhiteParticle.h"
 #include  "Enemy.h"
 #include  "EnemyBulletManager.h"
+#include  "SphereLights.h"
 
 
 class GamePlayScene :
@@ -25,6 +27,8 @@ public:
     void Update() override;
 
     void ModelDraw() override;
+
+	void SkyDraw() override;
 
 	void ShadowDraw() override;
 	void SpotLightShadowDraw() override;
@@ -44,6 +48,7 @@ private:
 private:
 	std::unique_ptr<Skydome> skydome_;
 	std::unique_ptr<BoxArea> boxArea_;
+	std::unique_ptr<Skybox> skybox_;
 	std::unique_ptr<Floor> floor_;
 	std::unique_ptr<GameObject> sphere_;
 
@@ -55,6 +60,7 @@ private:
 
 	std::unique_ptr<WhiteParticle> whiteParticle_;
 	
+	std::unique_ptr<SphereLights> sphereLights_;
 
 	//Enemy
 	std::list<std::unique_ptr<Enemy>> enemies_;

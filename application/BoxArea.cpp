@@ -5,7 +5,7 @@
 void BoxArea::Initialize(const std::string name)
 {
 	GameObject::Initialize(name);
-	material_.enableLighting_ = false;
+	material_.enableLighting_ = true;
 	material_.Update();
 	worldTransform_.scale_ = { size_, size_, size_ };
 	worldTransform_.translation_.y = size_ / 2.0f;

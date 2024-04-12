@@ -25,6 +25,7 @@ public:
     enum RenderTargetType {
         kColor,
         kNormal,
+        kMaterial,
 
         kRenderTargetNum
     };
@@ -35,7 +36,7 @@ public:
     void BeginFrame();
     void BeginMainRender();
     void EndMainRender();
-    void DeferredRender(const ViewProjection& viewProjection, DirectionalLights& directionalLight, const PointLights& pointLights, const SpotLights& spotLights, ShadowSpotLights& shadowSpotLights);
+    void DeferredRender(ViewProjection& viewProjection, DirectionalLights& directionalLight,PointLights& pointLights,AreaLights& areaLights, SpotLights& spotLights, ShadowSpotLights& shadowSpotLights);
     void BeginShadowMapRender(DirectionalLights& directionalLights);
     void EndShadowMapRender(DirectionalLights& directionalLights);
     void BeginSpotLightShadowMapRender(ShadowSpotLights& shadowSpotLights);
@@ -85,6 +86,7 @@ private:
     std::unique_ptr<TileBasedRendering> tileBasedRendering_;
 
     std::unique_ptr<Transition> transition_;
+
 
 };
 

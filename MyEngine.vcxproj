@@ -137,7 +137,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_WINDOWS;USE_IMGUI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_WINDOWS;USE_IMGUI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
@@ -168,8 +168,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\GamePlayScene.cpp" />
     <ClCompile Include="application\MyGame.cpp" />
     <ClCompile Include="application\SceneManager.cpp" />
+    <ClCompile Include="application\Skybox.cpp" />
+    <ClCompile Include="application\SphereLights.cpp" />
     <ClCompile Include="application\TitleScene.cpp" />
     <ClCompile Include="audio\Audio.cpp" />
+    <ClCompile Include="engine\AreaLights.cpp" />
     <ClCompile Include="engine\Bloom.cpp" />
     <ClCompile Include="application\BoxArea.cpp" />
     <ClCompile Include="application\Camera.cpp" />
@@ -179,6 +182,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\CommandQueue.cpp" />
     <ClCompile Include="application\Compute.cpp" />
     <ClCompile Include="engine\DebugCamera.cpp" />
+    <ClCompile Include="engine\DefaultBuffer.cpp" />
+    <ClCompile Include="engine\DefaultStructuredBuffer.cpp" />
     <ClCompile Include="engine\DeferredRenderer.cpp" />
     <ClCompile Include="engine\DepthBuffer.cpp" />
     <ClCompile Include="engine\DescriptorHeap.cpp" />
@@ -188,9 +193,13 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\DWParam.cpp" />
     <ClCompile Include="engine\Framework.cpp" />
     <ClCompile Include="engine\LightNumBuffer.cpp" />
+    <ClCompile Include="engine\RwStructuredBuffer.cpp" />
     <ClCompile Include="engine\ShadowSpotLights.cpp" />
+    <ClCompile Include="engine\Sky.cpp" />
     <ClCompile Include="engine\SpotLightShadowMap.cpp" />
     <ClCompile Include="engine\Transition.cpp" />
+    <ClCompile Include="engine\UAVBuffer.cpp" />
+    <ClCompile Include="engine\Voronoi.cpp" />
     <ClCompile Include="ImGui\ImGuiManager.cpp" />
     <ClCompile Include="math\Easing.cpp" />
     <ClCompile Include="engine\EdgeRenderer.cpp" />
@@ -218,7 +227,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\Model.cpp" />
     <ClCompile Include="engine\ModelManager.cpp" />
     <ClCompile Include="engine\Particle.cpp" />
-    <ClCompile Include="engine\ParticleBox.cpp" />
+    <ClCompile Include="engine\ParticleModel.cpp" />
     <ClCompile Include="engine\PipelineState.cpp" />
     <ClCompile Include="engine\PixelBuffer.cpp" />
     <ClCompile Include="application\Player.cpp" />
@@ -242,14 +251,18 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\WhiteParticle.cpp" />
     <ClCompile Include="engine\WinApp.cpp" />
     <ClCompile Include="engine\WorldTransform.cpp" />
+    <ClCompile Include="Wire.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application\BaseScene.h" />
     <ClInclude Include="application\GamePlayScene.h" />
     <ClInclude Include="application\MyGame.h" />
     <ClInclude Include="application\SceneManager.h" />
+    <ClInclude Include="application\Skybox.h" />
+    <ClInclude Include="application\SphereLights.h" />
     <ClInclude Include="application\TitleScene.h" />
     <ClInclude Include="audio\Audio.h" />
+    <ClInclude Include="engine\AreaLights.h" />
     <ClInclude Include="engine\Bloom.h" />
     <ClInclude Include="application\BoxArea.h" />
     <ClInclude Include="application\Camera.h" />
@@ -259,6 +272,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\CommandQueue.h" />
     <ClInclude Include="application\Compute.h" />
     <ClInclude Include="engine\DebugCamera.h" />
+    <ClInclude Include="engine\DefaultBuffer.h" />
+    <ClInclude Include="engine\DefaultStructuredBuffer.h" />
     <ClInclude Include="engine\DeferredRenderer.h" />
     <ClInclude Include="engine\DepthBuffer.h" />
     <ClInclude Include="engine\DescriptorHandle.h" />
@@ -269,9 +284,13 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\DWParam.h" />
     <ClInclude Include="engine\Framework.h" />
     <ClInclude Include="engine\LightNumBuffer.h" />
+    <ClInclude Include="engine\RwStructuredBuffer.h" />
     <ClInclude Include="engine\ShadowSpotLights.h" />
+    <ClInclude Include="engine\Sky.h" />
     <ClInclude Include="engine\SpotLightShadowMap.h" />
     <ClInclude Include="engine\Transition.h" />
+    <ClInclude Include="engine\UAVBuffer.h" />
+    <ClInclude Include="engine\Voronoi.h" />
     <ClInclude Include="ImGui\ImGuiManager.h" />
     <ClInclude Include="math\Easing.h" />
     <ClInclude Include="engine\EdgeRenderer.h" />
@@ -301,7 +320,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\ModelManager.h" />
     <ClInclude Include="math\Mymath.h" />
     <ClInclude Include="engine\Particle.h" />
-    <ClInclude Include="engine\ParticleBox.h" />
+    <ClInclude Include="engine\ParticleModel.h" />
     <ClInclude Include="engine\PipelineState.h" />
     <ClInclude Include="engine\PixelBuffer.h" />
     <ClInclude Include="application\Player.h" />
@@ -325,6 +344,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\WhiteParticle.h" />
     <ClInclude Include="engine\WinApp.h" />
     <ClInclude Include="engine\WorldTransform.h" />
+    <ClInclude Include="Wire.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\EdgePS.hlsl">
@@ -422,6 +442,16 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Demo|x64'">true</ExcludedFromBuild>
     </FxCompile>
+    <FxCompile Include="Resources\shaders\SkyPS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Demo|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\SkyVS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Demo|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
     <FxCompile Include="Resources\shaders\SpotLightShadowMapPS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -442,6 +472,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Demo|x64'">true</ExcludedFromBuild>
     </FxCompile>
+    <FxCompile Include="Resources\shaders\TBR.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Demo|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
     <FxCompile Include="Resources\shaders\TransitionPS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -456,6 +491,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Demo|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\VoronoiPS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Demo|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>

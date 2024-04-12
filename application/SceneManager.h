@@ -11,6 +11,7 @@ public:
 	void Update();
 
 	void ModelDraw();
+	void SkyDraw();
 	void ShadowDraw();
 	void SpotLightShadowDraw();
 

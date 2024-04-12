@@ -42,12 +42,20 @@ struct Ray {
 };
 struct Segment {
 	Vector3 origin{}; //始点
-	Vector3 diff{};//終点への差分ベクトル
+	Vector3 diff = {0.0f,1.0f,0.0f};//終点への差分ベクトル
 };
 struct OBB {
 	Vector3 center{};          // 中心点
 	Vector3 orientations[3]{}; // 座標軸、正規化、直交座標
 	Vector3 size{};            // 座標軸方向の長さの半分。中心から面までの距離
+};
+struct Plane {
+	Vector3 normal{};//法線
+	float distance = 0.0f;//距離
+};
+struct Frustum {
+	Plane plane[6]{};
+	Vector3 vertex[8]{};
 };
 #pragma endregion
 
@@ -243,7 +251,13 @@ inline Vector3 Normalize(const Vector3& v) {
 inline Vector3 Cross(const Vector3& v1, const Vector3& v2) {
 	return { (v1.y * v2.z - v1.z * v2.y),(v1.z * v2.x - v1.x * v2.z),(v1.x * v2.y - v1.y * v2.x) };
 }
+inline Vector3 MakeNormal(const Vector3& v1, const Vector3& v2, const Vector3& v3) {
+	Vector3 start = v2 - v1;
+	Vector3 end = v3 - v2;
 
+	Vector3 normal = Normalize(Cross(start, end));
+	return normal;
+}
 
 inline Vector3 Project(const Vector3& v1, const Vector3 v2) {
 	Vector3 norm = Normalize(v2);
@@ -1474,6 +1488,110 @@ inline Vector3 MakeRandVector3(OBB box) {
 	return result;
 }
 
+#pragma endregion
+#pragma region	Frustum
+
+inline Frustum MakeFrustum(const Vector3& frontLeftTop,const Vector3& frontRightTop,const Vector3& frontLeftBottom,const Vector3& frontRightBottom
+, const Vector3& backLeftTop, const Vector3& backRightTop, const Vector3& backLeftBottom, const Vector3& backRightBottom) {
+	Frustum frustum;
+	//left
+	frustum.plane[0].normal = MakeNormal(frontLeftTop, frontLeftBottom, backLeftBottom);
+	frustum.plane[0].distance = Dot(frustum.plane[0].normal, frontLeftTop);
+
+	//top
+	frustum.plane[1].normal = MakeNormal(frontLeftTop, backLeftTop, backRightTop);
+	frustum.plane[1].distance = Dot(frustum.plane[1].normal, frontLeftTop);
+
+	//right
+	frustum.plane[2].normal = MakeNormal(frontRightTop, backRightTop, backRightBottom);
+	frustum.plane[2].distance = Dot(frustum.plane[2].normal, frontRightTop);
+
+	//bottom
+	frustum.plane[3].normal = MakeNormal(frontLeftBottom, frontRightBottom, backRightBottom);
+	frustum.plane[3].distance = Dot(frustum.plane[3].normal, frontLeftBottom);
+
+	//front
+	frustum.plane[4].normal = MakeNormal(frontLeftTop, frontRightTop, frontRightBottom);
+	frustum.plane[4].distance = Dot(frustum.plane[4].normal, frontLeftTop);
+
+	//back
+	frustum.plane[5].normal = MakeNormal(backRightTop, backLeftTop, backLeftBottom);
+	frustum.plane[5].distance = Dot(frustum.plane[5].normal, backRightTop);
+
+	frustum.vertex[0] = frontLeftTop;
+	frustum.vertex[1] = frontRightTop;
+	frustum.vertex[2] = frontLeftBottom;
+	frustum.vertex[3] = frontRightBottom;
+	frustum.vertex[4] = backLeftTop;
+	frustum.vertex[5] = backRightTop;
+	frustum.vertex[6] = backLeftBottom;
+	frustum.vertex[7] = backRightBottom;
+	return frustum;
+}
+
+inline Frustum MakeFrustrum(const Matrix4x4& inverseViewProjection) {
+	Frustum result;
+	Vector3 vertex[8]{};
+	vertex[0] = Vector3{-1.0f,1.0f,0.0f} * inverseViewProjection;
+	vertex[1] = Vector3{1.0f,1.0f,0.0f } * inverseViewProjection;
+	vertex[2] = Vector3{ -1.0f,-1.0f,0.0f } * inverseViewProjection;
+	vertex[3] = Vector3{ 1.0f,-1.0f,0.0f } * inverseViewProjection;
+
+	vertex[4] = Vector3{ -1.0f,1.0f,1.0f } * inverseViewProjection;
+	vertex[5] = Vector3{ 1.0f,1.0f,1.0f } * inverseViewProjection;
+	vertex[6] = Vector3{ -1.0f,-1.0f,1.0f } * inverseViewProjection;
+	vertex[7] = Vector3{ 1.0f,-1.0f,1.0f } * inverseViewProjection;
+
+	result = MakeFrustum(vertex[0], vertex[1], vertex[2], vertex[3],vertex[4], vertex[5], vertex[6], vertex[7]);
+	return result;
+}
+
+//頂点だけセットされてるとき
+inline Frustum MakeFrustum(Frustum& frustum) {
+	//left
+	frustum.plane[0].normal = MakeNormal(frustum.vertex[0], frustum.vertex[2], frustum.vertex[6]);
+	frustum.plane[0].distance = Dot(frustum.plane[0].normal, frustum.vertex[0]);
+
+	//top
+	frustum.plane[1].normal = MakeNormal(frustum.vertex[0], frustum.vertex[4], frustum.vertex[5]);
+	frustum.plane[1].distance = Dot(frustum.plane[1].normal, frustum.vertex[0]);
+
+	//right
+	frustum.plane[2].normal = MakeNormal(frustum.vertex[1], frustum.vertex[5], frustum.vertex[7]);
+	frustum.plane[2].distance = Dot(frustum.plane[2].normal, frustum.vertex[1]);
+
+	//bottom
+	frustum.plane[3].normal = MakeNormal(frustum.vertex[2], frustum.vertex[3], frustum.vertex[7]);
+	frustum.plane[3].distance = Dot(frustum.plane[3].normal, frustum.vertex[2]);
+
+	//front
+	frustum.plane[4].normal = MakeNormal(frustum.vertex[0], frustum.vertex[1], frustum.vertex[3]);
+	frustum.plane[4].distance = Dot(frustum.plane[4].normal, frustum.vertex[0]);
+
+	//back
+	frustum.plane[5].normal = MakeNormal(frustum.vertex[4], frustum.vertex[6], frustum.vertex[7]);
+	frustum.plane[5].distance = Dot(frustum.plane[5].normal, frustum.vertex[4]);
+
+	return frustum;
+}
+
+inline Frustum operator *(const Frustum& f, const Matrix4x4& m) {
+
+	Frustum result;
+
+	result.vertex[0] = f.vertex[0] * m;
+	result.vertex[1] = f.vertex[1] * m;
+	result.vertex[2] = f.vertex[2] * m;
+	result.vertex[3] = f.vertex[3] * m;
+	result.vertex[4] = f.vertex[4] * m;
+	result.vertex[5] = f.vertex[5] * m;
+	result.vertex[6] = f.vertex[6] * m;
+	result.vertex[7] = f.vertex[7] * m;
+
+	MakeFrustum(result);
+
+	return result;
+}
 #pragma endregion
 
 

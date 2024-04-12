@@ -16,6 +16,8 @@ public:
 	void Draw(const WorldTransform& worldTransform, uint32_t textureHandle, Vector4 color = { 1.0f,1.0f,1.0f,1.0f });
 	void Draw(const WorldTransform& worldTransform, Vector4 color = { 1.0f,1.0f,1.0f,1.0f });
 
+	void SkyDraw();
+
 	void Draw(uint32_t modelHandle, const WorldTransform& worldTransform, Vector4 color = { 1.0f,1.0f,1.0f,1.0f });
 
 	void SetEnableLighting(bool enableLighting) {

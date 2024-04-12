@@ -1,8 +1,7 @@
 #pragma once
 #include <d3d12.h>
 #include "Mymath.h"
-#include "UploadBuffer.h"
-#include "DepthBuffer.h"
+#include "DefaultStructuredBuffer.h"
 #include <vector>
 #include "WorldTransform.h"
 
@@ -11,7 +10,7 @@ class PointLights
 public:
 
 	//4の倍数
-	static const uint32_t  lightNum = 64;
+	static const uint32_t  lightNum = 128;
 
 	struct PointLight {
 		Vector4 color = { 1.0f, 1.0f, 1.0f,1.0f };
@@ -36,8 +35,7 @@ public:
 
 public:
 	std::vector<PointLight> lights_;
-	UploadBuffer structureBuffer_;
-	DescriptorHandle srvHandle_;
+	DefaultStructuredBuffer structureBuffer_;
 private:
 
 };

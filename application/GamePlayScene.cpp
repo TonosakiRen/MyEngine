@@ -10,6 +10,7 @@ void GamePlayScene::Initialize()
 {
 	skydome_ = std::make_unique<Skydome>();
 	skydome_->Initialize("skydome");
+	skydome_->Update();
 
 	floor_ = std::make_unique<Floor>();
 	floor_->Initialize("floor");
@@ -21,6 +22,9 @@ void GamePlayScene::Initialize()
 
 	boxArea_ = std::make_unique<BoxArea>();
 	boxArea_->Initialize("box1x1Inverse");
+
+	skybox_ = std::make_unique<Skybox>();
+	skybox_->Initialize("skybox");
 
 	explodeParticle_ = std::make_unique<ExplodeParticle>();
 	explodeParticle_->Initialize(Vector3{ -1.0f,-1.0f,-1.0f }, Vector3{ 1.0f,1.0f,1.0f }, GameScene::pointLights);
@@ -35,8 +39,11 @@ void GamePlayScene::Initialize()
 	playerBulletManager_->Initialize();
 
 	player_ = std::make_unique<Player>();
-	player_->Initialize("sphere", playerBulletManager_.get());
+	player_->Initialize("doubleBox", playerBulletManager_.get());
 	player = player_.get();
+
+	sphereLights_ = std::make_unique<SphereLights>();
+	sphereLights_->Initialize(GameScene::pointLights);
 }
 
 void GamePlayScene::Finalize()
@@ -46,6 +53,8 @@ void GamePlayScene::Finalize()
 void GamePlayScene::Update()
 {
 	boxArea_->Update();
+
+	skybox_->Update();
 
 	player_->Update(*GameScene::currentViewProjection_);
 
@@ -60,7 +69,7 @@ void GamePlayScene::Update()
 			return true;
 		}
 		return false;
-		});
+	});
 
 	//敵弾更新
 	enemyBulletManager_->Update();
@@ -77,7 +86,7 @@ void GamePlayScene::Update()
 	const int spawnInterval = 300;
 	if (enemySpawnFrame_ <= 0) {
 		enemySpawnFrame_ = spawnInterval;
-		EnemySpawn({ 0.0f,3.0f,0.0f });
+		//EnemySpawn({ 0.0f,3.0f,0.0f });
 	}
 	enemySpawnFrame_--;
 
@@ -89,11 +98,13 @@ void GamePlayScene::Update()
 	ImGui::End();
 #endif
 	whiteParticle_->Update();
+
+	sphereLights_->Update();
 }
 
 void GamePlayScene::ModelDraw()
 {
-	boxArea_->Draw();
+	//boxArea_->Draw();
 	player_->Draw();
 	sphere_->Draw();
 	//敵描画
@@ -103,6 +114,11 @@ void GamePlayScene::ModelDraw()
 
 	enemyBulletManager_->Draw();
 	playerBulletManager_->Draw();
+}
+
+void GamePlayScene::SkyDraw()
+{
+	skybox_->Draw();
 }
 
 void GamePlayScene::ShadowDraw()
@@ -125,6 +141,7 @@ void GamePlayScene::ParticleDraw()
 void GamePlayScene::ParticleBoxDraw()
 {
 	explodeParticle_->Draw();
+	sphereLights_->Draw();
 }
 
 void GamePlayScene::PreSpriteDraw()

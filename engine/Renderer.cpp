@@ -35,7 +35,7 @@ void Renderer::Initialize() {
 
     // メインとなるバッファを初期化
     auto& swapChainBuffer = swapChain_->GetColorBuffer();
-    float clearColor[4] = { 0.0f,0.0f,0.3f,0.0f };
+    float clearColor[4] = { 0.0f,0.0f,0.0f,1.0f };
     colorBuffers_[kColor] = std::make_unique<ColorBuffer>();
     colorBuffers_[kColor]->SetClearColor(clearColor);
     colorBuffers_[kColor]->Create(swapChainBuffer.GetWidth(), swapChainBuffer.GetHeight(), DXGI_FORMAT_R8G8B8A8_UNORM_SRGB);
@@ -51,6 +51,9 @@ void Renderer::Initialize() {
     colorBuffers_[kNormal]->SetClearColor(clearNormal);
     colorBuffers_[kNormal]->Create(swapChainBuffer.GetWidth(), swapChainBuffer.GetHeight(), DXGI_FORMAT_R32G32B32A32_FLOAT);
 
+    colorBuffers_[kMaterial] = std::make_unique<ColorBuffer>();
+    colorBuffers_[kMaterial]->SetClearColor(clearColor);
+    colorBuffers_[kMaterial]->Create(swapChainBuffer.GetWidth(), swapChainBuffer.GetHeight(), DXGI_FORMAT_R32G32B32A32_FLOAT);
 
     // ブルームを初期化
     bloom_ = std::make_unique<Bloom>();
@@ -60,7 +63,7 @@ void Renderer::Initialize() {
     postEffect_->Initialize();
 
     deferredRenderer_ = std::make_unique<DeferredRenderer>();
-    deferredRenderer_->Initialize(colorBuffers_[kColor].get(), colorBuffers_[kNormal].get(), mainDepthBuffer_.get());
+    deferredRenderer_->Initialize(colorBuffers_[kColor].get(), colorBuffers_[kNormal].get(), colorBuffers_[kMaterial].get(), mainDepthBuffer_.get());
     edgeRenderer_ = std::make_unique<EdgeRenderer>();
     edgeRenderer_->Initialize(colorBuffers_[kColor].get(), colorBuffers_[kNormal].get(), mainDepthBuffer_.get());
 
@@ -76,6 +79,7 @@ void Renderer::Initialize() {
 
     transition_ = std::make_unique<Transition>();
     transition_->Initialize(*resultBuffer_);
+
 }
 
 void Renderer::BeginFrame()
@@ -86,12 +90,15 @@ void Renderer::BeginFrame()
 
 void Renderer::BeginMainRender() {
 
+   
+
     // メインカラーバッファをレンダ―ターゲットに
     commandContext_.TransitionResource(*colorBuffers_[kColor], D3D12_RESOURCE_STATE_RENDER_TARGET);
     commandContext_.TransitionResource(*colorBuffers_[kNormal], D3D12_RESOURCE_STATE_RENDER_TARGET);
+    commandContext_.TransitionResource(*colorBuffers_[kMaterial], D3D12_RESOURCE_STATE_RENDER_TARGET);
     commandContext_.TransitionResource(*mainDepthBuffer_, D3D12_RESOURCE_STATE_DEPTH_WRITE);
 
-    D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle[] = { colorBuffers_[kColor]->GetRTV(),colorBuffers_[kNormal]->GetRTV() };
+    D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle[] = { colorBuffers_[kColor]->GetRTV(),colorBuffers_[kNormal]->GetRTV() ,colorBuffers_[kMaterial]->GetRTV() };
     commandContext_.SetRenderTargets(kRenderTargetNum, rtvHandle, mainDepthBuffer_->GetDSV());
 
     for (int i = 0; i < kRenderTargetNum; i++) {
@@ -104,10 +111,10 @@ void Renderer::BeginMainRender() {
     commandContext_.SetViewportAndScissorRect(0, 0, colorBuffers_[kColor]->GetWidth(), colorBuffers_[kColor]->GetHeight());
 }
 
-void Renderer::DeferredRender(const ViewProjection& viewProjection, DirectionalLights& directionalLight, const PointLights& pointLights, const SpotLights& spotLights, ShadowSpotLights& shadowSpotLights)
+void Renderer::DeferredRender(ViewProjection& viewProjection, DirectionalLights& directionalLight, PointLights& pointLights,AreaLights& areaLights ,SpotLights& spotLights, ShadowSpotLights& shadowSpotLights)
 {
-    tileBasedRendering_->Update(pointLights, spotLights, shadowSpotLights);
-    deferredRenderer_->Render(commandContext_, resultBuffer_.get(), viewProjection, directionalLight, pointLights, spotLights, shadowSpotLights, *lightNumBuffer_, *tileBasedRendering_);
+    tileBasedRendering_->Update(viewProjection,pointLights, spotLights, shadowSpotLights);
+    deferredRenderer_->Render(commandContext_, resultBuffer_.get(), viewProjection, directionalLight, pointLights, areaLights ,spotLights,shadowSpotLights, *lightNumBuffer_, *tileBasedRendering_);
 }
 
 void Renderer::BeginShadowMapRender(DirectionalLights& directionalLights)
@@ -199,6 +206,7 @@ void Renderer::Shutdown() {
     bloom_.reset();
     tileBasedRendering_.reset();
     transition_.reset();
+
 
     swapChain_.reset();
     commandContext_.ShutDown();

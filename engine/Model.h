@@ -22,9 +22,7 @@ public:
 	enum class RootParameter {
 		kWorldTransform, 
 		kViewProjection, 
-		kDirectionalLights,
 		kTexture,
-		kShadowMap,
 		kMaterial,
 
 		parameterNum
@@ -32,7 +30,7 @@ public:
 
 	static void StaticInitialize();
 	static void Finalize();
-	static void PreDraw(CommandContext* commandContext, const ViewProjection& viewProjection, const DirectionalLights& directionalLights);
+	static void PreDraw(CommandContext* commandContext, const ViewProjection& viewProjection);
 	static void PostDraw();
 
 	static void Draw(uint32_t modelHandle,const WorldTransform& worldTransform, const Material& material);

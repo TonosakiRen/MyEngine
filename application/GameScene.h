@@ -1,6 +1,7 @@
 #pragma once
 #include "DirectXCommon.h"
 #include "Model.h"
+#include "Sky.h"
 #include "ViewProjection.h"
 #include "DebugCamera.h"
 #include "Camera.h"
@@ -10,6 +11,7 @@
 #include "Sprite.h"
 #include "DirectionalLights.h"
 #include "PointLights.h"
+#include "AreaLights.h"
 #include "SpotLights.h"
 #include "ShadowSpotLights.h"
 #include "Compute.h"
@@ -40,6 +42,10 @@ public:
 		return *pointLights_.get();
 	}
 
+	AreaLights& GetAreaLights() {
+		return *areaLights_.get();
+	}
+
 	SpotLights& GetSpotLights() {
 		return *spotLights_.get();
 	}
@@ -48,7 +54,7 @@ public:
 		return *shadowSpotLights_.get();
 	}
 
-	const ViewProjection& GetViewProjection() {
+	ViewProjection& GetViewProjection() {
 		return *currentViewProjection_;
 	}
 
@@ -56,6 +62,7 @@ public:
 	static ViewProjection* currentViewProjection_;
 	static DirectionalLights* directionLights;
 	static PointLights* pointLights;
+	static AreaLights* areaLights;
 	static SpotLights* spotLights;
 	static ShadowSpotLights* shadowSpotLights;
 
@@ -69,6 +76,7 @@ private:
 	std::unique_ptr<Camera> camera_;
 	std::unique_ptr <DirectionalLights> directionalLights_;
 	std::unique_ptr <PointLights> pointLights_;
+	std::unique_ptr <AreaLights> areaLights_;
 	std::unique_ptr <SpotLights> spotLights_;
 	std::unique_ptr <ShadowSpotLights> shadowSpotLights_;
 

@@ -4,14 +4,14 @@
 
 ExplodeParticle::ExplodeParticle()
 {
-	particleBox_ = std::make_unique<ParticleBox>(kParticleNum);
+	particle_ = std::make_unique<ParticleModel>(kParticleNum);
 }
 
 void ExplodeParticle::Initialize(Vector3 minDirection, Vector3 maxDirection, PointLights* pointLights)
 {
 	pointLights_ = pointLights;
 	acceleration_ = { 0.0f,0.0f,-0.1f };
-	particleBox_->Initialize();
+	particle_->Initialize("box1x1");
 	emitterWorldTransform_.SetIsScaleParent(false);
 	emitterWorldTransform_.Update();
 	SetDirection(minDirection, maxDirection);
@@ -20,9 +20,9 @@ void ExplodeParticle::Initialize(Vector3 minDirection, Vector3 maxDirection, Poi
 void ExplodeParticle::Update() {
 
 	emitterWorldTransform_.Update();
-	const float pointLightRadius_ = 5.0f;
+	const float pointLightRadius_ = 1.0f;
 
-	if (isEmit_) {
+	/*if (isEmit_) {
 		for (size_t i = 0; i < EmitNum_; i++) {
 			for (size_t i = 0; i < kParticleNum; i++) {
 				if (particles[i].isActive_ == false) {
@@ -32,7 +32,7 @@ void ExplodeParticle::Update() {
 					particles[i].worldTransform_.quaternion_ = IdentityQuaternion();
 					particles[i].worldTransform_.scale_ = emitterWorldTransform_.scale_;
 					particles[i].worldTransform_.Update();
-					for (size_t j = 0; j < kParticleNum; j++) {
+					for (size_t j = 0; j < PointLights::lightNum; j++) {
 						if (pointLights_->lights_[j].isActive == false) {
 							pointLights_->lights_[j].worldTransform.translation_ = {0.0f,0.0f,0.0f};
 							pointLights_->lights_[j].worldTransform.parent_ = &particles[i].worldTransform_;
@@ -50,7 +50,7 @@ void ExplodeParticle::Update() {
 			}
 		}
 		isEmit_ = false;
-	}
+	}*/
 
 	for (size_t i = 0; i < kParticleNum; i++) {
 		float rotationSpeed = Radian(1.0f) * (float(i % 2) * 2.0f - 1.0f);
@@ -75,7 +75,7 @@ void ExplodeParticle::Draw(Vector4 color)
 
 	emitterWorldTransform_.Update();
 
-	std::vector<ParticleBox::InstancingBufferData> instancingBufferDatas;
+	std::vector<ParticleModel::InstancingBufferData> instancingBufferDatas;
 	instancingBufferDatas.reserve(kParticleNum);
 
 	for (size_t i = 0; i < kParticleNum; i++)
@@ -87,6 +87,6 @@ void ExplodeParticle::Draw(Vector4 color)
 	}
 
 	if (!instancingBufferDatas.empty()) {
-		particleBox_->Draw(instancingBufferDatas, color);
+		//particle_->Draw(instancingBufferDatas, color);
 	}
 }

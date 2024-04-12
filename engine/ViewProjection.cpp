@@ -31,18 +31,21 @@ void ViewProjection::Update() {
 
     // ビュー行列の生成
     Vector3 tranlation = translation_ + Vector3{ Rand(-shakeValue_.x,shakeValue_.x),Rand(-shakeValue_.y,shakeValue_.y) ,Rand(-shakeValue_.z,shakeValue_.z) };
-    matView = MakeViewMatirx(quaternion_, tranlation);
+    worldMatrix_ = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, quaternion_, tranlation);
+    matView_ = Inverse(worldMatrix_);
 
     // 透視投影による射影行列の生成
-    matProjection = MakePerspectiveFovMatrix(fovAngleY_, aspectRatio_, nearZ_, farZ_);
+    matProjection_ = MakePerspectiveFovMatrix(fovAngleY_, aspectRatio_, nearZ_, farZ_);
     //matProjection = MakeOrthograohicmatrix(-16.0f * orthographicValue_, 9.0f * orthographicValue_,16.0f * orthographicValue_, -9.0f * orthographicValue_, 1.0f, farZ_);
 
+    Matrix4x4 viewProjection = matView_ * matProjection_;
+    inverseViewProjection_ = Inverse(viewProjection);
+    frustum_ = MakeFrustrum(inverseViewProjection_);
     // 定数バッファに書き込み
     ConstBufferData bufferData;
-    Matrix4x4 viewProjection = matView * matProjection;
     bufferData.viewProjection = viewProjection;
-    bufferData.inverseViewProjection = Inverse(viewProjection);
-    bufferData.viewPosition = translation_;
+    bufferData.inverseViewProjection = inverseViewProjection_;
+    bufferData.viewPosition = tranlation;
 
     constBuffer_.Copy(bufferData);
 }

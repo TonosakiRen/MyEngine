@@ -47,15 +47,6 @@ void Particle::PostDraw() {
     commandContext_ = nullptr;
 }
 
-Particle* Particle::Create(uint32_t particleNum) {
-    Particle* object3d = new Particle(particleNum);
-    assert(object3d);
-
-    object3d->Initialize();
-
-    return object3d;
-}
-
 void Particle::CreatePipeline() {
     ComPtr<IDxcBlob> vsBlob;
     ComPtr<IDxcBlob> psBlob;
@@ -141,7 +132,23 @@ void Particle::CreatePipeline() {
         blenddesc.SrcBlendAlpha = D3D12_BLEND_ONE;
         blenddesc.DestBlendAlpha = D3D12_BLEND_ZERO;
 
+        // レンダーターゲットのブレンド設定
+        D3D12_RENDER_TARGET_BLEND_DESC blenddesc2{};
+        blenddesc2.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+        blenddesc2.BlendEnable = false;
+        blenddesc2.BlendOp = D3D12_BLEND_OP_ADD;
+        blenddesc2.SrcBlend = D3D12_BLEND_SRC_ALPHA;
+        blenddesc2.DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
+
+        blenddesc2.BlendOpAlpha = D3D12_BLEND_OP_ADD;
+        blenddesc2.SrcBlendAlpha = D3D12_BLEND_ONE;
+        blenddesc2.DestBlendAlpha = D3D12_BLEND_ZERO;
+
+        // ブレンドステートの設定
+        gpipeline.BlendState.IndependentBlendEnable = true;
         gpipeline.BlendState.RenderTarget[0] = blenddesc;
+        gpipeline.BlendState.RenderTarget[1] = blenddesc;
+        gpipeline.BlendState.RenderTarget[2] = blenddesc2;
 
         gpipeline.DSVFormat = Renderer::GetInstance()->GetDSVFormat();
 
@@ -153,6 +160,7 @@ void Particle::CreatePipeline() {
         gpipeline.NumRenderTargets = Renderer::kRenderTargetNum;
         gpipeline.RTVFormats[int(Renderer::kColor)] = Renderer::GetInstance()->GetRTVFormat(Renderer::kColor);
         gpipeline.RTVFormats[int(Renderer::kNormal)] = Renderer::GetInstance()->GetRTVFormat(Renderer::kNormal);
+        gpipeline.RTVFormats[int(Renderer::kMaterial)] = Renderer::GetInstance()->GetRTVFormat(Renderer::kMaterial);
         gpipeline.SampleDesc.Count = 1;
 
 
@@ -213,22 +221,7 @@ void Particle::CreateMesh() {
     ibView_.Format = DXGI_FORMAT_R16_UINT;
     ibView_.SizeInBytes = sizeIB;
 
-    // インスタンシングデータのサイズ
-    UINT sizeINB = static_cast<UINT>(sizeof(InstancingBufferData) * kParticleNum);
-
-    instancingBuffer_.Create(sizeINB);
-
-
-    D3D12_SHADER_RESOURCE_VIEW_DESC instancingSrvDesc{};
-    instancingSrvDesc.Format = DXGI_FORMAT_UNKNOWN;
-    instancingSrvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-    instancingSrvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
-    instancingSrvDesc.Buffer.FirstElement = 0;
-    instancingSrvDesc.Buffer.NumElements = kParticleNum;
-    instancingSrvDesc.Buffer.StructureByteStride = sizeof(InstancingBufferData);
-
-    srvHandle_ = DirectXCommon::GetInstance()->AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-    DirectXCommon::GetInstance()->GetDevice()->CreateShaderResourceView(instancingBuffer_, &instancingSrvDesc, srvHandle_);
+    structuredBuffer_.Create(sizeof(InstancingBufferData), kParticleNum);
 }
 
 void Particle::Initialize() {
@@ -247,14 +240,14 @@ void Particle::Draw(const std::vector<InstancingBufferData>& bufferData, const V
     }
 
     //マッピング
-    instancingBuffer_.Copy(instancingBufferDatas.data(), sizeof(instancingBufferDatas[0]) * instancingBufferDatas.size());
+    structuredBuffer_.Copy(instancingBufferDatas.data(), sizeof(instancingBufferDatas[0]) * instancingBufferDatas.size());
 
     material_.color_ = color;
     material_.Update();
 
     commandContext_->SetVertexBuffer(0, 1, &vbView_);
     commandContext_->SetIndexBuffer(ibView_);
-    commandContext_->SetDescriptorTable(0, srvHandle_);
+    commandContext_->SetDescriptorTable(0, structuredBuffer_.GetSRV());
     commandContext_->SetConstantBuffer(static_cast<UINT>(RootParameter::kMaterial), material_.GetGPUVirtualAddress());
 
     TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(commandContext_, static_cast<UINT>(RootParameter::kTexture), textureHadle);

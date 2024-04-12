@@ -12,3 +12,8 @@ void Skydome::Update()
 {
 	worldTransform_.Update();
 }
+
+void Skydome::Draw()
+{
+	GameObject::SkyDraw();
+}

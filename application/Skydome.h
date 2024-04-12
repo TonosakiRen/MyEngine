@@ -7,4 +7,5 @@ public:
 
     void Initialize(const std::string name);
     void Update();
+    void Draw();
 };

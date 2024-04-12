@@ -68,9 +68,6 @@
     <Filter Include="Engine\Light">
       <UniqueIdentifier>{57d802ba-7fc0-4bf1-b234-87825c0658ba}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\Enemy">
-      <UniqueIdentifier>{4b27e529-b8ea-403d-8046-a62c3e892ca9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Engine\Framework">
       <UniqueIdentifier>{fc8df7ad-608f-4e6d-9af3-f46f532d9f7d}</UniqueIdentifier>
     </Filter>
@@ -88,6 +85,12 @@
     </Filter>
     <Filter Include="Game\Stage">
       <UniqueIdentifier>{1ec4e05a-a67a-4a6f-88ca-56453d6b836d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Enemy">
+      <UniqueIdentifier>{4b27e529-b8ea-403d-8046-a62c3e892ca9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Sky">
+      <UniqueIdentifier>{a3a8fdc8-5621-4fdb-8d80-dd550fe2da83}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -166,7 +169,7 @@
     <ClCompile Include="engine\Input.cpp">
       <Filter>Engine\Input</Filter>
     </ClCompile>
-    <ClCompile Include="engine\ParticleBox.cpp">
+    <ClCompile Include="engine\ParticleModel.cpp">
       <Filter>Engine\Particle</Filter>
     </ClCompile>
     <ClCompile Include="engine\Particle.cpp">
@@ -325,6 +328,34 @@
     <ClCompile Include="application\Skydome.cpp">
       <Filter>Game\Stage</Filter>
     </ClCompile>
+    <ClCompile Include="Wire.cpp">
+      <Filter>Engine\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\DefaultBuffer.cpp">
+      <Filter>Engine\GPUResource</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\DefaultStructuredBuffer.cpp">
+      <Filter>Engine\GPUResource</Filter>
+    </ClCompile>
+    <ClCompile Include="application\SphereLights.cpp" />
+    <ClCompile Include="engine\RwStructuredBuffer.cpp">
+      <Filter>Engine\GPUResource</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\UAVBuffer.cpp">
+      <Filter>Engine\GPUResource</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\AreaLights.cpp">
+      <Filter>Engine\Light</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\Sky.cpp">
+      <Filter>Engine\Sky</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\Voronoi.cpp">
+      <Filter>Engine\Sky</Filter>
+    </ClCompile>
+    <ClCompile Include="application\Skybox.cpp">
+      <Filter>Game\Stage</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -417,7 +448,7 @@
     <ClInclude Include="engine\Particle.h">
       <Filter>Engine\Particle</Filter>
     </ClInclude>
-    <ClInclude Include="engine\ParticleBox.h">
+    <ClInclude Include="engine\ParticleModel.h">
       <Filter>Engine\Particle</Filter>
     </ClInclude>
     <ClInclude Include="engine\PipelineState.h">
@@ -570,6 +601,34 @@
     <ClInclude Include="application\Skydome.h">
       <Filter>Game\Stage</Filter>
     </ClInclude>
+    <ClInclude Include="Wire.h">
+      <Filter>Engine\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\DefaultBuffer.h">
+      <Filter>Engine\GPUResource</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\DefaultStructuredBuffer.h">
+      <Filter>Engine\GPUResource</Filter>
+    </ClInclude>
+    <ClInclude Include="application\SphereLights.h" />
+    <ClInclude Include="engine\RwStructuredBuffer.h">
+      <Filter>Engine\GPUResource</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\UAVBuffer.h">
+      <Filter>Engine\GPUResource</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\AreaLights.h">
+      <Filter>Engine\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Sky.h">
+      <Filter>Engine\Sky</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Voronoi.h">
+      <Filter>Engine\Sky</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Skybox.h">
+      <Filter>Game\Stage</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\ModelPS.hlsl">
@@ -648,6 +707,18 @@
       <Filter>shaders</Filter>
     </FxCompile>
     <FxCompile Include="Resources\shaders\TransitionVS.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\TBR.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\SkyPS.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\SkyVS.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\VoronoiPS.hlsl">
       <Filter>shaders</Filter>
     </FxCompile>
   </ItemGroup>

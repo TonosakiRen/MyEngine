@@ -31,15 +31,27 @@ public:
 	}
 
 	const Matrix4x4 GetMatView() const {
-		return matView;
+		return matView_;
 	}
 
 	const Matrix4x4 GetMatProjection() const {
-		return matProjection;
+		return matProjection_;
+	}
+
+	const Matrix4x4 GetInverseViewProjection() const {
+		return inverseViewProjection_;
+	}
+
+	const Frustum GetFrustum() const {
+		return frustum_;
 	}
 
 	const Quaternion GetQuaternion() const {
 		return quaternion_;
+	}
+
+	const Matrix4x4 GetWorldMatrix() const {
+		return worldMatrix_;
 	}
 
 	void SetTranslation(const Vector3& translation) {
@@ -66,8 +78,13 @@ protected:
 	float nearZ_ = 0.1f;
 	float farZ_ = 100.0f;
 
-	Matrix4x4 matView;
-	Matrix4x4 matProjection;
+
+	Matrix4x4 worldMatrix_;
+	Matrix4x4 matView_;
+	Matrix4x4 matProjection_;
+	Matrix4x4 inverseViewProjection_;
+
+	Frustum frustum_;
 
 	UploadBuffer constBuffer_;
 };

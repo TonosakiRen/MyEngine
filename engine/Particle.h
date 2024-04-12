@@ -6,8 +6,7 @@
 
 #include "PipelineState.h"
 #include "RootSignature.h"
-#include "DescriptorHandle.h"
-#include "UploadBuffer.h"
+#include "StructuredBuffer.h"
 #include "CommandContext.h"
 
 #include "ViewProjection.h"
@@ -44,7 +43,6 @@ public:
 	static void Finalize();
 	static void PreDraw(CommandContext* commandContext, const ViewProjection& viewProjection);
 	static void PostDraw();
-	static Particle* Create(uint32_t particleNum);
 
 	Particle(uint32_t particleNum);
 	void Initialize();
@@ -64,10 +62,10 @@ private:
 
 	D3D12_VERTEX_BUFFER_VIEW vbView_{};
 	D3D12_INDEX_BUFFER_VIEW ibView_{};
-	DescriptorHandle srvHandle_;
 	std::vector<VertexData> vertices_;
 	std::vector<uint16_t> indices_;
 	UploadBuffer vertexBuffer_;
 	UploadBuffer indexBuffer_;
-	UploadBuffer instancingBuffer_;
+	
+	StructuredBuffer structuredBuffer_;
 };

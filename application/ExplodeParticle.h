@@ -1,5 +1,5 @@
 #pragma once
-#include "ParticleBox.h"
+#include "ParticleModel.h"
 class PointLights;
 class ExplodeParticle
 {
@@ -37,12 +37,12 @@ public:
 	WorldTransform emitterWorldTransform_;
 	Particle particles[kParticleNum];
 	PointLights* pointLights_;
-	int EmitNum_ = 10;
+	int EmitNum_ = 20;
 private:
 	float speed_ = 0.1f;
 	float scaleSpeed_ = 0.01f;
 	bool isEmit_ = false;
-	std::unique_ptr<ParticleBox> particleBox_;
+	std::unique_ptr<ParticleModel> particle_;
 	Vector3 minDirection_;
 	Vector3 maxDirection_;
 	Vector3 acceleration_;

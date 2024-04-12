@@ -3,16 +3,17 @@
 
 DustParticle::DustParticle()
 {
-	particleBox_ = std::make_unique<ParticleBox>(kParticleNum);
+	particle_ = std::make_unique<ParticleModel>(kParticleNum);
 }
 
 void DustParticle::Initialize(Vector3 minDirection, Vector3 maxDirection)
 {
 
-	particleBox_->Initialize();
+	particle_->Initialize("box1x1");
 	emitterWorldTransform_.SetIsScaleParent(false);
 	emitterWorldTransform_.Update();
 	SetDirection(minDirection, maxDirection);
+	particle_->material_.enableLighting_ = false;
 }
 
 void DustParticle::Update() {
@@ -59,7 +60,7 @@ void DustParticle::Draw( Vector4 color)
 
 	emitterWorldTransform_.Update();
 
-	std::vector<ParticleBox::InstancingBufferData> instancingBufferDatas;
+	std::vector<ParticleModel::InstancingBufferData> instancingBufferDatas;
 	instancingBufferDatas.reserve(kParticleNum);
 
 	for (size_t i = 0; i < kParticleNum; i++)
@@ -71,6 +72,6 @@ void DustParticle::Draw( Vector4 color)
 	}
 
 	if (!instancingBufferDatas.empty()) {
-		particleBox_->Draw(instancingBufferDatas, color);
+		particle_->Draw(instancingBufferDatas, color);
 	}
 }

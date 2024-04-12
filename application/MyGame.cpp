@@ -5,7 +5,7 @@
 #include <Windows.h>
 #include "GameScene.h"
 #include "Particle.h"
-#include "ParticleBox.h"
+#include "ParticleModel.h"
 #include "PostEffect.h"
 #include "GaussianBlur.h"
 #include "ShaderManager.h"
@@ -14,6 +14,7 @@
 #include "ShadowMap.h"
 #include "SpotLightShadowMap.h"
 #include "Model.h"
+#include "Sky.h"
 #include "Sprite.h"
 
 
@@ -35,10 +36,11 @@ void MyGame::Initialize()
 
 	// 3Dオブジェクト静的初期化
 	Model::StaticInitialize();
+	Sky::StaticInitialize();
 	ShadowMap::StaticInitialize();
 	SpotLightShadowMap::StaticInitialize();
 	Particle::StaticInitialize();
-	ParticleBox::StaticInitialize();
+	ParticleModel::StaticInitialize();
 	Sprite::StaticInitialize();
 
 #pragma endregion 変数
@@ -55,10 +57,11 @@ void MyGame::Finalize()
 	modelManager->Finalize();
 	textureManager->Finalize();
 	Model::Finalize();
+	Sky::Finalize();
 	ShadowMap::Finalize();
 	SpotLightShadowMap::Finalize();
 	Particle::Finalize();
-	ParticleBox::Finalize();
+	ParticleModel::Finalize();
 	Sprite::Finalize();
 
 	delete gameScene;
@@ -97,7 +100,8 @@ void MyGame::Draw()
 	renderer->EndShadowMapRender(gameScene->GetDirectionalLights());
 
 	renderer->BeginSpotLightShadowMapRender(gameScene->GetShadowSpotLights());
-
+	
+	//スポットライトシャドウマップ描画
 	gameScene->SpotLightShadowMapDraw(renderer->GetCommandContext());
 
 	renderer->EndSpotLightShadowMapRender(gameScene->GetShadowSpotLights());
@@ -107,7 +111,7 @@ void MyGame::Draw()
 	// ゲームシーンの描画
 	gameScene->Draw(renderer->GetCommandContext());
 
-	renderer->DeferredRender(gameScene->GetViewProjection(), gameScene->GetDirectionalLights(), gameScene->GetPointLights(), gameScene->GetSpotLights(), gameScene->GetShadowSpotLights());
+	renderer->DeferredRender(gameScene->GetViewProjection(), gameScene->GetDirectionalLights(), gameScene->GetPointLights(), gameScene->GetAreaLights(), gameScene->GetSpotLights(), gameScene->GetShadowSpotLights());
 
 	renderer->EndMainRender();
 

@@ -12,6 +12,7 @@
 class ViewProjection;
 class DirectionalLights;
 class PointLights;
+class AreaLights;
 class SpotLights;
 class ShadowSpotLights;
 class LightNumBuffer;
@@ -23,11 +24,13 @@ public:
 	enum class RootParameter {
 		kColorTexture,
 		kNormalTexture,
+		kMaterialTexture,
 		kDepthTexture,
 
 		kViewProjection,
 		kDirectionalLights,
 		kPointLights,
+		kAreaLights,
 		kSpotLights,
 		kShadowSpotLights,
 
@@ -49,8 +52,8 @@ public:
 		Vector4 pos;
 		Vector2 uv;
 	};
-	void Initialize(ColorBuffer* originalTexture, ColorBuffer* normalTexture, DepthBuffer* depthTexture);
-	void Render(CommandContext& commandContext, ColorBuffer* originalBuffer_, const ViewProjection& viewProjection, DirectionalLights& directionalLight, const PointLights& pointLights, const SpotLights& spotLights, const ShadowSpotLights& shadowSpotLights, const LightNumBuffer& lightNumBuffer, const TileBasedRendering& tileBasedRendering);
+	void Initialize(ColorBuffer* originalTexture, ColorBuffer* normalTexture, ColorBuffer* materialTexture, DepthBuffer* depthTexture);
+	void Render(CommandContext& commandContext, ColorBuffer* originalBuffer_, ViewProjection& viewProjection, DirectionalLights& directionalLight, PointLights& pointLights , AreaLights& areaLights, SpotLights& spotLights,ShadowSpotLights& shadowSpotLights, LightNumBuffer& lightNumBuffer, TileBasedRendering& tileBasedRendering);
 
 private:
 	void CreatePipeline();
@@ -60,6 +63,7 @@ private:
 	RootSignature rootSignature_;
 	ColorBuffer* colorTexture_;
 	ColorBuffer* normalTexture_;
+	ColorBuffer* materialTexture_;
 	DepthBuffer* depthTexture_;
 
 	struct LightNum {

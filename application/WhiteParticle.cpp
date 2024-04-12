@@ -15,6 +15,7 @@ void WhiteParticle::Initialize(Vector3 minDirection, Vector3 maxDirection)
 	SetDirection(minDirection, maxDirection);
 	emitBox_ = MakeOBB(emitterWorldTransform_.matWorld_);
 	emitBox_.size = { 1.0f,1.0f,1.0f };
+	particle_->material_.enableLighting_ = false;
 }
 
 void WhiteParticle::Update() {

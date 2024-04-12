@@ -9,6 +9,8 @@ public:
 
 	virtual void ModelDraw() = 0;
 
+	virtual void SkyDraw() = 0;
+
 	virtual void ShadowDraw() = 0;
 	virtual void SpotLightShadowDraw() = 0;
 

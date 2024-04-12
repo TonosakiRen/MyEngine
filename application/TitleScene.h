@@ -12,6 +12,7 @@ class TitleScene :
 	void Update() override;
 
 	void ModelDraw() override;
+	void SkyDraw() override;
 
 	void ShadowDraw() override;
 	void SpotLightShadowDraw() override;

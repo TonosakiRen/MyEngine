@@ -11,13 +11,14 @@
 #include "GamePlayScene.h"
 #include "Collider.h"
 #include "Particle.h"
-#include "ParticleBox.h"
+#include "ParticleModel.h"
 #include "Player.h"
 #include "TitleScene.h"
 
 ViewProjection* GameScene::currentViewProjection_ = nullptr;
 DirectionalLights* GameScene::directionLights = nullptr;
 PointLights* GameScene::pointLights = nullptr;
+AreaLights* GameScene::areaLights = nullptr;
 SpotLights* GameScene::spotLights = nullptr;
 ShadowSpotLights* GameScene::shadowSpotLights = nullptr;
 
@@ -45,7 +46,9 @@ void GameScene::Initialize() {
 
 	pointLights_ = std::make_unique<PointLights>();
 	pointLights_->Initialize();
-	pointLights_->Update();
+
+	areaLights_ = std::make_unique<AreaLights>();
+	areaLights_->Initialize();
 
 	shadowSpotLights_ = std::make_unique<ShadowSpotLights>();
 	shadowSpotLights_->Initialize();
@@ -58,6 +61,7 @@ void GameScene::Initialize() {
 	currentViewProjection_ = debugCamera_.get();
 	directionLights = directionalLights_.get();
 	pointLights = pointLights_.get();
+	areaLights = areaLights_.get();
 	spotLights = spotLights_.get();
 	shadowSpotLights = shadowSpotLights_.get();
 
@@ -95,6 +99,9 @@ void GameScene::Update(CommandContext& commandContext){
 				camera_->Update();
 			}
 		}
+
+
+
 		
 		// light
 #ifdef USE_IMGUI
@@ -126,7 +133,7 @@ void GameScene::Update(CommandContext& commandContext){
 		ImGui::DragFloat("decay", &pointLights_->lights_[1].decay, 0.01f, 0.0f);
 		ImGui::End();
 #endif
-		pointLights_->Update();
+		//pointLights_->Update();
 
 #ifdef USE_IMGUI
 		ImGui::Begin("spotLight");
@@ -139,11 +146,21 @@ void GameScene::Update(CommandContext& commandContext){
 		ImGui::DragFloat("cosAngle", &spotLights_->lights_[0].cosAngle, Radian(1.0f), 0.0f, Radian(179.0f));
 		ImGui::End();
 
+		ImGui::Begin("areaLights");
+		ImGui::DragFloat3("origin", &areaLights->lights_[0].segment.origin.x);
+		ImGui::DragFloat3("diff", &areaLights->lights_[0].segment.diff.x);
+		ImGui::DragFloat3("lightColor", &areaLights->lights_[0].color.x, 1.0f, 0.0f, 255.0f);
+		ImGui::DragFloat("intensity", &areaLights->lights_[0].intensity, 0.01f, 0.0f);
+		ImGui::DragFloat("range", &areaLights->lights_[0].range, 0.01f, 0.0f);
+		ImGui::DragFloat("decay", &areaLights->lights_[0].decay, 0.01f, 0.0f);
+		ImGui::End();
+
+		areaLights_->Update();
+
 #endif
 		spotLights_->lights_[0].direction = Normalize(spotLights_->lights_[0].direction);
 		spotLights_->Update();
-	}
-	
+	}	
 
 	sceneManager_->Update();
 		
@@ -171,9 +188,14 @@ void GameScene::Draw(CommandContext& commandContext) {
 	Renderer::GetInstance()->ClearMainDepthBuffer();
 
 	//3Dオブジェクト描画
-	Model::PreDraw(&commandContext, *currentViewProjection_ , *directionalLights_.get());
+	Model::PreDraw(&commandContext, *currentViewProjection_);
 	sceneManager_->ModelDraw();
 	Model::PostDraw();
+
+	//3Dオブジェクト描画
+	Sky::PreDraw(&commandContext, *currentViewProjection_);
+	sceneManager_->SkyDraw();
+	Sky::PostDraw();
 
 	//Particle描画
 	Particle::PreDraw(&commandContext, *currentViewProjection_);
@@ -181,9 +203,9 @@ void GameScene::Draw(CommandContext& commandContext) {
 	Particle::PostDraw();
 
 	//Particle描画
-	ParticleBox::PreDraw(&commandContext, *currentViewProjection_);
+	ParticleModel::PreDraw(&commandContext, *currentViewProjection_);
 	sceneManager_->ParticleBoxDraw();
-	ParticleBox::PostDraw();
+	ParticleModel::PostDraw();
 
 }
 

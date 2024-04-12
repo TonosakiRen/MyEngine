@@ -20,7 +20,7 @@ public:
 		float distance = 18.0f;
 		float decay = 0.4f;
 		float cosAngle = Radian(45.0f);
-		bool isActive = true;
+		bool isActive = false;
 	};
 
 	struct ConstBufferData {

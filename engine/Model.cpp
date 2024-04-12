@@ -20,7 +20,7 @@ void Model::Finalize()
     pipelineState_.reset();
 }
 
-void Model::PreDraw(CommandContext* commandContext, const ViewProjection& viewProjection, const DirectionalLights& directionalLights) {
+void Model::PreDraw(CommandContext* commandContext, const ViewProjection& viewProjection) {
     assert(Model::commandContext_ == nullptr);
 
     commandContext_ = commandContext;
@@ -30,11 +30,6 @@ void Model::PreDraw(CommandContext* commandContext, const ViewProjection& viewPr
 
     // CBVをセット（ビュープロジェクション行列）
     commandContext_->SetConstantBuffer(static_cast<UINT>(RootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
-
-    // CBVをセット（ビュープロジェクション行列）
-    commandContext_->SetConstantBuffer(static_cast<UINT>(RootParameter::kDirectionalLights), directionalLights.lights_[0].constBuffer_.GetGPUVirtualAddress());
-
-    commandContext_->SetDescriptorTable(static_cast<UINT>(RootParameter::kShadowMap), directionalLights.lights_[0].shadowMap_.GetSRV());
 
     commandContext_->SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
@@ -65,18 +60,12 @@ void Model::CreatePipeline() {
         CD3DX12_DESCRIPTOR_RANGE descRangeSRV;
         descRangeSRV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0); // t0 レジスタ
 
-        // デスクリプタレンジ
-        CD3DX12_DESCRIPTOR_RANGE descRangeSRVShadow;
-        descRangeSRVShadow.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1); // t1 レジスタ
-
         // ルートパラメータ
         CD3DX12_ROOT_PARAMETER rootparams[int(RootParameter::parameterNum)] = {};
         rootparams[int(RootParameter::kWorldTransform)].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_ALL);
         rootparams[int(RootParameter::kViewProjection)].InitAsConstantBufferView(1, 0, D3D12_SHADER_VISIBILITY_ALL);
-        rootparams[int(RootParameter::kDirectionalLights)].InitAsConstantBufferView(2, 0, D3D12_SHADER_VISIBILITY_ALL);
         rootparams[int(RootParameter::kTexture)].InitAsDescriptorTable(1, &descRangeSRV, D3D12_SHADER_VISIBILITY_ALL);
-        rootparams[int(RootParameter::kShadowMap)].InitAsDescriptorTable(1, &descRangeSRVShadow, D3D12_SHADER_VISIBILITY_ALL);
-        rootparams[int(RootParameter::kMaterial)].InitAsConstantBufferView(3, 0, D3D12_SHADER_VISIBILITY_ALL);
+        rootparams[int(RootParameter::kMaterial)].InitAsConstantBufferView(2, 0, D3D12_SHADER_VISIBILITY_ALL);
 
         // スタティックサンプラー
         CD3DX12_STATIC_SAMPLER_DESC samplerDesc =
@@ -133,8 +122,23 @@ void Model::CreatePipeline() {
         blenddesc.SrcBlendAlpha = D3D12_BLEND_ONE;
         blenddesc.DestBlendAlpha = D3D12_BLEND_ZERO;
 
+        // レンダーターゲットのブレンド設定
+        D3D12_RENDER_TARGET_BLEND_DESC blenddesc2{};
+        blenddesc2.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+        blenddesc2.BlendEnable = false;
+        blenddesc2.BlendOp = D3D12_BLEND_OP_ADD;
+        blenddesc2.SrcBlend = D3D12_BLEND_SRC_ALPHA;
+        blenddesc2.DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
+
+        blenddesc2.BlendOpAlpha = D3D12_BLEND_OP_ADD;
+        blenddesc2.SrcBlendAlpha = D3D12_BLEND_ONE;
+        blenddesc2.DestBlendAlpha = D3D12_BLEND_ZERO;
+
         // ブレンドステートの設定
+        gpipeline.BlendState.IndependentBlendEnable = true;
         gpipeline.BlendState.RenderTarget[0] = blenddesc;
+        gpipeline.BlendState.RenderTarget[1] = blenddesc;
+        gpipeline.BlendState.RenderTarget[2] = blenddesc2;
 
         // 深度バッファのフォーマット
         gpipeline.DSVFormat = Renderer::GetInstance()->GetDSVFormat();
@@ -149,6 +153,7 @@ void Model::CreatePipeline() {
         gpipeline.NumRenderTargets = Renderer::kRenderTargetNum;
         gpipeline.RTVFormats[int(Renderer::kColor)] = Renderer::GetInstance()->GetRTVFormat(Renderer::kColor);
         gpipeline.RTVFormats[int(Renderer::kNormal)] = Renderer::GetInstance()->GetRTVFormat(Renderer::kNormal);
+        gpipeline.RTVFormats[int(Renderer::kMaterial)] = Renderer::GetInstance()->GetRTVFormat(Renderer::kMaterial);
         gpipeline.SampleDesc.Count = 1; // 1ピクセルにつき1回サンプリング
 
         gpipeline.pRootSignature = *rootSignature_;
