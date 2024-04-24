@@ -287,12 +287,12 @@ inline float SignedAngle(const Vector3& from, const Vector3& to, const Vector3& 
 
 
 // 線形補間
-inline Vector3 Lerp(const Vector3& v1, const Vector3& v2, float t) {
+inline Vector3 Lerp(float t,const Vector3& v1, const Vector3& v2) {
 	Vector3 result = v1 + (v2 - v1) * t;
 	return result;
 }
 // 球面線形補間
-inline Vector3 Slerp(const Vector3& v1, const Vector3& v2, float t) {
+inline Vector3 Slerp(float t,const Vector3& v1, const Vector3& v2) {
 
 	const float epsilon = 0.0001f;
 
@@ -305,7 +305,7 @@ inline Vector3 Slerp(const Vector3& v1, const Vector3& v2, float t) {
 		return a;
 	}
 	else if (std::abs(dot + 1.0f) < epsilon) {
-		return Lerp(v1, v2, t);
+		return Lerp(t, v1, v2);
 	}
 
 	float theta = std::acos(dot);

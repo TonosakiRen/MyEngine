@@ -27,7 +27,7 @@ float32_t4 main(VSOutput input) : SV_TARGET{
 	float32_t minDistance = 3.402823466e+38F;
 	uint32_t index = 0;
 
-	float32_t2 uvPos = input.uv * 1500.0f;
+	float32_t2 uvPos = input.uv * 1024.0f;
 
 	for (int i = 0; i < pointNum.num; i++) {
 		float32_t distance = length(gPoints[i].pos - uvPos);

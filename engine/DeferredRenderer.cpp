@@ -23,7 +23,6 @@ void DeferredRenderer::Initialize(ColorBuffer* colorTexture, ColorBuffer* normal
 	colorTexture_ = colorTexture;
 	materialTexture_ = materialTexture;
 	CreatePipeline();
-	CreateMesh();
 }
 
 void DeferredRenderer::Render(CommandContext& commandContext, ColorBuffer* originalBuffer,ViewProjection& viewProjection, DirectionalLights& directionalLight, PointLights& pointLights, AreaLights& areaLights ,SpotLights& spotLights, ShadowSpotLights& shadowSpotLights, LightNumBuffer& lightNumBuffer, TileBasedRendering& tileBasedRendering)
@@ -57,6 +56,9 @@ void DeferredRenderer::Render(CommandContext& commandContext, ColorBuffer* origi
 	commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
 	commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kLightNum), lightNumBuffer.GetGPUVirtualAddress());
 
+	commandContext.TransitionResource(tileBasedRendering.pointLightIndexBuffer_, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+	commandContext.TransitionResource(tileBasedRendering.tileInformationBuffer_, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+
 	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kTBRInformation), tileBasedRendering.tileInformationBuffer_.GetSRV());
 	commandContext.SetConstants(static_cast<UINT>(RootParameter::kTileNum),TileBasedRendering::kTileWidthNum, TileBasedRendering::kTileHeightNum);
 
@@ -64,10 +66,7 @@ void DeferredRenderer::Render(CommandContext& commandContext, ColorBuffer* origi
 	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kTBRSpotLightIndex), tileBasedRendering.spotLightIndexBuffer_.GetSRV());
 	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kTBRShadowSpotLightIndex), tileBasedRendering.shadowSpotLightIndexBuffer_.GetSRV());
 
-	commandContext.SetVertexBuffer(0, vbView_);
-	commandContext.SetIndexBuffer(ibView_);
-
-	commandContext.DrawIndexedInstanced(static_cast<UINT>(indices_.size()), 1, 0, 0, 0);
+	commandContext.DrawInstanced(3, 1, 0, 0);
 }
 
 void DeferredRenderer::CreatePipeline()
@@ -148,14 +147,14 @@ void DeferredRenderer::CreatePipeline()
 
 	{
 
-		D3D12_INPUT_ELEMENT_DESC inputLayout[] = {
+		/*D3D12_INPUT_ELEMENT_DESC inputLayout[] = {
 			  {
 				"POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT,
 			   D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
 			  {
 			   "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,    0, D3D12_APPEND_ALIGNED_ELEMENT,
 			   D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-		};
+		};*/
 
 		// グラフィックスパイプラインの流れを設定
 		D3D12_GRAPHICS_PIPELINE_STATE_DESC gpipeline{};
@@ -182,10 +181,6 @@ void DeferredRenderer::CreatePipeline()
 		// ブレンドステートの設定
 		gpipeline.BlendState.RenderTarget[0] = blenddesc;
 
-		// 頂点レイアウトの設定
-		gpipeline.InputLayout.pInputElementDescs = inputLayout;
-		gpipeline.InputLayout.NumElements = _countof(inputLayout);
-
 		// 図形の形状設定（三角形）
 		gpipeline.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 
@@ -201,53 +196,3 @@ void DeferredRenderer::CreatePipeline()
 
 
 }
-
-void DeferredRenderer::CreateMesh()
-{
-
-
-	vertices_.resize(4);
-
-	//左下
-	vertices_[0].pos = { -1.0f,-1.0f,0.0f, 1.0f };
-	vertices_[0].uv = { 0.0f,1.0f };
-	//左上
-	vertices_[1].pos = { -1.0f,1.0f,0.0f, 1.0f };
-	vertices_[1].uv = { 0.0f,0.0f };
-	//右上
-	vertices_[2].pos = { 1.0f,1.0f,0.0f, 1.0f };
-	vertices_[2].uv = { 1.0f,0.0f };
-	//右下
-	vertices_[3].pos = { 1.0f,-1.0f,0.0f, 1.0f };
-	vertices_[3].uv = { 1.0f,1.0f };
-
-	// 頂点インデックスの設定
-	indices_ = { 0,  1,  2, 0, 2, 3 };
-
-	// 頂点データのサイズ
-	UINT sizeVB = static_cast<UINT>(sizeof(VertexData) * vertices_.size());
-
-	vertexBuffer_.Create(sizeVB);
-
-	vertexBuffer_.Copy(vertices_.data(), sizeVB);
-
-	// 頂点バッファビューの作成
-	vbView_.BufferLocation = vertexBuffer_.GetGPUVirtualAddress();
-	vbView_.SizeInBytes = sizeVB;
-	vbView_.StrideInBytes = sizeof(vertices_[0]);
-
-
-	// インデックスデータのサイズ
-	UINT sizeIB = static_cast<UINT>(sizeof(uint16_t) * indices_.size());
-
-	indexBuffer_.Create(sizeIB);
-
-	indexBuffer_.Copy(indices_.data(), sizeIB);
-
-	// インデックスバッファビューの作成
-	ibView_.BufferLocation = indexBuffer_.GetGPUVirtualAddress();
-	ibView_.Format = DXGI_FORMAT_R16_UINT;
-	ibView_.SizeInBytes = sizeIB;
-
-}
-

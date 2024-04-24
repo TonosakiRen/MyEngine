@@ -3,6 +3,8 @@
 #include "ModelManager.h"
 #include "PlayerBulletManager.h"
 #include "TextureManager.h"
+#include "Audio.h"
+
 void Player::Initialize(const std::string name, PlayerBulletManager* playerBulletManager)
 {
 	GameObject::Initialize(name);
@@ -17,20 +19,27 @@ void Player::Initialize(const std::string name, PlayerBulletManager* playerBulle
 	//modelの中心からmodelの高さの半分したにmodelWorldTransformを配置
 	modelWorldTransform_.translation_ = { 0.0f,0.0f,0.0f };
 
+	animation_ = AnimationManager::GetInstance()->Load("AnimatedCube.gltf");
+	animationTime_ = 0.0f;
+
 	velocity_ = { 0.0f,0.0f,0.0f };
 	acceleration_ = { 0.0f,-0.05f,0.0f };
 	uint32_t handle = TextureManager::Load("reticle.png");
 	sprite2DReticle_.Initialize(handle, { 0.0f,0.0f });
 	worldTransform3DReticle_.Initialize();
+
+	uint32_t soundHandle = Audio::GetInstance()->SoundLoadWave("walk.mp3");
+	uint32_t playHandle = Audio::GetInstance()->SoundPlayLoopStart(soundHandle);
 }
 
 void Player::Update(const ViewProjection& viewProjection)
 {
 
 	Move(viewProjection);
+	Animate();
 	ReticleUpdate(viewProjection);
 	Fire();
-	
+
 
 #ifdef _DEBUG
 	ImGui::Begin("Player");
@@ -83,6 +92,17 @@ void Player::Fire()
 		Vector3 direction = Normalize(worldTransform3DReticle_.translation_ - MakeTranslation(worldTransform_.matWorld_));
 		playerBulletManager_->PopPlayerBullet(position, direction);
 	}
+}
+
+void Player::Animate()
+{
+	animationTime_ += 1.0f / 60.0f;
+	animationTime_ = std::fmod(animationTime_, animation_.duration);
+	NodeAnimation& rootNodeAnimation = animation_.nodeAnimations[ModelManager::GetInstance()->GetRootNode(modelHandle_).name];
+	modelWorldTransform_.translation_ = CalculateValue(rootNodeAnimation.translate.keyframes, animationTime_);
+	modelWorldTransform_.quaternion_ = CalculateValue(rootNodeAnimation.rotate.keyframes, animationTime_);
+	modelWorldTransform_.scale_ = CalculateValue(rootNodeAnimation.scale.keyframes, animationTime_);
+	
 }
 
 void Player::Move(const ViewProjection& viewProjection)

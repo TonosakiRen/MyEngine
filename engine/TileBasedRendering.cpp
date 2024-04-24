@@ -5,6 +5,7 @@
 #include "ShaderManager.h"
 #include "Helper.h"
 #include "CommandContext.h"
+#include "LightNumBuffer.h"
 using namespace Microsoft::WRL;
 void TileBasedRendering::Initialize()
 {
@@ -26,7 +27,7 @@ void TileBasedRendering::Initialize()
 
     //compute
 
-   /* CreatePipeline();
+    CreatePipeline();
 
     {
         initialTileFrustrumBuffer_.Create(sizeof(Frustum), kTileNum);
@@ -34,12 +35,7 @@ void TileBasedRendering::Initialize()
 
     {
         rwTilesInformation_.Create(sizeof(ConstBufferData), kTileNum);
-        resetTileInformation_.Create(sizeof(ConstBufferData), kTileNum);
-        ConstBufferData constBufferData[kTileNum];
-        for (int i = 0; i < kTileNum; i++) {
-            constBufferData[i] = { 0,0,0 };
-        }
-        resetTileInformation_.Copy(constBufferData);
+ 
     }
 
     {
@@ -52,7 +48,7 @@ void TileBasedRendering::Initialize()
 
     {
         rwShadowSpotLightIndex_.Create(sizeof(uint32_t), kTileNum * ShadowSpotLights::lightNum);
-    }*/
+    }
 
 }
 
@@ -80,9 +76,6 @@ void TileBasedRendering::Update(const ViewProjection& viewProjection, const Poin
         tilesInformation_[i].pointLightIndex.clear();
         tilesInformation_[i].spotLightIndex.clear();
         tilesInformation_[i].shadowSpotLightIndex.clear();
-
-        int height = i / kTileWidthNum;
-        int width = i % kTileWidthNum;
 
         tileFrustrum_[i] = initialTileFrustrum_[i] * viewProjection_->GetWorldMatrix();
     }
@@ -165,7 +158,7 @@ void TileBasedRendering::Update(const ViewProjection& viewProjection, const Poin
     shadowSpotLightIndexBuffer_.Copy(shadowSpotLightLightIndex);
 }
 
-void TileBasedRendering::ComputeUpdate(CommandContext& commandContext, const ViewProjection& viewProjection, const PointLights& pointLights, const SpotLights& spotLights, const ShadowSpotLights& shadowSpotLights)
+void TileBasedRendering::ComputeUpdate(CommandContext& commandContext, const ViewProjection& viewProjection, PointLights& pointLights, const SpotLights& spotLights, const ShadowSpotLights& shadowSpotLights, LightNumBuffer& lightNumBuffer)
 {
     //初期化
     if (viewProjection_ != &viewProjection) {
@@ -181,8 +174,6 @@ void TileBasedRendering::ComputeUpdate(CommandContext& commandContext, const Vie
         }
     }
 
-    //タイルの数をすべて０に書き換える
-    commandContext.CopyBuffer(resetTileInformation_, rwTilesInformation_);
 
     //dispatch
     commandContext.SetPipelineState(pipelineState_);
@@ -192,17 +183,20 @@ void TileBasedRendering::ComputeUpdate(CommandContext& commandContext, const Vie
     commandContext.TransitionResource(rwPointLightIndex_, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
     commandContext.TransitionResource(rwSpotLightIndex_, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
     commandContext.TransitionResource(rwShadowSpotLightIndex_, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
-    commandContext.TransitionResource(initialTileFrustrumBuffer_, D3D12_RESOURCE_STATE_GENERIC_READ);
 
     commandContext.SetComputeDescriptorTable(UINT(RootParameter::kTileInformation), rwTilesInformation_.GetUAV());
     commandContext.SetComputeDescriptorTable(UINT(RootParameter::kPointLightIndex), rwPointLightIndex_.GetUAV());
     commandContext.SetComputeDescriptorTable(UINT(RootParameter::kSpotLightIndex), rwSpotLightIndex_.GetUAV());
     commandContext.SetComputeDescriptorTable(UINT(RootParameter::kShadowSpotLightIndex), rwShadowSpotLightIndex_.GetUAV());
     commandContext.SetComputeDescriptorTable(UINT(RootParameter::kInitialTileFrustum), initialTileFrustrumBuffer_.GetSRV(commandContext));
+    commandContext.SetComputeDescriptorTable(UINT(RootParameter::kPointLights), pointLights.structureBuffer_.GetSRV(commandContext));
+    commandContext.SetComputeConstantBuffer(UINT(RootParameter::kLightNum),lightNumBuffer.GetGPUVirtualAddress());
+    commandContext.SetComputeConstantBuffer(UINT(RootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
 
     commandContext.Dispatch(1,1,1);
 
-
+    commandContext.CopyBuffer(tileInformationBuffer_,rwTilesInformation_);
+    commandContext.CopyBuffer(pointLightIndexBuffer_, rwPointLightIndex_);
 }
 
 void TileBasedRendering::CreatePipeline()
@@ -213,12 +207,14 @@ void TileBasedRendering::CreatePipeline()
     uavBlob = shaderManager->Compile(L"TBR.hlsl", ShaderManager::kCompute);
     assert(uavBlob != nullptr);
 
-    CD3DX12_DESCRIPTOR_RANGE ranges[5]{};
+    CD3DX12_DESCRIPTOR_RANGE ranges[6]{};
     ranges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, int(RootParameter::kTileInformation));
     ranges[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, int(RootParameter::kPointLightIndex));
     ranges[2].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, int(RootParameter::kSpotLightIndex));
     ranges[3].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, int(RootParameter::kShadowSpotLightIndex));
+
     ranges[4].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
+    ranges[5].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1);
 
 
     CD3DX12_ROOT_PARAMETER rootparams[int(RootParameter::ParameterNum)]{};
@@ -227,6 +223,9 @@ void TileBasedRendering::CreatePipeline()
     rootparams[int(RootParameter::kSpotLightIndex)].InitAsDescriptorTable(1, &ranges[int(RootParameter::kSpotLightIndex)]);
     rootparams[int(RootParameter::kShadowSpotLightIndex)].InitAsDescriptorTable(1, &ranges[int(RootParameter::kShadowSpotLightIndex)]);
     rootparams[int(RootParameter::kInitialTileFrustum)].InitAsDescriptorTable(1, &ranges[int(RootParameter::kInitialTileFrustum)]);
+    rootparams[int(RootParameter::kPointLights)].InitAsDescriptorTable(1, &ranges[int(RootParameter::kPointLights)]);
+    rootparams[int(RootParameter::kLightNum)].InitAsConstantBufferView(0,0);
+    rootparams[int(RootParameter::kViewProjection)].InitAsConstantBufferView(1, 0);
 
     // ルートシグネチャの設定
     D3D12_ROOT_SIGNATURE_DESC rootSignatureDesc{};

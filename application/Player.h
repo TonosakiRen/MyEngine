@@ -4,6 +4,8 @@
 #include "Collider.h"
 #include "Sprite.h"
 #include "Mymath.h"
+#include "AnimationManager.h"
+
 class PlayerBulletManager;
 class Player :
     public GameObject
@@ -17,6 +19,7 @@ public:
     void Draw();
     void ReticleDraw();
     void Fire();
+    void Animate();
     void Move(const ViewProjection& viewProjection);
     void ReticleUpdate(const ViewProjection& viewProjection);
     const WorldTransform& GetWorldTransform() const {
@@ -36,4 +39,7 @@ private:
     Vector3 acceleration_;
     Vector3 modelSize_;
     Vector4 color_;
+
+    float animationTime_ = 0.0f;
+    Animation animation_;
 };

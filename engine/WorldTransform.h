@@ -2,10 +2,13 @@
 #include <d3d12.h>
 #include "Mymath.h"
 #include "UploadBuffer.h"
+#include "ModelManager.h"
 
 class WorldTransform
 {
 public:
+
+	static ModelManager* modelManager_;
 
 	struct ConstBufferData {
 		Matrix4x4 matWorld;
@@ -14,6 +17,7 @@ public:
 	//bufferに送る場合の初期化
 	void Initialize();
 	void Update();
+	void Update(uint32_t modelIndex);
 
 	void ConstUpdate() {
 		constBuffer_.Copy(matWorld_);

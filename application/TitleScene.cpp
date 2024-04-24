@@ -12,7 +12,7 @@ void TitleScene::Initialize()
 	input_ = Input::GetInstance();
 
 	title_ = std::make_unique<GameObject>();
-	title_->Initialize("title");
+	title_->Initialize("title.obj");
 	title_->GetWorldTransform()->translation_ = { 0.0f,3.0f,0.0f };
 	title_->UpdateMatrix();
 	pushSpace_ = std::make_unique<Sprite>();

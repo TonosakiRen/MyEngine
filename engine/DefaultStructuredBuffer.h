@@ -19,11 +19,16 @@ public:
     size_t GetBufferSize() const { return bufferSize_; }
     void* GetCPUData() const { return uploadBuffer_.GetCPUData(); }
 
-    DescriptorHandle GetSRV(CommandContext& commandContext) {
+    //コピーするやつ
+    DescriptorHandle GetSRV (CommandContext& commandContext) {
         if (isCopy_) {
             isCopy_ = false;
             BufferCopy(commandContext);
         }
+        return srvHandle_;
+    }
+
+    DescriptorHandle GetSRV() {
         return srvHandle_;
     }
 

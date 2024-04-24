@@ -198,7 +198,10 @@ uint32_t TextureManager::LoadUvInternal(const std::string& fileName, const std::
 
 	// WICテクスチャのロード
 	result = LoadFromWICFile(wfilePath, WIC_FLAGS_NONE, &metadata, scratchImg);
-	assert(SUCCEEDED(result));
+	//読み込めないのもだったら0(white.png)を返す
+	if (!SUCCEEDED(result)) {
+		return 0;
+	}
 
 	ScratchImage mipChain{};
 	// ミップマップ生成

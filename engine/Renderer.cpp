@@ -10,6 +10,7 @@
 #include "ShadowSpotLights.h"
 #include "TileBasedRendering.h"
 #include "TextureManager.h"
+#include "Sky.h"
 
 Renderer* Renderer::GetInstance() {
     static Renderer instance;
@@ -80,6 +81,8 @@ void Renderer::Initialize() {
     transition_ = std::make_unique<Transition>();
     transition_->Initialize(*resultBuffer_);
 
+    Sky::CreateVoronoi(&commandContext_);
+
 }
 
 void Renderer::BeginFrame()
@@ -113,7 +116,8 @@ void Renderer::BeginMainRender() {
 
 void Renderer::DeferredRender(ViewProjection& viewProjection, DirectionalLights& directionalLight, PointLights& pointLights,AreaLights& areaLights ,SpotLights& spotLights, ShadowSpotLights& shadowSpotLights)
 {
-    tileBasedRendering_->Update(viewProjection,pointLights, spotLights, shadowSpotLights);
+    //tileBasedRendering_->Update(viewProjection,pointLights, spotLights, shadowSpotLights);
+    //tileBasedRendering_->ComputeUpdate(commandContext_, viewProjection, pointLights, spotLights, shadowSpotLights, *lightNumBuffer_);
     deferredRenderer_->Render(commandContext_, resultBuffer_.get(), viewProjection, directionalLight, pointLights, areaLights ,spotLights,shadowSpotLights, *lightNumBuffer_, *tileBasedRendering_);
 }
 

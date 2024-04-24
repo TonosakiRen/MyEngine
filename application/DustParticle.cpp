@@ -9,7 +9,7 @@ DustParticle::DustParticle()
 void DustParticle::Initialize(Vector3 minDirection, Vector3 maxDirection)
 {
 
-	particle_->Initialize("box1x1");
+	particle_->Initialize("box1x1.obj");
 	emitterWorldTransform_.SetIsScaleParent(false);
 	emitterWorldTransform_.Update();
 	SetDirection(minDirection, maxDirection);

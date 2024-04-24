@@ -4,7 +4,7 @@
 void EnemyBulletManager::Initialize()
 {
 	enemyBullets_.clear();
-	modelHandle_ = ModelManager::Load("sphere");
+	modelHandle_ = ModelManager::Load("sphere.obj");
 }
 
 void EnemyBulletManager::Update()

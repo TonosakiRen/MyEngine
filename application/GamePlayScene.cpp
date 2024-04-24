@@ -9,22 +9,22 @@ const Player* GamePlayScene::player = nullptr;
 void GamePlayScene::Initialize()
 {
 	skydome_ = std::make_unique<Skydome>();
-	skydome_->Initialize("skydome");
+	skydome_->Initialize("skydome.obj");
 	skydome_->Update();
 
 	floor_ = std::make_unique<Floor>();
-	floor_->Initialize("floor");
+	floor_->Initialize("floor.obj");
 
 	sphere_ = std::make_unique<GameObject>();
-	sphere_->Initialize("sphere");
+	sphere_->Initialize("sphere.obj");
 	sphere_->SetPosition({ 0.0f,8.0f,-3.0f });
 	sphere_->UpdateMatrix();
 
 	boxArea_ = std::make_unique<BoxArea>();
-	boxArea_->Initialize("box1x1Inverse");
+	boxArea_->Initialize("box1x1Inverse.obj");
 
 	skybox_ = std::make_unique<Skybox>();
-	skybox_->Initialize("skybox");
+	skybox_->Initialize("skybox.obj");
 
 	explodeParticle_ = std::make_unique<ExplodeParticle>();
 	explodeParticle_->Initialize(Vector3{ -1.0f,-1.0f,-1.0f }, Vector3{ 1.0f,1.0f,1.0f }, GameScene::pointLights);
@@ -39,7 +39,7 @@ void GamePlayScene::Initialize()
 	playerBulletManager_->Initialize();
 
 	player_ = std::make_unique<Player>();
-	player_->Initialize("doubleBox", playerBulletManager_.get());
+	player_->Initialize("AnimatedCube.gltf", playerBulletManager_.get());
 	player = player_.get();
 
 	sphereLights_ = std::make_unique<SphereLights>();
@@ -105,6 +105,7 @@ void GamePlayScene::Update()
 void GamePlayScene::ModelDraw()
 {
 	//boxArea_->Draw();
+	floor_->Draw();
 	player_->Draw();
 	sphere_->Draw();
 	//敵描画
@@ -181,7 +182,7 @@ void GamePlayScene::CheckAllCollision()
 
 void GamePlayScene::EnemySpawn(const Vector3& position)
 {
-	uint32_t modelHandle = ModelManager::Load("sphere");
+	uint32_t modelHandle = ModelManager::Load("sphere.obj");
 	// 敵を生成、初期化
 	std::unique_ptr<Enemy> newEnemy = std::make_unique<Enemy>();
 	// 敵キャラに自キャラのアドレスを渡す

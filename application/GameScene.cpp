@@ -69,7 +69,7 @@ void GameScene::Initialize() {
 	compute_->Initialize();
 
 	sceneManager_ = SceneManager::GetInstance();
-	BaseScene* scene = new TitleScene();
+	BaseScene* scene = new GamePlayScene();
 	sceneManager_->SetNextScene(scene);
 
 }

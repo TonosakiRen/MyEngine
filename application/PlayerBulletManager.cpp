@@ -4,7 +4,7 @@
 void PlayerBulletManager::Initialize()
 {
 	playerBullets_.clear();
-	modelHandle_ = ModelManager::Load("sphere");
+	modelHandle_ = ModelManager::Load("sphere.obj");
 }
 
 void PlayerBulletManager::Update()

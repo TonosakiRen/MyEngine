@@ -32,6 +32,7 @@ public:
 	static const uint32_t pointNum_ = 60000;
 
 	static void StaticInitialize();
+	static void CreateVoronoi(CommandContext* commandContext);
 	static void Finalize();
 	static void PreDraw(CommandContext* commandContext, const ViewProjection& viewProjection);
 	static void PostDraw();
@@ -47,7 +48,6 @@ private:
 
 	static std::unique_ptr<Voronoi> voronoi_;
 
-	static bool isCreateVoronoi_;
 	static Vector4 topHSVA_;
 	static Vector4 bottomHSVA_;
 };

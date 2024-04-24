@@ -4,6 +4,7 @@
 #include "UploadBuffer.h"
 #include <vector>
 #include <memory>
+
 class Mesh
 {
 	friend class ModelManager;
@@ -35,7 +36,6 @@ private:
 	UploadBuffer indexBuffer_;
 	D3D12_INDEX_BUFFER_VIEW ibView_{};
 	std::vector<uint32_t> indices_;
-
 
 	std::string name_;
 	uint32_t uvHandle_ = 0;

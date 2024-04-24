@@ -45,6 +45,7 @@ void ViewProjection::Update() {
     ConstBufferData bufferData;
     bufferData.viewProjection = viewProjection;
     bufferData.inverseViewProjection = inverseViewProjection_;
+    bufferData.worldMatrix = worldMatrix_;
     bufferData.viewPosition = tranlation;
 
     constBuffer_.Copy(bufferData);

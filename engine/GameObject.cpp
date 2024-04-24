@@ -21,7 +21,7 @@ void GameObject::Initialize(uint32_t modelHandle)
 
 void GameObject::UpdateMatrix()
 {
-	worldTransform_.Update();
+	worldTransform_.Update(modelHandle_);
 }
 
 void GameObject::Draw(uint32_t textureHandle, Vector4 color)

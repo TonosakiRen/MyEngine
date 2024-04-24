@@ -10,8 +10,6 @@ using namespace Microsoft::WRL;
 
 void Bloom::Initialize(ColorBuffer* originalTexture)
 {
-    // メッシュ生成
-    CreateMesh();
 
     luminanceTexture_.Create(
         originalTexture->GetWidth(),
@@ -48,15 +46,6 @@ void Bloom::Initialize(ColorBuffer* originalTexture)
     }
 
     {
-        D3D12_INPUT_ELEMENT_DESC inputLayout[] = {
-      {
-       "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT,
-       D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-      {
-       "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,    0, D3D12_APPEND_ALIGNED_ELEMENT,
-       D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-        };
-
 
         DXGI_FORMAT format = originalTexture->GetFormat();
 
@@ -69,9 +58,6 @@ void Bloom::Initialize(ColorBuffer* originalTexture)
         ComPtr<IDxcBlob> ps = shaderManager->Compile(L"LuminanceExtractionrPS.hlsl", ShaderManager::kPixel);
         psoDesc.VS = CD3DX12_SHADER_BYTECODE(vs->GetBufferPointer(), vs->GetBufferSize());
         psoDesc.PS = CD3DX12_SHADER_BYTECODE(ps->GetBufferPointer(), ps->GetBufferSize());
-
-        psoDesc.InputLayout.pInputElementDescs = inputLayout;
-        psoDesc.InputLayout.NumElements = _countof(inputLayout);
 
         psoDesc.BlendState = Helper::BlendDisable;
         psoDesc.RasterizerState = Helper::RasterizerNoCull;
@@ -110,15 +96,12 @@ void Bloom::Render(CommandContext& commandContext, ColorBuffer* originalTexture,
 
     commandContext.SetGraphicsRootSignature(rootSignature_);
 
-    commandContext.SetVertexBuffer(0, vbView_);
-    commandContext.SetIndexBuffer(ibView_);
-
 
     commandContext.SetPipelineState(luminacePipelineState_);
     commandContext.SetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     commandContext.SetConstants(0, float(threshold_), float(knee_));
     commandContext.SetDescriptorTable(1, originalTexture->GetSRV());
-    commandContext.DrawIndexed(static_cast<UINT>(indices_.size()), 0, 0);
+    commandContext.DrawInstanced(3,1,0,0);
 
    
     for (uint32_t i = 0; i < level; ++i) {
@@ -136,60 +119,6 @@ void Bloom::Render(CommandContext& commandContext, ColorBuffer* originalTexture,
     for (uint32_t i = 0; i < level; ++i) {
         commandContext.SetDescriptorTable(i + 1, gaussianBlurs_[i].GetResult().GetSRV());
     }
-    commandContext.DrawIndexed(static_cast<UINT>(indices_.size()), 0, 0);
-
-}
-
-
-void Bloom::CreateMesh()
-{
-
-    vertices_.resize(4);
-
-    //左下
-    vertices_[0].pos = { -1.0f,-1.0f,0.0f,1.0f };
-    vertices_[0].uv = { 0.0f,1.0f };
-    //左上
-    vertices_[1].pos = { -1.0f,1.0f,0.0f,1.0f };
-    vertices_[1].uv = { 0.0f,0.0f };
-    //右上
-    vertices_[2].pos = { 1.0f,1.0f,0.0f,1.0f };
-    vertices_[2].uv = { 1.0f,0.0f };
-    //右下
-    vertices_[3].pos = { 1.0f,-1.0f,0.0f,1.0f };
-    vertices_[3].uv = { 1.0f,1.0f };
-
-    // 頂点インデックスの設定
-    indices_ = { 0,  1,  2, 0, 2, 3 };
-
-    // 頂点データのサイズ
-    UINT sizeVB = static_cast<UINT>(sizeof(VertexData) * vertices_.size());
-
-    vertexBuffer_.Create(sizeVB);
-
-    vertexBuffer_.Copy(vertices_.data(), sizeVB);
-
-    // 頂点バッファビューの作成
-    vbView_.BufferLocation = vertexBuffer_->GetGPUVirtualAddress();
-    vbView_.SizeInBytes = sizeVB;
-    vbView_.StrideInBytes = sizeof(vertices_[0]);
-
-
-    // インデックスデータのサイズ
-    UINT sizeIB = static_cast<UINT>(sizeof(uint16_t) * indices_.size());
-
-    indexBuffer_.Create(sizeIB);
-
-    indexBuffer_.Copy(indices_.data(), sizeIB);
-
-    // インデックスバッファビューの作成
-    ibView_.BufferLocation = indexBuffer_.GetGPUVirtualAddress();
-    ibView_.Format = DXGI_FORMAT_R16_UINT;
-    ibView_.SizeInBytes = sizeIB;
-
-    // インデックスバッファビューの作成
-    ibView_.BufferLocation = indexBuffer_->GetGPUVirtualAddress();
-    ibView_.Format = DXGI_FORMAT_R16_UINT;
-    ibView_.SizeInBytes = sizeIB;
+    commandContext.DrawInstanced(3, 1, 0, 0);
 
 }

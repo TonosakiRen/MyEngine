@@ -23,11 +23,6 @@ public:
 		ParameterNum
 	};
 
-	struct VertexData {
-		Vector4 pos;
-		Vector2 uv;
-	};
-
 	void Initialize(ColorBuffer& resultBuffer);
 
 	void Draw(ColorBuffer& resultBuffer, const DescriptorHandle& textureBuffer, CommandContext& commandContext);
@@ -41,18 +36,10 @@ public:
 	}
 
 private:
-	void CreateMesh();
 	void CreatePipeline();
 private:
 	RootSignature rootSignature_;
 	PipelineState pipelineState_;
-
-	D3D12_VERTEX_BUFFER_VIEW vbView_{};
-	D3D12_INDEX_BUFFER_VIEW ibView_{};
-	std::vector<VertexData> vertices_;
-	std::vector<uint16_t> indices_;
-	UploadBuffer vertexBuffer_;
-	UploadBuffer indexBuffer_;
 	ColorBuffer saveResultBuffer_;
 
 	float t_ = 0.0f;

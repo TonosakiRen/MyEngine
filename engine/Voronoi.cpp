@@ -70,7 +70,7 @@ void Voronoi::Initialize(uint32_t pointNum)
     // メッシュ生成
     CreateMesh();
 
-    voronoiTexture_.Create(1500, 1500, DXGI_FORMAT_R32G32B32A32_FLOAT);
+    voronoiTexture_.Create(1024, 1024, DXGI_FORMAT_R32G32B32A32_FLOAT);
 
     point_.Create(sizeof(Point), pointNum);
 

@@ -12,6 +12,7 @@ public:
 	struct ConstBufferData {
 		Matrix4x4 viewProjection;
 		Matrix4x4 inverseViewProjection;
+		Matrix4x4 worldMatrix;
 		Vector3 viewPosition;
 	};
 

@@ -1,18 +1,24 @@
 #include "Floor.h"
+#include "TextureManager.h"
 #include "ImGuiManager.h"
+
 void Floor::Initialize(const std::string name)
 {
 	GameObject::Initialize(name);
-	collider_.Initialize(&worldTransform_,name,{20.0f, 1.0f, 1.0f});
+	material_.enableLighting_ = true;
+	material_.Update();
+	worldTransform_.scale_ = { size_, size_, size_ };
+	worldTransform_.Update();
+	textureHandle_ = TextureManager::Load("floorTile.png");
 }
 
 void Floor::Update()
 {
-	collider_.AdjustmentScale();
-	UpdateMatrix();
+	worldTransform_.Update();
 }
 
-void Floor::Draw() {
-	collider_.Draw();
-	GameObject::Draw();
+void Floor::Draw()
+{
+	GameObject::Draw(worldTransform_, textureHandle_);
 }
+

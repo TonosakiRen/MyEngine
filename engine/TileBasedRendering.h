@@ -8,9 +8,11 @@
 #include "SpotLights.h"
 #include "ShadowSpotLights.h"
 #include "StructuredBuffer.h"
+#include "DefaultStructuredBuffer.h"
 #include "RwStructuredBuffer.h"
 #include "WinApp.h"
 #include "ViewProjection.h"
+class LightNumBuffer;
 class TileBasedRendering
 {
 public:
@@ -35,6 +37,9 @@ public:
 		kSpotLightIndex,
 		kShadowSpotLightIndex,
 		kInitialTileFrustum,
+		kPointLights,
+		kLightNum,
+		kViewProjection,
 		ParameterNum
 	};
 
@@ -46,7 +51,7 @@ public:
 
 	void Initialize();
 	void Update(const ViewProjection& viewProjection,const PointLights& pointLights,const SpotLights& spotLights,const ShadowSpotLights& shadowSpotLights);
-	void ComputeUpdate(CommandContext& commandContext,const ViewProjection& viewProjection, const PointLights& pointLights, const SpotLights& spotLights, const ShadowSpotLights& shadowSpotLights);
+	void ComputeUpdate(CommandContext& commandContext,const ViewProjection& viewProjection, PointLights& pointLights, const SpotLights& spotLights, const ShadowSpotLights& shadowSpotLights, LightNumBuffer& lightNumBuffer);
 
 
 	void CreatePipeline();
@@ -70,9 +75,9 @@ public:
 
 	const ViewProjection* viewProjection_ = nullptr;
 
-	StructuredBuffer tileInformationBuffer_;
+	DefaultStructuredBuffer tileInformationBuffer_;
 
-	StructuredBuffer pointLightIndexBuffer_;
+	DefaultStructuredBuffer pointLightIndexBuffer_;
 
 	StructuredBuffer spotLightIndexBuffer_;
 
@@ -83,8 +88,6 @@ public:
 	DefaultStructuredBuffer initialTileFrustrumBuffer_;
 
 	RwStructuredBuffer rwTilesInformation_;
-
-	UploadBuffer resetTileInformation_;
 
 	RwStructuredBuffer rwPointLightIndex_;
 

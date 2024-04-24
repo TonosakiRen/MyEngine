@@ -7,27 +7,27 @@
 #include <sstream>
 #include <filesystem>
 
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
-
 using namespace DirectX;
 
 uint32_t ModelManager::Load(const std::string& fileName) {
 	return ModelManager::GetInstance()->LoadInternal(fileName);
 }
 
-void ModelManager::CreateMeshes(ModelData& modelIndex)
+void ModelManager::CreateMeshes(ModelData& modelData)
 {
 	HRESULT result = S_FALSE;
 
-	std::string directoryPath = "Resources/models/" + modelIndex.name + "/";
+	//拡張子がない名前を取得
+	std::size_t dotPos = modelData.name.find_last_of('.');
+	std::string n = modelData.name.substr(0, dotPos);
+
+	std::string directoryPath = "Resources/models/" + n + "/";
 
 	Assimp::Importer importer;
-	std::string filePath = directoryPath + modelIndex.name + ".obj";
+	std::string filePath = directoryPath + modelData.name;
 	const aiScene* scene = importer.ReadFile(filePath.c_str(), aiProcess_FlipWindingOrder | aiProcess_FlipUVs);
 	assert(scene->HasMeshes());
-	modelIndex.meshes.resize(scene->mNumMeshes);
+	modelData.meshes.resize(scene->mNumMeshes);
 
 	Vector3 minModelSize{};
 	Vector3 maxModelSize{ FLT_MIN,FLT_MIN,FLT_MIN };
@@ -68,7 +68,7 @@ void ModelManager::CreateMeshes(ModelData& modelIndex)
 				maxModelSize.z = position.z;
 			}
 
-			modelIndex.meshes[meshIndex].vertices_.push_back(vertex);
+			modelData.meshes[meshIndex].vertices_.push_back(vertex);
 		}
 
 		for (uint32_t faceIndex = 0; faceIndex < mesh->mNumFaces; ++faceIndex) {
@@ -76,7 +76,7 @@ void ModelManager::CreateMeshes(ModelData& modelIndex)
 			assert(face.mNumIndices == 3);
 			for (uint32_t element = 0; element < face.mNumIndices; ++element) {
 				uint32_t vertexIndex = face.mIndices[element];
-				modelIndex.meshes[meshIndex].indices_.push_back(vertexIndex);
+				modelData.meshes[meshIndex].indices_.push_back(vertexIndex);
 			}
 		}
 
@@ -88,20 +88,20 @@ void ModelManager::CreateMeshes(ModelData& modelIndex)
 		material->GetTexture(aiTextureType_DIFFUSE, 0, &textureFilePath);
 		std::string a = textureFilePath.C_Str();
 		if (a != "") {
-			modelIndex.meshes[materialIndex - 1].uvHandle_ = TextureManager::LoadUv(textureFilePath.C_Str(), directoryPath + textureFilePath.C_Str());
+			modelData.meshes[meshIndex].uvHandle_ = TextureManager::LoadUv(textureFilePath.C_Str(), directoryPath + textureFilePath.C_Str());
 		}
 		
 	}
 
-	modelIndex.modelSize = (maxModelSize - minModelSize);
-	modelIndex.modelCenter = maxModelSize - Vector3(modelIndex.modelSize / 2.0f);
+	modelData.modelSize = (maxModelSize - minModelSize);
+	modelData.modelCenter = maxModelSize - Vector3(modelData.modelSize / 2.0f);
 	//もしmodelの原点を一番下にしていたら
 	if (minModelSize.y < 0.5f && minModelSize.y > -0.5f) {
-		modelIndex.modelCenter.y = minModelSize.y;
+		modelData.modelCenter.y = minModelSize.y;
 	}
 
 
-	for (auto& mesh : modelIndex.meshes) {
+	for (auto& mesh : modelData.meshes) {
 
 		// 頂点データのサイズ
 		UINT sizeVB = static_cast<UINT>(sizeof(Mesh::VertexData) * mesh.vertices_.size());
@@ -127,8 +127,10 @@ void ModelManager::CreateMeshes(ModelData& modelIndex)
 		mesh.ibView_.BufferLocation = mesh.indexBuffer_->GetGPUVirtualAddress();
 		mesh.ibView_.Format = DXGI_FORMAT_R32_UINT;
 		mesh.ibView_.SizeInBytes = sizeIB;
-
 	}
+
+	//node
+	modelData.rootNode = ReadNode(scene->mRootNode);
 }
 
 void ModelManager::Finalize()
@@ -216,13 +218,13 @@ void ModelManager::DrawInstanced(CommandContext* commandContext, uint32_t modelH
 	}
 }
 
-uint32_t ModelManager::LoadInternal(const std::string& name) {
+uint32_t ModelManager::LoadInternal(const std::string& fileName) {
 
 	assert(useModelCount_ < kNumModels);
 	uint32_t handle = useModelCount_;
 
 	// 読み込み済みmodelを検索
-	auto it = std::find_if(models_->begin(), models_->end(), [&](const auto& texture) {return texture.name == name; });
+	auto it = std::find_if(models_->begin(), models_->end(), [&](const auto& texture) {return texture.name == fileName; });
 
 	if (it != models_->end()) {
 		// 読み込み済みmodelの要素番号を取得
@@ -231,11 +233,11 @@ uint32_t ModelManager::LoadInternal(const std::string& name) {
 	}
 
 	// 書き込むmodelの参照
-	auto& modelIndex = (models_->at(useModelCount_));
+	auto& modelData = (models_->at(useModelCount_));
 
-	modelIndex.name = name;
+	modelData.name = fileName;
 
-	CreateMeshes(modelIndex);
+	CreateMeshes(modelData);
 
 	useModelCount_++;
 	return handle;
@@ -250,6 +252,12 @@ Vector3 ModelManager::GetModelCenter(uint32_t modelHandle)
 {
 	return  (*models_)[modelHandle].modelCenter;
 }
+
+Node& ModelManager::GetRootNode(uint32_t modelHandle)
+{
+	return  (*models_)[modelHandle].rootNode;
+}
+
 
 void ModelManager::DrawInstancing(CommandContext* commandContext, uint32_t modelHandle, UINT instancingNum, UINT textureRootParamterIndex) {
 	assert(modelHandle < kNumModels);
@@ -267,4 +275,24 @@ void ModelManager::DrawInstancing(CommandContext* commandContext, uint32_t model
 		// 描画コマンド
 		commandContext->DrawIndexedInstanced(static_cast<UINT>(mesh.indices_.size()), instancingNum, 0, 0, 0);
 	}
+}
+
+Node ModelManager::ReadNode(aiNode* node)
+{
+	Node result;
+	aiMatrix4x4 aiLocalMatrix = node->mTransformation;
+	aiLocalMatrix.Transpose();
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			result.localMatrix.m[i][j] = aiLocalMatrix[i][j];
+		}
+	}
+
+	result.name = node->mName.C_Str();
+	result.children.resize(node->mNumChildren);
+	for (uint32_t childIndex = 0; childIndex < node->mNumChildren; ++childIndex) {
+		result.children[childIndex] = ReadNode(node->mChildren[childIndex]);
+	}
+
+	return result;
 }

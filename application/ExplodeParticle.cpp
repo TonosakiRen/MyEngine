@@ -11,7 +11,7 @@ void ExplodeParticle::Initialize(Vector3 minDirection, Vector3 maxDirection, Poi
 {
 	pointLights_ = pointLights;
 	acceleration_ = { 0.0f,0.0f,-0.1f };
-	particle_->Initialize("box1x1");
+	particle_->Initialize("box1x1.obj");
 	emitterWorldTransform_.SetIsScaleParent(false);
 	emitterWorldTransform_.Update();
 	SetDirection(minDirection, maxDirection);

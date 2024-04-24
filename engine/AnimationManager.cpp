@@ -13,20 +13,52 @@
 
 using namespace DirectX;
 
-uint32_t AnimationManager::Load(const std::string& fileName) {
+const Animation& AnimationManager::Load(const std::string& fileName) {
 	return AnimationManager::GetInstance()->LoadInternal(fileName);
 }
 
-void AnimationManager::CreateAnimations(AnimationData& animationIndex)
+void AnimationManager::CreateAnimations(AnimationData& animationData)
 {
 	HRESULT result = S_FALSE;
 
-	std::string directoryPath = "Resources/animations/" + animationIndex.name + "/";
+	//拡張子がない名前を取得
+	std::size_t dotPos = animationData.name.find_last_of('.');
+	std::string n = animationData.name.substr(0, dotPos);
+
+	std::string directoryPath = "Resources/animations/" + n + "/";
 
 	Assimp::Importer importer;
-	std::string filePath = directoryPath + animationIndex.name + ".obj";
-	const aiScene* scene = importer.ReadFile(filePath.c_str(), aiProcess_FlipWindingOrder | aiProcess_FlipUVs);
-
+	std::string filePath = directoryPath + animationData.name;
+	const aiScene* scene = importer.ReadFile(filePath.c_str(),0);
+	assert(scene->mNumAnimations != 0); //animationがない
+	aiAnimation* animationAssimp = scene->mAnimations[0];//最初のanimationだけ採用。もちろん複数対応するに越したことはない。
+	animationData.animation.duration = float(animationAssimp->mDuration / animationAssimp->mTicksPerSecond);
+	
+	for (uint32_t channelIndex = 0; channelIndex < animationAssimp->mNumChannels; ++channelIndex) {
+		aiNodeAnim* nodeAnimationAssimp = animationAssimp->mChannels[channelIndex];
+		NodeAnimation& nodeAnimation = animationData.animation.nodeAnimations[nodeAnimationAssimp->mNodeName.C_Str()];
+		for (uint32_t keyIndex = 0; keyIndex < nodeAnimationAssimp->mNumPositionKeys; ++keyIndex) {
+			aiVectorKey& keyAssimp = nodeAnimationAssimp->mPositionKeys[keyIndex];
+			KeyframeVector3 keyframe;
+			keyframe.time = float(keyAssimp.mTime / animationAssimp->mTicksPerSecond);
+			keyframe.value = { -keyAssimp.mValue.x ,-keyAssimp.mValue.y,-keyAssimp.mValue.z };
+			nodeAnimation.translate.keyframes.push_back(keyframe);
+		}
+		for (uint32_t keyIndex = 0; keyIndex < nodeAnimationAssimp->mNumRotationKeys; ++keyIndex) {
+			aiQuatKey& keyAssimp = nodeAnimationAssimp->mRotationKeys[keyIndex];
+			KeyframeQuaternion keyframe;
+			keyframe.time = float(keyAssimp.mTime / animationAssimp->mTicksPerSecond);
+			keyframe.value = { keyAssimp.mValue.x ,-keyAssimp.mValue.y,-keyAssimp.mValue.z,keyAssimp.mValue.w };
+			nodeAnimation.rotate.keyframes.push_back(keyframe);
+		}
+		for (uint32_t keyIndex = 0; keyIndex < nodeAnimationAssimp->mNumScalingKeys; ++keyIndex) {
+			aiVectorKey& keyAssimp = nodeAnimationAssimp->mScalingKeys[keyIndex];
+			KeyframeVector3 keyframe;
+			keyframe.time = float(keyAssimp.mTime / animationAssimp->mTicksPerSecond);
+			keyframe.value = { keyAssimp.mValue.x ,keyAssimp.mValue.y,keyAssimp.mValue.z };
+			nodeAnimation.scale.keyframes.push_back(keyframe);
+		}
+	}
 }
 
 void AnimationManager::Finalize()
@@ -43,27 +75,28 @@ AnimationManager* AnimationManager::GetInstance() {
 	return &instance;
 }
 
-uint32_t AnimationManager::LoadInternal(const std::string& name) {
+const Animation& AnimationManager::LoadInternal(const std::string& name) {
 
 	assert(useAnimationCount_ < kNumAnimations);
 	uint32_t handle = useAnimationCount_;
 
-	// 読み込み済みmodelを検索
-	auto it = std::find_if(animations_->begin(), animations_->end(), [&](const auto& texture) {return texture.name == name; });
+	// 読み込み済みanimationを検索
+	const auto& it = std::find_if(animations_->begin(), animations_->end(), [&](const auto& texture) {return texture.name == name; });
 
 	if (it != animations_->end()) {
-		// 読み込み済みmodelの要素番号を取得
+		// 読み込み済みanimationの要素番号を取得
 		handle = static_cast<uint32_t>(std::distance(animations_->begin(), it));
-		return handle;
+		auto& animationData = animations_->at(handle);
+		return animationData.animation;
 	}
 
 	// 書き込むAnimationの参照
-	auto& animationIndex = (animations_->at(kNumAnimations));
+	auto& animationData = (animations_->at(handle));
 
-	animationIndex.name = name;
+	animationData.name = name;
 
-	CreateAnimations(animationIndex);
+	CreateAnimations(animationData);
 
 	useAnimationCount_++;
-	return handle;
+	return animationData.animation;
 }

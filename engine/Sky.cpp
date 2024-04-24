@@ -13,14 +13,19 @@ std::unique_ptr<PipelineState> Sky::pipelineState_;
 
 std::unique_ptr<Voronoi> Sky::voronoi_;
 
-bool Sky::isCreateVoronoi_ = false;
-
-Vector4 Sky::topHSVA_ = { 0.790f,1.0f,0.06f,1.0f };
-Vector4 Sky::bottomHSVA_ = { 0.220f,1.0f,0.06f,1.0f };
+Vector4 Sky::topHSVA_ = { 0.790f,1.0f,0.00f,1.0f };
+Vector4 Sky::bottomHSVA_ = { 0.220f,1.0f,0.03f,1.0f };
 
 
 void Sky::StaticInitialize() {
     CreatePipeline();
+}
+
+void Sky::CreateVoronoi(CommandContext* commandContext)
+{
+    voronoi_ = std::make_unique<Voronoi>();
+    voronoi_->Initialize(pointNum_);
+    voronoi_->Render(*commandContext);
 }
 
 void Sky::Finalize()
@@ -33,12 +38,6 @@ void Sky::Finalize()
 void Sky::PreDraw(CommandContext* commandContext, const ViewProjection& viewProjection) {
     assert(Sky::commandContext_ == nullptr);
 
-    if (!isCreateVoronoi_) {
-        isCreateVoronoi_ = true;
-        voronoi_ = std::make_unique<Voronoi>();
-        voronoi_->Initialize(pointNum_);
-        voronoi_->Render(*commandContext);
-    }
     commandContext_ = commandContext;
 
     commandContext_->SetPipelineState(*pipelineState_);

@@ -6,6 +6,9 @@
 #include <fstream>
 #include <vector>
 
+#include <mfapi.h>
+#include <mfidl.h>
+#include <mfreadwrite.h>
 class Audio {
 public:
     static const size_t kMaxNumPlayHandles = 128;

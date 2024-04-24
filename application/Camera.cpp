@@ -53,7 +53,7 @@ void Camera::Update(Vector3 playerPos)
 		}
 	}
 
-	interTarget_ = Lerp(interTarget_, playerPos, 0.1f);
+	interTarget_ = Lerp(0.1f,interTarget_, playerPos);
 
 	//追従対象からカメラまでのオフセット
 	Vector3 offset = GetOffset();

@@ -11,10 +11,10 @@ SphereLights::SphereLights()
 void SphereLights::Initialize(PointLights* pointLights)
 {
 	pointLights_ = pointLights;
-	particle_->Initialize("sphere");
+	particle_->Initialize("sphere.obj");
 
 	spheres_.resize(kSphereNum);
-	/*for (int j = 0; j < kSphereNum; j++) {
+	for (int j = 0; j < kSphereNum; j++) {
 		for (int i = 0; i < PointLights::lightNum; i++) {
 			if (pointLights_->lights_[i].isActive == false) {
 				activeNum_++;
@@ -33,7 +33,7 @@ void SphereLights::Initialize(PointLights* pointLights)
 				break;
 			}
 		}
-	}*/
+	}
 
 	pointLights_->Update();
 }

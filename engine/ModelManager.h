@@ -11,6 +11,16 @@
 #include "UploadBuffer.h"
 #include <memory>
 
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
+struct Node {
+	Matrix4x4 localMatrix = MakeIdentity4x4();
+	std::string name;
+	std::vector<Node> children;
+};
+
 class ModelManager
 {
 public:
@@ -19,6 +29,7 @@ public:
 	struct ModelData {
 		std::string name;
 		std::vector<Mesh> meshes;
+		Node rootNode;
 		//model全体のsize
 		Vector3 modelSize{};
 		Vector3 modelCenter{};
@@ -34,7 +45,9 @@ public:
 
 	Vector3 GetModelSize(uint32_t modelHandle);
 
-	Vector3 GetModelCenter(uint32_t modelHandle);
+	Vector3 GetModelCenter (uint32_t modelHandle);
+
+	Node& GetRootNode(uint32_t modelHandle);
 
 	void DrawInstanced(CommandContext* commandContext, uint32_t modelHandle);
 	void DrawInstanced(CommandContext* commandContext,uint32_t modelHandle,UINT textureRootParamterIndex);
@@ -42,6 +55,7 @@ public:
 	void DrawInstanced(CommandContext* commandContext, uint32_t modelHandle, UINT textureRootParamterIndex,uint32_t textureHandle);
 	void DrawInstancing(CommandContext* commandContext, uint32_t modelHandle, UINT instancingNum, UINT textureRootParamterIndex);
 
+	static Node ReadNode(aiNode* node);
 
 	void Finalize();
 private:

@@ -1,8 +1,16 @@
 #include "Audio.h"
 
 #include <cassert>
+#include <filesystem>
 
 #pragma comment(lib,"xaudio2.lib")
+
+
+#pragma comment(lib,"Mf.lib")
+#pragma comment(lib,"mfplat.lib")
+#pragma comment(lib,"Mfreadwrite.lib")
+#pragma comment(lib,"mfuuid.lib")
+
 
 Audio* Audio::GetInstance() {
     static Audio instans;
@@ -32,6 +40,12 @@ void Audio::Initialize() {
     for (size_t i = 0; i < kMaxNumPlayHandles; ++i) {
         DestroyPlayHandle(i);
     }
+
+    result = CoInitialize(nullptr);
+    assert(SUCCEEDED(result));
+    MFStartup(MF_VERSION, MFSTARTUP_NOSOCKET);
+
+ 
 }
 
 void Audio::Update() {
@@ -132,124 +146,58 @@ size_t Audio::SoundLoadWave(const char* filename) {
     assert(file.is_open());
 #pragma endregion
 
+    IMFSourceReader* pMFSourceReader{ nullptr };
+    std::filesystem::path path = { directryPass + filename };
+    MFCreateSourceReaderFromURL(path.wstring().c_str(), NULL, &pMFSourceReader);
 
-#pragma region wavデータ読み込み
-    // RIFFヘッターの読み込み
-    RiffHeader riff;
-    file.read((char*)&riff, sizeof(riff));
-    // ファイルがRIFFがチェック
-    if (strncmp(riff.chunk.id, "RIFF", 4) != 0) {
-        assert(0);
-    }
-    // タイプがWAVEがチェック
-    if (strncmp(riff.type, "WAVE", 4) != 0) {
-        assert(0);
-    }
+    IMFMediaType* pMFMediaType{ nullptr };
+    MFCreateMediaType(&pMFMediaType);
+    pMFMediaType->SetGUID(MF_MT_MAJOR_TYPE, MFMediaType_Audio);
+    pMFMediaType->SetGUID(MF_MT_SUBTYPE, MFAudioFormat_PCM);
+    pMFSourceReader->SetCurrentMediaType(MF_SOURCE_READER_FIRST_AUDIO_STREAM, nullptr, pMFMediaType);
 
-    auto SearchChunk = [&file](const char* id, ChunkHearder& dest) {
-        ChunkHearder data{};
-        const uint32_t kMaxSearchCount = 100;
-        for (uint32_t i = 0; i < kMaxSearchCount;) {
-            file.read((char*)&data, sizeof(ChunkHearder));
-            // 目的のチャンクだったら終了
-            if (strncmp(data.id, id, 4) == 0) {
-                dest = data;
-                return true;
-            }
-            // 余計なチャンクを飛ばす
-            file.seekg(data.size, std::ios_base::cur);
+    pMFMediaType->Release();
+    pMFMediaType = nullptr;
+    pMFSourceReader->GetCurrentMediaType(MF_SOURCE_READER_FIRST_AUDIO_STREAM, &pMFMediaType);
+
+    WAVEFORMATEX* waveFormat{ nullptr };
+    MFCreateWaveFormatExFromMFMediaType(pMFMediaType, &waveFormat, nullptr);
+
+    std::vector<BYTE> mediaData;
+    while (true)
+    {
+        IMFSample* pMFSample{ nullptr };
+        DWORD dwStreamFlags{ 0 };
+        pMFSourceReader->ReadSample(MF_SOURCE_READER_FIRST_AUDIO_STREAM, 0, nullptr, &dwStreamFlags, nullptr, &pMFSample);
+
+        if (dwStreamFlags & MF_SOURCE_READERF_ENDOFSTREAM)
+        {
+            break;
         }
-        return false;
-    };
 
-    FormatChunk formatChunk{};
-    if (!SearchChunk("fmt ", formatChunk.chunk)) {
-        assert(false);
+        IMFMediaBuffer* pMFMediaBuffer{ nullptr };
+        pMFSample->ConvertToContiguousBuffer(&pMFMediaBuffer);
+
+        BYTE* pBuffer{ nullptr };
+        DWORD cbCurrentLength{ 0 };
+        pMFMediaBuffer->Lock(&pBuffer, nullptr, &cbCurrentLength);
+
+        mediaData.resize(mediaData.size() + cbCurrentLength);
+        memcpy(mediaData.data() + mediaData.size() - cbCurrentLength, pBuffer, cbCurrentLength);
+
+        pMFMediaBuffer->Unlock();
+
+        pMFMediaBuffer->Release();
+        pMFSample->Release();
     }
-    // チャンク本体の読み込み
-    std::vector<char> formatData(formatChunk.chunk.size);
-    file.read(formatData.data(), formatChunk.chunk.size);
-    memcpy(&formatChunk.fmt, formatData.data(), sizeof(formatChunk.fmt));
 
-    ChunkHearder dataChunk{};
-    if (!SearchChunk("data", dataChunk)) {
-        assert(false);
-    }
-
-
-    //// Formatチャンクの読み込み
-    //FormatChunk format = {};
-    //// チャンクヘッターの確認
-    //file.read((char*)&format, sizeof(ChunkHearder));
-    //if (strncmp(format.chunk.id, "fmt ", 4) != 0) {
-    //    assert(0);
-    //}
-    //// チャンク本体の読み込み
-    //assert(format.chunk.size <= sizeof(format.fmt));
-    //file.read((char*)&format.fmt, format.chunk.size);
-    //// Dataチャンクの読み込み
-    //ChunkHearder data;
-    //file.read((char*)&data, sizeof(data));
-
-    //// JUNKチャンクを検出した場合
-    //if (strncmp(data.id, "JUNK", 4) == 0) {
-    //    // 読み取りチャンクを検出した場合
-    //    file.seekg(data.size, std::ios_base::cur);
-    //    // 再読み込み
-    //    file.read((char*)&data, sizeof(data));
-    //}
-    //// LISTチャンクを検出した場合
-    //if (strncmp(data.id, "LIST", 4) == 0) {
-    //    // 読み取りチャンクを検出した場合
-    //    file.seekg(data.size, std::ios_base::cur);
-    //    // 再読み込み
-    //    file.read((char*)&data, sizeof(data));
-    //}
-    //// bextチャンクを検出した場合
-    //if (strncmp(data.id, "bext", 4) == 0) {
-    //    // 読み取りチャンクを検出した場合
-    //    file.seekg(data.size, std::ios_base::cur);
-    //    // 再読み込み
-    //    file.read((char*)&data, sizeof(data));
-    //}
-    //// INFOチャンクを検出した場合
-    //if (strncmp(data.id, "INFO", 4) == 0) {
-    //    // 読み取りチャンクを検出した場合
-    //    file.seekg(data.size, std::ios_base::cur);
-    //    // 再読み込み
-    //    file.read((char*)&data, sizeof(data));
-    //}
-    //// REAPERチャンクを検出した場合
-    //if (strncmp(data.id, "REAPER", 6) == 0) {
-    //    // 読み取りチャンクを検出した場合
-    //    file.seekg(data.size, std::ios_base::cur);
-    //    // 再読み込み
-    //    file.read((char*)&data, sizeof(data));
-    //}
-    //if (strncmp(data.id, "junk", 4) == 0) {
-    //    // 読み取りチャンクを検出した場合
-    //    file.seekg(data.size, std::ios_base::cur);
-    //    // 再読み込み
-    //    file.read((char*)&data, sizeof(data));
-    //}
-    //if (strncmp(data.id, "data", 4) != 0) {
-    //    assert(0);
-    //}
-    // 
-    // Dataチャンクのデータ部（波形データ）の読み込み
-    std::vector<BYTE> pBuffer(dataChunk.size);
-    file.read(reinterpret_cast<char*>(pBuffer.data()), dataChunk.size);
-
-    // Waveファイルを閉じる
-    file.close();
-#pragma endregion
 #pragma region 読み込んだ音声データのreturn
     // returnする為の音声データ
     SoundData soundData = {};
     soundData.filename = filename;
-    soundData.wfex = formatChunk.fmt;
-    soundData.pBuffer = std::move(pBuffer);
-    soundData.bufferSize = dataChunk.size;
+    soundData.wfex = *waveFormat;
+    soundData.bufferSize = uint32_t(mediaData.size());
+    soundData.pBuffer = std::move(mediaData);
 #pragma endregion
     soundData_.emplace_back(soundData);
 
