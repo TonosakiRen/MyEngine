@@ -1,6 +1,6 @@
 #include "WorldTransform.h"
-
-ModelManager* WorldTransform::modelManager_ = ModelManager::GetInstance();
+#include "ModelManager.h"
+ModelManager* modelManager_ = ModelManager::GetInstance();
 
 void WorldTransform::Initialize() {
     parent_ = nullptr;

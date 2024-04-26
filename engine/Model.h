@@ -33,6 +33,7 @@ public:
 	static void PreDraw(CommandContext* commandContext, const ViewProjection& viewProjection);
 	static void PostDraw();
 
+	static void Draw(uint32_t modelHandle, const WorldTransform& worldTransform);
 	static void Draw(uint32_t modelHandle,const WorldTransform& worldTransform, const Material& material);
 	static void Draw(uint32_t modelHandle, const WorldTransform& worldTransform, const Material& material, uint32_t textureHadle);
 
@@ -42,5 +43,8 @@ private:
 	static CommandContext* commandContext_;
 	static std::unique_ptr<RootSignature> rootSignature_;
 	static std::unique_ptr<PipelineState> pipelineState_;
+
+
+	static std::unique_ptr<Material> normalMaterial_;
 };
 

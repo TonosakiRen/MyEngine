@@ -3,10 +3,16 @@
 #include "Material.h"
 #include "WorldTransform.h"
 #include "DirectionalLights.h"
+#include "AnimationManager.h"
+#include "ModelManager.h"
 #include <string>
 class GameObject
 {
 public:
+	static ModelManager* modelManager;
+	static AnimationManager* animationManager;
+
+
 	void Initialize(const std::string name);
 	void Initialize(uint32_t modelHandle);
 	void UpdateMatrix();
@@ -18,7 +24,7 @@ public:
 
 	void SkyDraw();
 
-	void Draw(uint32_t modelHandle, const WorldTransform& worldTransform, Vector4 color = { 1.0f,1.0f,1.0f,1.0f });
+	void Draw(uint32_t modelHandle, const WorldTransform& worldTransform);
 
 	void SetEnableLighting(bool enableLighting) {
 		material_.enableLighting_ = enableLighting;
@@ -34,6 +40,9 @@ public:
 	}
 	WorldTransform* GetWorldTransform() {
 		return &worldTransform_;
+	}
+	uint32_t GetModelHandle() const {
+		return modelHandle_;
 	}
 protected:
 	uint32_t modelHandle_;

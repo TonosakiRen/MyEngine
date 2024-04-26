@@ -39,7 +39,7 @@ void GamePlayScene::Initialize()
 	playerBulletManager_->Initialize();
 
 	player_ = std::make_unique<Player>();
-	player_->Initialize("AnimatedCube.gltf", playerBulletManager_.get());
+	player_->Initialize("rootPlayer.gltf", playerBulletManager_.get());
 	player = player_.get();
 
 	sphereLights_ = std::make_unique<SphereLights>();

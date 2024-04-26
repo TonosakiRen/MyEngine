@@ -5,6 +5,7 @@
 #include "Sprite.h"
 #include "Mymath.h"
 #include "AnimationManager.h"
+#include "ModelManager.h"
 
 class PlayerBulletManager;
 class Player :
@@ -31,15 +32,19 @@ private:
     Input* input_;
     PlayerBulletManager* playerBulletManager_;
     WorldTransform worldTransform3DReticle_;
+    Quaternion inputQuaternion_;
     Sprite sprite2DReticle_;
     WorldTransform modelWorldTransform_;
-    WorldTransform leftHandWorldTransform_;
-    WorldTransform rightHandWorldTransform_;
+    GameObject rightHand_;
     Vector3 velocity_;
     Vector3 acceleration_;
     Vector3 modelSize_;
     Vector4 color_;
-
+    Vector3 direction_;
     float animationTime_ = 0.0f;
+    float useAnimationTime_ = 0.0f;
     Animation animation_;
+    Skeleton skeleton_;
+    bool isAnimation_ = false;
+    bool isFire_ = false;
 };

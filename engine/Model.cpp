@@ -9,13 +9,17 @@ using namespace Microsoft::WRL;
 CommandContext* Model::commandContext_ = nullptr;
 std::unique_ptr<RootSignature> Model::rootSignature_;
 std::unique_ptr<PipelineState> Model::pipelineState_;
+std::unique_ptr <Material> Model::normalMaterial_;
 
 void Model::StaticInitialize() {
     CreatePipeline();
+    normalMaterial_ = std::make_unique<Material>();
+    normalMaterial_->Initialize();
 }
 
 void Model::Finalize()
 {
+    normalMaterial_.reset();
     rootSignature_.reset();
     pipelineState_.reset();
 }
@@ -161,6 +165,17 @@ void Model::CreatePipeline() {
         // グラフィックスパイプラインの生成
         pipelineState_->Create(gpipeline);
     }
+}
+
+void Model::Draw(uint32_t modelHandle, const WorldTransform& worldTransform)
+{
+    // CBVをセット（ワールド行列）
+    commandContext_->SetConstantBuffer(static_cast<UINT>(RootParameter::kWorldTransform), worldTransform.GetGPUVirtualAddress());
+
+    // CBVをセット（マテリアル）
+    commandContext_->SetConstantBuffer(static_cast<UINT>(RootParameter::kMaterial), normalMaterial_->GetGPUVirtualAddress());
+
+    ModelManager::GetInstance()->DrawInstanced(commandContext_, modelHandle, static_cast<UINT>(RootParameter::kTexture));
 }
 
 void Model::Draw(uint32_t modelHandle, const WorldTransform& worldTransform,const Material& material) {

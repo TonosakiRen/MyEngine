@@ -131,6 +131,7 @@ void ModelManager::CreateMeshes(ModelData& modelData)
 
 	//node
 	modelData.rootNode = ReadNode(scene->mRootNode);
+	
 }
 
 void ModelManager::Finalize()
@@ -243,6 +244,36 @@ uint32_t ModelManager::LoadInternal(const std::string& fileName) {
 	return handle;
 }
 
+Skeleton ModelManager::CreateSkelton(const Node& rootNode)
+{
+	Skeleton skeleton;
+	skeleton.root = CreateJoint(rootNode, {}, skeleton.joints);
+
+	// 名前とindexのマッピングを行いアクセスしやすくする
+	for (const Joint& joint : skeleton.joints) {
+		skeleton.jointMap.emplace(joint.name, joint.index);
+	}
+	return skeleton;
+}
+
+int32_t ModelManager::CreateJoint(const Node& node, const std::optional<int32_t>& parent, std::vector<Joint>& joints)
+{
+	Joint joint;
+	joint.name = node.name;
+	joint.localMatrix = node.localMatrix;
+	joint.skeletonSpaceMatrix = MakeIdentity4x4();
+	joint.transform = node.transform;
+	joint.index = int32_t(joints.size()); //現在登録されてる数をIndexに
+	joint.parent = parent;
+	joints.push_back(joint);// SkeletonのJoint列に追加
+	for (const Node& child : node.children) {
+		//このjointを作成し、そのIndexを登録
+		int32_t childIndex = CreateJoint(child, joint.index, joints);
+		joints[joint.index].children.push_back(childIndex);
+	}
+	return joint.index;
+}
+
 Vector3 ModelManager::GetModelSize(uint32_t modelHandle)
 {
 	return (*models_)[modelHandle].modelSize;
@@ -280,13 +311,15 @@ void ModelManager::DrawInstancing(CommandContext* commandContext, uint32_t model
 Node ModelManager::ReadNode(aiNode* node)
 {
 	Node result;
-	aiMatrix4x4 aiLocalMatrix = node->mTransformation;
-	aiLocalMatrix.Transpose();
-	for (int i = 0; i < 4; i++) {
-		for (int j = 0; j < 4; j++) {
-			result.localMatrix.m[i][j] = aiLocalMatrix[i][j];
-		}
-	}
+
+	aiVector3D scale, translate;
+	aiQuaternion rotate;
+	node->mTransformation.Decompose(scale, rotate, translate);
+	result.transform.scale_ = { scale.x,scale.y,scale.z };
+	result.transform.quaternion_ = { rotate.x,-rotate.y,-rotate.z,rotate.w };
+	result.transform.translation_ = { -translate.x,translate.y,translate.z };
+	result.localMatrix = MakeAffineMatrix(result.transform.scale_, result.transform.quaternion_, result.transform.translation_);
+
 
 	result.name = node->mName.C_Str();
 	result.children.resize(node->mNumChildren);

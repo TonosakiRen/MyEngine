@@ -75,6 +75,32 @@ AnimationManager* AnimationManager::GetInstance() {
 	return &instance;
 }
 
+void AnimationManager::ApplyAnimation(Skeleton& skeleton, const Animation& animation, float animationTime)
+{
+	for (Joint& joint : skeleton.joints) {
+		// 対称のJointのAnimationがあれば、値の適用を行う。下記のif文はC+;17から可能になった初期化付きif文。
+		if (auto it = animation.nodeAnimations.find(joint.name); it != animation.nodeAnimations.end()) {
+			const NodeAnimation& rootNodeAnimation = (*it).second;
+			joint.transform.translation_ = CalculateValue(rootNodeAnimation.translate.keyframes, animationTime);
+			joint.transform.quaternion_ = CalculateValue(rootNodeAnimation.rotate.keyframes, animationTime);
+			joint.transform.scale_ = CalculateValue(rootNodeAnimation.scale.keyframes, animationTime);
+		}
+	}
+}
+
+void AnimationManager::Update(Skeleton& skelton) {
+	//すべてのJOintを更新。親が若いので通常ループで処理可能になっている
+	for (Joint& joint : skelton.joints) {
+		joint.localMatrix = MakeAffineMatrix(joint.transform.scale_, joint.transform.quaternion_, joint.transform.translation_);
+		if (joint.parent) {
+			joint.skeletonSpaceMatrix = joint.localMatrix * skelton.joints[*joint.parent].skeletonSpaceMatrix;
+		}
+		else {
+			joint.skeletonSpaceMatrix = joint.localMatrix;
+		}
+	}
+}
+
 const Animation& AnimationManager::LoadInternal(const std::string& name) {
 
 	assert(useAnimationCount_ < kNumAnimations);

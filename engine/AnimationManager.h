@@ -11,6 +11,7 @@
 #include "UploadBuffer.h"
 #include <memory>
 #include <map>
+#include "ModelManager.h"
 
 template <typename tValue>
 struct Keyframe {
@@ -86,6 +87,9 @@ public:
 	static const Animation& Load(const std::string& fileName);
 
 	static AnimationManager* GetInstance();
+
+	static void ApplyAnimation(Skeleton& skeleton, const Animation& animation, float animationTime);
+	static void Update(Skeleton& skelton);
 
 	void Finalize();
 private:

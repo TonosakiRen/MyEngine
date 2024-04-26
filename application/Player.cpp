@@ -1,6 +1,5 @@
 #include "Player.h"
 #include "ImGuiManager.h"
-#include "ModelManager.h"
 #include "PlayerBulletManager.h"
 #include "TextureManager.h"
 #include "Audio.h"
@@ -10,8 +9,8 @@ void Player::Initialize(const std::string name, PlayerBulletManager* playerBulle
 	GameObject::Initialize(name);
 	playerBulletManager_ = playerBulletManager;
 	input_ = Input::GetInstance();
-	modelSize_ = ModelManager::GetInstance()->GetModelSize(modelHandle_);
-	Vector3 modelCenter = ModelManager::GetInstance()->GetModelCenter(modelHandle_);
+	modelSize_ = modelManager->GetModelSize(modelHandle_);
+	Vector3 modelCenter = modelManager->GetModelCenter(modelHandle_);
 	collider_.Initialize(&worldTransform_, name,modelSize_, modelCenter);
 	worldTransform_.translation_ = { 0.0f,modelSize_.y / 2.0f,0.0f };
 	modelWorldTransform_.Initialize();
@@ -19,27 +18,35 @@ void Player::Initialize(const std::string name, PlayerBulletManager* playerBulle
 	//modelの中心からmodelの高さの半分したにmodelWorldTransformを配置
 	modelWorldTransform_.translation_ = { 0.0f,0.0f,0.0f };
 
-	animation_ = AnimationManager::GetInstance()->Load("AnimatedCube.gltf");
+	animation_ = animationManager->Load("playerShot.gltf");
 	animationTime_ = 0.0f;
+	skeleton_ = modelManager->CreateSkelton(modelManager->GetRootNode(modelHandle_));
+	
+	rightHand_.Initialize(ModelManager::Load("rightHandPlayer.gltf"));
+	rightHand_.SetParent(&worldTransform_);
 
 	velocity_ = { 0.0f,0.0f,0.0f };
 	acceleration_ = { 0.0f,-0.05f,0.0f };
 	uint32_t handle = TextureManager::Load("reticle.png");
 	sprite2DReticle_.Initialize(handle, { 0.0f,0.0f });
 	worldTransform3DReticle_.Initialize();
+	direction_ = { 0.0f,0.0f,1.0f };
 
-	uint32_t soundHandle = Audio::GetInstance()->SoundLoadWave("walk.mp3");
-	uint32_t playHandle = Audio::GetInstance()->SoundPlayLoopStart(soundHandle);
+	size_t soundHandle = Audio::GetInstance()->SoundLoadWave("walk.mp3");
+	size_t playHandle = Audio::GetInstance()->SoundPlayLoopStart(soundHandle);
 }
 
 void Player::Update(const ViewProjection& viewProjection)
 {
 
 	Move(viewProjection);
-	Animate();
+	
 	ReticleUpdate(viewProjection);
+	isFire_ = false;
 	Fire();
-
+	if (isAnimation_) {
+		Animate();
+	}
 
 #ifdef _DEBUG
 	ImGui::Begin("Player");
@@ -54,6 +61,7 @@ void Player::Update(const ViewProjection& viewProjection)
 	worldTransform_.Update();
 	modelWorldTransform_.Update();
 	worldTransform3DReticle_.Update();
+	rightHand_.UpdateMatrix();
 }
 
 void Player::Extrusion(Collider& otherCollider)
@@ -75,6 +83,11 @@ void Player::OnCollision()
 void Player::Draw() {
 	collider_.Draw();
 	GameObject::Draw(modelWorldTransform_, {0.0f,0.55f,1.0f,1.0f});
+	rightHand_.Draw();
+	/*for (Joint& joint : skeleton_.joints) {
+		joint.transform.Update();
+		GameObject::Draw(modelManager->Load("box1x1.obj"), );
+	}*/
 	//GameObject::Draw(modelHandle_,worldTransform3DReticle_, { 0.0f,1.0f,0.0f,1.0f });
 }
 
@@ -87,9 +100,13 @@ void Player::ReticleDraw()
 
 void Player::Fire()
 {
-	if (input_->TriggerButton(XINPUT_GAMEPAD_RIGHT_SHOULDER) || input_->TriggerKey(DIK_E)) {
+	if (input_->TriggerButton(XINPUT_GAMEPAD_RIGHT_SHOULDER) || input_->TriggerKey(DIK_SPACE)) {
+		isAnimation_ = true;
+		isFire_ = true;
+		animationTime_ = 0.0f;
 		Vector3 position = MakeTranslation(worldTransform_.matWorld_);
-		Vector3 direction = Normalize(worldTransform3DReticle_.translation_ - MakeTranslation(worldTransform_.matWorld_));
+		//Vector3 direction = Normalize(worldTransform3DReticle_.translation_ - MakeTranslation(worldTransform_.matWorld_));
+		Vector3 direction = Normalize(direction_);
 		playerBulletManager_->PopPlayerBullet(position, direction);
 	}
 }
@@ -98,10 +115,20 @@ void Player::Animate()
 {
 	animationTime_ += 1.0f / 60.0f;
 	animationTime_ = std::fmod(animationTime_, animation_.duration);
-	NodeAnimation& rootNodeAnimation = animation_.nodeAnimations[ModelManager::GetInstance()->GetRootNode(modelHandle_).name];
-	modelWorldTransform_.translation_ = CalculateValue(rootNodeAnimation.translate.keyframes, animationTime_);
-	modelWorldTransform_.quaternion_ = CalculateValue(rootNodeAnimation.rotate.keyframes, animationTime_);
-	modelWorldTransform_.scale_ = CalculateValue(rootNodeAnimation.scale.keyframes, animationTime_);
+	if (!isFire_ && animationTime_ <= 0.03f) {
+		isAnimation_ = false;
+		animationTime_ = 0.0f;
+	}
+	else {
+		animationTime_ = std::fmod(animationTime_, animation_.duration);
+	}
+	AnimationManager::GetInstance()->ApplyAnimation(skeleton_, animation_, animationTime_);
+	AnimationManager::GetInstance()->Update(skeleton_);
+	
+	NodeAnimation& rootNodeAnimation = animation_.nodeAnimations[ModelManager::GetInstance()->GetRootNode(rightHand_.GetModelHandle()).name];
+	rightHand_.GetWorldTransform()->translation_ = CalculateValue(rootNodeAnimation.translate.keyframes, animationTime_);
+	rightHand_.GetWorldTransform()->quaternion_ = CalculateValue(rootNodeAnimation.rotate.keyframes, animationTime_);
+	rightHand_.GetWorldTransform()->scale_ = CalculateValue(rootNodeAnimation.scale.keyframes, animationTime_);
 	
 }
 
@@ -138,6 +165,12 @@ void Player::Move(const ViewProjection& viewProjection)
 
 	Quaternion yq = MakeYAxisFromQuaternion(viewProjection.GetQuaternion());
 	move = move * yq;
+
+	if (move.x != 0.0f || move.y != 0.0f || move.z != 0.0f) {
+		direction_ = Normalize(move);
+		inputQuaternion_ = MakeLookRotation(direction_);
+		worldTransform_.quaternion_ = Slerp(0.2f, worldTransform_.quaternion_, inputQuaternion_);
+	}
 
 	if (input_->TriggerKey(DIK_SPACE) || input_->TriggerButton(XINPUT_GAMEPAD_A)) {
 		velocity_.y = 0.3f;

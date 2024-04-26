@@ -25,7 +25,7 @@ void SphereLights::Initialize(PointLights* pointLights)
 				spheres_[j].worldTransform_.Update();
 				pointLights_->lights_[i].isActive = true;
 				pointLights_->lights_[i].worldTransform.translation_ = { 0.0f,0.0f,0.0f };
-				pointLights_->lights_[i].worldTransform.parent_ = &spheres_[j].worldTransform_;
+				pointLights_->lights_[i].worldTransform.SetParent(&spheres_[j].worldTransform_,false);
 				pointLights_->lights_[i].decay = 1.0f;
 				pointLights_->lights_[i].intensity = 3.0f;
 				pointLights_->lights_[i].radius = 3.0f;

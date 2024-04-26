@@ -5,6 +5,9 @@
 #include "ShadowMap.h"
 #include "SpotLightShadowMap.h"
 
+ModelManager* GameObject::modelManager = ModelManager::GetInstance();
+AnimationManager* GameObject::animationManager = AnimationManager::GetInstance();
+
 void GameObject::Initialize(const std::string name)
 {
 	modelHandle_ = ModelManager::Load(name);
@@ -72,6 +75,19 @@ void GameObject::Draw(const WorldTransform& worldTransform, Vector4 color)
 void GameObject::SkyDraw()
 {
 	Sky::Draw(modelHandle_, worldTransform_);
+}
+
+void GameObject::Draw(uint32_t modelHandle, const WorldTransform& worldTransform)
+{
+	if (ShadowMap::isDrawShadowMap) {
+		ShadowMap::Draw(modelHandle, worldTransform);
+	}
+	else if (SpotLightShadowMap::isDrawSpotLightShadowMap) {
+		SpotLightShadowMap::Draw(modelHandle, worldTransform);
+	}
+	else {
+		Model::Draw(modelHandle, worldTransform);
+	}
 }
 
 void GameObject::Draw(const WorldTransform& worldTransform, uint32_t textureHandle, Vector4 color)
