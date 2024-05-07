@@ -91,6 +91,24 @@ void ModelManager::CreateMeshes(ModelData& modelData)
 			modelData.meshes[meshIndex].uvHandle_ = TextureManager::LoadUv(textureFilePath.C_Str(), directoryPath + textureFilePath.C_Str());
 		}
 		
+		//skincluster
+		for (uint32_t boneIndex = 0; boneIndex < mesh->mNumBones; ++boneIndex) {
+			aiBone* bone = mesh->mBones[boneIndex];
+			std::string jointName = bone->mName.C_Str();
+			JointWeightData& jointWeightData= modelData.skinClusterData[jointName];
+
+			aiMatrix4x4 bindPoseMatrixAssimp = bone->mOffsetMatrix.Inverse();
+			aiVector3D scale, translate;
+			aiQuaternion rotate;
+			bindPoseMatrixAssimp.Decompose(scale, rotate, translate);
+			Matrix4x4 bindPoseMatrix = MakeAffineMatrix
+			({ scale.x,scale.y,scale.z }, { rotate.x,-rotate.y,-rotate.z,rotate.w }, { -translate.x,translate.y,translate.z });
+			jointWeightData.inverseBindPoseMatrix = Inverse(bindPoseMatrix);
+
+			for (uint32_t weightIndex = 0; weightIndex < bone->mNumWeights; ++weightIndex) {
+				jointWeightData.vertexWeights.push_back({ bone->mWeights[weightIndex].mWeight , bone->mWeights[weightIndex].mVertexId });
+			}
+		}
 	}
 
 	modelData.modelSize = (maxModelSize - minModelSize);
@@ -244,42 +262,12 @@ uint32_t ModelManager::LoadInternal(const std::string& fileName) {
 	return handle;
 }
 
-Skeleton ModelManager::CreateSkelton(const Node& rootNode)
-{
-	Skeleton skeleton;
-	skeleton.root = CreateJoint(rootNode, {}, skeleton.joints);
-
-	// 名前とindexのマッピングを行いアクセスしやすくする
-	for (const Joint& joint : skeleton.joints) {
-		skeleton.jointMap.emplace(joint.name, joint.index);
-	}
-	return skeleton;
-}
-
-int32_t ModelManager::CreateJoint(const Node& node, const std::optional<int32_t>& parent, std::vector<Joint>& joints)
-{
-	Joint joint;
-	joint.name = node.name;
-	joint.localMatrix = node.localMatrix;
-	joint.skeletonSpaceMatrix = MakeIdentity4x4();
-	joint.transform = node.transform;
-	joint.index = int32_t(joints.size()); //現在登録されてる数をIndexに
-	joint.parent = parent;
-	joints.push_back(joint);// SkeletonのJoint列に追加
-	for (const Node& child : node.children) {
-		//このjointを作成し、そのIndexを登録
-		int32_t childIndex = CreateJoint(child, joint.index, joints);
-		joints[joint.index].children.push_back(childIndex);
-	}
-	return joint.index;
-}
-
-Vector3 ModelManager::GetModelSize(uint32_t modelHandle)
+const Vector3& ModelManager::GetModelSize(uint32_t modelHandle)
 {
 	return (*models_)[modelHandle].modelSize;
 }
 
-Vector3 ModelManager::GetModelCenter(uint32_t modelHandle)
+const Vector3& ModelManager::GetModelCenter(uint32_t modelHandle)
 {
 	return  (*models_)[modelHandle].modelCenter;
 }
@@ -287,6 +275,11 @@ Vector3 ModelManager::GetModelCenter(uint32_t modelHandle)
 Node& ModelManager::GetRootNode(uint32_t modelHandle)
 {
 	return  (*models_)[modelHandle].rootNode;
+}
+
+const ModelData& ModelManager::GetModelData(uint32_t modelHandle)
+{
+	return  (*models_)[modelHandle];
 }
 
 

@@ -88,19 +88,6 @@ void AnimationManager::ApplyAnimation(Skeleton& skeleton, const Animation& anima
 	}
 }
 
-void AnimationManager::Update(Skeleton& skelton) {
-	//すべてのJOintを更新。親が若いので通常ループで処理可能になっている
-	for (Joint& joint : skelton.joints) {
-		joint.localMatrix = MakeAffineMatrix(joint.transform.scale_, joint.transform.quaternion_, joint.transform.translation_);
-		if (joint.parent) {
-			joint.skeletonSpaceMatrix = joint.localMatrix * skelton.joints[*joint.parent].skeletonSpaceMatrix;
-		}
-		else {
-			joint.skeletonSpaceMatrix = joint.localMatrix;
-		}
-	}
-}
-
 const Animation& AnimationManager::LoadInternal(const std::string& name) {
 
 	assert(useAnimationCount_ < kNumAnimations);

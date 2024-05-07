@@ -364,6 +364,13 @@
     <ClCompile Include="engine\AnimationManager.cpp">
       <Filter>Engine\Animation</Filter>
     </ClCompile>
+    <ClCompile Include="engine\SkinCluster.cpp" />
+    <ClCompile Include="engine\Skeleton.cpp">
+      <Filter>Engine\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\GrayScale.cpp">
+      <Filter>Engine\PostEffect</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -642,6 +649,13 @@
     <ClInclude Include="engine\AnimationManager.h">
       <Filter>Engine\Animation</Filter>
     </ClInclude>
+    <ClInclude Include="engine\SkinCluster.h" />
+    <ClInclude Include="engine\Skeleton.h">
+      <Filter>Engine\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\GrayScale.h">
+      <Filter>Engine\PostEffect</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\ModelPS.hlsl">
@@ -732,6 +746,9 @@
       <Filter>shaders</Filter>
     </FxCompile>
     <FxCompile Include="Resources\shaders\VoronoiPS.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\GrayScale.hlsl">
       <Filter>shaders</Filter>
     </FxCompile>
   </ItemGroup>

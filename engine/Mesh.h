@@ -28,6 +28,10 @@ public:
 		return uvHandle_;
 	}
 
+	const std::vector<VertexData>& GetVerticies() const {
+		return vertices_;
+	}
+
 private:
 	UploadBuffer vertexBuffer_;
 	std::vector<VertexData> vertices_;

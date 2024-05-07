@@ -47,6 +47,11 @@ void UploadBuffer::Copy(const void* srcData, size_t copySize) const {
     memcpy(cpuData_, srcData, copySize);
 }
 
+void UploadBuffer::SetZero()
+{
+    std::memset(cpuData_, 0, bufferSize_);
+}
+
 void UploadBuffer::Destroy() {
     if (cpuData_ && resource_) {
         resource_->Unmap(0, nullptr);

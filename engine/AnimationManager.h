@@ -12,6 +12,7 @@
 #include <memory>
 #include <map>
 #include "ModelManager.h"
+#include "Skeleton.h"
 
 template <typename tValue>
 struct Keyframe {
@@ -89,7 +90,6 @@ public:
 	static AnimationManager* GetInstance();
 
 	static void ApplyAnimation(Skeleton& skeleton, const Animation& animation, float animationTime);
-	static void Update(Skeleton& skelton);
 
 	void Finalize();
 private:

@@ -15,6 +15,8 @@ public:
     size_t GetBufferSize() const { return bufferSize_; }
     void* GetCPUData() const { return cpuData_; }
 
+    void SetZero();
+
 protected:
     void Destroy();
 

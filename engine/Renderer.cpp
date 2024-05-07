@@ -83,6 +83,8 @@ void Renderer::Initialize() {
 
     Sky::CreateVoronoi(&commandContext_);
 
+    grayScale_ = std::make_unique<GrayScale>();
+    grayScale_->Initialize(*resultBuffer_);
 }
 
 void Renderer::BeginFrame()
@@ -119,6 +121,7 @@ void Renderer::DeferredRender(ViewProjection& viewProjection, DirectionalLights&
     //tileBasedRendering_->Update(viewProjection,pointLights, spotLights, shadowSpotLights);
     //tileBasedRendering_->ComputeUpdate(commandContext_, viewProjection, pointLights, spotLights, shadowSpotLights, *lightNumBuffer_);
     deferredRenderer_->Render(commandContext_, resultBuffer_.get(), viewProjection, directionalLight, pointLights, areaLights ,spotLights,shadowSpotLights, *lightNumBuffer_, *tileBasedRendering_);
+
 }
 
 void Renderer::BeginShadowMapRender(DirectionalLights& directionalLights)
@@ -149,6 +152,8 @@ void Renderer::EndMainRender() {
 
     edgeRenderer_->Render(commandContext_, resultBuffer_.get());
     bloom_->Render(commandContext_, resultBuffer_.get());
+    grayScale_->Draw(*resultBuffer_.get(), commandContext_);
+
 }
 
 void Renderer::BeginUIRender()
@@ -158,7 +163,7 @@ void Renderer::BeginUIRender()
     //commandContext_.CopyBuffer(swapChain_.GetColorBuffer(), *resultBuffer_);
 
     //コピーしようとするとき消して
-    commandContext_.TransitionResource(*resultBuffer_, D3D12_RESOURCE_STATE_RENDER_TARGET);
+    //commandContext_.TransitionResource(*resultBuffer_, D3D12_RESOURCE_STATE_RENDER_TARGET); // ??なんでこれで警告消える？
     commandContext_.SetViewportAndScissorRect(0, 0, resultBuffer_->GetWidth(), resultBuffer_->GetHeight());  
     commandContext_.SetRenderTarget(resultBuffer_->GetRTV());
 
@@ -210,7 +215,7 @@ void Renderer::Shutdown() {
     bloom_.reset();
     tileBasedRendering_.reset();
     transition_.reset();
-
+    grayScale_.reset();
 
     swapChain_.reset();
     commandContext_.ShutDown();

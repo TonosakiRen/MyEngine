@@ -20,7 +20,7 @@ void Player::Initialize(const std::string name, PlayerBulletManager* playerBulle
 
 	animation_ = animationManager->Load("playerShot.gltf");
 	animationTime_ = 0.0f;
-	skeleton_ = modelManager->CreateSkelton(modelManager->GetRootNode(modelHandle_));
+	skeleton_.Create(modelManager->GetRootNode(modelHandle_));
 	
 	rightHand_.Initialize(ModelManager::Load("rightHandPlayer.gltf"));
 	rightHand_.SetParent(&worldTransform_);
@@ -123,7 +123,7 @@ void Player::Animate()
 		animationTime_ = std::fmod(animationTime_, animation_.duration);
 	}
 	AnimationManager::GetInstance()->ApplyAnimation(skeleton_, animation_, animationTime_);
-	AnimationManager::GetInstance()->Update(skeleton_);
+	skeleton_.Update();
 	
 	NodeAnimation& rootNodeAnimation = animation_.nodeAnimations[ModelManager::GetInstance()->GetRootNode(rightHand_.GetModelHandle()).name];
 	rightHand_.GetWorldTransform()->translation_ = CalculateValue(rootNodeAnimation.translate.keyframes, animationTime_);

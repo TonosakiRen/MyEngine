@@ -1,0 +1,56 @@
+#include "SkinCluster.h"
+#include "Helper.h"
+
+#include "DirectXCommon.h"
+#include "ModelManager.h"
+
+void SkinCluster::Create(const Skeleton& skeleton, const uint32_t modelHandle) {
+
+    skeleton_ = &skeleton;
+    const ModelData& modelData = ModelManager::GetInstance()->GetModelData(modelHandle);
+
+    paletteResource_.Create(sizeof(WellForGPU), UINT(modelData.meshes[0].GetVerticies().size()));
+    auto device = DirectXCommon::GetInstance()->GetDevice();
+
+    paletteResource_.SetZero();
+
+    influenceResource_.Create(sizeof(VertexInfluence) * modelData.meshes[0].GetVerticies().size());
+    influenceResource_.SetZero();
+
+    influenceBufferView_.BufferLocation = influenceResource_->GetGPUVirtualAddress();
+    influenceBufferView_.SizeInBytes = UINT(sizeof(VertexInfluence) * modelData.meshes[0].GetVerticies().size());
+    influenceBufferView_.StrideInBytes = sizeof(VertexInfluence);
+
+    inverseBindPoseMatrices_.resize(skeleton.joints.size());
+    std::generate(inverseBindPoseMatrices_.begin(), inverseBindPoseMatrices_.end(), MakeIdentity4x4);
+
+    for (const auto& jointWeight : modelData.skinClusterData) {
+        auto it = skeleton.jointMap.find(jointWeight.first);
+        if (it == skeleton.jointMap.end()) {
+            continue;
+        }
+
+        inverseBindPoseMatrices_[(*it).second] = jointWeight.second.inverseBindPoseMatrix;
+        for (const auto& vertexWeight : jointWeight.second.vertexWeights) {
+            VertexInfluence* vertexInfluence = static_cast<VertexInfluence*>(influenceResource_.GetCPUData());
+            auto& currentInfluence = vertexInfluence[vertexWeight.vertexIndex];
+            for (uint32_t index = 0; index < kNumMaxInfluence; ++index) {
+                if (currentInfluence.weights[index] == 0.0f) {
+                    currentInfluence.weights[index] = vertexWeight.weight;
+                    currentInfluence.jointIndices[index] = (*it).second;
+                    break;
+                }
+            }
+        }
+    }
+}
+
+void SkinCluster::Update()
+{
+    for (size_t jointIndex = 0; jointIndex < skeleton_->joints.size(); ++jointIndex) {
+        assert(jointIndex < inverseBindPoseMatrices_.size());
+        WellForGPU* mappedPalette = static_cast<WellForGPU*>(paletteResource_.GetCPUData());
+        mappedPalette[jointIndex].skeletonSpaceMatrix = inverseBindPoseMatrices_[jointIndex] * skeleton_->joints[jointIndex].skeletonSpaceMatrix;
+        mappedPalette[jointIndex].skeletonSpaceInverseTransposeMatrix = Transpose(Inverse(mappedPalette[jointIndex].skeletonSpaceMatrix));
+    }
+}

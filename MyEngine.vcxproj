@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
@@ -118,7 +118,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(ProjectDir)externals\assimp\lib\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)externals\assimp\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>assimp-vc143-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
@@ -193,9 +193,12 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\DustParticle.cpp" />
     <ClCompile Include="engine\DWParam.cpp" />
     <ClCompile Include="engine\Framework.cpp" />
+    <ClCompile Include="engine\GrayScale.cpp" />
     <ClCompile Include="engine\LightNumBuffer.cpp" />
     <ClCompile Include="engine\RwStructuredBuffer.cpp" />
     <ClCompile Include="engine\ShadowSpotLights.cpp" />
+    <ClCompile Include="engine\Skeleton.cpp" />
+    <ClCompile Include="engine\SkinCluster.cpp" />
     <ClCompile Include="engine\Sky.cpp" />
     <ClCompile Include="engine\SpotLightShadowMap.cpp" />
     <ClCompile Include="engine\Transition.cpp" />
@@ -285,9 +288,12 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\DustParticle.h" />
     <ClInclude Include="engine\DWParam.h" />
     <ClInclude Include="engine\Framework.h" />
+    <ClInclude Include="engine\GrayScale.h" />
     <ClInclude Include="engine\LightNumBuffer.h" />
     <ClInclude Include="engine\RwStructuredBuffer.h" />
     <ClInclude Include="engine\ShadowSpotLights.h" />
+    <ClInclude Include="engine\Skeleton.h" />
+    <ClInclude Include="engine\SkinCluster.h" />
     <ClInclude Include="engine\Sky.h" />
     <ClInclude Include="engine\SpotLightShadowMap.h" />
     <ClInclude Include="engine\Transition.h" />
@@ -358,6 +364,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Demo|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\GrayScale.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Demo|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="Resources\shaders\MultiplyPS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>

@@ -160,29 +160,29 @@ float4 main(VSOutput input) : SV_TARGET
 
 		float32_t3 viewDirection = normalize(gViewProjection.viewPosition - worldPos);
 
-		for (int i = 0; i < tileInformation.pointLightNum; i++) {
+		//for (int i = 0; i < tileInformation.pointLightNum; i++) {
 
-			int index = gTBRPointLightIndex[startPointLightIndex + i];
+		//	int index = gTBRPointLightIndex[startPointLightIndex + i];
 
-			float32_t3 pointLightDirection = worldPos - gPointLights[index].position;
-			float32_t distance = length(pointLightDirection);
-			pointLightDirection = pointLightDirection / distance;
-			float32_t factor = pow(saturate(-distance / gPointLights[index].radius + 1.0), gPointLights[index].decay);
+		//	float32_t3 pointLightDirection = worldPos - gPointLights[index].position;
+		//	float32_t distance = length(pointLightDirection);
+		//	pointLightDirection = pointLightDirection / distance;
+		//	float32_t factor = pow(saturate(-distance / gPointLights[index].radius + 1.0), gPointLights[index].decay);
 
-			//pointLightDiffuse
-			float32_t NdotL = dot(normal, -pointLightDirection);
-			float32_t cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
-			float32_t3 pointLightdiffuse = gPointLights[index].color.xyz * cos * gPointLights[index].intensity * factor;
+		//	//pointLightDiffuse
+		//	float32_t NdotL = dot(normal, -pointLightDirection);
+		//	float32_t cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
+		//	float32_t3 pointLightdiffuse = gPointLights[index].color.xyz * cos * gPointLights[index].intensity * factor;
 
-			//pointLightSpecular
-			float32_t3 reflectVec = reflect(pointLightDirection, normal);
-			float32_t specluerPower = 10.0f;
-			float32_t RdotE = dot(reflectVec, viewDirection);
-			float32_t specularPow = pow(saturate(RdotE), specluerPower);
-			float32_t3 pointLightSpecluer = gPointLights[index].color.xyz * gPointLights[index].intensity * specularPow * factor;
+		//	//pointLightSpecular
+		//	float32_t3 reflectVec = reflect(pointLightDirection, normal);
+		//	float32_t specluerPower = 10.0f;
+		//	float32_t RdotE = dot(reflectVec, viewDirection);
+		//	float32_t specularPow = pow(saturate(RdotE), specluerPower);
+		//	float32_t3 pointLightSpecluer = gPointLights[index].color.xyz * gPointLights[index].intensity * specularPow * factor;
 
-			lighting += (pointLightdiffuse + pointLightSpecluer);
-		}
+		//	lighting += (pointLightdiffuse + pointLightSpecluer);
+		//}
 
 		//spotLight
 
