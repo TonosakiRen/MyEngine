@@ -199,11 +199,13 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\ShadowSpotLights.cpp" />
     <ClCompile Include="engine\Skeleton.cpp" />
     <ClCompile Include="engine\SkinCluster.cpp" />
+    <ClCompile Include="engine\Skinning.cpp" />
     <ClCompile Include="engine\Sky.cpp" />
     <ClCompile Include="engine\SpotLightShadowMap.cpp" />
     <ClCompile Include="engine\Transition.cpp" />
     <ClCompile Include="engine\UAVBuffer.cpp" />
     <ClCompile Include="engine\Voronoi.cpp" />
+    <ClCompile Include="engine\Wire.cpp" />
     <ClCompile Include="ImGui\ImGuiManager.cpp" />
     <ClCompile Include="math\Easing.cpp" />
     <ClCompile Include="engine\EdgeRenderer.cpp" />
@@ -255,7 +257,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\WhiteParticle.cpp" />
     <ClCompile Include="engine\WinApp.cpp" />
     <ClCompile Include="engine\WorldTransform.cpp" />
-    <ClCompile Include="Wire.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application\BaseScene.h" />
@@ -294,11 +295,13 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\ShadowSpotLights.h" />
     <ClInclude Include="engine\Skeleton.h" />
     <ClInclude Include="engine\SkinCluster.h" />
+    <ClInclude Include="engine\Skinning.h" />
     <ClInclude Include="engine\Sky.h" />
     <ClInclude Include="engine\SpotLightShadowMap.h" />
     <ClInclude Include="engine\Transition.h" />
     <ClInclude Include="engine\UAVBuffer.h" />
     <ClInclude Include="engine\Voronoi.h" />
+    <ClInclude Include="engine\Wire.h" />
     <ClInclude Include="ImGui\ImGuiManager.h" />
     <ClInclude Include="math\Easing.h" />
     <ClInclude Include="engine\EdgeRenderer.h" />
@@ -352,7 +355,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\WhiteParticle.h" />
     <ClInclude Include="engine\WinApp.h" />
     <ClInclude Include="engine\WorldTransform.h" />
-    <ClInclude Include="Wire.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\EdgePS.hlsl">
@@ -455,6 +457,16 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Demo|x64'">true</ExcludedFromBuild>
     </FxCompile>
+    <FxCompile Include="Resources\shaders\SkinningPS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Demo|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\SkinningVS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Demo|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
     <FxCompile Include="Resources\shaders\SkyPS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Demo|x64'">true</ExcludedFromBuild>
@@ -506,6 +518,16 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Demo|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="Resources\shaders\VoronoiPS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Demo|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\WirePS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Demo|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\WireVS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Demo|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>

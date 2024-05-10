@@ -16,6 +16,7 @@
 #include "Model.h"
 #include "Sky.h"
 #include "Sprite.h"
+#include "Skinning.h"
 
 
 void MyGame::Initialize()
@@ -42,6 +43,7 @@ void MyGame::Initialize()
 	Particle::StaticInitialize();
 	ParticleModel::StaticInitialize();
 	Sprite::StaticInitialize();
+	Skinning::StaticInitialize();
 
 #pragma endregion 変数
 
@@ -63,6 +65,7 @@ void MyGame::Finalize()
 	Particle::Finalize();
 	ParticleModel::Finalize();
 	Sprite::Finalize();
+	Skinning::Finalize();
 
 	delete gameScene;
 

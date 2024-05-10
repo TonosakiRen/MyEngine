@@ -14,6 +14,7 @@
 #include "ParticleModel.h"
 #include "Player.h"
 #include "TitleScene.h"
+#include "Skinning.h"
 
 ViewProjection* GameScene::currentViewProjection_ = nullptr;
 DirectionalLights* GameScene::directionLights = nullptr;
@@ -191,6 +192,11 @@ void GameScene::Draw(CommandContext& commandContext) {
 	Model::PreDraw(&commandContext, *currentViewProjection_);
 	sceneManager_->ModelDraw();
 	Model::PostDraw();
+
+	//3Dオブジェクト描画
+	Skinning::PreDraw(&commandContext, *currentViewProjection_);
+	sceneManager_->SkinningDraw();
+	Skinning::PostDraw();
 
 	//3Dオブジェクト描画
 	Sky::PreDraw(&commandContext, *currentViewProjection_);

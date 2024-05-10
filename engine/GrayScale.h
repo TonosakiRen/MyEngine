@@ -40,6 +40,6 @@ private:
 
 	ColorBuffer resultBuffer_;
 
-	float t_ = 0.5f;
+	float t_ = 0.0f;
 };
 

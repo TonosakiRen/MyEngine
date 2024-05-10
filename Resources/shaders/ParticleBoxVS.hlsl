@@ -1,6 +1,7 @@
 
 struct WorldTransform {
 	float32_t4x4 world;
+	float32_t4x4 worldInverseTranspose;
 };
 StructuredBuffer<WorldTransform> gWorldTransforms  : register(t0);
 
@@ -28,8 +29,8 @@ struct VSOutput {
 
 VSOutput main(VSInput input) {
 	VSOutput output;
-	output.svpos = mul(input.pos, mul(gWorldTransforms[input.instanceId].world, gViewProjection.viewProjection));
-	output.normal = mul(normal, (float32_t3x3)gWorldTransform[input.instanceId].world);
+	output.svpos = mul(float32_t4(input.pos, 1.0f), mul(gWorldTransforms[input.instanceId].world, gViewProjection.viewProjection));
+	output.normal = mul(input.normal, (float32_t3x3)gWorldTransform[input.instanceId].worldInverseTranspose);
 	output.uv = input.uv;
 	output.worldPosition = mul(input.pos, gWorldTransforms[input.instanceId].world).xyz;
 	return output;

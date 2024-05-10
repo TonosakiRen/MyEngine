@@ -30,7 +30,7 @@ void Skeleton::Update()
 
 int32_t Skeleton::CreateJoint(const Node& node, const std::optional<int32_t>& parent, std::vector<Joint>& joints)
 {
-	Joint joint;
+	Joint joint{};
 	joint.name = node.name;
 	joint.localMatrix = node.localMatrix;
 	joint.skeletonSpaceMatrix = MakeIdentity4x4();

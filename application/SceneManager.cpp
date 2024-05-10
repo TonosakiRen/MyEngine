@@ -52,6 +52,12 @@ void SceneManager::SkyDraw()
 	scene_->SkyDraw();
 }
 
+
+void SceneManager::SkinningDraw()
+{
+	scene_->SkinningDraw();
+}
+
 void SceneManager::ShadowDraw()
 {
 	scene_->ShadowDraw();

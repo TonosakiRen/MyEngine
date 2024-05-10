@@ -4,6 +4,7 @@
 #include "Sky.h"
 #include "ShadowMap.h"
 #include "SpotLightShadowMap.h"
+#include "Skinning.h"
 
 ModelManager* GameObject::modelManager = ModelManager::GetInstance();
 AnimationManager* GameObject::animationManager = AnimationManager::GetInstance();
@@ -75,6 +76,11 @@ void GameObject::Draw(const WorldTransform& worldTransform, Vector4 color)
 void GameObject::SkyDraw()
 {
 	Sky::Draw(modelHandle_, worldTransform_);
+}
+
+void GameObject::SkinningDraw(const SkinCluster& skinCluster)
+{
+	Skinning::Draw(modelHandle_, worldTransform_, skinCluster);
 }
 
 void GameObject::Draw(uint32_t modelHandle, const WorldTransform& worldTransform)

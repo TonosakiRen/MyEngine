@@ -47,10 +47,13 @@ void SkinCluster::Create(const Skeleton& skeleton, const uint32_t modelHandle) {
 
 void SkinCluster::Update()
 {
+    WellForGPU* mappedPalette = static_cast<WellForGPU*>(paletteResource_.GetCPUData());
+
     for (size_t jointIndex = 0; jointIndex < skeleton_->joints.size(); ++jointIndex) {
         assert(jointIndex < inverseBindPoseMatrices_.size());
-        WellForGPU* mappedPalette = static_cast<WellForGPU*>(paletteResource_.GetCPUData());
         mappedPalette[jointIndex].skeletonSpaceMatrix = inverseBindPoseMatrices_[jointIndex] * skeleton_->joints[jointIndex].skeletonSpaceMatrix;
         mappedPalette[jointIndex].skeletonSpaceInverseTransposeMatrix = Transpose(Inverse(mappedPalette[jointIndex].skeletonSpaceMatrix));
+        mappedPalette[jointIndex].skeletonSpaceMatrix = mappedPalette[jointIndex].skeletonSpaceMatrix;
     }
+    WellForGPU* palette = static_cast<WellForGPU*>(paletteResource_.GetCPUData());
 }

@@ -18,11 +18,11 @@ struct Node {
 
 struct Joint {
 
-	WorldTransform transform; //Trsnform情報
+	WorldTransform transform; //Transform情報
 	Matrix4x4 localMatrix; // localMatrix
 	Matrix4x4 skeletonSpaceMatrix; // skeletonSpaceでの変換行列
 	std::string name; //名前
-	std::vector<int32_t> children; // 子JoinntのIndex. いなければnull
+	std::vector<int32_t> children; // 子JointのIndex. いなければnull
 	int32_t index; // 自身のIndex
 	std::optional<int32_t> parent; // 親JointのIndex,いなければnull
 };

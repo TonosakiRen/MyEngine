@@ -79,6 +79,7 @@ public:
     void SetVertexBuffer(UINT slot, UINT numViews, const D3D12_VERTEX_BUFFER_VIEW vbvs[]);
     void SetIndexBuffer(const D3D12_INDEX_BUFFER_VIEW& ibv);
 
+    void UAVBarrier(GPUResource& resource);
 
     void Dispatch(uint32_t x,uint32_t y,uint32_t z);
 
@@ -342,6 +343,15 @@ inline void CommandContext::Dispatch(uint32_t x, uint32_t y, uint32_t z)
 {
     FlushResourceBarriers();
     commandList_->Dispatch(x,y,z);
+}
+
+inline void CommandContext::UAVBarrier(GPUResource& resource) {
+    D3D12_RESOURCE_BARRIER& barrierDesc = resourceBarriers_[numResourceBarriers_++];
+    barrierDesc.Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
+    barrierDesc.UAV.pResource = resource;
+    if (numResourceBarriers_ >= kMaxNumResourceBarriers) {
+        FlushResourceBarriers();
+    }
 }
 
 inline void CommandContext::Draw(UINT vertexCount, UINT vertexStartOffset) {

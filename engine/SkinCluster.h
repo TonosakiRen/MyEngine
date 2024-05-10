@@ -27,7 +27,7 @@ public:
 
     const DescriptorHandle& GetSRV() const { return paletteResource_.GetSRV(); }
 
-private:
+public:
 
     std::vector<Matrix4x4> inverseBindPoseMatrices_;
     UploadBuffer influenceResource_;

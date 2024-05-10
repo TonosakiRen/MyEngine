@@ -331,9 +331,6 @@
     <ClCompile Include="application\Skydome.cpp">
       <Filter>Game\Stage</Filter>
     </ClCompile>
-    <ClCompile Include="Wire.cpp">
-      <Filter>Engine\Model</Filter>
-    </ClCompile>
     <ClCompile Include="engine\DefaultBuffer.cpp">
       <Filter>Engine\GPUResource</Filter>
     </ClCompile>
@@ -364,12 +361,20 @@
     <ClCompile Include="engine\AnimationManager.cpp">
       <Filter>Engine\Animation</Filter>
     </ClCompile>
-    <ClCompile Include="engine\SkinCluster.cpp" />
     <ClCompile Include="engine\Skeleton.cpp">
       <Filter>Engine\Model</Filter>
     </ClCompile>
     <ClCompile Include="engine\GrayScale.cpp">
       <Filter>Engine\PostEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\Skinning.cpp">
+      <Filter>Engine\Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\SkinCluster.cpp">
+      <Filter>Engine\Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\Wire.cpp">
+      <Filter>Engine\Model</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -616,9 +621,6 @@
     <ClInclude Include="application\Skydome.h">
       <Filter>Game\Stage</Filter>
     </ClInclude>
-    <ClInclude Include="Wire.h">
-      <Filter>Engine\Model</Filter>
-    </ClInclude>
     <ClInclude Include="engine\DefaultBuffer.h">
       <Filter>Engine\GPUResource</Filter>
     </ClInclude>
@@ -649,12 +651,20 @@
     <ClInclude Include="engine\AnimationManager.h">
       <Filter>Engine\Animation</Filter>
     </ClInclude>
-    <ClInclude Include="engine\SkinCluster.h" />
     <ClInclude Include="engine\Skeleton.h">
       <Filter>Engine\Model</Filter>
     </ClInclude>
     <ClInclude Include="engine\GrayScale.h">
       <Filter>Engine\PostEffect</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Skinning.h">
+      <Filter>Engine\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\SkinCluster.h">
+      <Filter>Engine\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Wire.h">
+      <Filter>Engine\Model</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -749,6 +759,18 @@
       <Filter>shaders</Filter>
     </FxCompile>
     <FxCompile Include="Resources\shaders\GrayScale.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\SkinningPS.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\SkinningVS.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\WirePS.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\WireVS.hlsl">
       <Filter>shaders</Filter>
     </FxCompile>
   </ItemGroup>

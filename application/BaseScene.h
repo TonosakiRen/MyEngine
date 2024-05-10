@@ -11,6 +11,8 @@ public:
 
 	virtual void SkyDraw() = 0;
 
+	virtual void SkinningDraw() = 0;
+
 	virtual void ShadowDraw() = 0;
 	virtual void SpotLightShadowDraw() = 0;
 

@@ -41,7 +41,7 @@ void AnimationManager::CreateAnimations(AnimationData& animationData)
 			aiVectorKey& keyAssimp = nodeAnimationAssimp->mPositionKeys[keyIndex];
 			KeyframeVector3 keyframe;
 			keyframe.time = float(keyAssimp.mTime / animationAssimp->mTicksPerSecond);
-			keyframe.value = { -keyAssimp.mValue.x ,-keyAssimp.mValue.y,-keyAssimp.mValue.z };
+			keyframe.value = { -keyAssimp.mValue.x ,keyAssimp.mValue.y,keyAssimp.mValue.z };
 			nodeAnimation.translate.keyframes.push_back(keyframe);
 		}
 		for (uint32_t keyIndex = 0; keyIndex < nodeAnimationAssimp->mNumRotationKeys; ++keyIndex) {

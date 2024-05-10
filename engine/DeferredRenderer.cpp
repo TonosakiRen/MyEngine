@@ -56,8 +56,10 @@ void DeferredRenderer::Render(CommandContext& commandContext, ColorBuffer* origi
 	commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
 	commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kLightNum), lightNumBuffer.GetGPUVirtualAddress());
 
-	commandContext.TransitionResource(tileBasedRendering.pointLightIndexBuffer_, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
-	commandContext.TransitionResource(tileBasedRendering.tileInformationBuffer_, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+	//commandContext.TransitionResource(tileBasedRendering.pointLightIndexBuffer_, D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
+
+	//こいつが悪い
+	//commandContext.TransitionResource(tileBasedRendering.tileInformationBuffer_, D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
 
 	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kTBRInformation), tileBasedRendering.tileInformationBuffer_.GetSRV());
 	commandContext.SetConstants(static_cast<UINT>(RootParameter::kTileNum),TileBasedRendering::kTileWidthNum, TileBasedRendering::kTileHeightNum);

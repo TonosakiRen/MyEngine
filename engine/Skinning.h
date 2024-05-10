@@ -1,7 +1,7 @@
 #pragma once
 #include <Windows.h>
 #include <memory>
-#include <vector>
+#include <d3d12.h>
 
 #include "PipelineState.h"
 #include "RootSignature.h"
@@ -9,14 +9,22 @@
 #include "CommandContext.h"
 
 #include "ViewProjection.h"
+#include "WorldTransform.h"
+#include "Mesh.h"
+
+#include "SkinCluster.h"
 
 class DirectXCommon;
 
-class Wire
+class Skinning
 {
 public:
 	enum class RootParameter {
+		kWorldTransform,
 		kViewProjection,
+		kTexture,
+		kMaterial,
+		kMatrixPalette,
 
 		parameterNum
 	};
@@ -26,19 +34,13 @@ public:
 	static void PreDraw(CommandContext* commandContext, const ViewProjection& viewProjection);
 	static void PostDraw();
 
-	static void Draw(const Vector3& start,const Vector3& end);
+	static void Draw(uint32_t modelHandle, const WorldTransform& worldTransform, const SkinCluster& skinCluster);
 
-private:
+private: 
 	static void CreatePipeline();
-	static void CreateVertex();
 private:
 	static CommandContext* commandContext_;
 	static std::unique_ptr<RootSignature> rootSignature_;
 	static std::unique_ptr<PipelineState> pipelineState_;
-	static uint32_t reservedCount_;
-
-	static D3D12_VERTEX_BUFFER_VIEW vbView_;
-	static std::vector<Vector3> vertices_;
-	static UploadBuffer vertexBuffer_;
 };
 

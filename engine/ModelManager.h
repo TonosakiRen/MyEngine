@@ -20,6 +20,7 @@
 #include <assimp/postprocess.h>
 
 #include "Skeleton.h"
+#include "SkinCluster.h"
 
 struct VertexWeightData {
 	float weight;
@@ -67,6 +68,8 @@ public:
 	void DrawInstanced(CommandContext* commandContext, uint32_t modelHandle, UINT textureRootParamterIndex, DescriptorHandle descriptorHandle);
 	void DrawInstanced(CommandContext* commandContext, uint32_t modelHandle, UINT textureRootParamterIndex,uint32_t textureHandle);
 	void DrawInstancing(CommandContext* commandContext, uint32_t modelHandle, UINT instancingNum, UINT textureRootParamterIndex);
+
+	void DrawSkinningInstanced(CommandContext* commandContext, uint32_t modelHandle,const SkinCluster& skinCluster, UINT textureRootParamterIndex, uint32_t textureHandle = 0);
 
 	static Node ReadNode(aiNode* node);
 

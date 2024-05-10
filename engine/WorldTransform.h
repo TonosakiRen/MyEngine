@@ -9,6 +9,7 @@ public:
 
 	struct ConstBufferData {
 		Matrix4x4 matWorld;
+		Matrix4x4 worldInverseTranspose;
 	};
 
 	//bufferに送る場合の初期化
@@ -69,6 +70,7 @@ public:
 	Quaternion quaternion_ = IdentityQuaternion();
 	Vector3 translation_ = { 0.0f,0.0f,0.0f };
 	Matrix4x4 matWorld_;
+	Matrix4x4 worldInverseTranspose_;
 private:
 	WorldTransform* parent_ = nullptr;
 	bool isScaleParent_ = true;

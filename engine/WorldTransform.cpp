@@ -8,6 +8,7 @@ void WorldTransform::Initialize() {
     quaternion_ = IdentityQuaternion();
     translation_ = { 0.0f,0.0f,0.0f };
     matWorld_ = MakeIdentity4x4();
+    worldInverseTranspose_ = MakeIdentity4x4();
     constBuffer_.Create((sizeof(ConstBufferData) + 0xff) & ~0xff);
     Update();
 }
@@ -44,10 +45,11 @@ void WorldTransform::Update() {
         }
 
         matWorld_ *= parent_->matWorld_;
+        worldInverseTranspose_ = Transpose(Inverse(matWorld_));
     }
 
     if (constBuffer_.GetCPUData()) {
-        constBuffer_.Copy(matWorld_);
+        constBuffer_.Copy(ConstBufferData{ matWorld_, worldInverseTranspose_ });
     }
 }
 
@@ -89,9 +91,11 @@ void WorldTransform::Update(uint32_t modelIndex) {
         if (rootNode) {
             matWorld_ *= rootNode->localMatrix;
         }
+
+        worldInverseTranspose_ = Transpose(Inverse(matWorld_));
     }
 
     if (constBuffer_.GetCPUData()) {
-        constBuffer_.Copy(matWorld_);
+        constBuffer_.Copy(ConstBufferData{ matWorld_, worldInverseTranspose_ });
     }
 }

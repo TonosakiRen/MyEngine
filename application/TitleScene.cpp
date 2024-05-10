@@ -59,6 +59,10 @@ void TitleScene::SkyDraw()
 {
 }
 
+void TitleScene::SkinningDraw()
+{
+}
+
 void TitleScene::ShadowDraw()
 {
 

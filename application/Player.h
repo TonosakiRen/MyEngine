@@ -6,6 +6,7 @@
 #include "Mymath.h"
 #include "AnimationManager.h"
 #include "ModelManager.h"
+#include "SkinCluster.h"
 
 class PlayerBulletManager;
 class Player :
@@ -18,6 +19,7 @@ public:
     void Extrusion(Collider& otherCollider);
     void OnCollision();
     void Draw();
+    void SkinningDraw();
     void ReticleDraw();
     void Fire();
     void Animate();
@@ -47,4 +49,6 @@ private:
     Skeleton skeleton_;
     bool isAnimation_ = false;
     bool isFire_ = false;
+
+    SkinCluster skinCluster_;
 };

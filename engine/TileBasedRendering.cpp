@@ -197,6 +197,9 @@ void TileBasedRendering::ComputeUpdate(CommandContext& commandContext, const Vie
 
     commandContext.CopyBuffer(tileInformationBuffer_,rwTilesInformation_);
     commandContext.CopyBuffer(pointLightIndexBuffer_, rwPointLightIndex_);
+
+    commandContext.UAVBarrier(rwTilesInformation_);
+    commandContext.UAVBarrier(rwPointLightIndex_);
 }
 
 void TileBasedRendering::CreatePipeline()

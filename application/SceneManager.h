@@ -12,6 +12,7 @@ public:
 
 	void ModelDraw();
 	void SkyDraw();
+	void SkinningDraw();
 	void ShadowDraw();
 	void SpotLightShadowDraw();
 

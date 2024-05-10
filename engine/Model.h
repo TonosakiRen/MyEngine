@@ -39,12 +39,11 @@ public:
 
 private: 
 	static void CreatePipeline();
+public:
+	static std::unique_ptr<Material> normalMaterial_;
 private:
 	static CommandContext* commandContext_;
 	static std::unique_ptr<RootSignature> rootSignature_;
 	static std::unique_ptr<PipelineState> pipelineState_;
-
-
-	static std::unique_ptr<Material> normalMaterial_;
 };
 

@@ -5,6 +5,7 @@
 #include "DirectionalLights.h"
 #include "AnimationManager.h"
 #include "ModelManager.h"
+#include "SkinCluster.h"
 #include <string>
 class GameObject
 {
@@ -23,6 +24,8 @@ public:
 	void Draw(const WorldTransform& worldTransform, Vector4 color = { 1.0f,1.0f,1.0f,1.0f });
 
 	void SkyDraw();
+
+	void SkinningDraw(const SkinCluster& skinCluster);
 
 	void Draw(uint32_t modelHandle, const WorldTransform& worldTransform);
 

@@ -46,8 +46,8 @@ void ModelManager::CreateMeshes(ModelData& modelData)
 			vertex.normal = { normal.x,normal.y,normal.z };
 			vertex.uv = { texcoord.x,texcoord.y };
 
-			vertex.pos.z *= -1.0f;
-			vertex.normal.z *= -1.0f;
+			vertex.pos.x *= -1.0f;
+			vertex.normal.x *= -1.0f;
 
 			if (minModelSize.x > position.x) {
 				minModelSize.x = position.x;
@@ -74,10 +74,9 @@ void ModelManager::CreateMeshes(ModelData& modelData)
 		for (uint32_t faceIndex = 0; faceIndex < mesh->mNumFaces; ++faceIndex) {
 			aiFace& face = mesh->mFaces[faceIndex];
 			assert(face.mNumIndices == 3);
-			for (uint32_t element = 0; element < face.mNumIndices; ++element) {
-				uint32_t vertexIndex = face.mIndices[element];
-				modelData.meshes[meshIndex].indices_.push_back(vertexIndex);
-			}
+			modelData.meshes[meshIndex].indices_.push_back(face.mIndices[0]);
+			modelData.meshes[meshIndex].indices_.push_back(face.mIndices[1]);
+			modelData.meshes[meshIndex].indices_.push_back(face.mIndices[2]);
 		}
 
 		//material
@@ -98,8 +97,8 @@ void ModelManager::CreateMeshes(ModelData& modelData)
 			JointWeightData& jointWeightData= modelData.skinClusterData[jointName];
 
 			aiMatrix4x4 bindPoseMatrixAssimp = bone->mOffsetMatrix.Inverse();
-			aiVector3D scale, translate;
-			aiQuaternion rotate;
+			aiVector3D scale{}, translate{};
+			aiQuaternion rotate{};
 			bindPoseMatrixAssimp.Decompose(scale, rotate, translate);
 			Matrix4x4 bindPoseMatrix = MakeAffineMatrix
 			({ scale.x,scale.y,scale.z }, { rotate.x,-rotate.y,-rotate.z,rotate.w }, { -translate.x,translate.y,translate.z });
@@ -298,6 +297,32 @@ void ModelManager::DrawInstancing(CommandContext* commandContext, uint32_t model
 		commandContext->SetIndexBuffer(*mesh.GetIbView());
 		// 描画コマンド
 		commandContext->DrawIndexedInstanced(static_cast<UINT>(mesh.indices_.size()), instancingNum, 0, 0, 0);
+	}
+}
+
+void ModelManager::DrawSkinningInstanced(CommandContext* commandContext, uint32_t modelHandle, const SkinCluster& skinCluster, UINT textureRootParamterIndex, uint32_t textureHandle)
+{
+	assert(modelHandle < kNumModels);
+
+	const auto& modelItem = (*models_)[modelHandle];
+
+	for (const auto& mesh : modelItem.meshes) {
+
+		// srvセット
+		TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(commandContext, textureRootParamterIndex, textureHandle);
+
+		D3D12_VERTEX_BUFFER_VIEW vbvs[2] = {
+			*mesh.GetVbView(),
+			skinCluster.influenceBufferView_
+		};
+
+		// 頂点バッファの設定
+		commandContext->SetVertexBuffer(0, 2, vbvs);
+
+		// インデックスバッファの設定
+		commandContext->SetIndexBuffer(*mesh.GetIbView());
+		// 描画コマンド
+		commandContext->DrawIndexedInstanced(static_cast<UINT>(mesh.indices_.size()), 1, 0, 0, 0);
 	}
 }
 
