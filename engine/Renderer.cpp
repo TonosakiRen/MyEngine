@@ -88,6 +88,9 @@ void Renderer::Initialize() {
 
     wire_ = std::make_unique<Wire>();
     wire_->Initialize();
+
+    vignette_ = std::make_unique<Vignette>();
+    vignette_->Initialize(*resultBuffer_);
 }
 
 void Renderer::BeginFrame()
@@ -155,6 +158,7 @@ void Renderer::EndMainRender() {
     edgeRenderer_->Render(commandContext_, resultBuffer_.get());
     bloom_->Render(commandContext_, resultBuffer_.get());
     grayScale_->Draw(*resultBuffer_.get(), commandContext_);
+    vignette_->Draw(*resultBuffer_.get(), commandContext_);
 
 }
 
@@ -219,6 +223,7 @@ void Renderer::Shutdown() {
     transition_.reset();
     grayScale_.reset();
     wire_.reset();
+    vignette_.reset();
 
     swapChain_.reset();
     commandContext_.ShutDown();

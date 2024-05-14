@@ -48,7 +48,7 @@ void Wire::AllDraw(CommandContext& commandContext, const ViewProjection& viewPro
 
     commandContext.SetVertexBuffer(0,1,vertexBufferView_.get());
 
-    commandContext.DrawInstanced(vertices_.size(),1);
+    commandContext.DrawInstanced(UINT(vertices_.size()),1);
 
     vertices_.clear();
 }

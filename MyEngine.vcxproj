@@ -204,6 +204,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\SpotLightShadowMap.cpp" />
     <ClCompile Include="engine\Transition.cpp" />
     <ClCompile Include="engine\UAVBuffer.cpp" />
+    <ClCompile Include="engine\Vignette.cpp" />
     <ClCompile Include="engine\Voronoi.cpp" />
     <ClCompile Include="engine\Wire.cpp" />
     <ClCompile Include="ImGui\ImGuiManager.cpp" />
@@ -300,6 +301,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\SpotLightShadowMap.h" />
     <ClInclude Include="engine\Transition.h" />
     <ClInclude Include="engine\UAVBuffer.h" />
+    <ClInclude Include="engine\Vignette.h" />
     <ClInclude Include="engine\Voronoi.h" />
     <ClInclude Include="engine\Wire.h" />
     <ClInclude Include="ImGui\ImGuiManager.h" />
@@ -516,6 +518,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Demo|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\Vignette.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Demo|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="Resources\shaders\VoronoiPS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>

@@ -14,6 +14,7 @@
 #include "TileBasedRendering.h"
 #include "Transition.h"
 #include "GrayScale.h"
+#include "Vignette.h"
 #include "Wire.h"
 
 class ViewProjection;
@@ -89,7 +90,9 @@ private:
 
     std::unique_ptr<Transition> transition_;
 
-    std::unique_ptr<GrayScale> grayScale_;;
+    std::unique_ptr<GrayScale> grayScale_;
+
+    std::unique_ptr<Vignette> vignette_;
 
     std::unique_ptr<Wire> wire_;
 };

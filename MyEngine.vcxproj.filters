@@ -376,6 +376,9 @@
     <ClCompile Include="engine\Wire.cpp">
       <Filter>Engine\Model</Filter>
     </ClCompile>
+    <ClCompile Include="engine\Vignette.cpp">
+      <Filter>Engine\PostEffect</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -666,6 +669,9 @@
     <ClInclude Include="engine\Wire.h">
       <Filter>Engine\Model</Filter>
     </ClInclude>
+    <ClInclude Include="engine\Vignette.h">
+      <Filter>Engine\PostEffect</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\ModelPS.hlsl">
@@ -771,6 +777,9 @@
       <Filter>shaders</Filter>
     </FxCompile>
     <FxCompile Include="Resources\shaders\WireVS.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\Vignette.hlsl">
       <Filter>shaders</Filter>
     </FxCompile>
   </ItemGroup>
