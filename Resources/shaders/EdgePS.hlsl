@@ -62,7 +62,7 @@ float4 main(VSOutput input) : SV_TARGET
 		output.color.w = 1.0f;
 	}
 	else {
-		output.color = float32_t4(0.0f, 0.0f, 0.0f, 0.0f);
+		output.color = colorTex.Sample(smp, input.texCenter);
 	}
 
 	return output.color;

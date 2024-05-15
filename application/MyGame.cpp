@@ -116,7 +116,7 @@ void MyGame::Draw()
 
 	renderer->DeferredRender(gameScene->GetViewProjection(), gameScene->GetDirectionalLights(), gameScene->GetPointLights(), gameScene->GetAreaLights(), gameScene->GetSpotLights(), gameScene->GetShadowSpotLights());
 
-	renderer->EndMainRender();
+	renderer->EndMainRender(gameScene->GetViewProjection());
 
 	renderer->BeginUIRender();
 

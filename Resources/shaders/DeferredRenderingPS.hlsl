@@ -92,11 +92,11 @@ struct TBRInformation {
 	uint32_t spotLightNum;
 	uint32_t shadowSpotLightNum;
 };
-StructuredBuffer<TBRInformation> gTBRInformation  : register(t9);
+RWStructuredBuffer<TBRInformation> gTBRInformation  : register(u0);
 
-StructuredBuffer<uint32_t> gTBRPointLightIndex  : register(t10);
-StructuredBuffer<uint32_t> gTBRSpotLightIndex  : register(t11);
-StructuredBuffer<uint32_t> gTBRShadowSpotLightIndex  : register(t12);
+RWStructuredBuffer<uint32_t> gTBRPointLightIndex  : register(u1);
+RWStructuredBuffer<uint32_t> gTBRSpotLightIndex  : register(u2);
+RWStructuredBuffer<uint32_t> gTBRShadowSpotLightIndex  : register(u3);
 
 ConstantBuffer<Param> tileNum : register(b2);
 
@@ -144,13 +144,13 @@ float4 main(VSOutput input) : SV_TARGET
 		float32_t2 texSize;
 		colorTex.GetDimensions(texSize.x, texSize.y);
 
-		float32_t tileWidth = texSize.x / tileNum.param.x;
+		float32_t tileWidth = texSize.x * rcp(tileNum.param.x);
 
-		float32_t tileHeight = texSize.y / tileNum.param.y;
+		float32_t tileHeight = texSize.y * rcp(tileNum.param.y);
 
 		float32_t2 pixelPos = input.uv * texSize;
 
-		uint32_t2 tile = uint32_t2(pixelPos.x / tileWidth, pixelPos.y / tileHeight);
+		uint32_t2 tile = uint32_t2(pixelPos.x * rcp(tileWidth), pixelPos.y * rcp(tileHeight));
 
 		uint32_t tileNumber = tile.y * tileNum.param.x + tile.x;
 

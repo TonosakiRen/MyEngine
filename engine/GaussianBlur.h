@@ -23,7 +23,6 @@ public:
 	~GaussianBlur();
 
 	static uint32_t gbInstanceCount;
-	void CreateMesh();
 
 	void Initialize(ColorBuffer* originalTexture);
 	void Render(CommandContext& commandContext);
@@ -37,13 +36,6 @@ private:
 	std::unique_ptr<RootSignature> sRootSignature;
 	std::unique_ptr<PipelineState> sHorizontalBlurPipelineState;
 	std::unique_ptr<PipelineState> sVerticalBlurPipelineState;
-
-	D3D12_VERTEX_BUFFER_VIEW vbView_{};
-	D3D12_INDEX_BUFFER_VIEW ibView_{};
-	std::vector<VertexData> vertices_;
-	std::vector<uint16_t> indices_;
-	UploadBuffer vertexBuffer_;
-	UploadBuffer indexBuffer_;
 
 	static const uint32_t kNumWeights = 8;
 

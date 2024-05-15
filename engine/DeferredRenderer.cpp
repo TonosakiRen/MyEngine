@@ -46,7 +46,7 @@ void DeferredRenderer::Render(CommandContext& commandContext, ColorBuffer* origi
 	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kDepthTexture), depthTexture_->GetSRV());
 
 	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kDirectionalLights), directionalLight.srvHandle_);
-	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kPointLights), pointLights.structureBuffer_.GetSRV(commandContext));
+	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kPointLights), pointLights.structureBuffer_.GetSRV());
 	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kAreaLights), areaLights.structureBuffer_.GetSRV());
 	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kSpotLights), spotLights.srvHandle_);
 	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kShadowSpotLights), shadowSpotLights.srvHandle_);
@@ -56,17 +56,13 @@ void DeferredRenderer::Render(CommandContext& commandContext, ColorBuffer* origi
 	commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
 	commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kLightNum), lightNumBuffer.GetGPUVirtualAddress());
 
-	//commandContext.TransitionResource(tileBasedRendering.pointLightIndexBuffer_, D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
 
-	//こいつが悪い
-	//commandContext.TransitionResource(tileBasedRendering.tileInformationBuffer_, D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
-
-	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kTBRInformation), tileBasedRendering.tileInformationBuffer_.GetSRV());
+	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kTBRInformation), tileBasedRendering.rwTilesInformation_.GetUAV());
 	commandContext.SetConstants(static_cast<UINT>(RootParameter::kTileNum),TileBasedRendering::kTileWidthNum, TileBasedRendering::kTileHeightNum);
 
-	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kTBRPointLightIndex), tileBasedRendering.pointLightIndexBuffer_.GetSRV());
-	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kTBRSpotLightIndex), tileBasedRendering.spotLightIndexBuffer_.GetSRV());
-	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kTBRShadowSpotLightIndex), tileBasedRendering.shadowSpotLightIndexBuffer_.GetSRV());
+	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kTBRPointLightIndex), tileBasedRendering.rwPointLightIndex_.GetUAV());
+	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kTBRSpotLightIndex), tileBasedRendering.rwSpotLightIndex_.GetUAV());
+	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kTBRShadowSpotLightIndex), tileBasedRendering.rwShadowSpotLightIndex_.GetUAV());
 
 	commandContext.DrawInstanced(3, 1, 0, 0);
 }
@@ -100,11 +96,11 @@ void DeferredRenderer::CreatePipeline()
 
 		ranges[9].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, DirectXCommon::GetInstance()->DirectXCommon::kSrvHeapDescriptorNum, 0, 1);
 
-		ranges[10].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 9);
+		ranges[10].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 0);
 
-		ranges[11].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 10);
-		ranges[12].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 11);
-		ranges[13].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 12);
+		ranges[11].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 1);
+		ranges[12].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 2);
+		ranges[13].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 3);
 
 		CD3DX12_ROOT_PARAMETER rootParameters[(int)RootParameter::ParameterNum]{};
 		rootParameters[(int)RootParameter::kColorTexture].InitAsDescriptorTable(1, &ranges[(int)RootParameter::kColorTexture]);
@@ -149,15 +145,6 @@ void DeferredRenderer::CreatePipeline()
 
 	{
 
-		/*D3D12_INPUT_ELEMENT_DESC inputLayout[] = {
-			  {
-				"POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT,
-			   D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-			  {
-			   "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,    0, D3D12_APPEND_ALIGNED_ELEMENT,
-			   D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-		};*/
-
 		// グラフィックスパイプラインの流れを設定
 		D3D12_GRAPHICS_PIPELINE_STATE_DESC gpipeline{};
 		gpipeline.VS = CD3DX12_SHADER_BYTECODE(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize());
@@ -168,20 +155,8 @@ void DeferredRenderer::CreatePipeline()
 		// ラスタライザステート
 		gpipeline.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
 
-		// レンダーターゲットのブレンド設定
-		D3D12_RENDER_TARGET_BLEND_DESC blenddesc{};
-		blenddesc.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
-		blenddesc.BlendEnable = false;
-		blenddesc.BlendOp = D3D12_BLEND_OP_ADD;
-		blenddesc.SrcBlend = D3D12_BLEND_SRC_ALPHA;
-		blenddesc.DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
-
-		blenddesc.BlendOpAlpha = D3D12_BLEND_OP_ADD;
-		blenddesc.SrcBlendAlpha = D3D12_BLEND_ONE;
-		blenddesc.DestBlendAlpha = D3D12_BLEND_ZERO;
-
 		// ブレンドステートの設定
-		gpipeline.BlendState.RenderTarget[0] = blenddesc;
+		gpipeline.BlendState = Helper::BlendDisable;
 
 		// 図形の形状設定（三角形）
 		gpipeline.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;

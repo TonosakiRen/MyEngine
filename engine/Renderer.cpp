@@ -91,6 +91,9 @@ void Renderer::Initialize() {
 
     vignette_ = std::make_unique<Vignette>();
     vignette_->Initialize(*resultBuffer_);
+
+    smooth_ = std::make_unique<Smooth>();
+    smooth_->Initialize(*resultBuffer_);
 }
 
 void Renderer::BeginFrame()
@@ -113,6 +116,7 @@ void Renderer::BeginMainRender() {
     for (int i = 0; i < kRenderTargetNum; i++) {
         commandContext_.ClearColor(*colorBuffers_[i]);
     }
+
     commandContext_.TransitionResource(*resultBuffer_, D3D12_RESOURCE_STATE_RENDER_TARGET);
     commandContext_.ClearColor(*resultBuffer_);
 
@@ -123,10 +127,8 @@ void Renderer::BeginMainRender() {
 void Renderer::DeferredRender(ViewProjection& viewProjection, DirectionalLights& directionalLight, PointLights& pointLights,AreaLights& areaLights ,SpotLights& spotLights, ShadowSpotLights& shadowSpotLights)
 {
     wire_->AllDraw(commandContext_, viewProjection);
-    //tileBasedRendering_->Update(viewProjection,pointLights, spotLights, shadowSpotLights);
-    //tileBasedRendering_->ComputeUpdate(commandContext_, viewProjection, pointLights, spotLights, shadowSpotLights, *lightNumBuffer_);
+    tileBasedRendering_->ComputeUpdate(commandContext_, viewProjection, pointLights, spotLights, shadowSpotLights, *lightNumBuffer_);
     deferredRenderer_->Render(commandContext_, resultBuffer_.get(), viewProjection, directionalLight, pointLights, areaLights ,spotLights,shadowSpotLights, *lightNumBuffer_, *tileBasedRendering_);
-
 }
 
 void Renderer::BeginShadowMapRender(DirectionalLights& directionalLights)
@@ -153,13 +155,13 @@ void Renderer::EndSpotLightShadowMapRender(ShadowSpotLights& shadowSpotLights)
     }
 }
 
-void Renderer::EndMainRender() {
+void Renderer::EndMainRender(ViewProjection& viewProjection) {
 
     edgeRenderer_->Render(commandContext_, resultBuffer_.get());
     bloom_->Render(commandContext_, resultBuffer_.get());
     grayScale_->Draw(*resultBuffer_.get(), commandContext_);
     vignette_->Draw(*resultBuffer_.get(), commandContext_);
-
+    smooth_->Draw(*resultBuffer_.get(), commandContext_);
 }
 
 void Renderer::BeginUIRender()
@@ -224,6 +226,7 @@ void Renderer::Shutdown() {
     grayScale_.reset();
     wire_.reset();
     vignette_.reset();
+    smooth_.reset();
 
     swapChain_.reset();
     commandContext_.ShutDown();

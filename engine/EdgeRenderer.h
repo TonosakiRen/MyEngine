@@ -29,18 +29,16 @@ public:
 		Vector4 pos;
 		Vector2 uv;
 	};
-	void Initialize(ColorBuffer* originalTexture,ColorBuffer* normalTexture, DepthBuffer* depthTexture);
+	void Initialize(ColorBuffer* colorTexture,ColorBuffer* normalTexture, DepthBuffer* depthTexture);
 	void Render(CommandContext& commandContext, ColorBuffer* originalTexture);
 
 private:
 	void CreatePipeline();
-	void CreateMesh();
 private:
 	PipelineState edgePipelineState_;
-	PipelineState multiplyPipeline_;
 	RootSignature edgeRootSignature_;
-	RootSignature multiplyRootSignature_;
 
+	ColorBuffer* colorTexture_;
 	ColorBuffer* normalTexture_;
 	DepthBuffer* depthTexture_;
 
@@ -48,16 +46,9 @@ private:
 
 	DescriptorHandle uavHandle_;
 
-
-	D3D12_VERTEX_BUFFER_VIEW vbView_{};
-	D3D12_INDEX_BUFFER_VIEW ibView_{};
-	std::vector<VertexData> vertices_;
-	std::vector<uint16_t> indices_;
-	UploadBuffer vertexBuffer_;
-	UploadBuffer indexBuffer_;
-
 	Vector3 edgeColor_ = { 0.0f,0.0f,0.0f };
-
+	float normalThreshold_ = 0.2f;
+	float depthThreshold_ = 0.001f;
 
 };
 

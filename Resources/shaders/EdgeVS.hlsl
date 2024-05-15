@@ -1,6 +1,22 @@
 
 Texture2D<float4> colorTex : register(t0);
 
+struct VSInput {
+	uint32_t vertexID : SV_VertexID;
+};
+
+static const uint32_t kNumVertex = 3;
+static const float32_t4 kPositions[kNumVertex] = {
+	{-1.0f,1.0f,0.0f,1.0f}, //左上
+	{3.0f,1.0f,0.0f,1.0f}, // 右上
+	{-1.0f,-3.0f,0.0f,1.0f} //左下
+};
+static const float32_t2 kTexcoords[kNumVertex] = {
+	{0.0f,0.0f}, //左上
+	{2.0f,0.0f}, //右下
+	{0.0f,2.0f} //左下
+};
+
 struct VSOutput {
 	float32_t4  svpos : SV_POSITION;
 	float32_t2 texCenter : TEXCOORD0;
@@ -14,17 +30,17 @@ struct VSOutput {
 	float32_t2 texRB : TEXCOORD8;
 };
 
-VSOutput main(float32_t4 pos : POSITION, float32_t2 uv : TEXCOORD0) {
+VSOutput main(VSInput input) {
 	VSOutput output;
 
 	float32_t2 texSize;
 	//テクスチャーのサイズ
 	colorTex.GetDimensions(texSize.x, texSize.y);
 
-	output.svpos = pos;
-	float32_t2 tex = uv;
+	output.svpos = kPositions[input.vertexID];
+	float32_t2 tex = kTexcoords[input.vertexID];
 
-	float32_t2 pixelSize = 1.0f / texSize;
+	float32_t2 pixelSize = 1.0f * rcp(texSize);
 
 	//法線
 	{

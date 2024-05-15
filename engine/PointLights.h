@@ -1,7 +1,7 @@
 #pragma once
 #include <d3d12.h>
 #include "Mymath.h"
-#include "DefaultStructuredBuffer.h"
+#include "StructuredBuffer.h"
 #include <vector>
 #include "WorldTransform.h"
 
@@ -35,7 +35,7 @@ public:
 
 public:
 	std::vector<PointLight> lights_;
-	DefaultStructuredBuffer structureBuffer_;
+	StructuredBuffer structureBuffer_;
 private:
 
 };

@@ -189,17 +189,11 @@ void TileBasedRendering::ComputeUpdate(CommandContext& commandContext, const Vie
     commandContext.SetComputeDescriptorTable(UINT(RootParameter::kSpotLightIndex), rwSpotLightIndex_.GetUAV());
     commandContext.SetComputeDescriptorTable(UINT(RootParameter::kShadowSpotLightIndex), rwShadowSpotLightIndex_.GetUAV());
     commandContext.SetComputeDescriptorTable(UINT(RootParameter::kInitialTileFrustum), initialTileFrustrumBuffer_.GetSRV(commandContext));
-    commandContext.SetComputeDescriptorTable(UINT(RootParameter::kPointLights), pointLights.structureBuffer_.GetSRV(commandContext));
+    commandContext.SetComputeDescriptorTable(UINT(RootParameter::kPointLights), pointLights.structureBuffer_.GetSRV());
     commandContext.SetComputeConstantBuffer(UINT(RootParameter::kLightNum),lightNumBuffer.GetGPUVirtualAddress());
     commandContext.SetComputeConstantBuffer(UINT(RootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
 
     commandContext.Dispatch(1,1,1);
-
-    commandContext.CopyBuffer(tileInformationBuffer_,rwTilesInformation_);
-    commandContext.CopyBuffer(pointLightIndexBuffer_, rwPointLightIndex_);
-
-    commandContext.UAVBarrier(rwTilesInformation_);
-    commandContext.UAVBarrier(rwPointLightIndex_);
 }
 
 void TileBasedRendering::CreatePipeline()

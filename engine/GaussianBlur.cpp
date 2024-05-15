@@ -19,62 +19,11 @@ GaussianBlur::~GaussianBlur()
     gbInstanceCount--;
 }
 
-void GaussianBlur::CreateMesh()
-{
-
-    vertices_.resize(4);
-
-    //左下
-    vertices_[0].pos = { -1.0f,-1.0f,0.0f,1.0f };
-    vertices_[0].uv = { 0.0f,1.0f };
-    //左上
-    vertices_[1].pos = { -1.0f,1.0f,0.0f,1.0f };
-    vertices_[1].uv = { 0.0f,0.0f };
-    //右上
-    vertices_[2].pos = { 1.0f,1.0f,0.0f,1.0f };
-    vertices_[2].uv = { 1.0f,0.0f };
-    //右下
-    vertices_[3].pos = { 1.0f,-1.0f,0.0f,1.0f };
-    vertices_[3].uv = { 1.0f,1.0f };
-
-    // 頂点インデックスの設定
-    indices_ = { 0,  1,  2, 0, 2, 3 };
-
-    // 頂点データのサイズ
-    UINT sizeVB = static_cast<UINT>(sizeof(VertexData) * vertices_.size());
-
-    vertexBuffer_.Create(sizeVB);
-
-    vertexBuffer_.Copy(vertices_.data(), sizeVB);
-
-    // 頂点バッファビューの作成
-    vbView_.BufferLocation = vertexBuffer_.GetGPUVirtualAddress();
-    vbView_.SizeInBytes = sizeVB;
-    vbView_.StrideInBytes = sizeof(vertices_[0]);
-
-
-    // インデックスデータのサイズ
-    UINT sizeIB = static_cast<UINT>(sizeof(uint16_t) * indices_.size());
-
-    indexBuffer_.Create(sizeIB);
-
-    indexBuffer_.Copy(indices_.data(), sizeIB);
-
-    // インデックスバッファビューの作成
-    ibView_.BufferLocation = indexBuffer_.GetGPUVirtualAddress();
-    ibView_.Format = DXGI_FORMAT_R16_UINT;
-    ibView_.SizeInBytes = sizeIB;
-
-}
-
 void GaussianBlur::Initialize(ColorBuffer* originalTexture)
 {
     assert(originalTexture);
 
     InitializeGraphicsPipeline();
-
-    // メッシュ生成
-    CreateMesh();
 
     originalTexture_ = originalTexture;
     horizontalBlurTexture_.Create(
@@ -102,14 +51,12 @@ void GaussianBlur::Render(CommandContext& commandContext)
 
     commandContext.SetGraphicsRootSignature(*sRootSignature);
 
-    commandContext.SetVertexBuffer(0, vbView_);
-    commandContext.SetIndexBuffer(ibView_);
 
     commandContext.SetPipelineState(*sHorizontalBlurPipelineState);
     commandContext.SetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     commandContext.SetDescriptorTable(0, originalTexture_->GetSRV());
     commandContext.SetConstantBuffer(1, constantBuffer_.GetGPUVirtualAddress());
-    commandContext.DrawIndexed(static_cast<UINT>(indices_.size()), 0, 0);
+    commandContext.DrawInstanced(3, 1, 0, 0);
 
     commandContext.TransitionResource(horizontalBlurTexture_, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
     commandContext.TransitionResource(verticalBlurTexture_, D3D12_RESOURCE_STATE_RENDER_TARGET);
@@ -122,7 +69,7 @@ void GaussianBlur::Render(CommandContext& commandContext)
     commandContext.SetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     commandContext.SetDescriptorTable(0, horizontalBlurTexture_.GetSRV());
     commandContext.SetConstantBuffer(1, constantBuffer_.GetGPUVirtualAddress());
-    commandContext.DrawIndexed(static_cast<UINT>(indices_.size()), 0, 0);
+    commandContext.DrawInstanced(3, 1, 0, 0);
 
     commandContext.TransitionResource(verticalBlurTexture_, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 }
@@ -177,15 +124,6 @@ void GaussianBlur::InitializeGraphicsPipeline()
 
     {
 
-        D3D12_INPUT_ELEMENT_DESC inputLayout[] = {
-        {
-         "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT,
-         D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-        {
-         "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,    0, D3D12_APPEND_ALIGNED_ELEMENT,
-         D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-        };
-
         // グラフィックスパイプラインの流れを設定
         D3D12_GRAPHICS_PIPELINE_STATE_DESC gpipeline{};
         gpipeline.VS = CD3DX12_SHADER_BYTECODE(horizontalVsBlob->GetBufferPointer(), horizontalVsBlob->GetBufferSize());
@@ -201,10 +139,6 @@ void GaussianBlur::InitializeGraphicsPipeline()
 
         // 深度バッファのフォーマット
         gpipeline.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
-
-        // 頂点レイアウトの設定
-        gpipeline.InputLayout.pInputElementDescs = inputLayout;
-        gpipeline.InputLayout.NumElements = _countof(inputLayout);
 
         // 図形の形状設定（三角形）
         gpipeline.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;

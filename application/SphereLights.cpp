@@ -34,8 +34,6 @@ void SphereLights::Initialize(PointLights* pointLights)
 			}
 		}
 	}
-
-	pointLights_->Update();
 }
 
 void SphereLights::Update() {
@@ -75,6 +73,8 @@ void SphereLights::Update() {
 		i++;
 	}
 	ImGui::End();
+
+	pointLights_->Update();
 }
 
 void SphereLights::Draw(Vector4 color)

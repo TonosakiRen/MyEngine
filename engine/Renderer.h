@@ -16,6 +16,7 @@
 #include "GrayScale.h"
 #include "Vignette.h"
 #include "Wire.h"
+#include "Smooth.h"
 
 class ViewProjection;
 class DirectionalLights;
@@ -38,7 +39,7 @@ public:
     void Initialize();
     void BeginFrame();
     void BeginMainRender();
-    void EndMainRender();
+    void EndMainRender(ViewProjection& viewProjection);
     void DeferredRender(ViewProjection& viewProjection, DirectionalLights& directionalLight,PointLights& pointLights,AreaLights& areaLights, SpotLights& spotLights, ShadowSpotLights& shadowSpotLights);
     void BeginShadowMapRender(DirectionalLights& directionalLights);
     void EndShadowMapRender(DirectionalLights& directionalLights);
@@ -95,5 +96,7 @@ private:
     std::unique_ptr<Vignette> vignette_;
 
     std::unique_ptr<Wire> wire_;
+
+    std::unique_ptr<Smooth> smooth_;
 };
 
