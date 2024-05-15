@@ -161,7 +161,7 @@ void Renderer::EndMainRender(ViewProjection& viewProjection) {
     bloom_->Render(commandContext_, resultBuffer_.get());
     grayScale_->Draw(*resultBuffer_.get(), commandContext_);
     vignette_->Draw(*resultBuffer_.get(), commandContext_);
-    smooth_->Draw(*resultBuffer_.get(), commandContext_);
+    //smooth_->Draw(*resultBuffer_.get(), commandContext_);
 }
 
 void Renderer::BeginUIRender()
