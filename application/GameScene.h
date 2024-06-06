@@ -29,10 +29,7 @@ public:
 
 	void Initialize();
 	void Update(CommandContext& commandContext);
-	void Draw(CommandContext& commandContext);
-	void ShadowMapDraw(CommandContext& commandContext);
-	void SpotLightShadowMapDraw(CommandContext& commandContext);
-	void UIDraw(CommandContext& commandContext);
+	void Draw();
 
 	DirectionalLights& GetDirectionalLights() {
 		return *directionalLights_.get();

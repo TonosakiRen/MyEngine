@@ -8,12 +8,7 @@
 
 using namespace Microsoft::WRL;
 
-bool ShadowMap::isDrawShadowMap = false;
-CommandContext* ShadowMap::commandContext_ = nullptr;
-std::unique_ptr<RootSignature> ShadowMap::rootSignature_;
-std::unique_ptr<PipelineState> ShadowMap::pipelineState_;
-DirectionalLights* ShadowMap::directionalLights_;
-void ShadowMap::StaticInitialize() {
+void ShadowMap::Initialize() {
     CreatePipeline();
 }
 
@@ -23,27 +18,19 @@ void ShadowMap::Finalize()
     pipelineState_.reset();
 }
 
-void ShadowMap::PreDraw(CommandContext* commandContext, DirectionalLights& directionalLight) {
-    assert(ShadowMap::commandContext_ == nullptr);
+void ShadowMap::PreDraw(CommandContext& commandContext, DirectionalLights& directionalLight) {
 
-    commandContext_ = commandContext;
     directionalLights_ = &directionalLight;
-    isDrawShadowMap = true;
 
-    commandContext_->SetPipelineState(*pipelineState_);
-    commandContext_->SetGraphicsRootSignature(*rootSignature_);
+    commandContext.SetPipelineState(*pipelineState_);
+    commandContext.SetGraphicsRootSignature(*rootSignature_);
 
     for (int i = 0; i < DirectionalLights::lightNum; i++) {
-        commandContext_->TransitionResource(directionalLights_->lights_[i].shadowMap_, D3D12_RESOURCE_STATE_DEPTH_WRITE);
-        commandContext_->ClearDepth(directionalLights_->lights_[i].shadowMap_);
+        commandContext.TransitionResource(directionalLights_->lights_[i].shadowMap_, D3D12_RESOURCE_STATE_DEPTH_WRITE);
+        commandContext.ClearDepth(directionalLights_->lights_[i].shadowMap_);
     }
 
-    commandContext_->SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-}
-
-void ShadowMap::PostDraw() {
-    commandContext_ = nullptr;
-    isDrawShadowMap = false;
+    commandContext.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 
 void ShadowMap::CreatePipeline() {
@@ -121,15 +108,15 @@ void ShadowMap::CreatePipeline() {
     }
 }
 
-void ShadowMap::Draw(uint32_t modelHandle, const WorldTransform& worldTransform) {
+void ShadowMap::Draw(CommandContext& commandContext, uint32_t modelHandle, const WorldTransform& worldTransform) {
 
     // CBVをセット（ワールド行列）
-    commandContext_->SetConstantBuffer(static_cast<UINT>(RootParameter::kWorldTransform), worldTransform.GetGPUVirtualAddress());
+    commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kWorldTransform), worldTransform.GetGPUVirtualAddress());
 
     for (int i = 0; i < DirectionalLights::lightNum; i++) {
-        commandContext_->SetDepthStencil(directionalLights_->lights_[i].shadowMap_.GetDSV());
-        commandContext_->SetConstantBuffer(static_cast<UINT>(RootParameter::kDirectionalLight), directionalLights_->lights_[i].constBuffer_.GetGPUVirtualAddress());
-        ModelManager::GetInstance()->DrawInstanced(commandContext_, modelHandle);
+        commandContext.SetDepthStencil(directionalLights_->lights_[i].shadowMap_.GetDSV());
+        commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kDirectionalLight), directionalLights_->lights_[i].constBuffer_.GetGPUVirtualAddress());
+        ModelManager::GetInstance()->DrawInstanced(commandContext, modelHandle);
     }
 }
 

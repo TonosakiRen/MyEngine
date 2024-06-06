@@ -1,5 +1,5 @@
 
-Texture2D<float4> tex : register(t0);
+TextureCube<float32_t4> tex : register(t0);
 SamplerState smp : register(s0);
 
 struct Param {
@@ -11,8 +11,7 @@ ConstantBuffer<Param> bottomColor  : register(b3);
 
 struct VSOutput {
 	float32_t4 pos : SV_POSITION; // システム用頂点座標
-	float32_t3 normal : NORMAL;     // 法線ベクトル
-	float32_t2 uv : TEXCOORD;       // uv値
+	float32_t3 uv : TEXCOORD;       // uv値
 };
 
 struct PixelShaderOutput {
@@ -42,7 +41,14 @@ PixelShaderOutput main(VSOutput input) {
 
 	PixelShaderOutput output;
 
-	output.enableLighting.x = 0.0f;
+	float32_t4 textureColor = tex.Sample(smp, input.uv);
+	output.color = textureColor;
+
+
+	output.normal = float32_t4(0.0f, 0.0f, 0.0f, 1.0f); 
+	
+
+	/*output.enableLighting.x = 0.0f;
 
 	output.color = float32_t4(0.0f, 0.0f, 0.0f, 1.0f);
 
@@ -60,7 +66,7 @@ PixelShaderOutput main(VSOutput input) {
 
 	output.color += tex.Sample(smp, input.uv * 3.5f);
 
-	output.normal = float32_t4(0.0f, 0.0f, 0.0f, 1.0f);
+	output.normal = float32_t4(0.0f, 0.0f, 0.0f, 1.0f);*/
 
 	return output;
 }

@@ -182,6 +182,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\CommandContext.cpp" />
     <ClCompile Include="engine\CommandQueue.cpp" />
     <ClCompile Include="application\Compute.cpp" />
+    <ClCompile Include="engine\CubeColorBuffer.cpp" />
     <ClCompile Include="engine\DebugCamera.cpp" />
     <ClCompile Include="engine\DefaultBuffer.cpp" />
     <ClCompile Include="engine\DefaultStructuredBuffer.cpp" />
@@ -191,10 +192,16 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\DirectionalLights.cpp" />
     <ClCompile Include="engine\DirectXCommon.cpp" />
     <ClCompile Include="application\DustParticle.cpp" />
+    <ClCompile Include="engine\DrawManager.cpp" />
     <ClCompile Include="engine\DWParam.cpp" />
+    <ClCompile Include="engine\FloorRenderer.cpp" />
     <ClCompile Include="engine\Framework.cpp" />
+    <ClCompile Include="engine\GPUResource.cpp" />
     <ClCompile Include="engine\GrayScale.cpp" />
     <ClCompile Include="engine\LightNumBuffer.cpp" />
+    <ClCompile Include="engine\GameObjectManager.cpp" />
+    <ClCompile Include="engine\ParticleData.cpp" />
+    <ClCompile Include="engine\ParticleModelData.cpp" />
     <ClCompile Include="engine\RwStructuredBuffer.cpp" />
     <ClCompile Include="engine\ShadowSpotLights.cpp" />
     <ClCompile Include="engine\Skeleton.cpp" />
@@ -203,6 +210,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\Sky.cpp" />
     <ClCompile Include="engine\Smooth.cpp" />
     <ClCompile Include="engine\SpotLightShadowMap.cpp" />
+    <ClCompile Include="engine\SpriteData.cpp" />
     <ClCompile Include="engine\Transition.cpp" />
     <ClCompile Include="engine\UAVBuffer.cpp" />
     <ClCompile Include="engine\Vignette.cpp" />
@@ -279,6 +287,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\CommandContext.h" />
     <ClInclude Include="engine\CommandQueue.h" />
     <ClInclude Include="application\Compute.h" />
+    <ClInclude Include="engine\CubeColorBuffer.h" />
     <ClInclude Include="engine\DebugCamera.h" />
     <ClInclude Include="engine\DefaultBuffer.h" />
     <ClInclude Include="engine\DefaultStructuredBuffer.h" />
@@ -289,10 +298,15 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\DirectionalLights.h" />
     <ClInclude Include="engine\DirectXCommon.h" />
     <ClInclude Include="application\DustParticle.h" />
+    <ClInclude Include="engine\DrawManager.h" />
     <ClInclude Include="engine\DWParam.h" />
+    <ClInclude Include="engine\FloorRenderer.h" />
     <ClInclude Include="engine\Framework.h" />
     <ClInclude Include="engine\GrayScale.h" />
     <ClInclude Include="engine\LightNumBuffer.h" />
+    <ClInclude Include="engine\GameObjectManager.h" />
+    <ClInclude Include="engine\ParticleData.h" />
+    <ClInclude Include="engine\ParticleModelData.h" />
     <ClInclude Include="engine\RwStructuredBuffer.h" />
     <ClInclude Include="engine\ShadowSpotLights.h" />
     <ClInclude Include="engine\Skeleton.h" />
@@ -301,6 +315,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\Sky.h" />
     <ClInclude Include="engine\Smooth.h" />
     <ClInclude Include="engine\SpotLightShadowMap.h" />
+    <ClInclude Include="engine\SpriteData.h" />
     <ClInclude Include="engine\Transition.h" />
     <ClInclude Include="engine\UAVBuffer.h" />
     <ClInclude Include="engine\Vignette.h" />
@@ -370,6 +385,16 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Demo|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\FloorPS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Demo|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\FloorVS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Demo|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="Resources\shaders\GrayScale.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>

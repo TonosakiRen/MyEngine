@@ -55,21 +55,20 @@ public:
 
 	static ModelManager* GetInstance();
 
-	const Vector3& GetModelSize(uint32_t modelHandle);
+	const Vector3& GetModelSize(const uint32_t modelHandle);
 
-	const Vector3& GetModelCenter (uint32_t modelHandle);
+	const Vector3& GetModelCenter (const uint32_t modelHandle);
 
-	Node& GetRootNode(uint32_t modelHandle);
+	Node& GetRootNode(const uint32_t modelHandle);
 
-	const ModelData& GetModelData(uint32_t modelHandle);
+	const ModelData& GetModelData(const uint32_t modelHandle);
 
-	void DrawInstanced(CommandContext* commandContext, uint32_t modelHandle);
-	void DrawInstanced(CommandContext* commandContext,uint32_t modelHandle,UINT textureRootParamterIndex);
-	void DrawInstanced(CommandContext* commandContext, uint32_t modelHandle, UINT textureRootParamterIndex, DescriptorHandle descriptorHandle);
-	void DrawInstanced(CommandContext* commandContext, uint32_t modelHandle, UINT textureRootParamterIndex,uint32_t textureHandle);
-	void DrawInstancing(CommandContext* commandContext, uint32_t modelHandle, UINT instancingNum, UINT textureRootParamterIndex);
+	void DrawInstanced(CommandContext& commandContext, const  uint32_t modelHandle);
+	void DrawInstanced(CommandContext& commandContext, const uint32_t modelHandle,const UINT textureRootParamterIndex, const uint32_t textureHandle = 0);
+	void DrawInstanced(CommandContext& commandContext, const  uint32_t modelHandle, UINT textureRootParamterIndex, DescriptorHandle descriptorHandle);
+	void DrawInstancing(CommandContext& commandContext, const  uint32_t modelHandle, UINT instancingNum, UINT textureRootParamterIndex);
 
-	void DrawSkinningInstanced(CommandContext* commandContext, uint32_t modelHandle,const SkinCluster& skinCluster, UINT textureRootParamterIndex, uint32_t textureHandle = 0);
+	void DrawSkinningInstanced(CommandContext& commandContext,const uint32_t modelHandle,const SkinCluster& skinCluster, UINT textureRootParamterIndex, uint32_t textureHandle = 0);
 
 	static Node ReadNode(aiNode* node);
 

@@ -7,9 +7,6 @@
 
 using namespace Microsoft::WRL;
 
-ID3D12GraphicsCommandList* Voronoi::sCommandList = nullptr;
-
-
 Voronoi::Voronoi()
 {
 }

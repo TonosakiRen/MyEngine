@@ -15,11 +15,12 @@
 #include "Material.h"
 #include "Mesh.h"
 
+#include "ParticleData.h"
+
 class Particle
 {
 public:
 
-	const uint32_t kParticleNum;
 
 	enum class RootParameter {
 		kWorldTransform,
@@ -35,37 +36,26 @@ public:
 		Vector2 uv;
 	};
 
-	struct InstancingBufferData {
-		Matrix4x4 matWorld;
-	};
-
-	static void StaticInitialize();
-	static void Finalize();
-	static void PreDraw(CommandContext* commandContext, const ViewProjection& viewProjection);
-	static void PostDraw();
-
-	Particle(uint32_t particleNum);
 	void Initialize();
-	void Draw(const std::vector<InstancingBufferData>& bufferData, const Vector4& color, const uint32_t textureHadle);
+	void Finalize();
+	void PreDraw(CommandContext& commandContext, const ViewProjection& viewProjection);
+
+	void Draw(CommandContext& commandContext, ParticleData& bufferData, const Material& material , const uint32_t textureHadle = 0);
 	void CreateMesh();
-
-public:
-	Material material_;
+	void CreatePipeline();
 
 private:
-	static void CreatePipeline();
-private:
-	static CommandContext* commandContext_;
-	static std::unique_ptr<RootSignature> rootSignature_;
-	static std::unique_ptr<PipelineState> pipelineState_;
-	static Matrix4x4 billBordMatrix;
 
-	D3D12_VERTEX_BUFFER_VIEW vbView_{};
-	D3D12_INDEX_BUFFER_VIEW ibView_{};
+private:
+	std::unique_ptr<RootSignature> rootSignature_;
+	std::unique_ptr<PipelineState> pipelineState_;
+	Matrix4x4 billBordMatrix;
+
+	D3D12_VERTEX_BUFFER_VIEW vbView_;
+	D3D12_INDEX_BUFFER_VIEW ibView_;
 	std::vector<VertexData> vertices_;
 	std::vector<uint16_t> indices_;
 	UploadBuffer vertexBuffer_;
 	UploadBuffer indexBuffer_;
-	
-	StructuredBuffer structuredBuffer_;
+
 };

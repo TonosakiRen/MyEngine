@@ -208,7 +208,7 @@ void Collider::Draw(Vector4 color)
 
 	if (isDrawCollider) {
 		MatrixUpdate();
-		cube_.Draw(worldTransform_ ,color);
+		cube_.Draw(color);
 	}
 
 }

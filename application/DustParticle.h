@@ -1,5 +1,7 @@
 #pragma once
-#include "ParticleModel.h"
+#include <memory>
+#include "ParticleModelData.h"
+#include "WorldTransform.h"
 class DustParticle
 {
 public:
@@ -7,7 +9,7 @@ public:
 	DustParticle();
 	void Initialize(Vector3 minDirection, Vector3 maxDirection);
 	void Update();
-	void Draw(Vector4 color = { 1.0f,1.0f,1.0f,1.0f });
+	void Draw();
 	void SetDirection(Vector3 minDirection, Vector3 maxDirection) {
 		minDirection_ = minDirection;
 		maxDirection_ = maxDirection;
@@ -35,7 +37,7 @@ private:
 	float speed_ = 0.1f;
 	float scaleSpeed_ = 0.01f;
 	bool isEmit_ = false;
-	std::unique_ptr<ParticleModel> particle_;
+	std::unique_ptr<ParticleModelData> particleData_;
 	Vector3 minDirection_;
 	Vector3 maxDirection_;
 };

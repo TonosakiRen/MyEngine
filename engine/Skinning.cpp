@@ -10,14 +10,7 @@
 
 using namespace Microsoft::WRL;
 
-CommandContext* Skinning::commandContext_ = nullptr;
-std::unique_ptr<RootSignature> Skinning::rootSignature_;
-std::unique_ptr<PipelineState> Skinning::pipelineState_;
-
-
-
-
-void Skinning::StaticInitialize() {
+void Skinning::Initialize() {
     CreatePipeline();
 }
 
@@ -27,22 +20,15 @@ void Skinning::Finalize()
     pipelineState_.reset();
 }
 
-void Skinning::PreDraw(CommandContext* commandContext, const ViewProjection& viewProjection) {
-    assert(Skinning::commandContext_ == nullptr);
+void Skinning::PreDraw(CommandContext& commandContext, const ViewProjection& viewProjection) {
 
-    commandContext_ = commandContext;
-
-    commandContext_->SetPipelineState(*pipelineState_);
-    commandContext_->SetGraphicsRootSignature(*rootSignature_);
+    commandContext.SetPipelineState(*pipelineState_);
+    commandContext.SetGraphicsRootSignature(*rootSignature_);
 
     // CBVをセット（ビュープロジェクション行列）
-    commandContext_->SetConstantBuffer(static_cast<UINT>(RootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
+    commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
 
-    commandContext_->SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-}
-
-void Skinning::PostDraw() {
-    commandContext_ = nullptr;
+    commandContext.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 
 void Skinning::CreatePipeline() {
@@ -191,15 +177,15 @@ void Skinning::CreatePipeline() {
     }
 }
 
-void Skinning::Draw(uint32_t modelHandle, const WorldTransform& worldTransform, const SkinCluster& skinCluster) {
+void Skinning::Draw(CommandContext& commandContext,const uint32_t modelHandle, const WorldTransform& worldTransform, const Material& material, const SkinCluster& skinCluster) {
 
     // CBVをセット（ワールド行列）// CBVをセット（ワールド行列）
-    commandContext_->SetConstantBuffer(static_cast<UINT>(RootParameter::kWorldTransform), worldTransform.GetGPUVirtualAddress());
+    commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kWorldTransform), worldTransform.GetGPUVirtualAddress());
 
     // CBVをセット（マテリアル）
-    commandContext_->SetConstantBuffer(static_cast<UINT>(RootParameter::kMaterial), Model::normalMaterial_->GetGPUVirtualAddress());
+    commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kMaterial), material.GetGPUVirtualAddress());
 
-    commandContext_->SetDescriptorTable(static_cast<UINT>(RootParameter::kMatrixPalette), skinCluster.GetSRV());
+    commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kMatrixPalette), skinCluster.GetSRV());
 
-    ModelManager::GetInstance()->DrawSkinningInstanced(commandContext_, modelHandle, skinCluster, static_cast<UINT>(RootParameter::kTexture));
+    ModelManager::GetInstance()->DrawSkinningInstanced(commandContext, modelHandle, skinCluster, static_cast<UINT>(RootParameter::kTexture));
 }

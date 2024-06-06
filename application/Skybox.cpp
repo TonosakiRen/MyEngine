@@ -1,11 +1,12 @@
 #include "Skybox.h"
+#include "DrawManager.h"
 
 void Skybox::Initialize(const std::string name)
 {
 	GameObject::Initialize(name);
 	material_.enableLighting_ = false;
 	material_.Update();
-	worldTransform_.scale_ = worldTransform_.scale_ * 100.0f;
+	worldTransform_.scale_ = {50.0f,50.0f,50.0f };
 }
 
 void Skybox::Update()
@@ -15,5 +16,5 @@ void Skybox::Update()
 
 void Skybox::Draw()
 {
-	GameObject::SkyDraw();
+	DrawManager::GetInstance()->DrawSky(worldTransform_);
 }

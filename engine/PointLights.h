@@ -10,7 +10,7 @@ class PointLights
 public:
 
 	//4の倍数
-	static const uint32_t  lightNum = 128;
+	static const uint32_t  lightNum = 128 * 2;
 
 	struct PointLight {
 		Vector4 color = { 1.0f, 1.0f, 1.0f,1.0f };

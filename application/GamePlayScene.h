@@ -16,6 +16,7 @@
 #include  "Enemy.h"
 #include  "EnemyBulletManager.h"
 #include  "SphereLights.h"
+#include "GameObjectManager.h"
 
 
 class GamePlayScene :
@@ -26,20 +27,7 @@ public:
     void Finalize() override;
     void Update() override;
 
-    void ModelDraw() override;
-
-	void SkyDraw() override;
-
-	void SkinningDraw() override;
-
-	void ShadowDraw() override;
-	void SpotLightShadowDraw() override;
-
-	void ParticleDraw() override;
-	void ParticleBoxDraw() override;
-
-	void PreSpriteDraw() override;
-	void PostSpriteDraw() override;
+    void Draw() override;
 
 	static const Player* player;
 
@@ -73,5 +61,7 @@ private:
 	//Enemyが出現するフレーム
 	uint32_t enemySpawnFrame_ = 0;
 
+
+	std::vector<std::unique_ptr<GameObject>>* gameObjects_;
 };
 

@@ -6,12 +6,8 @@
 #include "Renderer.h"
 
 using namespace Microsoft::WRL;
-CommandContext* Sprite::commandContext_ = nullptr;
-std::unique_ptr<RootSignature> Sprite::rootSignature_;
-std::unique_ptr<PipelineState> Sprite::pipelineState_;
-Matrix4x4 Sprite::matProjection_;
 
-void Sprite::StaticInitialize() {
+void Sprite::Initialize() {
 	ComPtr<IDxcBlob> vsBlob;    
 	ComPtr<IDxcBlob> psBlob;    
 	ComPtr<ID3DBlob> errorBlob; 
@@ -119,119 +115,33 @@ void Sprite::Finalize()
 	pipelineState_.reset();
 }
 
-void Sprite::PreDraw(CommandContext* commandContext) {
-	assert(Sprite::commandContext_ == nullptr);
+void Sprite::PreDraw(CommandContext& commandContext) {
 
-	commandContext_ = commandContext;
-
-	commandContext_->SetPipelineState(*pipelineState_);
-	commandContext_->SetGraphicsRootSignature(*rootSignature_);
-	commandContext_->SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+	commandContext.SetPipelineState(*pipelineState_);
+	commandContext.SetGraphicsRootSignature(*rootSignature_);
+	commandContext.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 }
 
-void Sprite::PostDraw() {
-	Sprite::commandContext_ = nullptr;
-}
+void Sprite::Draw(CommandContext& commandContext,SpriteData& spriteData) {
 
-void Sprite::Initialize(uint32_t textureHandle, Vector2 position, Vector4 color, Vector2 anchorpoint, bool isFlipX, bool isFlipY) {
+	spriteData.TransferVertices();
 
-	Vector2 size = { 100.0f, 100.0f };
-
-	const D3D12_RESOURCE_DESC& resDesc = TextureManager::GetInstance()->GetResoureDesc(textureHandle);
-	size = { (float)resDesc.Width, (float)resDesc.Height };
-
-	position_ = position;
-	size_ = size;
-	anchorPoint_ = anchorpoint;
-	matWorld_ = MakeIdentity4x4();
-	color_ = color;
-	textureHandle_ = textureHandle;
-	isFlipX_ = isFlipX;
-	isFlipY_ = isFlipY;
-	texSize_ = size;
-
-	resourceDesc_ = TextureManager::GetInstance()->GetResoureDesc(textureHandle_);
-
-	vertexBuffer_.Create(sizeof(VertexData) * 4);
-
-	// 頂点バッファへのデータ転送
-	TransferVertices();
-
-	// 頂点バッファビューの作成
-	vbView_.BufferLocation = vertexBuffer_->GetGPUVirtualAddress();
-	vbView_.SizeInBytes = sizeof(VertexData) * 4;
-	vbView_.StrideInBytes = sizeof(VertexData);
-
-	constBuffer_.Create((sizeof(ConstBufferData) + 0xff) & ~0xff);
-}
-
-void Sprite::SetTextureHandle(uint32_t textureHandle) {
-	textureHandle_ = textureHandle;
-	resourceDesc_ = TextureManager::GetInstance()->GetResoureDesc(textureHandle_);
-}
-
-void Sprite::Draw() {
-
-	TransferVertices();
-
-	matWorld_ = MakeIdentity4x4();
-	matWorld_ *= MakeRotateZMatrix(rotation_);
-	matWorld_ *= MakeTranslateMatrix({ position_.x, position_.y, 0.0f });
+	spriteData.matWorld_ = MakeIdentity4x4();
+	spriteData.matWorld_ *= MakeRotateZMatrix(spriteData.rotation_);
+	spriteData.matWorld_ *= MakeTranslateMatrix({ spriteData.position_.x, spriteData.position_.y, 0.0f });
 
 	ConstBufferData mapData;
 
-	mapData.color = color_;
-	mapData.mat = matWorld_ * matProjection_;
+	mapData.color = spriteData.color_;
+	mapData.mat = spriteData.matWorld_ * matProjection_;
 
-	constBuffer_.Copy(mapData);
+	spriteData.constBuffer_.Copy(mapData);
 
-	commandContext_->SetVertexBuffer(0, 1, &vbView_);
+	commandContext.SetVertexBuffer(0, 1, &spriteData.vbView_);
 
-	commandContext_->SetConstantBuffer(0, constBuffer_.GetGPUVirtualAddress());
+	commandContext.SetConstantBuffer(0, spriteData.constBuffer_.GetGPUVirtualAddress());
 
-	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(commandContext_, 1, textureHandle_);
+	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(commandContext, 1, spriteData.textureHandle_);
 	
-	commandContext_->DrawInstanced(4, 1, 0, 0);
-}
-
-void Sprite::TransferVertices() {
-
-	enum { LB, LT, RB, RT };
-
-	float left = (0.0f - anchorPoint_.x) * size_.x;
-	float right = (1.0f - anchorPoint_.x) * size_.x;
-	float top = (0.0f - anchorPoint_.y) * size_.y;
-	float bottom = (1.0f - anchorPoint_.y) * size_.y;
-	if (isFlipX_) { 
-		left = -left;
-		right = -right;
-	}
-
-	if (isFlipY_) {
-		top = -top;
-		bottom = -bottom;
-	}
-
-	// 頂点データ
-	VertexData vertices[4];
-
-	vertices[LB].pos = { left, bottom, 0.0f };  
-	vertices[LT].pos = { left, top, 0.0f };     
-	vertices[RB].pos = { right, bottom, 0.0f }; 
-	vertices[RT].pos = { right, top, 0.0f };    
-
-	{
-		float tex_left = texBase_.x / resourceDesc_.Width;
-		float tex_right = (texBase_.x + texSize_.x) / resourceDesc_.Width;
-		float tex_top = texBase_.y / resourceDesc_.Height;
-		float tex_bottom = (texBase_.y + texSize_.y) / resourceDesc_.Height;
-
-		vertices[LB].uv = { tex_left, tex_bottom };  
-		vertices[LT].uv = { tex_left, tex_top };     
-		vertices[RB].uv = { tex_right, tex_bottom }; 
-		vertices[RT].uv = { tex_right, tex_top };    
-	}
-
-	// 頂点バッファへのデータ転送
-	vertexBuffer_.Copy(vertices, sizeof(vertices));
+	commandContext.DrawInstanced(4, 1, 0, 0);
 }

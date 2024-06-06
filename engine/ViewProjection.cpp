@@ -23,7 +23,7 @@ void ViewProjection::SwitchIsUseDebugCamera()
 }
 
 void ViewProjection::Initialize() {
-    constBuffer_.Create((sizeof(ConstBufferData) + 0xff) & ~0xff);
+    constBuffer_.Create(sizeof(ConstBufferData));
     Update();
 }
 

@@ -10,17 +10,7 @@ public:
 
 	void Update();
 
-	void ModelDraw();
-	void SkyDraw();
-	void SkinningDraw();
-	void ShadowDraw();
-	void SpotLightShadowDraw();
-
-	void ParticleDraw();
-	void ParticleBoxDraw();
-
-	void PreSpriteDraw();
-	void PostSpriteDraw();
+	void Draw();
 
 	void SetNextScene(BaseScene* nextScene) { nextScene_ = nextScene; };
 

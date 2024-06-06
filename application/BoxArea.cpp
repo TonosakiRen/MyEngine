@@ -1,6 +1,7 @@
 #include "BoxArea.h"
 #include "TextureManager.h"
 #include "ImGuiManager.h"
+#include "DrawManager.h"
 
 void BoxArea::Initialize(const std::string name)
 {
@@ -19,6 +20,6 @@ void BoxArea::Update()
 
 void BoxArea::Draw()
 {
-	GameObject::Draw(worldTransform_, textureHandle_);
+	DrawManager::GetInstance()->DrawModel(worldTransform_,modelHandle_, textureHandle_, material_);
 }
 

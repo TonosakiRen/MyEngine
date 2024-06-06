@@ -22,21 +22,17 @@ public:
 		parameterNum
 	};
 
-	static bool isDrawShadowMap;
+	void Initialize();
+	void Finalize();
+	void PreDraw(CommandContext& commandContext, DirectionalLights& directionalLights);
 
-	static void StaticInitialize();
-	static void Finalize();
-	static void PreDraw(CommandContext* commandContext, DirectionalLights& directionalLights);
-	static void PostDraw();
-
-	static void Draw(uint32_t modelHandle, const WorldTransform& worldTransform);
+	void Draw(CommandContext& commandContext, uint32_t modelHandle, const WorldTransform& worldTransform);
 
 private:
-	static void CreatePipeline();
+	void CreatePipeline();
 private:
-	static CommandContext* commandContext_;
-	static std::unique_ptr<RootSignature> rootSignature_;
-	static std::unique_ptr<PipelineState> pipelineState_;
-	static DirectionalLights* directionalLights_;
+	std::unique_ptr<RootSignature> rootSignature_;
+	std::unique_ptr<PipelineState> pipelineState_;
+	DirectionalLights* directionalLights_;
 };
 

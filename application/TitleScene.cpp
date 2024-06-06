@@ -7,6 +7,7 @@
 #include "GamePlayScene.h"
 #include "SceneManager.h"
 #include "GameScene.h"
+#include "DrawManager.h"
 void TitleScene::Initialize()
 {
 	input_ = Input::GetInstance();
@@ -15,7 +16,7 @@ void TitleScene::Initialize()
 	title_->Initialize("title.obj");
 	title_->GetWorldTransform()->translation_ = { 0.0f,3.0f,0.0f };
 	title_->UpdateMatrix();
-	pushSpace_ = std::make_unique<Sprite>();
+	pushSpace_ = std::make_unique<SpriteData>();
 	pushSpace_->Initialize(TextureManager::Load("pushSpace.png"), { WinApp::kWindowWidth / 2.0f,WinApp::kWindowHeight / 2.0f + 300.0f });
 
 	GameScene::currentViewProjection_->SetTranslation({0.0f,4.5f,-8.0f});
@@ -50,42 +51,8 @@ void TitleScene::Update()
 	title_->UpdateMatrix();
 }
 
-void TitleScene::ModelDraw()
+void TitleScene::Draw()
 {
 	title_->Draw();
+	DrawManager::GetInstance()->DrawPostSprite(*pushSpace_);
 }
-
-void TitleScene::SkyDraw()
-{
-}
-
-void TitleScene::SkinningDraw()
-{
-}
-
-void TitleScene::ShadowDraw()
-{
-
-}
-
-void TitleScene::SpotLightShadowDraw()
-{
-}
-
-void TitleScene::ParticleDraw()
-{
-}
-
-void TitleScene::ParticleBoxDraw()
-{
-}
-
-void TitleScene::PreSpriteDraw()
-{
-}
-
-void TitleScene::PostSpriteDraw()
-{
-	pushSpace_->Draw();
-}
-

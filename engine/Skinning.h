@@ -11,6 +11,7 @@
 #include "ViewProjection.h"
 #include "WorldTransform.h"
 #include "Mesh.h"
+#include "Material.h"
 
 #include "SkinCluster.h"
 
@@ -29,18 +30,16 @@ public:
 		parameterNum
 	};
 
-	static void StaticInitialize();
-	static void Finalize();
-	static void PreDraw(CommandContext* commandContext, const ViewProjection& viewProjection);
-	static void PostDraw();
+	void Initialize();
+	void Finalize();
+	void PreDraw(CommandContext& commandContext, const ViewProjection& viewProjection);
 
-	static void Draw(uint32_t modelHandle, const WorldTransform& worldTransform, const SkinCluster& skinCluster);
+	void Draw(CommandContext& commandContext,const uint32_t modelHandle, const WorldTransform& worldTransform,const Material& material, const SkinCluster& skinCluster);
 
 private: 
-	static void CreatePipeline();
+	void CreatePipeline();
 private:
-	static CommandContext* commandContext_;
-	static std::unique_ptr<RootSignature> rootSignature_;
-	static std::unique_ptr<PipelineState> pipelineState_;
+	std::unique_ptr<RootSignature> rootSignature_;
+	std::unique_ptr<PipelineState> pipelineState_;
 };
 

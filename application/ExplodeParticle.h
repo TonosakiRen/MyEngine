@@ -1,5 +1,7 @@
 #pragma once
-#include "ParticleModel.h"
+#include <memory>
+#include "ParticleModelData.h"
+#include "WorldTransform.h"
 class PointLights;
 class ExplodeParticle
 {
@@ -42,7 +44,7 @@ private:
 	float speed_ = 0.1f;
 	float scaleSpeed_ = 0.01f;
 	bool isEmit_ = false;
-	std::unique_ptr<ParticleModel> particle_;
+	std::unique_ptr<ParticleModelData> particle_;
 	Vector3 minDirection_;
 	Vector3 maxDirection_;
 	Vector3 acceleration_;

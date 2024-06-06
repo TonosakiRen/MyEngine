@@ -74,9 +74,6 @@
     <Filter Include="Game\Scene">
       <UniqueIdentifier>{6d4f3c8c-9564-4272-adf6-b3958391d2c6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\Particle">
-      <UniqueIdentifier>{1820220b-483d-485b-968f-ded23a5732e3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Game\Player">
       <UniqueIdentifier>{f806b664-fb89-4bdb-be9b-d5f92a9288a6}</UniqueIdentifier>
     </Filter>
@@ -94,6 +91,21 @@
     </Filter>
     <Filter Include="Engine\Animation">
       <UniqueIdentifier>{49f097c0-c68c-4793-a54b-3b5dc154bdc0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\DrawManager">
+      <UniqueIdentifier>{4117657c-d136-48f4-b988-5c1b47d35590}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Particle">
+      <UniqueIdentifier>{1820220b-483d-485b-968f-ded23a5732e3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\FloorRenderer">
+      <UniqueIdentifier>{670fbe95-3bb6-4402-987d-3da3a2dd3b41}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Loader">
+      <UniqueIdentifier>{dfa7d86a-50f9-4618-9471-7628f44a98f3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\GameObjectManager">
+      <UniqueIdentifier>{00d6d0a4-5148-4aa1-90a0-cc8392bce01a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -381,6 +393,30 @@
     </ClCompile>
     <ClCompile Include="engine\Smooth.cpp">
       <Filter>Engine\PostEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\DrawManager.cpp">
+      <Filter>Engine\DrawManager</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\ParticleData.cpp">
+      <Filter>Engine\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\ParticleModelData.cpp">
+      <Filter>Engine\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\SpriteData.cpp">
+      <Filter>Engine\Sprite</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\FloorRenderer.cpp">
+      <Filter>Engine\FloorRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\GPUResource.cpp">
+      <Filter>Engine\GPUResource</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\CubeColorBuffer.cpp">
+      <Filter>Engine\GPUResource</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\GameObjectManager.cpp">
+      <Filter>Engine\Loader</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -678,6 +714,27 @@
     <ClInclude Include="engine\Smooth.h">
       <Filter>Engine\PostEffect</Filter>
     </ClInclude>
+    <ClInclude Include="engine\DrawManager.h">
+      <Filter>Engine\DrawManager</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\ParticleData.h">
+      <Filter>Engine\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\ParticleModelData.h">
+      <Filter>Engine\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\SpriteData.h">
+      <Filter>Engine\Sprite</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\FloorRenderer.h">
+      <Filter>Engine\FloorRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\CubeColorBuffer.h">
+      <Filter>Engine\GPUResource</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\GameObjectManager.h">
+      <Filter>Engine\Loader</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\ModelPS.hlsl">
@@ -789,6 +846,12 @@
       <Filter>shaders</Filter>
     </FxCompile>
     <FxCompile Include="Resources\shaders\SmoothPS.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\FloorPS.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\FloorVS.hlsl">
       <Filter>shaders</Filter>
     </FxCompile>
   </ItemGroup>

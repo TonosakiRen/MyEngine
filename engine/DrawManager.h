@@ -1,0 +1,91 @@
+#pragma once
+
+#include <vector>
+#include <memory>
+#include <functional>
+
+#include "CommandContext.h"
+#include "Material.h"
+#include "WorldTransform.h"
+#include "SkinCluster.h"
+#include "ParticleModelData.h"
+#include "ParticleData.h"
+#include "SpriteData.h"
+
+#include "Model.h"
+#include "Skinning.h"
+#include "Particle.h"
+#include "ParticleModel.h"
+#include "Sprite.h"
+#include "ShadowMap.h"
+#include "SpotLightShadowMap.h"
+#include "Sky.h"
+#include "FloorRenderer.h"
+#include "ViewProjection.h"
+
+#include "DirectionalLights.h"
+#include "ShadowSpotLights.h"
+
+class DrawManager
+{
+friend class Renderer;
+public:
+
+	enum Call {
+		kModel,
+		kSkinning,
+		kParticle,
+		kParticleModel,
+		kPreSprite,
+		kPostSprite,
+		kShadow,
+		kSpotLightShadow,
+		kSky,
+		kFloor,
+
+		kCallNum,
+	};
+
+	static DrawManager* GetInstance();
+
+	void DrawModel(const WorldTransform& worldTransform, const uint32_t modelHandle = 0,const uint32_t textureHandle = 0, const Material& material = *defaultMaterial_.get());
+	void DrawSkinning(const WorldTransform& worldTransform, const SkinCluster& skinCluster,const uint32_t modelHandle = 0, const Material& material = *defaultMaterial_.get());
+	void DrawParticle(ParticleData& bufferData, const uint32_t textureHandle = 0, const Material& material = *defaultMaterial_.get());
+	void DrawParticleModel(ParticleModelData& bufferData, const uint32_t modelHandle = 0, const Material& material = *defaultMaterial_.get());
+	void DrawPreSprite(SpriteData& spriteData);
+	void DrawPostSprite(SpriteData& spriteData);
+	void DrawShadow(const WorldTransform& worldTransform, const uint32_t modelHandle = 0);
+	void DrawSpotLightShadow(const WorldTransform& worldTransform, const uint32_t modelHandle = 0);
+	void DrawSky(const WorldTransform& worldTransform);
+	void DrawFloor(const WorldTransform& worldTransform, const uint32_t modelHandle = 0);
+private:
+
+	void Initialize(CommandContext& CommandContext);
+	void Finalize();
+	void AllDraw(const ViewProjection& viewProjection);
+	void ShadowDraw(DirectionalLights& directionalLights);
+	void ShadowSpotLightDraw(ShadowSpotLights& shadowSpotLights);
+	void ResetCalls();
+
+private:
+	std::unique_ptr<Model> modelPipeline_;
+	std::unique_ptr<Skinning> skinningPipeline_;
+	std::unique_ptr<Particle> particlePipeline_;
+	std::unique_ptr<ParticleModel> particleModelPipeline_;
+	std::unique_ptr<Sprite> spritePipeline_;
+	std::unique_ptr<ShadowMap> shadowPipeline_;
+	std::unique_ptr<SpotLightShadowMap> spotLightShadowPipeline_;
+	std::unique_ptr<Sky> skyPipeline_;
+	std::unique_ptr<FloorRenderer> floorPipeline_;
+
+	static std::unique_ptr<Material> defaultMaterial_;
+	CommandContext* commandContext_;
+
+	std::vector<std::function<void()>> calls[kCallNum];
+private:
+	DrawManager() = default;
+	~DrawManager() = default;
+	DrawManager(const DrawManager&) = delete;
+	DrawManager& operator=(const DrawManager&) = delete;
+};
+

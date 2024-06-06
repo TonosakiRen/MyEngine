@@ -4,28 +4,16 @@
 #include "ShaderManager.h"
 #include "ImGuiManager.h"
 #include "Renderer.h"
+#include "Helper.h"
 
 using namespace Microsoft::WRL;
 
-CommandContext* Sky::commandContext_ = nullptr;
-std::unique_ptr<RootSignature> Sky::rootSignature_;
-std::unique_ptr<PipelineState> Sky::pipelineState_;
-
-std::unique_ptr<Voronoi> Sky::voronoi_;
-
-Vector4 Sky::topHSVA_ = { 0.790f,1.0f,0.00f,1.0f };
-Vector4 Sky::bottomHSVA_ = { 0.220f,1.0f,0.03f,1.0f };
-
-
-void Sky::StaticInitialize() {
+void Sky::Initialize(CommandContext& commnadContext) {
     CreatePipeline();
-}
-
-void Sky::CreateVoronoi(CommandContext* commandContext)
-{
+    CreateMesh();
     voronoi_ = std::make_unique<Voronoi>();
     voronoi_->Initialize(pointNum_);
-    voronoi_->Render(*commandContext);
+    voronoi_->Render(commnadContext);
 }
 
 void Sky::Finalize()
@@ -35,31 +23,26 @@ void Sky::Finalize()
     voronoi_.reset();
 }
 
-void Sky::PreDraw(CommandContext* commandContext, const ViewProjection& viewProjection) {
-    assert(Sky::commandContext_ == nullptr);
+void Sky::PreDraw(CommandContext& commandContext, const ViewProjection& viewProjection) {
 
-    commandContext_ = commandContext;
 
-    commandContext_->SetPipelineState(*pipelineState_);
-    commandContext_->SetGraphicsRootSignature(*rootSignature_);
+    commandContext.SetPipelineState(*pipelineState_);
+    commandContext.SetGraphicsRootSignature(*rootSignature_);
 
     // CBVをセット（ビュープロジェクション行列）
-    commandContext_->SetConstantBuffer(static_cast<UINT>(RootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
+    commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
 
     ImGui::Begin("Sky");
     ImGui::DragFloat4("HSVA TOP COLOR", &topHSVA_.x, 0.01f,0.0f,1.0f);
     ImGui::DragFloat4("HSVA BOTTOM COLOR", &bottomHSVA_.x, 0.01f, 0.0f, 1.0f);
     ImGui::End();
 
-    commandContext_->SetConstants(static_cast<UINT>(RootParameter::kTopColor), topHSVA_.x, topHSVA_.y, topHSVA_.z, topHSVA_.w);
-    commandContext_->SetConstants(static_cast<UINT>(RootParameter::kBottomColor), bottomHSVA_.x, bottomHSVA_.y, bottomHSVA_.z, bottomHSVA_.w);
+    commandContext.SetConstants(static_cast<UINT>(RootParameter::kTopColor), topHSVA_.x, topHSVA_.y, topHSVA_.z, topHSVA_.w);
+    commandContext.SetConstants(static_cast<UINT>(RootParameter::kBottomColor), bottomHSVA_.x, bottomHSVA_.y, bottomHSVA_.z, bottomHSVA_.w);
 
-    commandContext_->SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    commandContext.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 
-void Sky::PostDraw() {
-    commandContext_ = nullptr;
-}
 
 void Sky::CreatePipeline() {
     HRESULT result = S_FALSE;
@@ -109,17 +92,10 @@ void Sky::CreatePipeline() {
 
     {
 
-
         D3D12_INPUT_ELEMENT_DESC inputLayout[] = {
-          {
-           "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT,
-           D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-          {
-           "NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT,
-           D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-          {
-           "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,    0, D3D12_APPEND_ALIGNED_ELEMENT,
-           D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+                 {
+                  "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT,
+                  D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
         };
 
         // グラフィックスパイプラインの流れを設定
@@ -132,7 +108,10 @@ void Sky::CreatePipeline() {
         // ラスタライザステート
         gpipeline.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
         //  デプスステンシルステート
-        gpipeline.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
+        gpipeline.DepthStencilState.DepthEnable = true;
+        gpipeline.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+        gpipeline.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+
 
         // レンダーターゲットのブレンド設定
         D3D12_RENDER_TARGET_BLEND_DESC blenddesc{};
@@ -187,10 +166,82 @@ void Sky::CreatePipeline() {
     }
 }
 
-void Sky::Draw(uint32_t modelHandle, const WorldTransform& worldTransform) {
+void Sky::CreateMesh()
+{
+    vertices_.resize(36);
+    vertices_ = {
+        // 右
+      { 1.0f, 1.0f, 1.0f ,1.0f},
+      { 1.0f, 1.0f,-1.0f,1.0f },
+      { 1.0f,-1.0f, 1.0f,1.0f },
+
+      { 1.0f,-1.0f, 1.0f ,1.0f},
+      { 1.0f, 1.0f,-1.0f ,1.0f},
+      { 1.0f,-1.0f,-1.0f ,1.0f},
+         // 左
+      {-1.0f, 1.0f,-1.0f ,1.0f},
+      {-1.0f, 1.0f, 1.0f ,1.0f},
+      {-1.0f,-1.0f,-1.0f ,1.0f},
+
+      {-1.0f,-1.0f,-1.0f ,1.0f},
+      {-1.0f, 1.0f, 1.0f ,1.0f},
+      {-1.0f,-1.0f, 1.0f ,1.0f},
+         // 前
+      {-1.0f, 1.0f, 1.0f,1.0f },
+      { 1.0f, 1.0f, 1.0f ,1.0f},
+      {-1.0f,-1.0f, 1.0f ,1.0f},
+
+      {-1.0f,-1.0f, 1.0f ,1.0f},
+      { 1.0f, 1.0f, 1.0f,1.0f },
+      { 1.0f,-1.0f, 1.0f ,1.0f},
+      // 後
+      { 1.0f, 1.0f,-1.0f ,1.0f},
+      {-1.0f, 1.0f,-1.0f ,1.0f},
+      { 1.0f,-1.0f,-1.0f,1.0f },
+      { 1.0f,-1.0f,-1.0f ,1.0f},
+      {-1.0f, 1.0f,-1.0f,1.0f },
+      {-1.0f,-1.0f,-1.0f ,1.0f},
+       // 上
+      {-1.0f, 1.0f,-1.0f ,1.0f},
+      { 1.0f, 1.0f,-1.0f ,1.0f},
+      {-1.0f, 1.0f, 1.0f ,1.0f},
+      {-1.0f, 1.0f, 1.0f ,1.0f},
+      { 1.0f, 1.0f,-1.0f ,1.0f},
+      { 1.0f, 1.0f, 1.0f ,1.0f},
+       // 下
+      {-1.0f,-1.0f, 1.0f ,1.0f},
+      { 1.0f,-1.0f, 1.0f ,1.0f},
+      {-1.0f,-1.0f,-1.0f ,1.0f},
+      {-1.0f,-1.0f,-1.0f ,1.0f},
+      { 1.0f,-1.0f, 1.0f ,1.0f},
+      { 1.0f,-1.0f,-1.0f ,1.0f},
+    };
+
+    // 頂点データのサイズ
+    UINT sizeVB = static_cast<UINT>(sizeof(Vector4) * vertices_.size());
+
+    vertexBuffer_.Create(sizeVB);
+
+    vertexBuffer_.Copy(vertices_.data(), sizeVB);
+
+    // 頂点バッファビューの作成
+    vbView_.BufferLocation = vertexBuffer_->GetGPUVirtualAddress();
+    vbView_.SizeInBytes = sizeVB;
+    vbView_.StrideInBytes = sizeof(vertices_[0]);
+
+}
+
+void Sky::Draw(CommandContext& commandContext, const WorldTransform& worldTransform) {
 
     // CBVをセット（ワールド行列）
-    commandContext_->SetConstantBuffer(static_cast<UINT>(RootParameter::kWorldTransform),worldTransform.GetGPUVirtualAddress());
+    commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kWorldTransform),worldTransform.GetGPUVirtualAddress());
+    // srvセット
+    commandContext.SetDescriptorTable(UINT(RootParameter::kVoronoiTexture), TextureManager::GetInstance()->GetSRV("rostock_laage_airport_4k.dds"));
 
-    ModelManager::GetInstance()->DrawInstanced(commandContext_, modelHandle,UINT(RootParameter::kVoronoiTexture),voronoi_->GetResult().GetSRV());
+    //ModelManager::GetInstance()->DrawInstanced(commandContext, ModelManager::GetInstance()->Load("box1x1Inverse.obj"));
+
+    // 頂点バッファの設定
+    commandContext.SetVertexBuffer(0, 1, &vbView_);
+    // 描画コマンド
+    commandContext.DrawInstanced(static_cast<UINT>(vertices_.size()), 1, 0, 0);
 }

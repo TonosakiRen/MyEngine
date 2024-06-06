@@ -4,19 +4,9 @@
 #include "ModelManager.h"
 #include <Windows.h>
 #include "GameScene.h"
-#include "Particle.h"
-#include "ParticleModel.h"
-#include "PostEffect.h"
-#include "GaussianBlur.h"
 #include "ShaderManager.h"
 #include "Renderer.h"
-#include "Compute.h"
-#include "ShadowMap.h"
-#include "SpotLightShadowMap.h"
-#include "Model.h"
-#include "Sky.h"
-#include "Sprite.h"
-#include "Skinning.h"
+#include "GameObjectManager.h"
 
 
 void MyGame::Initialize()
@@ -27,24 +17,14 @@ void MyGame::Initialize()
 
 	// テクスチャマネージャの初期化
 	textureManager = TextureManager::GetInstance();
-	textureManager->Initialize();
+	textureManager->Initialize(renderer->GetCommandContext());
 	textureManager->Load("white1x1.png");
 
 	modelManager = ModelManager::GetInstance();
 
 	sceneManager = SceneManager::GetInstance();
 
-
-	// 3Dオブジェクト静的初期化
-	Model::StaticInitialize();
-	Sky::StaticInitialize();
-	ShadowMap::StaticInitialize();
-	SpotLightShadowMap::StaticInitialize();
-	Particle::StaticInitialize();
-	ParticleModel::StaticInitialize();
-	Sprite::StaticInitialize();
-	Skinning::StaticInitialize();
-
+	gameObjectManager = GameObjectManager::GetInstance();
 #pragma endregion 変数
 
 	// ゲームシーンの初期化
@@ -58,14 +38,7 @@ void MyGame::Finalize()
 	sceneManager->Finalize();
 	modelManager->Finalize();
 	textureManager->Finalize();
-	Model::Finalize();
-	Sky::Finalize();
-	ShadowMap::Finalize();
-	SpotLightShadowMap::Finalize();
-	Particle::Finalize();
-	ParticleModel::Finalize();
-	Sprite::Finalize();
-	Skinning::Finalize();
+	gameObjectManager->Finalize();
 
 	delete gameScene;
 
@@ -96,31 +69,20 @@ void MyGame::Update()
 void MyGame::Draw()
 {
 	// 描画開始
-	renderer->BeginShadowMapRender(gameScene->GetDirectionalLights());
 
-	gameScene->ShadowMapDraw(renderer->GetCommandContext());
+	gameScene->Draw();
 
-	renderer->EndShadowMapRender(gameScene->GetDirectionalLights());
+	renderer->ShadowMapRender(gameScene->GetDirectionalLights());
 
-	renderer->BeginSpotLightShadowMapRender(gameScene->GetShadowSpotLights());
-	
-	//スポットライトシャドウマップ描画
-	gameScene->SpotLightShadowMapDraw(renderer->GetCommandContext());
+	renderer->SpotLightShadowMapRender(gameScene->GetShadowSpotLights());
 
-	renderer->EndSpotLightShadowMapRender(gameScene->GetShadowSpotLights());
-
-	renderer->BeginMainRender();
-
-	// ゲームシーンの描画
-	gameScene->Draw(renderer->GetCommandContext());
+	renderer->MainRender(gameScene->GetViewProjection());
 
 	renderer->DeferredRender(gameScene->GetViewProjection(), gameScene->GetDirectionalLights(), gameScene->GetPointLights(), gameScene->GetAreaLights(), gameScene->GetSpotLights(), gameScene->GetShadowSpotLights());
 
-	renderer->EndMainRender(gameScene->GetViewProjection());
+	renderer->UIRender();
 
-	renderer->BeginUIRender();
+	renderer->EndRender();
 
-	gameScene->UIDraw(renderer->GetCommandContext());
-
-	renderer->EndUIRender();
+	
 }

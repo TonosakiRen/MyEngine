@@ -1,17 +1,19 @@
 #include "SphereLights.h"
 #include "ImGuiManager.h"
 #include "PointLights.h"
+#include "DrawManager.h"
+#include "ModelManager.h"
 #include <string>
 
 SphereLights::SphereLights()
 {
-	particle_ = std::make_unique<ParticleModel>(kSphereNum);
+	particle_ = std::make_unique<ParticleModelData>(kSphereNum);
 }
 
 void SphereLights::Initialize(PointLights* pointLights)
 {
 	pointLights_ = pointLights;
-	particle_->Initialize("sphere.obj");
+	particle_->Initialize();
 
 	spheres_.resize(kSphereNum);
 	for (int j = 0; j < kSphereNum; j++) {
@@ -80,18 +82,15 @@ void SphereLights::Update() {
 void SphereLights::Draw(Vector4 color)
 {
 
-	std::vector<ParticleModel::InstancingBufferData> instancingBufferDatas;
-	instancingBufferDatas.reserve(kSphereNum);
-
 	for (size_t i = 0; i < kSphereNum; i++)
 	{
 		if (spheres_[i].isActive_) {
-			spheres_[i].worldTransform_.Update();
-			instancingBufferDatas.emplace_back(spheres_[i].worldTransform_.matWorld_);
+			ParticleModelData::Data data;
+			data.matWorld = spheres_[i].worldTransform_.matWorld_;
+			data.worldInverseTranspose = Inverse(spheres_[i].worldTransform_.matWorld_);
+			particle_->PushBackData(data);
 		}
 	}
 
-	if (!instancingBufferDatas.empty()) {
-		particle_->Draw(instancingBufferDatas, color);
-	}
+	DrawManager::GetInstance()->DrawParticleModel(*particle_, ModelManager::GetInstance()->Load("sphere.obj"));
 }

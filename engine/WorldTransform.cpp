@@ -2,11 +2,13 @@
 #include "ModelManager.h"
 ModelManager* modelManager_ = ModelManager::GetInstance();
 
-void WorldTransform::Initialize() {
+void WorldTransform::Initialize(bool srtChange) {
     parent_ = nullptr;
-    scale_ = { 1.0f,1.0f,1.0f };
-    quaternion_ = IdentityQuaternion();
-    translation_ = { 0.0f,0.0f,0.0f };
+    if (srtChange) {
+        scale_ = { 1.0f,1.0f,1.0f };
+        quaternion_ = IdentityQuaternion();
+        translation_ = { 0.0f,0.0f,0.0f };
+    }
     matWorld_ = MakeIdentity4x4();
     worldInverseTranspose_ = MakeIdentity4x4();
     constBuffer_.Create((sizeof(ConstBufferData) + 0xff) & ~0xff);

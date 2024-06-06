@@ -22,21 +22,18 @@ public:
 		parameterNum
 	};
 
-	static bool isDrawSpotLightShadowMap;
 
-	static void StaticInitialize();
-	static void Finalize();
-	static void PreDraw(CommandContext* commandContext, ShadowSpotLights& shadowSpotLights);
-	static void PostDraw();
+	void Initialize();
+	void Finalize();
+	void PreDraw(CommandContext& commandContext, ShadowSpotLights& shadowSpotLights);
 
-	static void Draw(uint32_t modelHandle, const WorldTransform& worldTransform);
+	void Draw(CommandContext& commandContext, uint32_t modelHandle, const WorldTransform& worldTransform);
 
 private:
-	static void CreatePipeline();
+	void CreatePipeline();
 private:
-	static CommandContext* commandContext_;
-	static std::unique_ptr<RootSignature> rootSignature_;
-	static std::unique_ptr<PipelineState> pipelineState_;
-	static ShadowSpotLights* shadowSpotLights_;
+	std::unique_ptr<RootSignature> rootSignature_;
+	std::unique_ptr<PipelineState> pipelineState_;
+	ShadowSpotLights* shadowSpotLights_;
 };
 

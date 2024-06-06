@@ -1,4 +1,5 @@
 #include "Skydome.h"
+#include "DrawManager.h"
 
 void Skydome::Initialize(const std::string name)
 {
@@ -15,5 +16,5 @@ void Skydome::Update()
 
 void Skydome::Draw()
 {
-	GameObject::SkyDraw();
+	DrawManager::GetInstance()->DrawSky(worldTransform_);
 }

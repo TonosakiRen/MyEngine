@@ -16,6 +16,12 @@ public:
 
     D3D12_GPU_VIRTUAL_ADDRESS GetGPUVirtualAddress() const { return resource_->GetGPUVirtualAddress(); }
 
+    void CreateResource(
+        const D3D12_HEAP_PROPERTIES& heapProperties,
+        const D3D12_RESOURCE_DESC& desc,
+        D3D12_RESOURCE_STATES initState = D3D12_RESOURCE_STATE_COMMON,
+        const D3D12_CLEAR_VALUE* optimizedClearValue = nullptr);
+
 protected:
     Microsoft::WRL::ComPtr<ID3D12Resource> resource_;
     D3D12_RESOURCE_STATES state_ = D3D12_RESOURCE_STATE_COMMON;

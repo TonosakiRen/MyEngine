@@ -7,14 +7,7 @@
 
 using namespace Microsoft::WRL;
 
-CommandContext* ParticleModel::commandContext_ = nullptr;
-std::unique_ptr<RootSignature> ParticleModel::rootSignature_;
-std::unique_ptr<PipelineState> ParticleModel::pipelineState_;
-
-ParticleModel::ParticleModel(uint32_t particleNum) : kParticleNum(particleNum) {
-}
-
-void ParticleModel::StaticInitialize() {
+void ParticleModel::Initialize() {
     CreatePipeline();
 }
 
@@ -24,22 +17,16 @@ void ParticleModel::Finalize()
     pipelineState_.reset();
 }
 
-void ParticleModel::PreDraw(CommandContext* commandContext, const ViewProjection& viewProjection) {
-    assert(ParticleModel::commandContext_ == nullptr);
-
-    commandContext_ = commandContext;
-
-    commandContext_->SetPipelineState(*pipelineState_);
-    commandContext_->SetGraphicsRootSignature(*rootSignature_);
+void ParticleModel::PreDraw(CommandContext& commandContext, const ViewProjection& viewProjection) {
+    
+    commandContext.SetPipelineState(*pipelineState_);
+    commandContext.SetGraphicsRootSignature(*rootSignature_);
     // CBVをセット（ビュープロジェクション行列）
-    commandContext_->SetConstantBuffer(static_cast<UINT>(RootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
+    commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
   
-    commandContext_->SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    commandContext.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 
-void ParticleModel::PostDraw() {
-    commandContext_ = nullptr;
-}
 
 void ParticleModel::CreatePipeline() {
     ComPtr<IDxcBlob> vsBlob;
@@ -165,26 +152,14 @@ void ParticleModel::CreatePipeline() {
 
 }
 
-void ParticleModel::Initialize(std::string name) {
-    modelHandle_ = ModelManager::Load(name);
-    material_.Initialize();
-    structuredBuffer_.Create(sizeof(InstancingBufferData), kParticleNum);
-}
-
-void ParticleModel::Draw(const std::vector<InstancingBufferData>& bufferData, const Vector4& color)
+void ParticleModel::Draw(CommandContext& commandContext, ParticleModelData& bufferData, const Material& material, uint32_t modelHandle)
 {
-    assert(commandContext_);
-    assert(!bufferData.empty());
+ 
+    commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kWorldTransform), bufferData.structuredBuffer_.GetSRV());
 
-    //マッピング
-    structuredBuffer_.Copy(bufferData.data(), sizeof(bufferData[0]) * bufferData.size());
+    commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kMaterial), material.GetGPUVirtualAddress());
 
-    material_.color_ = color;
-    material_.Update();
+    ModelManager::GetInstance()->DrawInstancing(commandContext, modelHandle, static_cast<UINT>(bufferData.dataNum_), static_cast<UINT>(RootParameter::kTexture));
 
-    commandContext_->SetDescriptorTable(0, structuredBuffer_.GetSRV());
-
-    commandContext_->SetConstantBuffer(static_cast<UINT>(RootParameter::kMaterial), material_.GetGPUVirtualAddress());
-
-    ModelManager::GetInstance()->DrawInstancing(commandContext_, modelHandle_, static_cast<UINT>(bufferData.size()), static_cast<UINT>(RootParameter::kTexture));
+    bufferData.Reset();
 }

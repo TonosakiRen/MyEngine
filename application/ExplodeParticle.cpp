@@ -1,17 +1,18 @@
 #include "ExplodeParticle.h"
 #include "ImGuiManager.h"
 #include "PointLights.h"
+#include "DrawManager.h"
 
 ExplodeParticle::ExplodeParticle()
 {
-	particle_ = std::make_unique<ParticleModel>(kParticleNum);
+	particle_ = std::make_unique<ParticleModelData>(kParticleNum);
 }
 
 void ExplodeParticle::Initialize(Vector3 minDirection, Vector3 maxDirection, PointLights* pointLights)
 {
 	pointLights_ = pointLights;
 	acceleration_ = { 0.0f,0.0f,-0.1f };
-	particle_->Initialize("box1x1.obj");
+	particle_->Initialize();
 	emitterWorldTransform_.SetIsScaleParent(false);
 	emitterWorldTransform_.Update();
 	SetDirection(minDirection, maxDirection);
@@ -75,18 +76,14 @@ void ExplodeParticle::Draw(Vector4 color)
 
 	emitterWorldTransform_.Update();
 
-	std::vector<ParticleModel::InstancingBufferData> instancingBufferDatas;
-	instancingBufferDatas.reserve(kParticleNum);
-
 	for (size_t i = 0; i < kParticleNum; i++)
 	{
 		if (particles[i].isActive_) {
-			particles[i].worldTransform_.Update();
-			instancingBufferDatas.emplace_back(particles[i].worldTransform_.matWorld_);
+			ParticleModelData::Data data;
+			data.matWorld = particles[i].worldTransform_.matWorld_;
+			particle_->PushBackData(data);
 		}
 	}
 
-	if (!instancingBufferDatas.empty()) {
-		//particle_->Draw(instancingBufferDatas, color);
-	}
+	DrawManager::GetInstance()->DrawParticleModel(*particle_);
 }

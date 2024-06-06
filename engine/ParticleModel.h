@@ -14,13 +14,13 @@
 #include "Material.h"
 #include "Mesh.h"
 
+#include "ParticleModelData.h"
+
 class DirectXCommon;
 
 class ParticleModel
 {
 public:
-
-	const uint32_t kParticleNum;
 
 	enum class RootParameter {
 		kWorldTransform,
@@ -37,30 +37,17 @@ public:
 		Vector2 uv;
 	};
 
-	struct InstancingBufferData {
-		Matrix4x4 matWorld;
-	};
+	void Initialize();
+	void Finalize();
+	void PreDraw(CommandContext& commandContext, const ViewProjection& viewProjection);
 
-	static void StaticInitialize();
-	static void Finalize();
-	static void PreDraw(CommandContext* commandContext, const ViewProjection& viewProjection);
-	static void PostDraw();
+	void Draw(CommandContext& commandContext, ParticleModelData& bufferData, const Material& material, uint32_t modelHandle = 0);
 
-	ParticleModel(uint32_t particleNum);
-
-	void Initialize(std::string name);
-	void Draw(const std::vector<InstancingBufferData>& bufferData, const Vector4& color = { 1.0f,1.0f,1.0f,1.0f });
-
-public:
-	Material material_;
+	
 private:
-	static void CreatePipeline();
+	void CreatePipeline();
 private:
-	static CommandContext* commandContext_;
-	static std::unique_ptr<RootSignature> rootSignature_;
-	static std::unique_ptr<PipelineState> pipelineState_;
+	std::unique_ptr<RootSignature> rootSignature_;
+	std::unique_ptr<PipelineState> pipelineState_;
 
-	StructuredBuffer structuredBuffer_;
-
-	uint32_t modelHandle_ = 0;
 };

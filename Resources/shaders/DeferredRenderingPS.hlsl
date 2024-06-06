@@ -17,6 +17,7 @@ struct Param {
 struct ViewProjection {
 	float32_t4x4 viewProjection;
 	float32_t4x4 inverseViewProjection;
+	float32_t4x4 worldMatrix;
 	float32_t3 viewPosition;
 };
 ConstantBuffer<ViewProjection> gViewProjection  : register(b0);
@@ -158,7 +159,7 @@ float4 main(VSOutput input) : SV_TARGET
 
 		uint32_t startPointLightIndex = lightNum.pointLight * tileNumber;
 
-		float32_t3 viewDirection = normalize(gViewProjection.viewPosition - worldPos);
+		float32_t3 viewDirection = normalize(worldPos - gViewProjection.viewPosition);
 
 		for (int i = 0; i < tileInformation.pointLightNum; i++) {
 
@@ -255,7 +256,7 @@ float4 main(VSOutput input) : SV_TARGET
 			shadowMapUV *= float32_t2(0.5f, -0.5f);
 			shadowMapUV += 0.5f;
 
-			if (lightViewPosition.z > 0.0f) {
+			/*if (lightViewPosition.z > 0.0f) {
 				float32_t zInLVP = lightViewPosition.z / lightViewPosition.w;
 
 				if (shadowMapUV.x > 0.0f && shadowMapUV.x < 1.0f
@@ -268,7 +269,7 @@ float4 main(VSOutput input) : SV_TARGET
 						}
 					}
 				}
-			}
+			}*/
 
 		}
 
@@ -280,7 +281,6 @@ float4 main(VSOutput input) : SV_TARGET
 			float32_t3 directionalLightdiffuse = gDirectionLights[k].color.xyz * cos * gDirectionLights[k].intensity;
 
 			//directionalLightSpecular
-
 			float32_t3 reflectVec = reflect(gDirectionLights[k].direction, normal);
 			float32_t specluerPower = 10.0f;
 			float32_t RdotE = dot(reflectVec, viewDirection);
@@ -290,7 +290,7 @@ float4 main(VSOutput input) : SV_TARGET
 			lighting += (directionalLightdiffuse + directionalLightSpecluer);
 
 			//影
-			float32_t4 wp = float4(worldPos.xyz, 1.0f);
+			/*float32_t4 wp = float4(worldPos.xyz, 1.0f);
 			float32_t4 lightViewPosition = mul(wp, gDirectionLights[k].viewProjection);
 			float32_t2 shadowMapUV = lightViewPosition.xy / lightViewPosition.w;
 			shadowMapUV *= float32_t2(0.5f, -0.5f);
@@ -305,7 +305,7 @@ float4 main(VSOutput input) : SV_TARGET
 				if (zInLVP - 0.00001 > zInShadowMap) {
 					shading *= 0.5f;
 				}
-			}
+			}*/
 
 		}
 

@@ -93,21 +93,12 @@ bool IsHitSphere(Frustum frustum, float32_t3 position, float32_t radius)
 	for (uint32_t i = 0; i < 6; i++) {
 		//プラスであれば外側距離を測る,内側の場合マイナス
 		float32_t a = dot(frustum.plane[i].normal, position) - frustum.plane[i].distance;
-		if (a < 0.0f) {
-			hitNum++;
-		}
-		else {
-			if (abs(a) < radius) {
-				hitNum++;
-			}
+		if (a > radius) {
+			return false;
 		}
 	}
 
-	if (hitNum == 6) {
-		return true;
-	}
-
-	return false;
+	return true;
 }
 
 struct LightNum {

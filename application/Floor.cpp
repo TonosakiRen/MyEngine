@@ -1,6 +1,7 @@
 #include "Floor.h"
 #include "TextureManager.h"
 #include "ImGuiManager.h"
+#include "DrawManager.h"
 
 void Floor::Initialize(const std::string name)
 {
@@ -19,6 +20,6 @@ void Floor::Update()
 
 void Floor::Draw()
 {
-	GameObject::Draw(worldTransform_, textureHandle_);
+	DrawManager::GetInstance()->DrawFloor(worldTransform_,modelHandle_);
 }
 

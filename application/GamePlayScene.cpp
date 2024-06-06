@@ -3,6 +3,7 @@
 
 #include "ModelManager.h"
 #include "ImGuiManager.h"
+#include "GameObjectManager.h"
 
 const Player* GamePlayScene::player = nullptr;
 
@@ -24,7 +25,7 @@ void GamePlayScene::Initialize()
 	boxArea_->Initialize("box1x1Inverse.obj");
 
 	skybox_ = std::make_unique<Skybox>();
-	skybox_->Initialize("skybox.obj");
+	skybox_->Initialize("box1x1Inverse.obj");
 
 	explodeParticle_ = std::make_unique<ExplodeParticle>();
 	explodeParticle_->Initialize(Vector3{ -1.0f,-1.0f,-1.0f }, Vector3{ 1.0f,1.0f,1.0f }, GameScene::pointLights);
@@ -44,6 +45,13 @@ void GamePlayScene::Initialize()
 
 	sphereLights_ = std::make_unique<SphereLights>();
 	sphereLights_->Initialize(GameScene::pointLights);
+
+	GameObjectManager::GetInstance()->Load();
+	gameObjects_ = &GameObjectManager::GetInstance()->gameObjects_;
+
+	for (auto& gameObject : *gameObjects_) {
+		gameObject->Initialize();
+	}
 }
 
 void GamePlayScene::Finalize()
@@ -102,10 +110,8 @@ void GamePlayScene::Update()
 	sphereLights_->Update();
 }
 
-void GamePlayScene::ModelDraw()
+void GamePlayScene::Draw()
 {
-	//boxArea_->Draw();
-	floor_->Draw();
 	player_->Draw();
 	sphere_->Draw();
 	//敵描画
@@ -115,49 +121,15 @@ void GamePlayScene::ModelDraw()
 
 	enemyBulletManager_->Draw();
 	playerBulletManager_->Draw();
-}
 
-void GamePlayScene::SkyDraw()
-{
 	skybox_->Draw();
-}
-
-void GamePlayScene::SkinningDraw()
-{
-	player_->SkinningDraw();
-}
-
-void GamePlayScene::ShadowDraw()
-{
-	player_->Draw();
-	sphere_->Draw();
-}
-
-void GamePlayScene::SpotLightShadowDraw()
-{
-	player_->Draw();
-	sphere_->Draw();
-}
-
-void GamePlayScene::ParticleDraw()
-{
-	whiteParticle_->Draw({ 1.0f,1.0f,1.0f,1.0f });
-}
-
-void GamePlayScene::ParticleBoxDraw()
-{
-	explodeParticle_->Draw();
+	//whiteParticle_->Draw();
 	sphereLights_->Draw();
-}
+	floor_->Draw();
 
-void GamePlayScene::PreSpriteDraw()
-{
-
-}
-
-void GamePlayScene::PostSpriteDraw()
-{
-	player_->ReticleDraw();
+	for (auto& gameObject : *gameObjects_) {
+		gameObject->Draw();
+	}
 }
 
 void GamePlayScene::CheckAllCollision()

@@ -40,7 +40,6 @@ public:
 private:
 	void InitializeGraphicsPipeline();
 private:
-	static ID3D12GraphicsCommandList* sCommandList;
 	std::unique_ptr<RootSignature> sRootSignature;
 	std::unique_ptr<PipelineState> sPipelineState;
 

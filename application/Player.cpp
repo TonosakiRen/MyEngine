@@ -4,6 +4,7 @@
 #include "TextureManager.h"
 #include "Audio.h"
 #include "Wire.h"
+#include "DrawManager.h"
 
 void Player::Initialize(const std::string name, PlayerBulletManager* playerBulletManager)
 {
@@ -92,19 +93,12 @@ void Player::Draw() {
 		GameObject::Draw(modelManager->Load("box1x1.obj"), );
 	}*/
 	//GameObject::Draw(modelHandle_,worldTransform3DReticle_, { 0.0f,1.0f,0.0f,1.0f });
-}
-
-void Player::SkinningDraw()
-{
-	GameObject::SkinningDraw(skinCluster_);
-	Wire::Draw(skeleton_,worldTransform_);
-}
-
-void Player::ReticleDraw()
-{
 	if (input_->PushRightTrigger()) {
-		sprite2DReticle_.Draw();
+		DrawManager::GetInstance()->DrawPostSprite(sprite2DReticle_);
 	}
+
+	//DrawManager::GetInstance()->DrawSkinning(worldTransform_, skinCluster_,modelHandle_);
+	Wire::Draw(skeleton_, worldTransform_);
 }
 
 void Player::Fire()
@@ -122,19 +116,19 @@ void Player::Fire()
 
 void Player::Animate()
 {
-	animationTime_ += 1.0f / 60.0f;
-	animationTime_ = std::fmod(animationTime_, animation_.duration);
-	/*if (!isFire_ && animationTime_ <= 0.03f) {
-		isAnimation_ = false;
-		animationTime_ = 0.0f;
-	}
-	else {
-		animationTime_ = std::fmod(animationTime_, animation_.duration);
-	}*/
-	AnimationManager::GetInstance()->ApplyAnimation(skeleton_, animation_, animationTime_);
-	skeleton_.Update();
+	//animationTime_ += 1.0f / 60.0f;
+	//animationTime_ = std::fmod(animationTime_, animation_.duration);
+	///*if (!isFire_ && animationTime_ <= 0.03f) {
+	//	isAnimation_ = false;
+	//	animationTime_ = 0.0f;
+	//}
+	//else {
+	//	animationTime_ = std::fmod(animationTime_, animation_.duration);
+	//}*/
+	//AnimationManager::GetInstance()->ApplyAnimation(skeleton_, animation_, animationTime_);
+	//skeleton_.Update();
 
-	skinCluster_.Update();
+	//skinCluster_.Update();
 	
 	/*NodeAnimation& rootNodeAnimation = animation_.nodeAnimations[ModelManager::GetInstance()->GetRootNode(rightHand_.GetModelHandle()).name];
 	rightHand_.GetWorldTransform()->translation_ = CalculateValue(rootNodeAnimation.translate.keyframes, animationTime_);

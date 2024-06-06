@@ -21,6 +21,9 @@ public:
     void SetDescriptorHeap();
     void ShutDown();
 
+    void ReleaseResource(GPUResource& resource);
+    void ReleaseAllResource();
+
     void Close();
     void Reset();
 
@@ -97,6 +100,7 @@ private:
     Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList_;
 
     D3D12_RESOURCE_BARRIER resourceBarriers_[kMaxNumResourceBarriers]{};
+    std::vector<GPUResource*> releaseResources_;
     uint32_t numResourceBarriers_;
 
     ID3D12RootSignature* rootSignature_;
@@ -370,4 +374,8 @@ inline void CommandContext::DrawInstanced(UINT vertexCountPerInstance, UINT inst
 inline void CommandContext::DrawIndexedInstanced(UINT indexCountPerInstance, UINT instanceCount, UINT startIndexLocation, INT baseVertexLocation, UINT startInstanceLocation) {
     FlushResourceBarriers();
     commandList_->DrawIndexedInstanced(indexCountPerInstance, instanceCount, startIndexLocation, baseVertexLocation, startInstanceLocation);
+}
+
+inline void CommandContext::ReleaseResource(GPUResource& resource) {
+    releaseResources_.push_back(&resource);
 }

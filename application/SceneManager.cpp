@@ -42,48 +42,7 @@ void SceneManager::Update()
 	scene_->Update();
 }
 
-void SceneManager::ModelDraw()
+void SceneManager::Draw()
 {
-	scene_->ModelDraw();
-}
-
-void SceneManager::SkyDraw()
-{
-	scene_->SkyDraw();
-}
-
-
-void SceneManager::SkinningDraw()
-{
-	scene_->SkinningDraw();
-}
-
-void SceneManager::ShadowDraw()
-{
-	scene_->ShadowDraw();
-}
-
-void SceneManager::SpotLightShadowDraw()
-{
-	scene_->SpotLightShadowDraw();
-}
-
-void SceneManager::ParticleDraw()
-{
-	scene_->ParticleDraw();
-}
-
-void SceneManager::ParticleBoxDraw()
-{
-	scene_->ParticleBoxDraw();
-}
-
-void SceneManager::PreSpriteDraw()
-{
-	scene_->PreSpriteDraw();
-}
-
-void SceneManager::PostSpriteDraw()
-{
-	scene_->PostSpriteDraw();
+	scene_->Draw();
 }

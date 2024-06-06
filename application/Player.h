@@ -2,7 +2,7 @@
 #include "GameObject.h"
 #include "Input.h"
 #include "Collider.h"
-#include "Sprite.h"
+#include "SpriteData.h"
 #include "Mymath.h"
 #include "AnimationManager.h"
 #include "ModelManager.h"
@@ -19,8 +19,6 @@ public:
     void Extrusion(Collider& otherCollider);
     void OnCollision();
     void Draw();
-    void SkinningDraw();
-    void ReticleDraw();
     void Fire();
     void Animate();
     void Move(const ViewProjection& viewProjection);
@@ -35,7 +33,7 @@ private:
     PlayerBulletManager* playerBulletManager_;
     WorldTransform worldTransform3DReticle_;
     Quaternion inputQuaternion_;
-    Sprite sprite2DReticle_;
+    SpriteData sprite2DReticle_;
     WorldTransform modelWorldTransform_;
     GameObject rightHand_;
     Vector3 velocity_;

@@ -117,26 +117,6 @@ void GameScene::Update(CommandContext& commandContext){
 		directionalLights_->Update();
 
 #ifdef USE_IMGUI
-		ImGui::Begin("pointLight");
-
-		ImGui::DragFloat3("lightPosition", &pointLights_->lights_[0].worldTransform.translation_.x, 0.01f);
-		ImGui::DragFloat3("lightColor", &pointLights_->lights_[0].color.x, 1.0f, 0.0f, 255.0f);
-		ImGui::DragFloat("intensity", &pointLights_->lights_[0].intensity, 0.01f, 0.0f);
-		ImGui::DragFloat("radius", &pointLights_->lights_[0].radius, 0.01f, 0.0f);
-		ImGui::DragFloat("decay", &pointLights_->lights_[0].decay, 0.01f, 0.0f);
-		ImGui::End();
-
-		ImGui::Begin("pointLight2");
-		ImGui::DragFloat3("lightPosition", &pointLights_->lights_[1].worldTransform.translation_.x, 0.01f);
-		ImGui::DragFloat3("lightColor", &pointLights_->lights_[1].color.x, 1.0f, 0.0f, 255.0f);
-		ImGui::DragFloat("intensity", &pointLights_->lights_[1].intensity, 0.01f, 0.0f);
-		ImGui::DragFloat("radius", &pointLights_->lights_[1].radius, 0.01f, 0.0f);
-		ImGui::DragFloat("decay", &pointLights_->lights_[1].decay, 0.01f, 0.0f);
-		ImGui::End();
-#endif
-		//pointLights_->Update();
-
-#ifdef USE_IMGUI
 		ImGui::Begin("spotLight");
 		ImGui::DragFloat3("lightPosition", &spotLights_->lights_[0].worldTransform.translation_.x, 0.01f);
 		ImGui::DragFloat3("lightColor", &spotLights_->lights_[0].color.x, 1.0f, 0.0f, 255.0f);
@@ -159,6 +139,7 @@ void GameScene::Update(CommandContext& commandContext){
 		areaLights_->Update();
 
 #endif
+		areaLights_->Update();
 		spotLights_->lights_[0].direction = Normalize(spotLights_->lights_[0].direction);
 		spotLights_->Update();
 	}	
@@ -179,60 +160,6 @@ void GameScene::Update(CommandContext& commandContext){
 
 }
 
-void GameScene::Draw(CommandContext& commandContext) {
-
-	// 背景スプライト描画
-	Sprite::PreDraw(&commandContext);
-	sceneManager_->PreSpriteDraw();
-	Sprite::PostDraw();
-
-	Renderer::GetInstance()->ClearMainDepthBuffer();
-
-	//3Dオブジェクト描画
-	Model::PreDraw(&commandContext, *currentViewProjection_);
-	sceneManager_->ModelDraw();
-	Model::PostDraw();
-
-	//3Dオブジェクト描画
-	Skinning::PreDraw(&commandContext, *currentViewProjection_);
-	sceneManager_->SkinningDraw();
-	Skinning::PostDraw();
-
-	//3Dオブジェクト描画
-	Sky::PreDraw(&commandContext, *currentViewProjection_);
-	sceneManager_->SkyDraw();
-	Sky::PostDraw();
-
-	//Particle描画
-	Particle::PreDraw(&commandContext, *currentViewProjection_);
-	sceneManager_->ParticleDraw();
-	Particle::PostDraw();
-
-	//Particle描画
-	ParticleModel::PreDraw(&commandContext, *currentViewProjection_);
-	sceneManager_->ParticleBoxDraw();
-	ParticleModel::PostDraw();
-
-}
-
-void GameScene::ShadowMapDraw(CommandContext& commandContext)
-{
-	ShadowMap::PreDraw(&commandContext, *directionalLights_.get());
-	sceneManager_->ShadowDraw();
-	ShadowMap::PostDraw();
-}
-
-void GameScene::SpotLightShadowMapDraw(CommandContext& commandContext)
-{
-	SpotLightShadowMap::PreDraw(&commandContext, *shadowSpotLights_.get());
-	sceneManager_->SpotLightShadowDraw();
-	SpotLightShadowMap::PostDraw();
-}
-
-void GameScene::UIDraw(CommandContext& commandContext)
-{
-	// 前景スプライト描画
-	Sprite::PreDraw(&commandContext);
-	sceneManager_->PostSpriteDraw();
-	Sprite::PostDraw();
+void GameScene::Draw() {
+	sceneManager_->Draw();
 }

@@ -1,19 +1,19 @@
 #include "DustParticle.h"
+#include "DrawManager.h"
 #include "ImGuiManager.h"
 
 DustParticle::DustParticle()
 {
-	particle_ = std::make_unique<ParticleModel>(kParticleNum);
+	particleData_ = std::make_unique<ParticleModelData>(kParticleNum);
 }
 
 void DustParticle::Initialize(Vector3 minDirection, Vector3 maxDirection)
 {
 
-	particle_->Initialize("box1x1.obj");
+	particleData_->Initialize();
 	emitterWorldTransform_.SetIsScaleParent(false);
 	emitterWorldTransform_.Update();
 	SetDirection(minDirection, maxDirection);
-	particle_->material_.enableLighting_ = false;
 }
 
 void DustParticle::Update() {
@@ -55,23 +55,20 @@ void DustParticle::Update() {
 
 }
 
-void DustParticle::Draw( Vector4 color)
+void DustParticle::Draw()
 {
 
 	emitterWorldTransform_.Update();
 
-	std::vector<ParticleModel::InstancingBufferData> instancingBufferDatas;
-	instancingBufferDatas.reserve(kParticleNum);
-
 	for (size_t i = 0; i < kParticleNum; i++)
 	{
 		if (particles[i].isActive_) {
-			particles[i].worldTransform_.Update();
-			instancingBufferDatas.emplace_back(particles[i].worldTransform_.matWorld_);
+			ParticleModelData::Data data;
+			data.matWorld = particles[i].worldTransform_.matWorld_;
+			data.worldInverseTranspose = Inverse(particles[i].worldTransform_.matWorld_);
+			particleData_->PushBackData(data);
 		}
 	}
 
-	if (!instancingBufferDatas.empty()) {
-		particle_->Draw(instancingBufferDatas, color);
-	}
+	DrawManager::GetInstance()->DrawParticleModel(*particleData_);
 }

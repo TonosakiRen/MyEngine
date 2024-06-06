@@ -8,12 +8,7 @@
 
 using namespace Microsoft::WRL;
 
-bool SpotLightShadowMap::isDrawSpotLightShadowMap = false;
-CommandContext* SpotLightShadowMap::commandContext_ = nullptr;
-std::unique_ptr<RootSignature> SpotLightShadowMap::rootSignature_;
-std::unique_ptr<PipelineState> SpotLightShadowMap::pipelineState_;
-ShadowSpotLights* SpotLightShadowMap::shadowSpotLights_;
-void SpotLightShadowMap::StaticInitialize() {
+void SpotLightShadowMap::Initialize() {
     CreatePipeline();
 }
 
@@ -23,27 +18,19 @@ void SpotLightShadowMap::Finalize()
     pipelineState_.reset();
 }
 
-void SpotLightShadowMap::PreDraw(CommandContext* commandContext, ShadowSpotLights& shadowSpotLights) {
-    assert(SpotLightShadowMap::commandContext_ == nullptr);
-
-    commandContext_ = commandContext;
+void SpotLightShadowMap::PreDraw(CommandContext& commandContext, ShadowSpotLights& shadowSpotLights) {
+   
     shadowSpotLights_ = &shadowSpotLights;
-    isDrawSpotLightShadowMap = true;
 
-    commandContext_->SetPipelineState(*pipelineState_);
-    commandContext_->SetGraphicsRootSignature(*rootSignature_);
+    commandContext.SetPipelineState(*pipelineState_);
+    commandContext.SetGraphicsRootSignature(*rootSignature_);
 
     for (int i = 0; i < ShadowSpotLights::lightNum; i++) {
-        commandContext_->TransitionResource(shadowSpotLights_->lights_[i].shadowMap_, D3D12_RESOURCE_STATE_DEPTH_WRITE);
-        commandContext_->ClearDepth(shadowSpotLights_->lights_[i].shadowMap_);
+        commandContext.TransitionResource(shadowSpotLights_->lights_[i].shadowMap_, D3D12_RESOURCE_STATE_DEPTH_WRITE);
+        commandContext.ClearDepth(shadowSpotLights_->lights_[i].shadowMap_);
     }
 
-    commandContext_->SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-}
-
-void SpotLightShadowMap::PostDraw() {
-    commandContext_ = nullptr;
-    isDrawSpotLightShadowMap = false;
+    commandContext.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 
 void SpotLightShadowMap::CreatePipeline() {
@@ -121,15 +108,15 @@ void SpotLightShadowMap::CreatePipeline() {
     }
 }
 
-void SpotLightShadowMap::Draw(uint32_t modelHandle, const WorldTransform& worldTransform) {
+void SpotLightShadowMap::Draw(CommandContext& commandContext, uint32_t modelHandle, const WorldTransform& worldTransform) {
 
     // CBVをセット（ワールド行列）
-    commandContext_->SetConstantBuffer(static_cast<UINT>(RootParameter::kWorldTransform), worldTransform.GetGPUVirtualAddress());
+    commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kWorldTransform), worldTransform.GetGPUVirtualAddress());
 
     for (int i = 0; i < ShadowSpotLights::lightNum; i++) {
-        commandContext_->SetDepthStencil(shadowSpotLights_->lights_[i].shadowMap_.GetDSV());
-        commandContext_->SetConstantBuffer(static_cast<UINT>(RootParameter::kShadowSpotLight), shadowSpotLights_->lights_[i].constBuffer_.GetGPUVirtualAddress());
-        ModelManager::GetInstance()->DrawInstanced(commandContext_, modelHandle);
+        commandContext.SetDepthStencil(shadowSpotLights_->lights_[i].shadowMap_.GetDSV());
+        commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kShadowSpotLight), shadowSpotLights_->lights_[i].constBuffer_.GetGPUVirtualAddress());
+        ModelManager::GetInstance()->DrawInstanced(commandContext, modelHandle);
     }
 }
 

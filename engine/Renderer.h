@@ -21,6 +21,7 @@
 class ViewProjection;
 class DirectionalLights;
 class ShadowSpotLights;
+class DrawManager;
 
 class Renderer
 {
@@ -38,15 +39,15 @@ public:
 
     void Initialize();
     void BeginFrame();
-    void BeginMainRender();
-    void EndMainRender(ViewProjection& viewProjection);
+
+    void MainRender(ViewProjection& viewProjection);
+
     void DeferredRender(ViewProjection& viewProjection, DirectionalLights& directionalLight,PointLights& pointLights,AreaLights& areaLights, SpotLights& spotLights, ShadowSpotLights& shadowSpotLights);
-    void BeginShadowMapRender(DirectionalLights& directionalLights);
-    void EndShadowMapRender(DirectionalLights& directionalLights);
-    void BeginSpotLightShadowMapRender(ShadowSpotLights& shadowSpotLights);
-    void EndSpotLightShadowMapRender(ShadowSpotLights& shadowSpotLights);
-    void BeginUIRender();
-    void EndUIRender();
+    void ShadowMapRender(DirectionalLights& directionalLights);
+    void SpotLightShadowMapRender(ShadowSpotLights& shadowSpotLights);
+
+    void UIRender();
+    void EndRender();
     void Shutdown();
 
     SwapChain& GetSwapChain() { return *swapChain_; }
@@ -71,6 +72,7 @@ private:
     Renderer& operator=(const Renderer&) = delete;
 
     DirectXCommon* graphics_ = nullptr;
+    DrawManager* drawManager_ = nullptr;
     std::unique_ptr<SwapChain> swapChain_;
     CommandContext commandContext_;
 

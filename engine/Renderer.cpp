@@ -11,6 +11,7 @@
 #include "TileBasedRendering.h"
 #include "TextureManager.h"
 #include "Sky.h"
+#include "DrawManager.h"
 
 Renderer* Renderer::GetInstance() {
     static Renderer instance;
@@ -34,6 +35,7 @@ void Renderer::Initialize() {
     swapChain_ = std::make_unique<SwapChain>();
     swapChain_->Create(window->GetHwnd());
 
+
     // メインとなるバッファを初期化
     auto& swapChainBuffer = swapChain_->GetColorBuffer();
     float clearColor[4] = { 0.0f,0.0f,0.0f,1.0f };
@@ -55,6 +57,10 @@ void Renderer::Initialize() {
     colorBuffers_[kMaterial] = std::make_unique<ColorBuffer>();
     colorBuffers_[kMaterial]->SetClearColor(clearColor);
     colorBuffers_[kMaterial]->Create(swapChainBuffer.GetWidth(), swapChainBuffer.GetHeight(), DXGI_FORMAT_R32G32B32A32_FLOAT);
+
+    //ドローマネージャー
+    drawManager_ = DrawManager::GetInstance();
+    drawManager_->Initialize(commandContext_);
 
     // ブルームを初期化
     bloom_ = std::make_unique<Bloom>();
@@ -81,8 +87,6 @@ void Renderer::Initialize() {
     transition_ = std::make_unique<Transition>();
     transition_->Initialize(*resultBuffer_);
 
-    Sky::CreateVoronoi(&commandContext_);
-
     grayScale_ = std::make_unique<GrayScale>();
     grayScale_->Initialize(*resultBuffer_);
 
@@ -102,7 +106,7 @@ void Renderer::BeginFrame()
     imguiManager->Begin();
 }
 
-void Renderer::BeginMainRender() {
+void Renderer::MainRender(ViewProjection& viewProjection) {
 
     // メインカラーバッファをレンダ―ターゲットに
     commandContext_.TransitionResource(*colorBuffers_[kColor], D3D12_RESOURCE_STATE_RENDER_TARGET);
@@ -122,6 +126,10 @@ void Renderer::BeginMainRender() {
 
     commandContext_.ClearDepth(*mainDepthBuffer_);
     commandContext_.SetViewportAndScissorRect(0, 0, colorBuffers_[kColor]->GetWidth(), colorBuffers_[kColor]->GetHeight());
+
+    drawManager_->AllDraw(viewProjection);
+    drawManager_->ResetCalls();
+
 }
 
 void Renderer::DeferredRender(ViewProjection& viewProjection, DirectionalLights& directionalLight, PointLights& pointLights,AreaLights& areaLights ,SpotLights& spotLights, ShadowSpotLights& shadowSpotLights)
@@ -129,33 +137,6 @@ void Renderer::DeferredRender(ViewProjection& viewProjection, DirectionalLights&
     wire_->AllDraw(commandContext_, viewProjection);
     tileBasedRendering_->ComputeUpdate(commandContext_, viewProjection, pointLights, spotLights, shadowSpotLights, *lightNumBuffer_);
     deferredRenderer_->Render(commandContext_, resultBuffer_.get(), viewProjection, directionalLight, pointLights, areaLights ,spotLights,shadowSpotLights, *lightNumBuffer_, *tileBasedRendering_);
-}
-
-void Renderer::BeginShadowMapRender(DirectionalLights& directionalLights)
-{
-    commandContext_.SetViewportAndScissorRect(0, 0, DirectionalLights::shadowWidth, DirectionalLights::shadowHeight);
-}
-
-void Renderer::EndShadowMapRender(DirectionalLights& directionalLights)
-{
-    for (int i = 0; i < DirectionalLights::lightNum; i++) {
-        commandContext_.TransitionResource(directionalLights.lights_[i].shadowMap_, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
-    }
-}
-
-void Renderer::BeginSpotLightShadowMapRender(ShadowSpotLights& shadowSpotLights)
-{
-    commandContext_.SetViewportAndScissorRect(0, 0, ShadowSpotLights::shadowWidth, ShadowSpotLights::shadowHeight);
-}
-
-void Renderer::EndSpotLightShadowMapRender(ShadowSpotLights& shadowSpotLights)
-{
-    for (int i = 0; i < ShadowSpotLights::lightNum; i++) {
-        commandContext_.TransitionResource(shadowSpotLights.lights_[i].shadowMap_, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
-    }
-}
-
-void Renderer::EndMainRender(ViewProjection& viewProjection) {
 
     edgeRenderer_->Render(commandContext_, resultBuffer_.get());
     bloom_->Render(commandContext_, resultBuffer_.get());
@@ -164,7 +145,29 @@ void Renderer::EndMainRender(ViewProjection& viewProjection) {
     //smooth_->Draw(*resultBuffer_.get(), commandContext_);
 }
 
-void Renderer::BeginUIRender()
+void Renderer::ShadowMapRender(DirectionalLights& directionalLights)
+{
+    commandContext_.SetViewportAndScissorRect(0, 0, DirectionalLights::shadowWidth, DirectionalLights::shadowHeight);
+
+    drawManager_->ShadowDraw(directionalLights);
+
+    for (int i = 0; i < DirectionalLights::lightNum; i++) {
+        commandContext_.TransitionResource(directionalLights.lights_[i].shadowMap_, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+    }
+}
+
+void Renderer::SpotLightShadowMapRender(ShadowSpotLights& shadowSpotLights)
+{
+    commandContext_.SetViewportAndScissorRect(0, 0, ShadowSpotLights::shadowWidth, ShadowSpotLights::shadowHeight);
+
+    drawManager_->ShadowSpotLightDraw(shadowSpotLights);
+
+    for (int i = 0; i < ShadowSpotLights::lightNum; i++) {
+        commandContext_.TransitionResource(shadowSpotLights.lights_[i].shadowMap_, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+    }
+}
+
+void Renderer::UIRender()
 {
 
     //コピーできないよん
@@ -177,7 +180,7 @@ void Renderer::BeginUIRender()
 
 }
 
-void Renderer::EndUIRender()
+void Renderer::EndRender()
 {
 
     transition_->Draw(*resultBuffer_, TextureManager::GetInstance()->GetSRV("white1x1.png"), commandContext_);
@@ -229,6 +232,8 @@ void Renderer::Shutdown() {
     smooth_.reset();
 
     swapChain_.reset();
+
+    drawManager_->Finalize();
     commandContext_.ShutDown();
 
     graphics_->Shutdown();

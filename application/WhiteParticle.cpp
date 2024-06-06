@@ -1,21 +1,24 @@
 #include "WhiteParticle.h"
 #include "ImGuiManager.h"
+#include "DrawManager.h"
 
 WhiteParticle::WhiteParticle()
 {
-	particle_ = std::make_unique<Particle>(kParticleNum);
+	particleData_ = std::make_unique<ParticleData>(kParticleNum);
 }
 
 void WhiteParticle::Initialize(Vector3 minDirection, Vector3 maxDirection)
 {
 
-	particle_->Initialize();
+	particleData_->Initialize();
 	emitterWorldTransform_.SetIsScaleParent(false);
 	emitterWorldTransform_.Update();
 	SetDirection(minDirection, maxDirection);
 	emitBox_ = MakeOBB(emitterWorldTransform_.matWorld_);
 	emitBox_.size = { 1.0f,1.0f,1.0f };
-	particle_->material_.enableLighting_ = false;
+	material_.Initialize();
+	material_.enableLighting_ = false;
+	material_.Update();
 }
 
 void WhiteParticle::Update() {
@@ -61,22 +64,20 @@ void WhiteParticle::Update() {
 
 }
 
-void WhiteParticle::Draw(Vector4 color, uint32_t textureHandle)
+void WhiteParticle::Draw(uint32_t textureHandle)
 {
 
 	emitterWorldTransform_.Update();
 
-	std::vector<Particle::InstancingBufferData> instancingBufferDatas;
-	instancingBufferDatas.reserve(kParticleNum);
-
 	for (size_t i = 0; i < kParticleNum; i++)
 	{
 		if (particles[i].isActive_) {
-			instancingBufferDatas.emplace_back(particles[i].worldTransform_.matWorld_);
+			ParticleData::Data data;
+			data.matWorld = particles[i].worldTransform_.matWorld_;
+			data.worldInverseTranspose = Inverse(particles[i].worldTransform_.matWorld_);
+			particleData_->PushBackData(data);
 		}
 	}
 
-	if (!instancingBufferDatas.empty()) {
-		particle_->Draw(instancingBufferDatas, color, textureHandle);
-	}
+	DrawManager::GetInstance()->DrawParticle(*particleData_,0, material_);
 }

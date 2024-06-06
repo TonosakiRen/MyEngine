@@ -13,7 +13,7 @@ public:
 	};
 
 	//bufferに送る場合の初期化
-	void Initialize();
+	void Initialize(bool srtChange = true);
 
 	void Update();
 	void Update(uint32_t modelIndex);

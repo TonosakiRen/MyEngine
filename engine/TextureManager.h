@@ -8,6 +8,7 @@
 #include "GPUResource.h"
 #include "DescriptorHandle.h"
 #include <memory>
+#include "UploadBuffer.h"
 
 class TextureManager
 {
@@ -16,6 +17,7 @@ public:
 
 	struct Texture {
 		GPUResource resource;
+		UploadBuffer intermediateResource;
 		DescriptorHandle srvHandle;
 		std::string name;
 	};
@@ -26,16 +28,17 @@ public:
 
 	static TextureManager* GetInstance();
 
-	void Initialize(std::string directoryPath = "Resources/textures/");
+	void Initialize(CommandContext& commandContext ,std::string directoryPath = "Resources/textures/");
 	void Finalize();
 
-	const D3D12_RESOURCE_DESC GetResoureDesc(uint32_t textureHandle);
+	const D3D12_RESOURCE_DESC GetResoureDesc(const uint32_t textureHandle);
 
-	void SetGraphicsRootDescriptorTable(
-		CommandContext* commandList, UINT rootParamIndex, uint32_t textureHandle);
+	void SetGraphicsRootDescriptorTable(CommandContext& commandList, const  UINT rootParamIndex, const  uint32_t textureHandle);
 
 	DescriptorHandle GetSRV(const std::string& fileName);
 
+private:
+	CommandContext* commandContext_ = nullptr;
 private:
 	TextureManager() = default;
 	~TextureManager() = default;

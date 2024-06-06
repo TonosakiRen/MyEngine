@@ -31,24 +31,30 @@ public:
 
 	static const uint32_t pointNum_ = 60000;
 
-	static void StaticInitialize();
-	static void CreateVoronoi(CommandContext* commandContext);
-	static void Finalize();
-	static void PreDraw(CommandContext* commandContext, const ViewProjection& viewProjection);
-	static void PostDraw();
+	void Initialize(CommandContext& commnadContext);
+	void Finalize();
+	void PreDraw(CommandContext& commandContext, const ViewProjection& viewProjection);
 
-	static void Draw(uint32_t modelHandle,const WorldTransform& worldTransform);
+	void Draw(CommandContext& commandContext,const WorldTransform& worldTransform);
 
 private: 
-	static void CreatePipeline();
+	void CreatePipeline();
+	void CreateMesh();
 private:
-	static CommandContext* commandContext_;
-	static std::unique_ptr<RootSignature> rootSignature_;
-	static std::unique_ptr<PipelineState> pipelineState_;
+	std::unique_ptr<RootSignature> rootSignature_;
+	std::unique_ptr<PipelineState> pipelineState_;
 
-	static std::unique_ptr<Voronoi> voronoi_;
+	UploadBuffer vertexBuffer_;
+	std::vector<Vector4> vertices_;
+	D3D12_VERTEX_BUFFER_VIEW vbView_{};
 
-	static Vector4 topHSVA_;
-	static Vector4 bottomHSVA_;
+	UploadBuffer indexBuffer_;
+	D3D12_INDEX_BUFFER_VIEW ibView_{};
+	std::vector<uint32_t> indices_;
+
+	std::unique_ptr<Voronoi> voronoi_;
+
+	Vector4 topHSVA_ = { 0.790f,1.0f,0.00f,1.0f };;
+	Vector4 bottomHSVA_ = { 0.220f,1.0f,0.03f,1.0f };
 };
 

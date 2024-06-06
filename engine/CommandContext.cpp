@@ -31,6 +31,13 @@ void CommandContext::ShutDown()
     commandList_.Reset();
 }
 
+void CommandContext::ReleaseAllResource()
+{
+    for (GPUResource* resource : releaseResources_) {
+        resource->resource_.Reset();
+    }
+}
+
 void CommandContext::Close() {
     FlushResourceBarriers();
     Helper::AssertIfFailed(commandList_->Close());
@@ -41,6 +48,8 @@ void CommandContext::Reset() {
     Helper::AssertIfFailed(commandAllocator_->Reset());
 
     Helper::AssertIfFailed(commandList_->Reset(commandAllocator_.Get(), nullptr));
+
+    ReleaseAllResource();
 
     auto graphics = DirectXCommon::GetInstance();
     ID3D12DescriptorHeap* ppHeaps[] = {

@@ -6,40 +6,25 @@
 
 using namespace Microsoft::WRL;
 
-CommandContext* Model::commandContext_ = nullptr;
-std::unique_ptr<RootSignature> Model::rootSignature_;
-std::unique_ptr<PipelineState> Model::pipelineState_;
-std::unique_ptr <Material> Model::normalMaterial_;
-
-void Model::StaticInitialize() {
+void Model::Initialize() {
     CreatePipeline();
-    normalMaterial_ = std::make_unique<Material>();
-    normalMaterial_->Initialize();
 }
 
 void Model::Finalize()
 {
-    normalMaterial_.reset();
     rootSignature_.reset();
     pipelineState_.reset();
 }
 
-void Model::PreDraw(CommandContext* commandContext, const ViewProjection& viewProjection) {
-    assert(Model::commandContext_ == nullptr);
-
-    commandContext_ = commandContext;
-
-    commandContext_->SetPipelineState(*pipelineState_);
-    commandContext_->SetGraphicsRootSignature(*rootSignature_);
+void Model::PreDraw(CommandContext& commandContext, const ViewProjection& viewProjection) {
+  
+    commandContext.SetPipelineState(*pipelineState_);
+    commandContext.SetGraphicsRootSignature(*rootSignature_);
 
     // CBVをセット（ビュープロジェクション行列）
-    commandContext_->SetConstantBuffer(static_cast<UINT>(RootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
+    commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
 
-    commandContext_->SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-}
-
-void Model::PostDraw() {
-    commandContext_ = nullptr;
+    commandContext.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 
 void Model::CreatePipeline() {
@@ -167,35 +152,13 @@ void Model::CreatePipeline() {
     }
 }
 
-void Model::Draw(uint32_t modelHandle, const WorldTransform& worldTransform)
-{
-    // CBVをセット（ワールド行列）
-    commandContext_->SetConstantBuffer(static_cast<UINT>(RootParameter::kWorldTransform), worldTransform.GetGPUVirtualAddress());
-
-    // CBVをセット（マテリアル）
-    commandContext_->SetConstantBuffer(static_cast<UINT>(RootParameter::kMaterial), normalMaterial_->GetGPUVirtualAddress());
-
-    ModelManager::GetInstance()->DrawInstanced(commandContext_, modelHandle, static_cast<UINT>(RootParameter::kTexture));
-}
-
-void Model::Draw(uint32_t modelHandle, const WorldTransform& worldTransform,const Material& material) {
+void Model::Draw(CommandContext& commandContext, uint32_t modelHandle, const WorldTransform& worldTransform, const Material& material,const uint32_t textureHandle) {
 
     // CBVをセット（ワールド行列）
-    commandContext_->SetConstantBuffer(static_cast<UINT>(RootParameter::kWorldTransform),worldTransform.GetGPUVirtualAddress());
+    commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kWorldTransform), worldTransform.GetGPUVirtualAddress());
 
     // CBVをセット（マテリアル）
-    commandContext_->SetConstantBuffer(static_cast<UINT>(RootParameter::kMaterial), material.GetGPUVirtualAddress());
+    commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kMaterial), material.GetGPUVirtualAddress());
 
-    ModelManager::GetInstance()->DrawInstanced(commandContext_, modelHandle, static_cast<UINT>(RootParameter::kTexture));
-}
-
-void Model::Draw(uint32_t modelHandle, const WorldTransform& worldTransform, const Material& material, uint32_t textureHandle) {
-
-    // CBVをセット（ワールド行列）
-    commandContext_->SetConstantBuffer(static_cast<UINT>(RootParameter::kWorldTransform), worldTransform.GetGPUVirtualAddress());
-
-    // CBVをセット（マテリアル）
-    commandContext_->SetConstantBuffer(static_cast<UINT>(RootParameter::kMaterial), material.GetGPUVirtualAddress());
-
-    ModelManager::GetInstance()->DrawInstanced(commandContext_, modelHandle, static_cast<UINT>(RootParameter::kTexture), textureHandle);
+    ModelManager::GetInstance()->DrawInstanced(commandContext, modelHandle, static_cast<UINT>(RootParameter::kTexture), textureHandle);
 }

@@ -14,10 +14,10 @@ public:
 
 	struct AreaLight {
 		Vector4 color = { 1.0f, 1.0f, 1.0f,1.0f };
-		Segment segment;
-		float intensity = 1.0f;
-		float range = 1.0f;
-		float decay = 1.0f;
+		Segment segment{};
+		float intensity = 10.0f;
+		float range = 5.0f;
+		float decay = 1.7f;
 		bool isActive = false;
 	};
 
@@ -25,10 +25,10 @@ public:
 		Vector4 color = { 1.0f, 1.0f, 1.0f,1.0f };
 		Vector3 origin = { 0.0f, 0.0f, 0.0f };
 		Vector3 diff = { 0.0f, 1.0f, 0.0f };
-		float intensity = 1.0f;
-		float range = 1.0f;
-		float decay = 1.0f;
-		float isActive = false;
+		float intensity = 10.0f;
+		float range = 5.0f;
+		float decay = 1.7f;
+		float isActive = 0.0f;
 	};
 
 	void Initialize();

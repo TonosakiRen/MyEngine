@@ -1,10 +1,6 @@
 #include "GameObject.h"
 #include "ModelManager.h"
-#include "Model.h"
-#include "Sky.h"
-#include "ShadowMap.h"
-#include "SpotLightShadowMap.h"
-#include "Skinning.h"
+#include "DrawManager.h"
 
 ModelManager* GameObject::modelManager = ModelManager::GetInstance();
 AnimationManager* GameObject::animationManager = AnimationManager::GetInstance();
@@ -23,92 +19,24 @@ void GameObject::Initialize(uint32_t modelHandle)
 	material_.Initialize();
 }
 
+void GameObject::Initialize()
+{
+	worldTransform_.Initialize(false);
+	worldTransform_.Update();
+	material_.Initialize();
+}
+
 void GameObject::UpdateMatrix()
 {
 	worldTransform_.Update(modelHandle_);
 }
 
-void GameObject::Draw(uint32_t textureHandle, Vector4 color)
-{
-	if (ShadowMap::isDrawShadowMap) {
-		ShadowMap::Draw(modelHandle_, worldTransform_);
-	}
-	else if (SpotLightShadowMap::isDrawSpotLightShadowMap) {
-		SpotLightShadowMap::Draw(modelHandle_, worldTransform_);
-	}
-	else {
-		material_.color_ = color;
-		material_.Update();
-		Model::Draw(modelHandle_, worldTransform_, material_, textureHandle);
-	}
-}
 
 void GameObject::Draw(Vector4 color)
 {
-	if (ShadowMap::isDrawShadowMap) {
-		ShadowMap::Draw(modelHandle_, worldTransform_);
-	}
-	else if (SpotLightShadowMap::isDrawSpotLightShadowMap) {
-		SpotLightShadowMap::Draw(modelHandle_, worldTransform_);
-	}
-	else {
-		material_.color_ = color;
-		material_.Update();
-		Model::Draw(modelHandle_, worldTransform_, material_);
-	}
-}
-
-void GameObject::Draw(const WorldTransform& worldTransform, Vector4 color)
-{
-	if (ShadowMap::isDrawShadowMap) {
-		ShadowMap::Draw(modelHandle_, worldTransform_);
-	}
-	else if (SpotLightShadowMap::isDrawSpotLightShadowMap) {
-		SpotLightShadowMap::Draw(modelHandle_, worldTransform_);
-	}
-	else {
-		material_.color_ = color;
-		material_.Update();
-		Model::Draw(modelHandle_, worldTransform, material_);
-	}
-}
-
-void GameObject::SkyDraw()
-{
-	Sky::Draw(modelHandle_, worldTransform_);
-}
-
-void GameObject::SkinningDraw(const SkinCluster& skinCluster)
-{
-	Skinning::Draw(modelHandle_, worldTransform_, skinCluster);
-}
-
-void GameObject::Draw(uint32_t modelHandle, const WorldTransform& worldTransform)
-{
-	if (ShadowMap::isDrawShadowMap) {
-		ShadowMap::Draw(modelHandle, worldTransform);
-	}
-	else if (SpotLightShadowMap::isDrawSpotLightShadowMap) {
-		SpotLightShadowMap::Draw(modelHandle, worldTransform);
-	}
-	else {
-		Model::Draw(modelHandle, worldTransform);
-	}
-}
-
-void GameObject::Draw(const WorldTransform& worldTransform, uint32_t textureHandle, Vector4 color)
-{
-	if (ShadowMap::isDrawShadowMap) {
-		ShadowMap::Draw(modelHandle_, worldTransform_);
-	}
-	else if (SpotLightShadowMap::isDrawSpotLightShadowMap) {
-		SpotLightShadowMap::Draw(modelHandle_, worldTransform_);
-	}
-	else {
-		material_.color_ = color;
-		material_.Update();
-		Model::Draw(modelHandle_, worldTransform, material_, textureHandle);
-	}
+	material_.color_ = color;
+	material_.Update();
+	DrawManager::GetInstance()->DrawModel(worldTransform_,modelHandle_,0, material_);
 }
 
 void GameObject::UpdateMaterial(Vector4 color)

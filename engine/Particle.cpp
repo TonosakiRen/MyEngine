@@ -5,16 +5,9 @@
 
 using namespace Microsoft::WRL;
 
-CommandContext* Particle::commandContext_ = nullptr;
-std::unique_ptr<RootSignature> Particle::rootSignature_;
-std::unique_ptr<PipelineState> Particle::pipelineState_;
-Matrix4x4 Particle::billBordMatrix;
-
-Particle::Particle(uint32_t particleNum) : kParticleNum(particleNum) {
-}
-
-void Particle::StaticInitialize() {
+void Particle::Initialize() {
     CreatePipeline();
+    CreateMesh();
 }
 
 void Particle::Finalize()
@@ -23,9 +16,8 @@ void Particle::Finalize()
     pipelineState_.reset();
 }
 
-void Particle::PreDraw(CommandContext* commandContext, const ViewProjection& viewProjection) {
-    assert(Particle::commandContext_ == nullptr);
-    commandContext_ = commandContext;
+void Particle::PreDraw(CommandContext& commandContext, const ViewProjection& viewProjection) {
+
 
     billBordMatrix = viewProjection.GetMatView();
     billBordMatrix.m[3][0] = 0.0f;
@@ -34,17 +26,13 @@ void Particle::PreDraw(CommandContext* commandContext, const ViewProjection& vie
 
     billBordMatrix = Inverse(billBordMatrix);
 
-    commandContext_->SetPipelineState(*pipelineState_);
-    commandContext_->SetGraphicsRootSignature(*rootSignature_);
+    commandContext.SetPipelineState(*pipelineState_);
+    commandContext.SetGraphicsRootSignature(*rootSignature_);
 
     // CBVをセット（ビュープロジェクション行列）
-    commandContext_->SetConstantBuffer(static_cast<UINT>(RootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
+    commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
 
-    commandContext_->SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-}
-
-void Particle::PostDraw() {
-    commandContext_ = nullptr;
+    commandContext.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 
 void Particle::CreatePipeline() {
@@ -220,37 +208,20 @@ void Particle::CreateMesh() {
     ibView_.BufferLocation = indexBuffer_.GetGPUVirtualAddress();
     ibView_.Format = DXGI_FORMAT_R16_UINT;
     ibView_.SizeInBytes = sizeIB;
-
-    structuredBuffer_.Create(sizeof(InstancingBufferData), kParticleNum);
 }
 
-void Particle::Initialize() {
-    material_.Initialize();
-    CreateMesh();
-}
-
-void Particle::Draw(const std::vector<InstancingBufferData>& bufferData, const Vector4& color, const uint32_t textureHadle) {
-    assert(commandContext_);
-    assert(!bufferData.empty());
-
-    std::vector<Particle::InstancingBufferData> instancingBufferDatas;
-
-    for (const auto& data : bufferData) {
-        instancingBufferDatas.emplace_back(data.matWorld * billBordMatrix);
+void Particle::Draw(CommandContext& commandContext, ParticleData& bufferData, const Material& material, const uint32_t textureHandle) {
+  
+    commandContext.SetVertexBuffer(0, 1, &vbView_);
+    commandContext.SetIndexBuffer(ibView_);
+    for (uint32_t i = 0; i < bufferData.dataNum_; i++) {
+        bufferData.data_[i].matWorld *= billBordMatrix;
     }
+    commandContext.SetDescriptorTable(0, bufferData.structuredBuffer_.GetSRV());
+    commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kMaterial), material.GetGPUVirtualAddress());
 
-    //マッピング
-    structuredBuffer_.Copy(instancingBufferDatas.data(), sizeof(instancingBufferDatas[0]) * instancingBufferDatas.size());
+    TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(commandContext, static_cast<UINT>(RootParameter::kTexture), textureHandle);
 
-    material_.color_ = color;
-    material_.Update();
-
-    commandContext_->SetVertexBuffer(0, 1, &vbView_);
-    commandContext_->SetIndexBuffer(ibView_);
-    commandContext_->SetDescriptorTable(0, structuredBuffer_.GetSRV());
-    commandContext_->SetConstantBuffer(static_cast<UINT>(RootParameter::kMaterial), material_.GetGPUVirtualAddress());
-
-    TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(commandContext_, static_cast<UINT>(RootParameter::kTexture), textureHadle);
-
-    commandContext_->DrawIndexedInstanced(static_cast<UINT>(indices_.size()), static_cast<UINT>(bufferData.size()), 0, 0, 0);
+    commandContext.DrawIndexedInstanced(static_cast<UINT>(indices_.size()), static_cast<UINT>(bufferData.dataNum_), 0, 0, 0);
+    bufferData.Reset();
 }

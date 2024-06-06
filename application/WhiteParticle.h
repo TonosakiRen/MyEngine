@@ -1,5 +1,8 @@
 #pragma once
-#include "Particle.h"
+#include <memory>
+#include "ParticleData.h"
+#include "WorldTransform.h"
+#include "Material.h"
 class WhiteParticle
 {
 public:
@@ -7,7 +10,7 @@ public:
 	WhiteParticle();
 	void Initialize(Vector3 minDirection, Vector3 maxDirection);
 	void Update();
-	void Draw(Vector4 color = { 1.0f,1.0f,1.0f,1.0f }, uint32_t textureHandle = 0);
+	void Draw(uint32_t textureHandle = 0);
 	void SetDirection(Vector3 minDirection, Vector3 maxDirection) {
 		minDirection_ = minDirection;
 		maxDirection_ = maxDirection;
@@ -36,8 +39,9 @@ private:
 	float speed_ = 0.05f;
 	float scaleSpeed_ = 0.03f;
 	bool isEmit_ = false;
-	std::unique_ptr<Particle> particle_;
+	std::unique_ptr<ParticleData> particleData_;
 	Vector3 minDirection_;
 	Vector3 maxDirection_;
+	Material material_;
 };
 
