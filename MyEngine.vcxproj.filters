@@ -418,6 +418,9 @@
     <ClCompile Include="engine\GameObjectManager.cpp">
       <Filter>Engine\Loader</Filter>
     </ClCompile>
+    <ClCompile Include="engine\Reducation.cpp">
+      <Filter>Engine\PostEffect</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -735,6 +738,9 @@
     <ClInclude Include="engine\GameObjectManager.h">
       <Filter>Engine\Loader</Filter>
     </ClInclude>
+    <ClInclude Include="engine\Reducation.h">
+      <Filter>Engine\PostEffect</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\ModelPS.hlsl">
@@ -852,6 +858,9 @@
       <Filter>shaders</Filter>
     </FxCompile>
     <FxCompile Include="Resources\shaders\FloorVS.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\ReducationPS.hlsl">
       <Filter>shaders</Filter>
     </FxCompile>
   </ItemGroup>

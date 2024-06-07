@@ -13,6 +13,7 @@
 #include "Mesh.h"
 
 #include "Voronoi.h"
+#include "Reducation.h"
 
 class DirectXCommon;
 
@@ -54,7 +55,11 @@ private:
 
 	std::unique_ptr<Voronoi> voronoi_;
 
-	Vector4 topHSVA_ = { 0.790f,1.0f,0.00f,1.0f };;
-	Vector4 bottomHSVA_ = { 0.220f,1.0f,0.03f,1.0f };
+	std::unique_ptr<Reducation> reducation_;
+
+	CubeColorBuffer starTexture_;
+
+	Vector4 topHSVA_ = { 0.650f,1.0f,0.07f,1.0f };;
+	Vector4 bottomHSVA_ = { 0.550f,1.0f,0.15f,1.0f };
 };
 

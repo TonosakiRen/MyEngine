@@ -1,6 +1,7 @@
 #pragma once
 #include <stdint.h>
 #include "ColorBuffer.h"
+#include "CubeColorBuffer.h"
 #include "UploadBuffer.h"
 #include "StructuredBuffer.h"
 #include "PipelineState.h"
@@ -55,6 +56,7 @@ private:
 	Voronoi& operator=(const Voronoi&) = delete;
 
 	ColorBuffer voronoiTexture_;
+
 
 	uint32_t pointNum_ = 0;
 };

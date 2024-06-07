@@ -1,6 +1,7 @@
 #pragma once
 
 #include <d3d12.h>
+#include <d3dx12.h>
 #include <wrl/client.h>
 
 #include <cassert>
@@ -10,6 +11,7 @@
 #include "PipelineState.h"
 #include "RootSignature.h"
 #include "ColorBuffer.h"
+#include "CubeColorBuffer.h"
 #include "DepthBuffer.h"
 
 #include "DWParam.h"
@@ -39,6 +41,10 @@ public:
 
     void ClearColor(ColorBuffer& target);
     void ClearColor(ColorBuffer& target, float clearColor[4]);
+    void ClearColor(CubeColorBuffer& target);
+    void ClearColor(CubeColorBuffer& target, float clearColor[4]);
+    void CopyCubeBuffer(CubeColorBuffer& dest, CubeColorBuffer& src, uint32_t srcIndex = 0);
+    void CopyCubeBuffer(CubeColorBuffer& dest, ColorBuffer& src);
     void ClearDepth(DepthBuffer& target);
     void ClearDepth(DepthBuffer& target, float clearValue);
 
@@ -181,6 +187,59 @@ inline void CommandContext::ClearColor(ColorBuffer& target) {
 inline void CommandContext::ClearColor(ColorBuffer& target, float clearColor[4]) {
     FlushResourceBarriers();
     commandList_->ClearRenderTargetView(target.GetRTV(), clearColor, 0, nullptr);
+}
+
+inline void CommandContext::ClearColor(CubeColorBuffer& target) {
+    FlushResourceBarriers();
+    for (uint32_t i = 0; i < 6; i++) {
+        commandList_->ClearRenderTargetView(target.GetRTV(i), target.GetClearColor(), 0, nullptr);
+    }
+}
+
+inline void CommandContext::ClearColor(CubeColorBuffer& target, float clearColor[4]) {
+    FlushResourceBarriers();
+    for (uint32_t i = 0; i < 6; i++) {
+        commandList_->ClearRenderTargetView(target.GetRTV(i), clearColor, 0, nullptr);
+    }
+}
+
+inline void CommandContext::CopyCubeBuffer(CubeColorBuffer& dest, CubeColorBuffer& src,uint32_t srcIndex) {
+    TransitionResource(dest, D3D12_RESOURCE_STATE_COPY_DEST);
+    TransitionResource(src, D3D12_RESOURCE_STATE_COPY_SOURCE);
+    FlushResourceBarriers();
+    for (uint32_t i = 1; i < 6; i++) {
+        D3D12_TEXTURE_COPY_LOCATION dstLocation{};
+        dstLocation.pResource = dest;
+        dstLocation.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
+        dstLocation.SubresourceIndex = D3D12CalcSubresource(0, i, 0, 1, 1);
+
+        D3D12_TEXTURE_COPY_LOCATION srcLocation{};
+        srcLocation.pResource = src;
+        srcLocation.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
+        srcLocation.SubresourceIndex = D3D12CalcSubresource(0, srcIndex, 0, 1, 1);
+
+        commandList_->CopyTextureRegion(&dstLocation, 0, 0, 0, &srcLocation, nullptr);
+    }
+}
+
+inline void CommandContext::CopyCubeBuffer(CubeColorBuffer& dest, ColorBuffer& src) {
+    TransitionResource(dest, D3D12_RESOURCE_STATE_COPY_DEST);
+    TransitionResource(src, D3D12_RESOURCE_STATE_COPY_SOURCE);
+    FlushResourceBarriers();
+
+    D3D12_TEXTURE_COPY_LOCATION srcLocation{};
+    srcLocation.pResource = src;
+    srcLocation.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
+    srcLocation.SubresourceIndex = 0;
+
+    for (uint32_t i = 0; i < 6; i++) {
+        D3D12_TEXTURE_COPY_LOCATION dstLocation{};
+        dstLocation.pResource = dest;
+        dstLocation.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
+        dstLocation.SubresourceIndex = D3D12CalcSubresource(0, i, 0, 1, 1);
+
+        commandList_->CopyTextureRegion(&dstLocation, 0, 0, 0, &srcLocation, nullptr);
+    }
 }
 
 inline void CommandContext::ClearDepth(DepthBuffer& target) {

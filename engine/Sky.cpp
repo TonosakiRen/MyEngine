@@ -14,7 +14,16 @@ void Sky::Initialize(CommandContext& commnadContext) {
     voronoi_ = std::make_unique<Voronoi>();
     voronoi_->Initialize(pointNum_);
     voronoi_->Render(commnadContext);
+
+    reducation_ = std::make_unique<Reducation>();
+    reducation_->Initialize(voronoi_->GetResult());
+    reducation_->Draw(voronoi_->GetResult(),commnadContext);
+
+    starTexture_.Create(reducation_->GetResult().GetWidth(), reducation_->GetResult().GetHeight(), reducation_->GetResult().GetFormat());
+    commnadContext.CopyCubeBuffer(starTexture_, reducation_->GetResult());
+    commnadContext.TransitionResource(starTexture_, D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
 }
+
 
 void Sky::Finalize()
 {
@@ -236,7 +245,7 @@ void Sky::Draw(CommandContext& commandContext, const WorldTransform& worldTransf
     // CBVをセット（ワールド行列）
     commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kWorldTransform),worldTransform.GetGPUVirtualAddress());
     // srvセット
-    commandContext.SetDescriptorTable(UINT(RootParameter::kVoronoiTexture), TextureManager::GetInstance()->GetSRV("rostock_laage_airport_4k.dds"));
+    commandContext.SetDescriptorTable(UINT(RootParameter::kVoronoiTexture), starTexture_.GetSRV());
 
     //ModelManager::GetInstance()->DrawInstanced(commandContext, ModelManager::GetInstance()->Load("box1x1Inverse.obj"));
 

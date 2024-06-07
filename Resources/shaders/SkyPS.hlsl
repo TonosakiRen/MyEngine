@@ -10,8 +10,9 @@ ConstantBuffer<Param> bottomColor  : register(b3);
 
 
 struct VSOutput {
-	float32_t4 pos : SV_POSITION; // システム用頂点座標
-	float32_t3 uv : TEXCOORD;       // uv値
+	float32_t4 pos : SV_POSITION0;
+	float32_t4 localPos : TEXCOORD0;
+	float32_t3 uv : TEXCOORD1;
 };
 
 struct PixelShaderOutput {
@@ -41,12 +42,18 @@ PixelShaderOutput main(VSOutput input) {
 
 	PixelShaderOutput output;
 
-	float32_t4 textureColor = tex.Sample(smp, input.uv);
-	output.color = textureColor;
-
 
 	output.normal = float32_t4(0.0f, 0.0f, 0.0f, 1.0f); 
+
+	output.color = float32_t4(0.0f, 0.0f, 0.0f, 1.0f);
 	
+	float32_t t = (input.localPos.y + 1.0f) * 0.5f;
+
+	float32_t4 hsva = lerp(topColor.color, bottomColor.color, t);
+	output.color.xyz = HSVToRGB(hsva.xyz);
+
+	float32_t4 textureColor = tex.Sample(smp, input.uv);
+	output.color += textureColor;
 
 	/*output.enableLighting.x = 0.0f;
 

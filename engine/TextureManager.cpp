@@ -218,63 +218,77 @@ uint32_t TextureManager::LoadUvInternal(const std::string& fileName, const std::
 	HRESULT result;
 
 	TexMetadata metadata{};
-	ScratchImage scratchImg{};
+	ScratchImage image{};
 
 	// WICテクスチャのロード
-	result = LoadFromWICFile(wfilePath, WIC_FLAGS_NONE, &metadata, scratchImg);
-	//読み込めないのもだったら0(white.png)を返す
-	if (!SUCCEEDED(result)) {
-		return 0;
+	if (fullPath.ends_with(".dds")) {
+		result = LoadFromDDSFile(wfilePath, DDS_FLAGS_NONE, nullptr, image);
 	}
+	else {
+		result = LoadFromWICFile(wfilePath, WIC_FLAGS_NONE, nullptr, image);
+	}
+	assert(SUCCEEDED(result));
 
-	ScratchImage mipChain{};
+	ScratchImage mipImages{};
+
+	metadata = image.GetMetadata();
+
+
 	// ミップマップ生成
-	result = GenerateMipMaps(
-		scratchImg.GetImages(), scratchImg.GetImageCount(), scratchImg.GetMetadata(),
-		TEX_FILTER_DEFAULT, 0, mipChain);
-	if (SUCCEEDED(result)) {
-		scratchImg = std::move(mipChain);
-		metadata = scratchImg.GetMetadata();
+	if (IsCompressed(metadata.format)) {
+		mipImages = std::move(image);
+	}
+	else {
+		if (metadata.width != 1 && metadata.height != 1) {
+			result = GenerateMipMaps(
+				image.GetImages(), image.GetImageCount(), image.GetMetadata(),
+				TEX_FILTER_SRGB, 0, mipImages);
+		}
+		else {
+			mipImages = std::move(image);
+		}
 	}
 
-	// 読み込んだディフューズテクスチャをSRGBとして扱う
+	// metadata読み込んだディフューズテクスチャをSRGBとして扱う
+	metadata = mipImages.GetMetadata();
 	metadata.format = MakeSRGB(metadata.format);
 
+	assert(SUCCEEDED(result));
+
 	// リソース設定
-	CD3DX12_RESOURCE_DESC texresDesc = CD3DX12_RESOURCE_DESC::Tex2D(
-		metadata.format,
-		metadata.width,
-		(UINT)metadata.height,
-		(UINT16)metadata.arraySize,
-		(UINT16)metadata.mipLevels);
+	CD3DX12_RESOURCE_DESC texresDesc{};
+	texresDesc.Width = UINT(metadata.width);
+	texresDesc.Height = UINT(metadata.height);
+	texresDesc.MipLevels = UINT16(metadata.mipLevels);
+	texresDesc.DepthOrArraySize = UINT16(metadata.arraySize);
+	texresDesc.Format = metadata.format;
+	texresDesc.SampleDesc.Count = 1;
+	texresDesc.Dimension = D3D12_RESOURCE_DIMENSION(metadata.dimension);
 
 	// ヒーププロパティ
-	CD3DX12_HEAP_PROPERTIES heapProps = CD3DX12_HEAP_PROPERTIES(D3D12_CPU_PAGE_PROPERTY_WRITE_BACK, D3D12_MEMORY_POOL_L0);
+	CD3DX12_HEAP_PROPERTIES heapProps{};
+	heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
 
-	// テクスチャ用バッファの生成
-	result = device_->CreateCommittedResource(
-		&heapProps, D3D12_HEAP_FLAG_NONE,
-		&texresDesc,
-		D3D12_RESOURCE_STATE_GENERIC_READ, // テクスチャ用指定
-		nullptr, IID_PPV_ARGS(texture.resource.GetAddressOf()));
+	texture.resource.CreateResource(heapProps, texresDesc, D3D12_RESOURCE_STATE_COPY_DEST);
 
-	assert(SUCCEEDED(result));
+	// 中間リソースを読み込む
+	std::vector<D3D12_SUBRESOURCE_DATA> subresources;
+	PrepareUpload(device_, mipImages.GetImages(), mipImages.GetImageCount(), mipImages.GetMetadata(), subresources);
+
+
 #ifdef _DEBUG
 	texture.resource->SetName(L"Texture");
 #endif // _DEBUG
 
-	// テクスチャバッファにデータ転送
-	for (size_t i = 0; i < metadata.mipLevels; i++) {
-		const Image* img = scratchImg.GetImage(i, 0, 0);
-		result = texture.resource->WriteToSubresource(
-			(UINT)i,
-			nullptr,
-			img->pixels,
-			(UINT)img->rowPitch,
-			(UINT)img->slicePitch
-		);
-		assert(SUCCEEDED(result));
-	}
+	uint64_t intermediateSize = GetRequiredIntermediateSize(texture.resource, 0, UINT(subresources.size()));
+
+
+	texture.intermediateResource.Create(intermediateSize);
+
+	UpdateSubresources(*commandContext_, texture.resource, texture.intermediateResource, 0, 0, UINT(subresources.size()), subresources.data());
+	commandContext_->TransitionResource(texture.resource, D3D12_RESOURCE_STATE_GENERIC_READ);
+
+	commandContext_->ReleaseResource(texture.intermediateResource);
 
 	// シェーダリソースビュー作成
 	texture.srvHandle = DirectXCommon::GetInstance()->AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
@@ -282,10 +296,19 @@ uint32_t TextureManager::LoadUvInternal(const std::string& fileName, const std::
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
 	D3D12_RESOURCE_DESC resDesc = texture.resource->GetDesc();
 
-	srvDesc.Format = resDesc.Format;
+	srvDesc.Format = metadata.format;
 	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-	srvDesc.Texture2D.MipLevels = (UINT)metadata.mipLevels;
+
+	if (metadata.IsCubemap()) {
+		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
+		srvDesc.TextureCube.MostDetailedMip = 0;
+		srvDesc.TextureCube.MipLevels = UINT_MAX;
+		srvDesc.TextureCube.ResourceMinLODClamp = 0.0f;
+	}
+	else {
+		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+		srvDesc.Texture2D.MipLevels = (UINT)metadata.mipLevels;
+	}
 
 	device_->CreateShaderResourceView(
 		texture.resource,

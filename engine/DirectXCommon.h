@@ -16,7 +16,7 @@ public:
 
 	//うんち設計
 	uint32_t kSrvHeapDescriptorNum = 1024;
-	uint32_t kRtvHeapDescriptorNum = 32;
+	uint32_t kRtvHeapDescriptorNum = 64;
 	uint32_t kDsvHeapDescriptorNum = 16;
 
 	//mainColorBufferNum

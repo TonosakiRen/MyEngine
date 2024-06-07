@@ -202,6 +202,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\GameObjectManager.cpp" />
     <ClCompile Include="engine\ParticleData.cpp" />
     <ClCompile Include="engine\ParticleModelData.cpp" />
+    <ClCompile Include="engine\Reducation.cpp" />
     <ClCompile Include="engine\RwStructuredBuffer.cpp" />
     <ClCompile Include="engine\ShadowSpotLights.cpp" />
     <ClCompile Include="engine\Skeleton.cpp" />
@@ -307,6 +308,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\GameObjectManager.h" />
     <ClInclude Include="engine\ParticleData.h" />
     <ClInclude Include="engine\ParticleModelData.h" />
+    <ClInclude Include="engine\Reducation.h" />
     <ClInclude Include="engine\RwStructuredBuffer.h" />
     <ClInclude Include="engine\ShadowSpotLights.h" />
     <ClInclude Include="engine\Skeleton.h" />
@@ -475,6 +477,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Demo|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\ReducationPS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Demo|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="Resources\shaders\ShadowMapPS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>

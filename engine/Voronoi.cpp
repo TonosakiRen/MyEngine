@@ -102,7 +102,6 @@ void Voronoi::Render(CommandContext& commandContext)
 {
     commandContext.TransitionResource(voronoiTexture_, D3D12_RESOURCE_STATE_RENDER_TARGET);
 
-    commandContext.SetRenderTarget(voronoiTexture_.GetRTV());
     commandContext.ClearColor(voronoiTexture_);
     commandContext.SetViewportAndScissorRect(0, 0, voronoiTexture_.GetWidth(), voronoiTexture_.GetHeight());
 
@@ -116,9 +115,11 @@ void Voronoi::Render(CommandContext& commandContext)
 
     commandContext.SetDescriptorTable(0, point_.GetSRV());
     commandContext.SetConstant(1, 0, pointNum_);
-   
-    commandContext.DrawIndexed(static_cast<UINT>(indices_.size()), 0, 0);
 
+    
+    commandContext.SetRenderTarget(voronoiTexture_.GetRTV());
+    commandContext.DrawIndexed(static_cast<UINT>(indices_.size()), 0, 0);
+    
     commandContext.TransitionResource(voronoiTexture_, D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
 }
 
