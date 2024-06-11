@@ -81,13 +81,13 @@ void DrawManager::AllDraw(const ViewProjection& viewProjection)
 		call();
 	}
 
-	floorPipeline_->PreDraw(*commandContext_, viewProjection);
-	for (auto& call : calls[kFloor]) {
+	skyPipeline_->PreDraw(*commandContext_, viewProjection);
+	for (auto& call : calls[kSky]) {
 		call();
 	}
 
-	skyPipeline_->PreDraw(*commandContext_, viewProjection);
-	for (auto& call : calls[kSky]) {
+	floorPipeline_->PreDraw(*commandContext_, viewProjection);
+	for (auto& call : calls[kFloor]) {
 		call();
 	}
 }

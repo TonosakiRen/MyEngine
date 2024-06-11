@@ -112,7 +112,7 @@ void GamePlayScene::Update()
 
 void GamePlayScene::Draw()
 {
-	//player_->Draw();
+	player_->Draw();
 	sphere_->Draw();
 	//敵描画
 	for (const std::unique_ptr<Enemy>& enemy : enemies_) {
