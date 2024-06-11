@@ -24,7 +24,7 @@ public:
     
     void Create(const Skeleton& skeleton,const uint32_t modelHandle);
     void Update();
-
+     
     const DescriptorHandle& GetSRV() const { return paletteResource_.GetSRV(); }
 
 public:

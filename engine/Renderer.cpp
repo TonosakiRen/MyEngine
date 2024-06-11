@@ -56,7 +56,7 @@ void Renderer::Initialize() {
 
     colorBuffers_[kMaterial] = std::make_unique<ColorBuffer>();
     colorBuffers_[kMaterial]->SetClearColor(clearColor);
-    colorBuffers_[kMaterial]->Create(swapChainBuffer.GetWidth(), swapChainBuffer.GetHeight(), DXGI_FORMAT_R32G32B32A32_FLOAT);
+    colorBuffers_[kMaterial]->Create(swapChainBuffer.GetWidth(), swapChainBuffer.GetHeight(), DXGI_FORMAT_R8_UNORM);
 
     //ドローマネージャー
     drawManager_ = DrawManager::GetInstance();

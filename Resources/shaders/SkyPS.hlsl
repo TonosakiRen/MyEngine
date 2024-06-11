@@ -18,7 +18,7 @@ struct VSOutput {
 struct PixelShaderOutput {
 	float32_t4 color : SV_TARGET0;
 	float32_t4 normal : SV_TARGET1;
-	float32_t4 enableLighting : SV_TARGET2;
+	float32_t enableLighting : SV_TARGET2;
 };
 
 float32_t Random(float32_t2 num) {
@@ -44,6 +44,8 @@ PixelShaderOutput main(VSOutput input) {
 
 
 	output.normal = float32_t4(0.0f, 0.0f, 0.0f, 1.0f); 
+
+	output.enableLighting = 0.0f;
 
 	output.color = float32_t4(0.0f, 0.0f, 0.0f, 1.0f);
 	

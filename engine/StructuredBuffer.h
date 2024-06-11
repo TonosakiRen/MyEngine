@@ -6,7 +6,7 @@ class StructuredBuffer
 {
 public:
 	void Create(size_t bufferSize, UINT numElements);
-	DescriptorHandle GetSRV() const { return srvHandle_; }
+	const DescriptorHandle& GetSRV() const { return srvHandle_; }
 private:
 	DescriptorHandle srvHandle_;
 };

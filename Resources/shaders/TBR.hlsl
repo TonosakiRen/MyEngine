@@ -126,11 +126,11 @@ RWStructuredBuffer<uint32_t> shadowSpotLightIndex : register(u3);
 
 StructuredBuffer<Frustum> initialTileFrustum : register(t0);
 StructuredBuffer<PointLight> gPointLights  : register(t1);
-[numthreads(16, 9, 1)]
+[numthreads(16 * 2, 9 * 2, 1)]
 void main( uint32_t2 index : SV_GroupThreadID )
 {
 
-	uint32_t tileIndex = index.x + (index.y * 16);
+	uint32_t tileIndex = index.x + (index.y * (16 * 2));
 
 	tileInformations[tileIndex].pointLightNum = 0;
 	tileInformations[tileIndex].spotLightNum = 0;

@@ -43,8 +43,8 @@ public:
 		ParameterNum
 	};
 
-	static const uint32_t kTileWidthNum = 16 ;
-	static const uint32_t kTileHeightNum = 9 ;
+	static const uint32_t kTileWidthNum = 16  * 2;
+	static const uint32_t kTileHeightNum = 9  * 2;
 	static const uint32_t kTileWidth = WinApp::kWindowWidth / kTileWidthNum;
 	static const uint32_t kTileHeight = WinApp::kWindowHeight / kTileHeightNum;
 	static const uint32_t kTileNum = kTileWidthNum * kTileHeightNum;

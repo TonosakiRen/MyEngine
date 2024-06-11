@@ -17,7 +17,7 @@ struct VSOutput {
 struct PixelShaderOutput {
 	float32_t4 color : SV_TARGET0;
 	float32_t4 normal : SV_TARGET1;
-	float32_t4 enableLighting : SV_TARGET2;
+	float32_t enableLighting : SV_TARGET2;
 };
 
 float32_t3 HSVToRGB(in float32_t3 hsv) {
@@ -31,7 +31,7 @@ PixelShaderOutput main(VSOutput input) {
 	PixelShaderOutput output;
 
 	float32_t3 normal = normalize(input.normal);
-	output.enableLighting.x = 1.0f;
+	output.enableLighting = 1.0f;
 	// マテリアル
 	output.color = color.color;
 
