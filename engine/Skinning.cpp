@@ -41,7 +41,7 @@ void Skinning::CreatePipeline() {
     vsBlob = shaderManager->Compile(L"SkinningVS.hlsl",ShaderManager::kVertex);
     assert(vsBlob != nullptr);
 
-    psBlob = shaderManager->Compile(L"SkinningPS.hlsl", ShaderManager::kPixel);
+    psBlob = shaderManager->Compile(L"ModelPS.hlsl", ShaderManager::kPixel);
     assert(psBlob != nullptr);
 
     rootSignature_ = std::make_unique<RootSignature>();

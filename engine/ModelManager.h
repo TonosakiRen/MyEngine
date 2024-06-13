@@ -40,6 +40,7 @@ struct ModelData {
 	//model全体のsize
 	Vector3 modelSize{};
 	Vector3 modelCenter{};
+	Sphere modelSphere{};
 	uint32_t meshNum = 0;
 };
 
@@ -58,6 +59,8 @@ public:
 	const Vector3& GetModelSize(const uint32_t modelHandle);
 
 	const Vector3& GetModelCenter (const uint32_t modelHandle);
+
+	const Sphere& GetModelSphere(const uint32_t modelHandle);
 
 	Node& GetRootNode(const uint32_t modelHandle);
 

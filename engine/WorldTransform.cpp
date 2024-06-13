@@ -15,6 +15,18 @@ void WorldTransform::Initialize(bool srtChange) {
     Update();
 }
 
+void WorldTransform::Reset() {
+    parent_ = nullptr;
+   
+    scale_ = { 1.0f,1.0f,1.0f };
+    quaternion_ = IdentityQuaternion();
+    translation_ = { 0.0f,0.0f,0.0f };
+    
+    matWorld_ = MakeIdentity4x4();
+    worldInverseTranspose_ = MakeIdentity4x4();
+}
+
+
 void WorldTransform::Update() {
 
     // スケール、回転、平行移動行列の計算

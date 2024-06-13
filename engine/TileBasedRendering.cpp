@@ -9,21 +9,6 @@
 using namespace Microsoft::WRL;
 void TileBasedRendering::Initialize()
 {
-    {
-        tileInformationBuffer_.Create(sizeof(ConstBufferData), kTileNum);
-    }
-
-    {
-        pointLightIndexBuffer_.Create(sizeof(uint32_t), kTileNum * PointLights::lightNum);
-    }
-
-    {
-        spotLightIndexBuffer_.Create(sizeof(uint32_t), kTileNum * SpotLights::lightNum);
-    }
-
-    {
-        shadowSpotLightIndexBuffer_.Create(sizeof(uint32_t), kTileNum * ShadowSpotLights::lightNum);
-    }
 
     //compute
 

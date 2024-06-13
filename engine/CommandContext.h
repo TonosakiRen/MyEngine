@@ -97,6 +97,8 @@ public:
     void DrawInstanced(UINT vertexCountPerInstance, UINT instanceCount, UINT startVertexLocation = 0, UINT startInstanceLocation = 0);
     void DrawIndexedInstanced(UINT indexCountPerInstance, UINT instanceCount, UINT startIndexLocation = 0, INT baseVertexLocation = 0, UINT startInstanceLocation = 0);
 
+    void ExecuteIndirect(ID3D12CommandSignature* commandSignature, UINT maxCommandCount, ID3D12Resource* argumentBuffer, UINT64 argumentBufferOffset, ID3D12Resource* countBuffer, UINT64 countBufferOffset);
+
     operator ID3D12GraphicsCommandList* () const { return commandList_.Get(); }
 
 private:
@@ -437,4 +439,9 @@ inline void CommandContext::DrawIndexedInstanced(UINT indexCountPerInstance, UIN
 
 inline void CommandContext::ReleaseResource(GPUResource& resource) {
     releaseResources_.push_back(&resource);
+}
+
+inline void CommandContext::ExecuteIndirect(ID3D12CommandSignature* commandSignature, UINT maxCommandCount, ID3D12Resource* argumentBuffer, UINT64 argumentBufferOffset, ID3D12Resource* countBuffer, UINT64 countBufferOffset) {
+    FlushResourceBarriers();
+    commandList_->ExecuteIndirect(commandSignature, maxCommandCount, argumentBuffer, argumentBufferOffset, countBuffer, countBufferOffset);
 }

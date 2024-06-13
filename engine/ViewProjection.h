@@ -47,6 +47,10 @@ public:
 		return frustum_;
 	}
 
+	const Frustum GetWorldFrustum() const {
+		return frustum_;
+	}
+
 	const Quaternion GetQuaternion() const {
 		return quaternion_;
 	}
@@ -86,6 +90,7 @@ protected:
 	Matrix4x4 inverseViewProjection_;
 
 	Frustum frustum_;
+	Frustum worldFrustum_;
 
 	UploadBuffer constBuffer_;
 };

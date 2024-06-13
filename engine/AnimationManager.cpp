@@ -13,25 +13,34 @@
 
 using namespace DirectX;
 
-const Animation& AnimationManager::Load(const std::string& fileName) {
-	return AnimationManager::GetInstance()->LoadInternal(fileName);
+const Animation& AnimationManager::Load(const std::string& fileName, const std::string& animationName) {
+	return AnimationManager::GetInstance()->LoadInternal(fileName, animationName);
 }
 
-void AnimationManager::CreateAnimations(AnimationData& animationData)
+void AnimationManager::CreateAnimations(const std::string& fileName, AnimationData& animationData)
 {
 	HRESULT result = S_FALSE;
 
 	//拡張子がない名前を取得
-	std::size_t dotPos = animationData.name.find_last_of('.');
-	std::string n = animationData.name.substr(0, dotPos);
+	std::size_t dotPos = fileName.find_last_of('.');
+	std::string n = fileName.substr(0, dotPos);
 
 	std::string directoryPath = "Resources/animations/" + n + "/";
 
 	Assimp::Importer importer;
-	std::string filePath = directoryPath + animationData.name;
+	std::string filePath = directoryPath + fileName;
 	const aiScene* scene = importer.ReadFile(filePath.c_str(),0);
 	assert(scene->mNumAnimations != 0); //animationがない
-	aiAnimation* animationAssimp = scene->mAnimations[0];//最初のanimationだけ採用。もちろん複数対応するに越したことはない。
+	aiAnimation* animationAssimp = nullptr;
+	for (uint32_t animationIndex = 0; animationIndex < scene->mNumAnimations; animationIndex++){
+		aiString name = scene->mAnimations[animationIndex]->mName;
+		if (name.C_Str() == animationData.name) {
+			animationAssimp = scene->mAnimations[animationIndex];//名前が一致したら代入
+			break;
+		}
+	}
+
+	assert(animationAssimp != nullptr);
 	animationData.animation.duration = float(animationAssimp->mDuration / animationAssimp->mTicksPerSecond);
 	
 	for (uint32_t channelIndex = 0; channelIndex < animationAssimp->mNumChannels; ++channelIndex) {
@@ -88,13 +97,13 @@ void AnimationManager::ApplyAnimation(Skeleton& skeleton, const Animation& anima
 	}
 }
 
-const Animation& AnimationManager::LoadInternal(const std::string& name) {
+const Animation& AnimationManager::LoadInternal(const std::string& fileName, const std::string& animationName) {
 
 	assert(useAnimationCount_ < kNumAnimations);
 	uint32_t handle = useAnimationCount_;
 
 	// 読み込み済みanimationを検索
-	const auto& it = std::find_if(animations_->begin(), animations_->end(), [&](const auto& texture) {return texture.name == name; });
+	const auto& it = std::find_if(animations_->begin(), animations_->end(), [&](const auto& animation) {return animation.name == animationName; });
 
 	if (it != animations_->end()) {
 		// 読み込み済みanimationの要素番号を取得
@@ -106,9 +115,9 @@ const Animation& AnimationManager::LoadInternal(const std::string& name) {
 	// 書き込むAnimationの参照
 	auto& animationData = (animations_->at(handle));
 
-	animationData.name = name;
+	animationData.name = animationName;
 
-	CreateAnimations(animationData);
+	CreateAnimations(fileName, animationData);
 
 	useAnimationCount_++;
 	return animationData.animation;

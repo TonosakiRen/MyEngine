@@ -85,7 +85,7 @@ public:
 		Animation animation;
 	};
 
-	static const Animation& Load(const std::string& fileName);
+	static const Animation& Load(const std::string& fileName, const std::string& animationName);
 
 	static AnimationManager* GetInstance();
 
@@ -101,9 +101,9 @@ private:
 	std::unique_ptr<std::array<AnimationData, kNumAnimations>> animations_;
 	uint32_t useAnimationCount_ = 0;
 
-	const Animation& LoadInternal(const std::string& fileName);
+	const Animation& LoadInternal(const std::string& fileName, const std::string& animationName);
 
-	void CreateAnimations(AnimationData& modelIndex);
+	void CreateAnimations(const std::string& fileName, AnimationData& modelIndex);
 
 };
 

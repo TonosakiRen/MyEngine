@@ -116,7 +116,22 @@ void ModelManager::CreateMeshes(ModelData& modelData)
 	if (minModelSize.y < 0.5f && minModelSize.y > -0.5f) {
 		modelData.modelCenter.y = minModelSize.y;
 	}
-
+	modelData.modelSphere.center = modelData.modelCenter;
+	if (modelData.modelSize.x > modelData.modelSize.y) {
+		if (modelData.modelSize.x > modelData.modelSize.z) {
+			modelData.modelSphere.radius = modelData.modelSize.x * 0.5f;
+		}else {
+			modelData.modelSphere.radius = modelData.modelSize.z * 0.5f;
+		}
+	}
+	else {
+		if (modelData.modelSize.y > modelData.modelSize.z) {
+			modelData.modelSphere.radius = modelData.modelSize.y * 0.5f;
+		}
+		else {
+			modelData.modelSphere.radius = modelData.modelSize.z * 0.5f;
+		}
+	}
 
 	for (auto& mesh : modelData.meshes) {
 
@@ -256,6 +271,11 @@ const Vector3& ModelManager::GetModelSize(const uint32_t modelHandle)
 const Vector3& ModelManager::GetModelCenter(const uint32_t modelHandle)
 {
 	return  (*models_)[modelHandle].modelCenter;
+}
+
+const Sphere& ModelManager::GetModelSphere(const uint32_t modelHandle)
+{
+	return  (*models_)[modelHandle].modelSphere;
 }
 
 Node& ModelManager::GetRootNode(const uint32_t modelHandle)

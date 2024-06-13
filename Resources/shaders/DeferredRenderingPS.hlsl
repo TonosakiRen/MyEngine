@@ -127,12 +127,12 @@ float4 main(VSOutput input) : SV_TARGET
 
 	float32_t3 color = colorTex.Sample(smp, input.uv).xyz;
 
-	float32_t enableLighting = materialTex.Sample(smp, input.uv).x;
+	float32_t4 normalSample = normalTex.Sample(smp, input.uv);
+	float32_t3 normal = normalSample.xyz * 2.0f - 1.0f;
+	float32_t enableLighting = normalSample.w;
 
 	if (enableLighting) {
 
-		float32_t3 normal = normalTex.Sample(smp, input.uv).xyz;
-		normal = normal * 2.0f - 1.0f;
 		float32_t depth = depthTex.Sample(smp, input.uv).x;
 
 		float32_t3 worldPos = GetWorldPosition(input.uv, depth, gViewProjection.inverseViewProjection);
@@ -159,7 +159,7 @@ float4 main(VSOutput input) : SV_TARGET
 
 		uint32_t startPointLightIndex = lightNum.pointLight * tileNumber;
 
-		float32_t3 viewDirection = normalize(worldPos - gViewProjection.viewPosition);
+		float32_t3 viewDirection = normalize(gViewProjection.viewPosition - worldPos);
 
 		for (int i = 0; i < tileInformation.pointLightNum; i++) {
 

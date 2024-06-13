@@ -55,6 +55,10 @@ public:
 		return *currentViewProjection_;
 	}
 
+	ViewProjection& GetGameViewProjection() {
+		return *camera_;
+	}
+
 public:
 	static ViewProjection* currentViewProjection_;
 	static DirectionalLights* directionLights;

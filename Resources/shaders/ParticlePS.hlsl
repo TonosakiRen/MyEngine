@@ -17,7 +17,7 @@ struct VSOutput {
 struct PixelShaderOutput {
 	float32_t4 color : SV_TARGET0;
 	float32_t4 normal : SV_TARGET1;
-	float32_t4 enableLighting : SV_TARGET2;
+	float32_t material : SV_TARGET2;
 };
 
 PixelShaderOutput main(VSOutput input) {
@@ -25,9 +25,8 @@ PixelShaderOutput main(VSOutput input) {
 
 	float32_t3 normal = normalize(input.normal);
 	output.normal.xyz = (normal.xyz + 1.0f) * 0.5f;
-	output.normal.w = 1.0f;
-	output.enableLighting = float32_t4(0.0f, 0.0f, 0.0f, 0.0f);
-	output.enableLighting.x = gMaterial.enableLighting;
+	output.normal.w = gMaterial.enableLighting;
+	output.material = gMaterial.enableLighting;
 
 	float32_t4 tranformedUV = mul(float32_t4(input.uv, 0.0f, 1.0f), gMaterial.uvTransfrom);
 	float32_t4 texcolor = tex.Sample(smp, tranformedUV.xy);

@@ -88,7 +88,6 @@ Frustum Multiply(Frustum f, float32_t4x4 m) {
 
 bool IsHitSphere(Frustum frustum, float32_t3 position, float32_t radius)
 {
-	uint32_t hitNum = 0;
 	//平面の法線と内積をとる
 	for (uint32_t i = 0; i < 6; i++) {
 		//プラスであれば外側距離を測る,内側の場合マイナス

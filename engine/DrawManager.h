@@ -25,6 +25,7 @@
 
 #include "DirectionalLights.h"
 #include "ShadowSpotLights.h"
+#include "Calling.h"
 
 class DrawManager
 {
@@ -58,6 +59,8 @@ public:
 	void DrawSpotLightShadow(const WorldTransform& worldTransform, const uint32_t modelHandle = 0);
 	void DrawSky(const WorldTransform& worldTransform);
 	void DrawFloor(const WorldTransform& worldTransform, const uint32_t modelHandle = 0);
+
+	void SetCallingViewProjection(const ViewProjection& viewProjection) { calling_->SetViewProjection(&viewProjection); }
 private:
 
 	void Initialize(CommandContext& CommandContext);
@@ -79,6 +82,8 @@ private:
 	std::unique_ptr<FloorRenderer> floorPipeline_;
 
 	static std::unique_ptr<Material> defaultMaterial_;
+
+	std::unique_ptr<Calling> calling_;
 	CommandContext* commandContext_;
 
 	std::vector<std::function<void()>> calls[kCallNum];

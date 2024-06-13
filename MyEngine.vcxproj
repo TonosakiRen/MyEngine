@@ -183,11 +183,13 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\Bloom.cpp" />
     <ClCompile Include="application\BoxArea.cpp" />
     <ClCompile Include="application\Camera.cpp" />
+    <ClCompile Include="engine\Calling.cpp" />
     <ClCompile Include="engine\Collider.cpp" />
     <ClCompile Include="engine\ColorBuffer.cpp" />
     <ClCompile Include="engine\CommandContext.cpp" />
     <ClCompile Include="engine\CommandQueue.cpp" />
     <ClCompile Include="application\Compute.cpp" />
+    <ClCompile Include="engine\CommandSignature.cpp" />
     <ClCompile Include="engine\CubeColorBuffer.cpp" />
     <ClCompile Include="engine\DebugCamera.cpp" />
     <ClCompile Include="engine\DefaultBuffer.cpp" />
@@ -289,11 +291,13 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\Bloom.h" />
     <ClInclude Include="application\BoxArea.h" />
     <ClInclude Include="application\Camera.h" />
+    <ClInclude Include="engine\Calling.h" />
     <ClInclude Include="engine\Collider.h" />
     <ClInclude Include="engine\ColorBuffer.h" />
     <ClInclude Include="engine\CommandContext.h" />
     <ClInclude Include="engine\CommandQueue.h" />
     <ClInclude Include="application\Compute.h" />
+    <ClInclude Include="engine\CommandSignature.h" />
     <ClInclude Include="engine\CubeColorBuffer.h" />
     <ClInclude Include="engine\DebugCamera.h" />
     <ClInclude Include="engine\DefaultBuffer.h" />
@@ -498,11 +502,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Demo|x64'">true</ExcludedFromBuild>
-    </FxCompile>
-    <FxCompile Include="Resources\shaders\SkinningPS.hlsl">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Demo|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="Resources\shaders\SkinningVS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>

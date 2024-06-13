@@ -421,6 +421,12 @@
     <ClCompile Include="engine\Reducation.cpp">
       <Filter>Engine\PostEffect</Filter>
     </ClCompile>
+    <ClCompile Include="engine\Calling.cpp">
+      <Filter>Engine\DrawManager</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\CommandSignature.cpp">
+      <Filter>Engine\Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -741,6 +747,12 @@
     <ClInclude Include="engine\Reducation.h">
       <Filter>Engine\PostEffect</Filter>
     </ClInclude>
+    <ClInclude Include="engine\Calling.h">
+      <Filter>Engine\DrawManager</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\CommandSignature.h">
+      <Filter>Engine\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\ModelPS.hlsl">
@@ -834,9 +846,6 @@
       <Filter>shaders</Filter>
     </FxCompile>
     <FxCompile Include="Resources\shaders\GrayScale.hlsl">
-      <Filter>shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Resources\shaders\SkinningPS.hlsl">
       <Filter>shaders</Filter>
     </FxCompile>
     <FxCompile Include="Resources\shaders\SkinningVS.hlsl">

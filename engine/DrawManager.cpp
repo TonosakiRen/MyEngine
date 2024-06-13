@@ -51,6 +51,9 @@ void DrawManager::Initialize(CommandContext& CommandContext)
 	skyPipeline_->Initialize(CommandContext);
 	floorPipeline_ = std::make_unique<FloorRenderer>();
 	floorPipeline_->Initialize();
+
+	calling_ = std::make_unique<Calling>();
+	calling_->Initialize();
 }
 
 void DrawManager::AllDraw(const ViewProjection& viewProjection)
@@ -118,12 +121,16 @@ void DrawManager::ResetCalls()
 
 void DrawManager::DrawModel(const WorldTransform& worldTransform, const uint32_t modelHandle,const uint32_t textureHandle, const Material& material)
 {
-	calls[kModel].push_back([&, modelHandle , textureHandle]() {modelPipeline_->Draw(*commandContext_, modelHandle, worldTransform, material, textureHandle); });
+	if (calling_->isDraw(modelHandle,worldTransform)) {
+		calls[kModel].push_back([&, modelHandle , textureHandle]() {modelPipeline_->Draw(*commandContext_, modelHandle, worldTransform, material, textureHandle); });
+	}
 }
 
 void DrawManager::DrawSkinning(const WorldTransform& worldTransform, const SkinCluster& skinCluster,const uint32_t modelHandle, const Material& material)
 {
-	calls[kSkinning].push_back([&, modelHandle]() {skinningPipeline_->Draw(*commandContext_,modelHandle,worldTransform,material,skinCluster); });
+	if (calling_->isDraw(modelHandle, worldTransform)) {
+		calls[kSkinning].push_back([&, modelHandle]() {skinningPipeline_->Draw(*commandContext_, modelHandle, worldTransform, material, skinCluster); });
+	}
 }
 
 void DrawManager::DrawParticle(ParticleData& bufferData, const uint32_t textureHandle, const Material& material)

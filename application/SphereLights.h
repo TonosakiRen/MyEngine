@@ -7,7 +7,7 @@ class PointLights;
 class SphereLights
 {
 public:
-	static const uint32_t kSphereNum = 64;
+	static const uint32_t kSphereNum = 64 * 2;
 	SphereLights();
 	void Initialize(PointLights* pointLights);
 	void Update();

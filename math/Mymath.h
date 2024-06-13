@@ -5,6 +5,8 @@
 #include <numbers>
 #include<cstdlib>
 #include<ctime>
+#include <DirectXMath.h>
+using namespace DirectX;
 
 #pragma region	struct定義
 
@@ -31,6 +33,11 @@ struct Quaternion {
 	float y = 0.0f;
 	float z = 0.0f;
 	float w = 1.0f;
+};
+
+struct Sphere {
+	Vector3 center{};
+	float radius = 0.0f;
 };
 struct Line {
 	Vector3 origin{}; //始点
@@ -504,7 +511,7 @@ inline Matrix4x4 operator *(const Matrix4x4& m1, const Matrix4x4& m2) {
 	return tmp;
 }
 inline Matrix4x4 Inverse(const Matrix4x4& m) {
-	float lal = m.m[0][0] * m.m[1][1] * m.m[2][2] * m.m[3][3]
+	/*float lal = m.m[0][0] * m.m[1][1] * m.m[2][2] * m.m[3][3]
 		+ m.m[0][0] * m.m[1][2] * m.m[2][3] * m.m[3][1]
 		+ m.m[0][0] * m.m[1][3] * m.m[2][1] * m.m[3][2]
 
@@ -588,7 +595,20 @@ inline Matrix4x4 Inverse(const Matrix4x4& m) {
 	tmp.m[3][3] = (m.m[0][0] * m.m[1][1] * m.m[2][2] + m.m[0][1] * m.m[1][2] * m.m[2][0] + m.m[0][2] * m.m[1][0] * m.m[2][1]
 		- m.m[0][2] * m.m[1][1] * m.m[2][0] - m.m[0][1] * m.m[1][0] * m.m[2][2] - m.m[0][0] * m.m[1][2] * m.m[2][1]) / lal;
 
-	return tmp;
+	return tmp;*/
+
+	// DirectXMathのXMMATRIXに変換
+	XMMATRIX xmMat = XMLoadFloat4x4(reinterpret_cast<const XMFLOAT4X4*>(&m));
+
+	// 行列の逆行列を計算
+	XMVECTOR det;
+	XMMATRIX xmInverseMat = XMMatrixInverse(&det, xmMat);
+
+	// 結果を自作のMatrix4x4に変換
+	Matrix4x4 result;
+	XMStoreFloat4x4(reinterpret_cast<XMFLOAT4X4*>(&result), xmInverseMat);
+
+	return result;
 }
 inline Matrix4x4 Transpose(const Matrix4x4& m) {
 	Matrix4x4 tmp;

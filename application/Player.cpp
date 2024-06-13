@@ -21,7 +21,7 @@ void Player::Initialize(const std::string name, PlayerBulletManager* playerBulle
 	modelWorldTransform_.translation_ = { 0.0f,0.0f,0.0f };
 	worldTransform_.scale_ = { 5.0f,5.0f,5.0f };
 
-	animation_ = animationManager->Load(name);
+	animation_ = animationManager->Load(name,"Armature|mixamo.com|Layer0");
 	animationTime_ = 0.0f;
 	skeleton_.Create(modelManager->GetRootNode(modelHandle_));
 	
@@ -125,7 +125,7 @@ void Player::Animate()
 	else {
 		animationTime_ = std::fmod(animationTime_, animation_.duration);
 	}*/
-	AnimationManager::GetInstance()->ApplyAnimation(skeleton_, animation_, animationTime_);
+	AnimationManager::ApplyAnimation(skeleton_, animation_, animationTime_);
 	skeleton_.Update();
 
 	skinCluster_.Update();
@@ -175,7 +175,7 @@ void Player::Move(const ViewProjection& viewProjection)
 		direction_ = Normalize(move);
 		inputQuaternion_ = MakeLookRotation(direction_);
 		worldTransform_.quaternion_ = Slerp(0.2f, worldTransform_.quaternion_, inputQuaternion_);
-		Animate();
+		//Animate();
 	}
 
 	if (input_->TriggerKey(DIK_SPACE) || input_->TriggerButton(XINPUT_GAMEPAD_A)) {

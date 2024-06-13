@@ -41,6 +41,8 @@ void ViewProjection::Update() {
     Matrix4x4 viewProjection = matView_ * matProjection_;
     inverseViewProjection_ = Inverse(viewProjection);
     frustum_ = MakeFrustrum(inverseViewProjection_);
+    worldFrustum_ = frustum_ * worldMatrix_;
+
     // 定数バッファに書き込み
     ConstBufferData bufferData;
     bufferData.viewProjection = viewProjection;

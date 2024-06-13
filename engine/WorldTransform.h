@@ -15,6 +15,8 @@ public:
 	//bufferに送る場合の初期化
 	void Initialize(bool srtChange = true);
 
+	void Reset();
+
 	void Update();
 	void Update(uint32_t modelIndex);
 

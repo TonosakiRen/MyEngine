@@ -15,6 +15,7 @@
 #include "Player.h"
 #include "TitleScene.h"
 #include "Skinning.h"
+#include "DrawManager.h"
 
 ViewProjection* GameScene::currentViewProjection_ = nullptr;
 DirectionalLights* GameScene::directionLights = nullptr;
@@ -73,6 +74,7 @@ void GameScene::Initialize() {
 	BaseScene* scene = new GamePlayScene();
 	sceneManager_->SetNextScene(scene);
 
+	DrawManager::GetInstance()->SetCallingViewProjection(*camera_);
 }
 
 void GameScene::Update(CommandContext& commandContext){
