@@ -32,10 +32,11 @@ void FloorRenderer::PreDraw(CommandContext& commandContext, const ViewProjection
 
     // CBVをセット（ビュープロジェクション行列）
     commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
-
+#ifdef USE_IMGUI
     ImGui::Begin("FloorRenderer");
     ImGui::DragFloat4("HSVA COLOR", &HSVA_.x, 0.01f,0.0f,1.0f);
     ImGui::End();
+#endif
 
     commandContext.SetConstants(static_cast<UINT>(RootParameter::kColor), HSVA_.x, HSVA_.y, HSVA_.z,HSVA_.w);
 

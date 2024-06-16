@@ -18,6 +18,7 @@ public:
 	void Reset();
 
 	void Update();
+	void Update(Matrix4x4 localMatrix);
 	void Update(uint32_t modelIndex);
 
 	void ConstUpdate() {

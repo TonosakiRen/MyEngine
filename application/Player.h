@@ -1,4 +1,5 @@
 #pragma once
+#include <memory>
 #include "GameObject.h"
 #include "Input.h"
 #include "Collider.h"
@@ -7,12 +8,15 @@
 #include "AnimationManager.h"
 #include "ModelManager.h"
 #include "SkinCluster.h"
+#include "DustParticle.h"
 
 class PlayerBulletManager;
 class Player :
     public GameObject
 {
 public:
+
+    static const int fireNum_ = 40;
 
     void Initialize(const std::string name,PlayerBulletManager* playerBulletManager);
     void Update(const ViewProjection& viewProjection);
@@ -48,5 +52,12 @@ private:
     bool isAnimation_ = false;
     bool isFire_ = false;
 
+
+
     SkinCluster skinCluster_;
+    WorldTransform leftHandWorldTransform_;
+    WorldTransform leftHandModelWorldTransform_;
+    std::unique_ptr<DustParticle> fireParticle_;
+
+    WorldTransform rightHandWorldTransform_;
 };

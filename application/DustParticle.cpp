@@ -11,6 +11,7 @@ void DustParticle::Initialize(Vector3 minDirection, Vector3 maxDirection)
 {
 
 	particleData_->Initialize();
+	material_.Initialize();
 	emitterWorldTransform_.SetIsScaleParent(false);
 	emitterWorldTransform_.Update();
 	SetDirection(minDirection, maxDirection);
@@ -46,6 +47,7 @@ void DustParticle::Update() {
 			particles[i].worldTransform_.quaternion_ *= MakeFromAngleAxis({ 1.0f,1.0f,1.0f }, rotationSpeed);
 			particles[i].worldTransform_.translation_ += particles[i].direction_ * speed_;
 			particles[i].worldTransform_.scale_ = particles[i].worldTransform_.scale_ - scaleSpeed_;
+			particles[i].worldTransform_.Update();
 			if (particles[i].worldTransform_.scale_.x <= 0.0f) {
 				particles[i].isActive_ = false;
 			}
@@ -57,8 +59,7 @@ void DustParticle::Update() {
 
 void DustParticle::Draw()
 {
-
-	emitterWorldTransform_.Update();
+	material_.Update();
 
 	for (size_t i = 0; i < kParticleNum; i++)
 	{
@@ -70,5 +71,5 @@ void DustParticle::Draw()
 		}
 	}
 
-	DrawManager::GetInstance()->DrawParticleModel(*particleData_);
+	DrawManager::GetInstance()->DrawParticleModel(*particleData_,0, material_);
 }

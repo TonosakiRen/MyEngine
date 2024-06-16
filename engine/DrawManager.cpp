@@ -93,6 +93,11 @@ void DrawManager::AllDraw(const ViewProjection& viewProjection)
 	for (auto& call : calls[kFloor]) {
 		call();
 	}
+
+	spritePipeline_->PreDraw(*commandContext_);
+	for (auto& call : calls[kPostSprite]) {
+		call();
+	}
 }
 
 void DrawManager::ShadowDraw(DirectionalLights& directionalLights)

@@ -39,6 +39,7 @@ void SphereLights::Initialize(PointLights* pointLights)
 }
 
 void SphereLights::Update() {
+#ifdef USE_IMGUI
 	ImGui::Begin("PointLight");
 	/*if (ImGui::Button("spawn") && activeNum_ < kSphereNum) {
 		for (int j = 0; j < kSphereNum; j++) {
@@ -75,6 +76,7 @@ void SphereLights::Update() {
 		i++;
 	}
 	ImGui::End();
+#endif
 
 	pointLights_->Update();
 }

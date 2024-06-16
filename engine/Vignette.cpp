@@ -108,10 +108,14 @@ void Vignette::Draw(ColorBuffer& originalBuffer, CommandContext& commandContext)
 
 	// SRVをセット
 	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kTexture), originalBuffer.GetSRV());
+
+#ifdef USE_IMGUI
 	ImGui::Begin("Vignette");
 	ImGui::DragFloat("t", &t_, 0.01f, 0.1f);
 	ImGui::DragFloat("scale", &scale_, 0.01f, 0.1f);
 	ImGui::End();
+#endif
+
 	commandContext.SetConstants(static_cast<UINT>(RootParameter::kT), scale_,t_);
 
 	  // 描画コマンド

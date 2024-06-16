@@ -41,6 +41,23 @@ void Player::Initialize(const std::string name, PlayerBulletManager* playerBulle
 	size_t playHandle = Audio::GetInstance()->SoundPlayLoopStart(soundHandle);
 
 	Animate();
+
+	leftHandWorldTransform_.Initialize();
+	leftHandWorldTransform_.SetParent(&worldTransform_);
+	leftHandModelWorldTransform_.Initialize();
+	leftHandModelWorldTransform_.SetParent(&leftHandWorldTransform_);
+	leftHandModelWorldTransform_.translation_ = { 2.0f,6.0f,1.0f };
+	leftHandModelWorldTransform_.scale_ = { 1.0f,20.0f,1.0f };
+	leftHandModelWorldTransform_.quaternion_ = MakeFromEulerAngle(Vector3{-0.61f,0.0f,-0.54f});
+
+	rightHandWorldTransform_.Initialize();
+	rightHandWorldTransform_.SetParent(&worldTransform_);
+
+	fireParticle_ = std::make_unique<DustParticle>();
+	fireParticle_->Initialize({ -0.5f,-0.5f,-0.5f }, {0.5f,-1.0f,0.5f});
+	fireParticle_->emitterWorldTransform_.SetParent(&rightHandWorldTransform_);
+	fireParticle_->emitterWorldTransform_.scale_ = { 0.5f,0.5f,0.5f };
+	fireParticle_->material_.color_ = {1.0f,0.0f,0.0f,1.0f};
 }
 
 void Player::Update(const ViewProjection& viewProjection)
@@ -60,6 +77,8 @@ void Player::Update(const ViewProjection& viewProjection)
 	ImGui::DragFloat4("color", &color_.x, 0.01f, 0.0f, 1.0f);
 	ImGui::End();
 #endif
+
+	fireParticle_->Update();
 
 	//collider_.AdjustmentScale();
 	worldTransform_.Update();
@@ -99,6 +118,12 @@ void Player::Draw() {
 
 	DrawManager::GetInstance()->DrawSkinning(worldTransform_, skinCluster_,modelHandle_);
 	Wire::Draw(skeleton_, worldTransform_);
+	leftHandWorldTransform_.Update(skeleton_.GetJoint("mixamorig:LeftHand").skeletonSpaceMatrix);
+	leftHandModelWorldTransform_.Update();
+
+	rightHandWorldTransform_.Update(skeleton_.GetJoint("mixamorig:RightHand").skeletonSpaceMatrix);
+	fireParticle_->Draw();
+	DrawManager::GetInstance()->DrawManager::DrawModel(leftHandModelWorldTransform_,ModelManager::GetInstance()->Load("box1x1.obj"));
 }
 
 void Player::Fire()
@@ -108,8 +133,13 @@ void Player::Fire()
 		isFire_ = true;
 		animationTime_ = 0.0f;*/
 		Vector3 position = MakeTranslation(worldTransform_.matWorld_);
-		//Vector3 direction = Normalize(worldTransform3DReticle_.translation_ - MakeTranslation(worldTransform_.matWorld_));
-		Vector3 direction = Normalize(direction_);
+		Vector3 direction;
+		if (input_->PushRightTrigger()) {
+			direction = Normalize(worldTransform3DReticle_.translation_ - MakeTranslation(worldTransform_.matWorld_));
+		}
+		else {
+			direction = Normalize(direction_);
+		}
 		playerBulletManager_->PopPlayerBullet(position, direction);
 	}
 }
@@ -175,7 +205,7 @@ void Player::Move(const ViewProjection& viewProjection)
 		direction_ = Normalize(move);
 		inputQuaternion_ = MakeLookRotation(direction_);
 		worldTransform_.quaternion_ = Slerp(0.2f, worldTransform_.quaternion_, inputQuaternion_);
-		//Animate();
+		Animate();
 	}
 
 	if (input_->TriggerKey(DIK_SPACE) || input_->TriggerButton(XINPUT_GAMEPAD_A)) {

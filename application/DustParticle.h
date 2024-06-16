@@ -2,6 +2,7 @@
 #include <memory>
 #include "ParticleModelData.h"
 #include "WorldTransform.h"
+#include "Material.h"
 class DustParticle
 {
 public:
@@ -32,13 +33,15 @@ public:
 public:
 	WorldTransform emitterWorldTransform_;
 	Particle particles[kParticleNum];
+	Material material_;
 	int EmitNum_ = 1;
 private:
 	float speed_ = 0.1f;
-	float scaleSpeed_ = 0.01f;
-	bool isEmit_ = false;
+	float scaleSpeed_ = 0.02f;
+	bool isEmit_ = true;
 	std::unique_ptr<ParticleModelData> particleData_;
 	Vector3 minDirection_;
 	Vector3 maxDirection_;
+
 };
 

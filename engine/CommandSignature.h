@@ -6,7 +6,7 @@
 
 class CommandSignature {
 public:
-    void Create(const D3D12_COMMAND_SIGNATURE_DESC& desc);
+    void Create(const D3D12_COMMAND_SIGNATURE_DESC& desc,ID3D12RootSignature& rootSignature);
 
     operator ID3D12CommandSignature* () const { return commandSignature_.Get(); }
     operator bool() const { return commandSignature_; }

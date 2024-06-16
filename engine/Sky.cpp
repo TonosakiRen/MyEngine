@@ -40,11 +40,12 @@ void Sky::PreDraw(CommandContext& commandContext, const ViewProjection& viewProj
 
     // CBVをセット（ビュープロジェクション行列）
     commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
-
+#ifdef USE_IMGUI
     ImGui::Begin("Sky");
     ImGui::DragFloat4("HSVA TOP COLOR", &topHSVA_.x, 0.01f,0.0f,1.0f);
     ImGui::DragFloat4("HSVA BOTTOM COLOR", &bottomHSVA_.x, 0.01f, 0.0f, 1.0f);
     ImGui::End();
+#endif
 
     commandContext.SetConstants(static_cast<UINT>(RootParameter::kTopColor), topHSVA_.x, topHSVA_.y, topHSVA_.z, topHSVA_.w);
     commandContext.SetConstants(static_cast<UINT>(RootParameter::kBottomColor), bottomHSVA_.x, bottomHSVA_.y, bottomHSVA_.z, bottomHSVA_.w);

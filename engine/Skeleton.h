@@ -31,6 +31,13 @@ class Skeleton{
 public:
 
 	void Create(const Node& rootNode);
+	Joint GetJoint(std::string name) {
+		int32_t index;
+		if (jointMap.find(name) != jointMap.end()) {
+			index = jointMap[name];
+		}
+		return joints[index];
+	}
 	void Update();
 	int32_t CreateJoint(const Node& node, const std::optional<int32_t>& parent, std::vector<Joint>& joints);
 
