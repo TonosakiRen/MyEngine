@@ -118,8 +118,6 @@ void Player::Draw() {
 	if (input_->PushRightTrigger()) {
 		DrawManager::GetInstance()->DrawPostSprite(sprite2DReticle_);
 	}
-
-	//DrawManager::GetInstance()->DrawSkinning(worldTransform_, skinCluster_,modelHandle_);
 	DrawManager::GetInstance()->DrawMeshletModel(worldTransform_, modelHandle_, skinCluster_);
 	Wire::Draw(skeleton_, worldTransform_);
 	leftHandWorldTransform_.Update(skeleton_.GetJoint("mixamorig:LeftHand").skeletonSpaceMatrix);
