@@ -34,10 +34,10 @@ void ParticleModel::CreatePipeline() {
 
     auto shaderManager = ShaderManager::GetInstance();
 
-    vsBlob = shaderManager->Compile(L"ParticleVS.hlsl", ShaderManager::kVertex);
+    vsBlob = shaderManager->Compile(L"ParticleModelVS.hlsl", ShaderManager::kVertex);
     assert(vsBlob != nullptr);
 
-    psBlob = shaderManager->Compile(L"ParticlePS.hlsl", ShaderManager::kPixel);
+    psBlob = shaderManager->Compile(L"ParticleModelPS.hlsl", ShaderManager::kPixel);
     assert(psBlob != nullptr);
 
     rootSignature_ = std::make_unique<RootSignature>();

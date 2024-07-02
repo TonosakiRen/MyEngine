@@ -52,9 +52,11 @@ public:
 
 	static uint32_t Load(const std::string& fileName);
 
-	static void CreateMeshes(ModelData& modelIndex);
+	void CreateMeshes(ModelData& modelIndex);
 
 	static ModelManager* GetInstance();
+
+	void Initialize(CommandContext& commandContext_);
 
 	const Vector3& GetModelSize(const uint32_t modelHandle);
 
@@ -71,7 +73,11 @@ public:
 	void DrawInstanced(CommandContext& commandContext, const  uint32_t modelHandle, UINT textureRootParamterIndex, DescriptorHandle descriptorHandle);
 	void DrawInstancing(CommandContext& commandContext, const  uint32_t modelHandle, UINT instancingNum, UINT textureRootParamterIndex);
 
-	void DrawSkinningInstanced(CommandContext& commandContext,const uint32_t modelHandle,const SkinCluster& skinCluster, UINT textureRootParamterIndex, uint32_t textureHandle = 0);
+	void DrawMeshletInstanced(CommandContext& commandContext, const  uint32_t modelHandle, const uint32_t textureHandle);
+
+
+	void DrawInstanced(CommandContext& commandContext, const uint32_t modelHandle,SkinCluster& skincluster, const UINT textureRootParamterIndex, const uint32_t textureHandle = 0);
+	void DrawMeshletInstanced(CommandContext& commandContext, const  uint32_t modelHandle, SkinCluster& skincluster, const uint32_t textureHandle = 0);
 
 	static Node ReadNode(aiNode* node);
 
@@ -84,6 +90,7 @@ private:
 
 	std::unique_ptr<std::array<ModelData, kNumModels>> models_;
 	uint32_t useModelCount_ = 0;
+	CommandContext* commandContext_;
 
 	uint32_t LoadInternal(const std::string& fileName);
 

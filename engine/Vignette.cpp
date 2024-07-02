@@ -110,9 +110,12 @@ void Vignette::Draw(ColorBuffer& originalBuffer, CommandContext& commandContext)
 	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kTexture), originalBuffer.GetSRV());
 
 #ifdef USE_IMGUI
-	ImGui::Begin("Vignette");
-	ImGui::DragFloat("t", &t_, 0.01f, 0.1f);
-	ImGui::DragFloat("scale", &scale_, 0.01f, 0.1f);
+	ImGui::Begin("Engine");
+	if (ImGui::BeginMenu("Viginette")) {
+		ImGui::DragFloat("t", &t_, 0.01f, 0.1f);
+		ImGui::DragFloat("scale", &scale_, 0.01f, 0.1f);
+		ImGui::EndMenu();
+	}
 	ImGui::End();
 #endif
 

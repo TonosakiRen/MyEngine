@@ -6,6 +6,12 @@
 #include <fstream>
 #include <sstream>
 #include <filesystem>
+#include <DirectXMesh.h>
+#include "Helper.h"
+#include "ByteAddressBuffer.h"
+
+
+#include "MeshletModel.h"
 
 using namespace DirectX;
 
@@ -32,6 +38,7 @@ void ModelManager::CreateMeshes(ModelData& modelData)
 	Vector3 minModelSize{};
 	Vector3 maxModelSize{ FLT_MIN,FLT_MIN,FLT_MIN };
 
+	//mesh
 	for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex) {
 		aiMesh* mesh = scene->mMeshes[meshIndex];
 		assert(mesh->HasNormals());
@@ -41,8 +48,10 @@ void ModelManager::CreateMeshes(ModelData& modelData)
 			aiVector3D& normal = mesh->mNormals[vertexIndex];
 			aiVector3D& texcoord = mesh->mTextureCoords[0][vertexIndex];
 
+			XMFLOAT3 p;
 			Mesh::VertexData vertex;
 			vertex.pos = { position.x,position.y,position.z };
+			p = { position.x,position.y,position.z };
 			vertex.normal = { normal.x,normal.y,normal.z };
 			vertex.uv = { texcoord.x,texcoord.y };
 
@@ -69,6 +78,8 @@ void ModelManager::CreateMeshes(ModelData& modelData)
 			}
 
 			modelData.meshes[meshIndex].vertices_.push_back(vertex);
+			//meshlet用
+			modelData.meshes[meshIndex].positions_.push_back(p);
 		}
 
 		for (uint32_t faceIndex = 0; faceIndex < mesh->mNumFaces; ++faceIndex) {
@@ -80,7 +91,6 @@ void ModelManager::CreateMeshes(ModelData& modelData)
 		}
 
 		//material
-		
 		int materialIndex = mesh->mMaterialIndex;
 		aiMaterial* material = scene->mMaterials[materialIndex];
 		aiString textureFilePath;
@@ -138,7 +148,7 @@ void ModelManager::CreateMeshes(ModelData& modelData)
 		// 頂点データのサイズ
 		UINT sizeVB = static_cast<UINT>(sizeof(Mesh::VertexData) * mesh.vertices_.size());
 
-		mesh.vertexBuffer_.Create(sizeVB);
+		mesh.vertexBuffer_.Create(sizeof(Mesh::VertexData), UINT(mesh.vertices_.size()));
 
 		mesh.vertexBuffer_.Copy(mesh.vertices_.data(), sizeVB);
 
@@ -151,7 +161,7 @@ void ModelManager::CreateMeshes(ModelData& modelData)
 		// インデックスデータのサイズ
 		UINT sizeIB = static_cast<UINT>(sizeof(uint32_t) * mesh.indices_.size());
 
-		mesh.indexBuffer_.Create(sizeIB);
+		mesh.indexBuffer_.Create(sizeof(uint32_t), UINT(mesh.indices_.size()));
 
 		mesh.indexBuffer_.Copy(mesh.indices_.data(), sizeIB);
 
@@ -159,6 +169,25 @@ void ModelManager::CreateMeshes(ModelData& modelData)
 		mesh.ibView_.BufferLocation = mesh.indexBuffer_->GetGPUVirtualAddress();
 		mesh.ibView_.Format = DXGI_FORMAT_R32_UINT;
 		mesh.ibView_.SizeInBytes = sizeIB;
+
+
+		// Meshletの作成
+		Helper::AssertIfFailed(DirectX::ComputeMeshlets(
+			mesh.indices_.data(), mesh.indices_.size() / 3,
+			mesh.positions_.data(), mesh.positions_.size(),
+			nullptr,
+			mesh.meshlets_,
+			mesh.uniqueVertexIndex,
+			mesh.primitiveIndices_));
+
+		mesh.meshletBuffer_.Create(sizeof(DirectX::Meshlet), UINT(mesh.meshlets_.size()));
+		mesh.meshletBuffer_.Copy(mesh.meshlets_.data(), sizeof(DirectX::Meshlet) * mesh.meshlets_.size());
+
+		mesh.uniqueVertexIndexBuffer_.Create(sizeof(uint8_t), UINT(mesh.uniqueVertexIndex.size()));
+		mesh.uniqueVertexIndexBuffer_.Copy(mesh.uniqueVertexIndex.data(), sizeof(uint8_t)* mesh.uniqueVertexIndex.size(), *commandContext_);
+
+		mesh.primitiveIndicesBuffer_.Create(sizeof(DirectX::MeshletTriangle), UINT(mesh.primitiveIndices_.size()));
+		mesh.primitiveIndicesBuffer_.Copy(mesh.primitiveIndices_.data(), sizeof(DirectX::MeshletTriangle)* mesh.primitiveIndices_.size());
 	}
 
 	//node
@@ -178,6 +207,11 @@ ModelManager* ModelManager::GetInstance() {
 		instance.models_ = std::make_unique<std::array<ModelData, kNumModels>>();
 	}
 	return &instance;
+}
+
+void ModelManager::Initialize(CommandContext& commandContext)
+{
+	commandContext_ = &commandContext;
 }
 
 void ModelManager::DrawInstanced(CommandContext& commandContext, const  uint32_t modelHandle)
@@ -206,10 +240,10 @@ void ModelManager::DrawInstanced(CommandContext& commandContext, const  uint32_t
 	for (const auto& mesh : modelItem.meshes) {
 		// srvセット
 		if (mesh.GetUv() != 0) {
-			TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(commandContext, textureRootParamterIndex, mesh.GetUv());
+			TextureManager::GetInstance()->SetDescriptorTable(commandContext, textureRootParamterIndex, mesh.GetUv());
 		}
 		else {
-			TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(commandContext, textureRootParamterIndex, textureHandle);
+			TextureManager::GetInstance()->SetDescriptorTable(commandContext, textureRootParamterIndex, textureHandle);
 		}
 		// 頂点バッファの設定
 		commandContext.SetVertexBuffer(0, 1, mesh.GetVbView());
@@ -297,7 +331,7 @@ void ModelManager::DrawInstancing(CommandContext& commandContext, const uint32_t
 
 	for (const auto& mesh : modelItem.meshes) {
 		// srvセット
-		TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(commandContext, textureRootParamterIndex, mesh.GetUv());
+		TextureManager::GetInstance()->SetDescriptorTable(commandContext, textureRootParamterIndex, mesh.GetUv());
 		// 頂点バッファの設定
 		commandContext.SetVertexBuffer(0, 1, mesh.GetVbView());
 		// インデックスバッファの設定
@@ -307,29 +341,82 @@ void ModelManager::DrawInstancing(CommandContext& commandContext, const uint32_t
 	}
 }
 
-void ModelManager::DrawSkinningInstanced(CommandContext& commandContext,const uint32_t modelHandle, const SkinCluster& skinCluster, UINT textureRootParamterIndex, uint32_t textureHandle)
+void ModelManager::DrawMeshletInstanced(CommandContext& commandContext, const  uint32_t modelHandle, const uint32_t textureHandle)
 {
 	assert(modelHandle < kNumModels);
 
 	const auto& modelItem = (*models_)[modelHandle];
 
 	for (const auto& mesh : modelItem.meshes) {
-
 		// srvセット
-		TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(commandContext, textureRootParamterIndex, textureHandle);
+		if (mesh.GetUv() != 0) {
+			TextureManager::GetInstance()->SetDescriptorTable(commandContext,UINT(MeshletModel::RootParameter::kTexture), mesh.GetUv());
+		}
+		else {
+			TextureManager::GetInstance()->SetDescriptorTable(commandContext, UINT(MeshletModel::RootParameter::kTexture), textureHandle);
+		}
 
-		D3D12_VERTEX_BUFFER_VIEW vbvs[2] = {
-			*mesh.GetVbView(),
-			skinCluster.influenceBufferView_
-		};
+		//頂点セット
+		commandContext.SetDescriptorTable(UINT(MeshletModel::RootParameter::kVertices), mesh.vertexBuffer_.GetSRV());
+		//Meshletセット
+		commandContext.SetDescriptorTable(UINT(MeshletModel::RootParameter::kMeshlets), mesh.meshletBuffer_.GetSRV());
+		commandContext.SetDescriptorTable(UINT(MeshletModel::RootParameter::kPrimitiveIndices), mesh.primitiveIndicesBuffer_.GetSRV());
+		commandContext.SetDescriptorTable(UINT(MeshletModel::RootParameter::kUniqueVertexIndices), mesh.uniqueVertexIndexBuffer_.GetSRV());
 
+		// 描画コマンド
+		commandContext.DispatchMesh(uint32_t(mesh.meshlets_.size()),1,1);
+	}
+}
+
+void ModelManager::DrawInstanced(CommandContext& commandContext, const uint32_t modelHandle, SkinCluster& skincluster, const UINT textureRootParamterIndex, const uint32_t textureHandle)
+{
+	assert(modelHandle < kNumModels);
+
+	const auto& modelItem = (*models_)[modelHandle];
+
+	for (const auto& mesh : modelItem.meshes) {
+		// srvセット
+		if (mesh.GetUv() != 0) {
+			TextureManager::GetInstance()->SetDescriptorTable(commandContext, textureRootParamterIndex, mesh.GetUv());
+		}
+		else {
+			TextureManager::GetInstance()->SetDescriptorTable(commandContext, textureRootParamterIndex, textureHandle);
+		}
+		commandContext.TransitionResource(skincluster.GetSkinnedVertices(), D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
 		// 頂点バッファの設定
-		commandContext.SetVertexBuffer(0, 2, vbvs);
-
+		commandContext.SetVertexBuffer(0, 1, &skincluster.GetSkinnedVertexBufferView());
 		// インデックスバッファの設定
 		commandContext.SetIndexBuffer(*mesh.GetIbView());
 		// 描画コマンド
 		commandContext.DrawIndexedInstanced(static_cast<UINT>(mesh.indices_.size()), 1, 0, 0, 0);
+	}
+}
+
+void ModelManager::DrawMeshletInstanced(CommandContext& commandContext, const uint32_t modelHandle, SkinCluster& skincluster, const uint32_t textureHandle)
+{
+	assert(modelHandle < kNumModels);
+
+	const auto& modelItem = (*models_)[modelHandle];
+
+	for (const auto& mesh : modelItem.meshes) {
+		// srvセット
+		if (mesh.GetUv() != 0) {
+			TextureManager::GetInstance()->SetDescriptorTable(commandContext, UINT(MeshletModel::RootParameter::kTexture), mesh.GetUv());
+		}
+		else {
+			TextureManager::GetInstance()->SetDescriptorTable(commandContext, UINT(MeshletModel::RootParameter::kTexture), textureHandle);
+		}
+
+		//頂点セット
+		commandContext.TransitionResource(skincluster.GetSkinnedVertices(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS);;
+		commandContext.SetDescriptorTable(UINT(MeshletModel::RootParameter::kVertices), skincluster.GetSkinnedVerticesUAV());
+		//Meshletセット
+		commandContext.SetDescriptorTable(UINT(MeshletModel::RootParameter::kMeshlets), mesh.meshletBuffer_.GetSRV());
+		commandContext.SetDescriptorTable(UINT(MeshletModel::RootParameter::kPrimitiveIndices), mesh.primitiveIndicesBuffer_.GetSRV());
+		commandContext.SetDescriptorTable(UINT(MeshletModel::RootParameter::kUniqueVertexIndices), mesh.uniqueVertexIndexBuffer_.GetSRV());
+
+		// 描画コマンド
+		commandContext.DispatchMesh(uint32_t(mesh.meshlets_.size()), 1, 1);
 	}
 }
 

@@ -12,6 +12,7 @@
 #include "WorldTransform.h"
 #include "DirectionalLights.h"
 #include "Material.h"
+#include "SkinCluster.h"
 #include "Mesh.h"
 
 class DirectXCommon;
@@ -33,6 +34,7 @@ public:
 	void PreDraw(CommandContext& commandContext, const ViewProjection& viewProjection);
 
 	void Draw(CommandContext& commandContext, uint32_t modelHandle, const WorldTransform& worldTransform, const Material& material,const uint32_t textureHandle = 0);
+	void Draw(CommandContext& commandContext, uint32_t modelHandle, const WorldTransform& worldTransform,SkinCluster& skinCluster, const Material& material, const uint32_t textureHandle = 0);
 
 private: 
 	void CreatePipeline();

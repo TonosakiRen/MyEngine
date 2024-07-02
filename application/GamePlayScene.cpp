@@ -101,8 +101,11 @@ void GamePlayScene::Update()
 
 #ifdef _DEBUG
 	//パーティクル
-	ImGui::Begin("particle");
-	ImGui::DragFloat3("emitterPos", &whiteParticle_->emitterWorldTransform_.translation_.x, 0.01f);
+	ImGui::Begin("Game");
+	if (ImGui::BeginMenu("Particle")) {
+		ImGui::DragFloat3("emitterPos", &whiteParticle_->emitterWorldTransform_.translation_.x, 0.01f);
+		ImGui::EndMenu();
+	}
 	ImGui::End();
 #endif
 	whiteParticle_->Update();

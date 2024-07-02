@@ -214,13 +214,10 @@ void Particle::Draw(CommandContext& commandContext, ParticleData& bufferData, co
   
     commandContext.SetVertexBuffer(0, 1, &vbView_);
     commandContext.SetIndexBuffer(ibView_);
-    for (uint32_t i = 0; i < bufferData.dataNum_; i++) {
-        bufferData.data_[i].matWorld *= billBordMatrix;
-    }
     commandContext.SetDescriptorTable(0, bufferData.structuredBuffer_.GetSRV());
     commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kMaterial), material.GetGPUVirtualAddress());
 
-    TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(commandContext, static_cast<UINT>(RootParameter::kTexture), textureHandle);
+    TextureManager::GetInstance()->SetDescriptorTable(commandContext, static_cast<UINT>(RootParameter::kTexture), textureHandle);
 
     commandContext.DrawIndexedInstanced(static_cast<UINT>(indices_.size()), static_cast<UINT>(bufferData.dataNum_), 0, 0, 0);
     bufferData.Reset();

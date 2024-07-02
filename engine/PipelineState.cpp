@@ -14,3 +14,10 @@ void PipelineState::Create(const D3D12_COMPUTE_PIPELINE_STATE_DESC& desc)
     hr = (DirectXCommon::GetInstance()->GetDevice()->CreateComputePipelineState(&desc, IID_PPV_ARGS(pipelineState_.ReleaseAndGetAddressOf())));
     assert(SUCCEEDED(hr));
 }
+
+void PipelineState::Create(const D3D12_PIPELINE_STATE_STREAM_DESC& desc)
+{
+    HRESULT hr = S_FALSE;
+    hr = (DirectXCommon::GetInstance()->GetDevice()->CreatePipelineState(&desc, IID_PPV_ARGS(pipelineState_.ReleaseAndGetAddressOf())));
+    assert(SUCCEEDED(hr));
+}

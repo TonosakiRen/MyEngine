@@ -13,6 +13,7 @@
 #include "SpriteData.h"
 
 #include "Model.h"
+#include "MeshletModel.h"
 #include "Skinning.h"
 #include "Particle.h"
 #include "ParticleModel.h"
@@ -32,9 +33,12 @@ class DrawManager
 friend class Renderer;
 public:
 
+	static const uint32_t kMaxDrawCall = 4096;
+	uint32_t drawCallNum_ = 0;
+
 	enum Call {
 		kModel,
-		kSkinning,
+		kMeshletModel,
 		kParticle,
 		kParticleModel,
 		kPreSprite,
@@ -44,13 +48,17 @@ public:
 		kSky,
 		kFloor,
 
+		kSkinning,
+
 		kCallNum,
 	};
 
 	static DrawManager* GetInstance();
 
 	void DrawModel(const WorldTransform& worldTransform, const uint32_t modelHandle = 0,const uint32_t textureHandle = 0, const Material& material = *defaultMaterial_.get());
-	void DrawSkinning(const WorldTransform& worldTransform, const SkinCluster& skinCluster,const uint32_t modelHandle = 0, const Material& material = *defaultMaterial_.get());
+	void DrawModel(const WorldTransform& worldTransform, const uint32_t modelHandle, SkinCluster& skinCluster, const uint32_t textureHandle = 0, const Material& material = *defaultMaterial_.get());
+	void DrawMeshletModel(const WorldTransform& worldTransform, const uint32_t modelHandle = 0, const uint32_t textureHandle = 0, const Material& material = *defaultMaterial_.get());
+	void DrawMeshletModel(const WorldTransform& worldTransform, const uint32_t modelHandle, SkinCluster& skinCluster, const uint32_t textureHandle = 0, const Material& material = *defaultMaterial_.get());
 	void DrawParticle(ParticleData& bufferData, const uint32_t textureHandle = 0, const Material& material = *defaultMaterial_.get());
 	void DrawParticleModel(ParticleModelData& bufferData, const uint32_t modelHandle = 0, const Material& material = *defaultMaterial_.get());
 	void DrawPreSprite(SpriteData& spriteData);
@@ -72,6 +80,7 @@ private:
 
 private:
 	std::unique_ptr<Model> modelPipeline_;
+	std::unique_ptr<MeshletModel> meshletModelPipeline_;
 	std::unique_ptr<Skinning> skinningPipeline_;
 	std::unique_ptr<Particle> particlePipeline_;
 	std::unique_ptr<ParticleModel> particleModelPipeline_;

@@ -47,7 +47,7 @@ const D3D12_RESOURCE_DESC TextureManager::GetResoureDesc(const uint32_t textureH
 	return (*textures_)[textureHandle].resource->GetDesc();
 }
 
-void TextureManager::SetGraphicsRootDescriptorTable(CommandContext& commandContext, const  UINT rootParamIndex,const uint32_t textureHandle) { // デスクリプタヒープの配列
+void TextureManager::SetDescriptorTable(CommandContext& commandContext, const  UINT rootParamIndex,const uint32_t textureHandle) { // デスクリプタヒープの配列
 	assert(textureHandle < kNumTextures);
 	// シェーダリソースビューをセット
 	commandContext.SetDescriptorTable(rootParamIndex, (*textures_)[textureHandle].srvHandle);

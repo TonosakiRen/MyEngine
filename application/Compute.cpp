@@ -56,6 +56,7 @@ void Compute::Dispatch(CommandContext& commandContext)
 	commandContext.SetComputeRootSignature(rootSignature_);
 	commandContext.SetComputeUAVBuffer(0, rwStructureBuffer_->GetGPUVirtualAddress());
 	commandContext.Dispatch(kNum,1,1);
+
 	commandContext.CopyBuffer(copyBuffer_, rwStructureBuffer_);
 	
 }

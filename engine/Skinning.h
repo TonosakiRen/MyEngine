@@ -21,21 +21,22 @@ class Skinning
 {
 public:
 	enum class RootParameter {
-		kWorldTransform,
-		kViewProjection,
-		kTexture,
-		kMaterial,
 		kMatrixPalette,
+		kInputVertices,
+		kInfluences,
+
+		kSkinnedVertices,
+
+		kSkinningInformation,
 
 		parameterNum
 	};
 
 	void Initialize();
 	void Finalize();
-	void PreDraw(CommandContext& commandContext, const ViewProjection& viewProjection);
 
-	void Draw(CommandContext& commandContext,const uint32_t modelHandle, const WorldTransform& worldTransform,const Material& material, const SkinCluster& skinCluster);
-
+	void PreDispatch(CommandContext& commandContext);
+	void Dispatch(CommandContext& commandContext, const uint32_t modelHandle, SkinCluster& skinCluster);
 private: 
 	void CreatePipeline();
 private:

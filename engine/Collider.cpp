@@ -8,14 +8,17 @@ bool Collider::isDrawCollider = false;
 void Collider::SwitchIsDrawCollider()
 {
 #ifdef _DEBUG
-	ImGui::Begin("Collider");
-	if (ImGui::Button("SwitchColliderDraw")) {
-		if (Collider::isDrawCollider == false) {
-			Collider::isDrawCollider = true;
+	ImGui::Begin("Game");
+	if (ImGui::BeginMenu("Collider")) {
+		if (ImGui::Button("SwitchColliderDraw")) {
+			if (Collider::isDrawCollider == false) {
+				Collider::isDrawCollider = true;
+			}
+			else {
+				Collider::isDrawCollider = false;
+			}
 		}
-		else {
-			Collider::isDrawCollider = false;
-		}
+		ImGui::EndMenu();
 	}
 	ImGui::End();
 #endif 

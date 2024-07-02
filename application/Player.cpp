@@ -70,15 +70,18 @@ void Player::Update(const ViewProjection& viewProjection)
 	Fire();
 
 #ifdef _DEBUG
-	ImGui::Begin("Player");
-	ImGui::DragFloat3("translation", &worldTransform_.translation_.x, 0.1f);
-	//ImGui::DragFloat3("rotation", &worldTransform_.quaternion_.x, 0.1f);
-	ImGui::DragFloat3("scale", &worldTransform_.scale_.x, 0.1f);
-	ImGui::DragFloat4("color", &color_.x, 0.01f, 0.0f, 1.0f);
+	ImGui::Begin("Game");
+	if (ImGui::BeginMenu("Player")) {
+		ImGui::DragFloat3("translation", &worldTransform_.translation_.x, 0.1f);
+		//ImGui::DragFloat3("rotation", &worldTransform_.quaternion_.x, 0.1f);
+		ImGui::DragFloat3("scale", &worldTransform_.scale_.x, 0.1f);
+		ImGui::DragFloat4("color", &color_.x, 0.01f, 0.0f, 1.0f);
+		ImGui::EndMenu();
+	}
 	ImGui::End();
 #endif
 
-	fireParticle_->Update();
+	//fireParticle_->Update();
 
 	//collider_.AdjustmentScale();
 	worldTransform_.Update();
@@ -116,7 +119,8 @@ void Player::Draw() {
 		DrawManager::GetInstance()->DrawPostSprite(sprite2DReticle_);
 	}
 
-	DrawManager::GetInstance()->DrawSkinning(worldTransform_, skinCluster_,modelHandle_);
+	//DrawManager::GetInstance()->DrawSkinning(worldTransform_, skinCluster_,modelHandle_);
+	DrawManager::GetInstance()->DrawMeshletModel(worldTransform_, modelHandle_, skinCluster_);
 	Wire::Draw(skeleton_, worldTransform_);
 	leftHandWorldTransform_.Update(skeleton_.GetJoint("mixamorig:LeftHand").skeletonSpaceMatrix);
 	leftHandModelWorldTransform_.Update();

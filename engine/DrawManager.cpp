@@ -9,6 +9,7 @@ std::unique_ptr<Material> DrawManager::defaultMaterial_;
 void DrawManager::Finalize()
 {
 	modelPipeline_.reset();
+	meshletModelPipeline_.reset();
 	skinningPipeline_.reset();
 	particlePipeline_.reset();
 	particleModelPipeline_.reset();
@@ -35,6 +36,8 @@ void DrawManager::Initialize(CommandContext& CommandContext)
 	defaultMaterial_->Initialize();
 	modelPipeline_ = std::make_unique<Model>();
 	modelPipeline_->Initialize();
+	meshletModelPipeline_ = std::make_unique<MeshletModel>();
+	meshletModelPipeline_->Initialize();
 	skinningPipeline_ = std::make_unique<Skinning>();
 	skinningPipeline_->Initialize();
 	particlePipeline_ = std::make_unique<Particle>();
@@ -59,6 +62,16 @@ void DrawManager::Initialize(CommandContext& CommandContext)
 void DrawManager::AllDraw(const ViewProjection& viewProjection)
 {
 
+	//SkinClusterUpdate
+	skinningPipeline_->PreDispatch(*commandContext_);
+	for (auto& call : calls[kSkinning]) {
+		call();
+	}
+
+	//drawCall最大値チェック
+	assert(drawCallNum_ < kMaxDrawCall);
+	drawCallNum_ = 0;
+
 	spritePipeline_->PreDraw(*commandContext_);
 	for (auto& call : calls[kPreSprite]) {
 		call();
@@ -69,8 +82,8 @@ void DrawManager::AllDraw(const ViewProjection& viewProjection)
 		call();
 	}
 
-	skinningPipeline_->PreDraw(*commandContext_, viewProjection);
-	for (auto& call : calls[kSkinning]) {
+	meshletModelPipeline_->PreDraw(*commandContext_, viewProjection);
+	for (auto& call : calls[kMeshletModel]) {
 		call();
 	}
 
@@ -126,55 +139,83 @@ void DrawManager::ResetCalls()
 
 void DrawManager::DrawModel(const WorldTransform& worldTransform, const uint32_t modelHandle,const uint32_t textureHandle, const Material& material)
 {
+	drawCallNum_++;
 	if (calling_->isDraw(modelHandle,worldTransform)) {
 		calls[kModel].push_back([&, modelHandle , textureHandle]() {modelPipeline_->Draw(*commandContext_, modelHandle, worldTransform, material, textureHandle); });
 	}
 }
 
-void DrawManager::DrawSkinning(const WorldTransform& worldTransform, const SkinCluster& skinCluster,const uint32_t modelHandle, const Material& material)
+void DrawManager::DrawModel(const WorldTransform& worldTransform, const uint32_t modelHandle, SkinCluster& skinCluster, const uint32_t textureHandle, const Material& material)
 {
+	drawCallNum_++;
 	if (calling_->isDraw(modelHandle, worldTransform)) {
-		calls[kSkinning].push_back([&, modelHandle]() {skinningPipeline_->Draw(*commandContext_, modelHandle, worldTransform, material, skinCluster); });
+		calls[kSkinning].push_back([&, modelHandle]() {skinningPipeline_->Dispatch(*commandContext_,modelHandle,skinCluster); });
+		calls[kModel].push_back([&, modelHandle, textureHandle]() {modelPipeline_->Draw(*commandContext_, modelHandle, worldTransform, skinCluster, material, textureHandle); });
+	}
+}
+
+void DrawManager::DrawMeshletModel(const WorldTransform& worldTransform, const uint32_t modelHandle, const uint32_t textureHandle, const Material& material)
+{
+	drawCallNum_++;
+	if (calling_->isDraw(modelHandle, worldTransform)) {
+		calls[kMeshletModel].push_back([&, modelHandle, textureHandle]() {meshletModelPipeline_->Draw(*commandContext_, modelHandle, worldTransform, material, textureHandle); });
+	}
+}
+
+void DrawManager::DrawMeshletModel(const WorldTransform& worldTransform, const uint32_t modelHandle, SkinCluster& skinCluster, const uint32_t textureHandle, const Material& material)
+{
+	drawCallNum_++;
+	if (calling_->isDraw(modelHandle, worldTransform)) {
+		calls[kSkinning].push_back([&, modelHandle]() {skinningPipeline_->Dispatch(*commandContext_, modelHandle, skinCluster); });
+		calls[kMeshletModel].push_back([&, modelHandle, textureHandle]() {meshletModelPipeline_->Draw(*commandContext_, modelHandle, worldTransform, skinCluster, material, textureHandle); });
 	}
 }
 
 void DrawManager::DrawParticle(ParticleData& bufferData, const uint32_t textureHandle, const Material& material)
 {
+	drawCallNum_++;
 	calls[kParticle].push_back([&, textureHandle]() {particlePipeline_->Draw(*commandContext_, bufferData,material, textureHandle); });
 }
 
 void DrawManager::DrawParticleModel(ParticleModelData& bufferData, const uint32_t modelHandle, const Material& material)
 {
+	drawCallNum_++;
 	calls[kParticleModel].push_back([&, modelHandle]() {particleModelPipeline_->Draw(*commandContext_, bufferData, material, modelHandle); });
 }
 
 void DrawManager::DrawPreSprite(SpriteData& spriteData)
 {
+	drawCallNum_++;
 	calls[kPreSprite].push_back([&]() {spritePipeline_->Draw(*commandContext_,spriteData); });
 }
 
 void DrawManager::DrawPostSprite(SpriteData& spriteData)
 {
+	drawCallNum_++;
 	calls[kPostSprite].push_back([&]() {spritePipeline_->Draw(*commandContext_, spriteData); });
 }
 
 void DrawManager::DrawShadow(const WorldTransform& worldTransform, const uint32_t modelHandle)
 {
+	drawCallNum_++;
 	calls[kShadow].push_back([&, modelHandle]() {shadowPipeline_->Draw(*commandContext_,modelHandle,worldTransform); });
 }
 
 void DrawManager::DrawSpotLightShadow(const WorldTransform& worldTransform, const uint32_t modelHandle)
 {
+	drawCallNum_++;
 	calls[kSpotLightShadow].push_back([&, modelHandle]() {spotLightShadowPipeline_->Draw(*commandContext_, modelHandle, worldTransform); });
 }
 
 void DrawManager::DrawSky(const WorldTransform& worldTransform)
 {
+	drawCallNum_++;
 	calls[kSky].push_back([&]() {skyPipeline_->Draw(*commandContext_, worldTransform); });
 }
 
 void DrawManager::DrawFloor(const WorldTransform& worldTransform, const uint32_t modelHandle)
 {
+	drawCallNum_++;
 	calls[kFloor].push_back([&, modelHandle]() {floorPipeline_->Draw(*commandContext_, modelHandle, worldTransform); });
 }
 

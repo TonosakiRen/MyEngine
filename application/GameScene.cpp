@@ -108,34 +108,39 @@ void GameScene::Update(CommandContext& commandContext){
 		
 		// light
 #ifdef USE_IMGUI
-		ImGui::Begin("DirectionalLight");
-		ImGui::DragFloat3("lightDirection", &directionalLights_->lights_[0].direction.x, 0.01f);
-		ImGui::DragFloat3("lightPosition", &directionalLights_->lights_[0].position.x, 1.0f);
-		ImGui::DragFloat4("lightColor", &directionalLights_->lights_[0].color.x, 1.0f,0.0f,255.0f);
-		ImGui::DragFloat("intensity", &directionalLights_->lights_[0].intensity, 0.01f, 0.0f);
-		ImGui::End();
+		ImGui::Begin("Game");
+		if (ImGui::BeginMenu("DirectionalLight")) {
+			ImGui::DragFloat3("lightDirection", &directionalLights_->lights_[0].direction.x, 0.01f);
+			ImGui::DragFloat3("lightPosition", &directionalLights_->lights_[0].position.x, 1.0f);
+			ImGui::DragFloat4("lightColor", &directionalLights_->lights_[0].color.x, 1.0f, 0.0f, 255.0f);
+			ImGui::DragFloat("intensity", &directionalLights_->lights_[0].intensity, 0.01f, 0.0f);
+			ImGui::EndMenu();
+		}
 #endif
 		directionalLights_->lights_[0].direction = Normalize(directionalLights_->lights_[0].direction);
 		directionalLights_->Update();
 
 #ifdef USE_IMGUI
-		ImGui::Begin("spotLight");
-		ImGui::DragFloat3("lightPosition", &spotLights_->lights_[0].worldTransform.translation_.x, 0.01f);
-		ImGui::DragFloat3("lightColor", &spotLights_->lights_[0].color.x, 1.0f, 0.0f, 255.0f);
-		ImGui::DragFloat("intensity", &spotLights_->lights_[0].intensity, 0.01f, 0.0f);
-		ImGui::DragFloat3("direction", &spotLights_->lights_[0].direction.x, 0.01f, 0.0f);
-		ImGui::DragFloat("distance", &spotLights_->lights_[0].distance, 0.01f, 0.0f);
-		ImGui::DragFloat("decay", &spotLights_->lights_[0].decay, 0.01f, 0.0f);
-		ImGui::DragFloat("cosAngle", &spotLights_->lights_[0].cosAngle, Radian(1.0f), 0.0f, Radian(179.0f));
-		ImGui::End();
+		if (ImGui::BeginMenu("spotLight")) {
+			ImGui::DragFloat3("lightPosition", &spotLights_->lights_[0].worldTransform.translation_.x, 0.01f);
+			ImGui::DragFloat3("lightColor", &spotLights_->lights_[0].color.x, 1.0f, 0.0f, 255.0f);
+			ImGui::DragFloat("intensity", &spotLights_->lights_[0].intensity, 0.01f, 0.0f);
+			ImGui::DragFloat3("direction", &spotLights_->lights_[0].direction.x, 0.01f, 0.0f);
+			ImGui::DragFloat("distance", &spotLights_->lights_[0].distance, 0.01f, 0.0f);
+			ImGui::DragFloat("decay", &spotLights_->lights_[0].decay, 0.01f, 0.0f);
+			ImGui::DragFloat("cosAngle", &spotLights_->lights_[0].cosAngle, Radian(1.0f), 0.0f, Radian(179.0f));
+			ImGui::EndMenu();
+		};
 
-		ImGui::Begin("areaLights");
-		ImGui::DragFloat3("origin", &areaLights->lights_[0].segment.origin.x);
-		ImGui::DragFloat3("diff", &areaLights->lights_[0].segment.diff.x);
-		ImGui::DragFloat3("lightColor", &areaLights->lights_[0].color.x, 1.0f, 0.0f, 255.0f);
-		ImGui::DragFloat("intensity", &areaLights->lights_[0].intensity, 0.01f, 0.0f);
-		ImGui::DragFloat("range", &areaLights->lights_[0].range, 0.01f, 0.0f);
-		ImGui::DragFloat("decay", &areaLights->lights_[0].decay, 0.01f, 0.0f);
+		if (ImGui::BeginMenu("areaLights")) {
+			ImGui::DragFloat3("origin", &areaLights->lights_[0].segment.origin.x);
+			ImGui::DragFloat3("diff", &areaLights->lights_[0].segment.diff.x);
+			ImGui::DragFloat3("lightColor", &areaLights->lights_[0].color.x, 1.0f, 0.0f, 255.0f);
+			ImGui::DragFloat("intensity", &areaLights->lights_[0].intensity, 0.01f, 0.0f);
+			ImGui::DragFloat("range", &areaLights->lights_[0].range, 0.01f, 0.0f);
+			ImGui::DragFloat("decay", &areaLights->lights_[0].decay, 0.01f, 0.0f);
+			ImGui::EndMenu();
+		};
 		ImGui::End();
 
 		areaLights_->Update();
@@ -156,7 +161,9 @@ void GameScene::Update(CommandContext& commandContext){
 
 		int a = date[2];
 #ifdef _DEBUG
-		ImGui::Text("%d", int(a));
+		ImGui::Begin("Game");
+		ImGui::Text("ComputeTest : %d", int(a));
+		ImGui::End();
 		#endif
 	}
 

@@ -13,6 +13,7 @@ public:
 		Matrix4x4 viewProjection;
 		Matrix4x4 inverseViewProjection;
 		Matrix4x4 worldMatrix;
+		Matrix4x4 billBorMatrix;
 		Vector3 viewPosition;
 	};
 
@@ -88,6 +89,7 @@ protected:
 	Matrix4x4 matView_;
 	Matrix4x4 matProjection_;
 	Matrix4x4 inverseViewProjection_;
+	Matrix4x4 billBordMatrix_;
 
 	Frustum frustum_;
 	Frustum worldFrustum_;

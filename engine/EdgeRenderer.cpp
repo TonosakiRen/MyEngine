@@ -42,8 +42,11 @@ void EdgeRenderer::Render(CommandContext& commandContext, ColorBuffer* originalT
 
 
 #ifdef _DEBUG
-	ImGui::Begin("Edge");
-	ImGui::DragFloat3("EdgeColor", &edgeColor_.x,0.01f,0.0f,1.0f);
+	ImGui::Begin("Engine");
+	if (ImGui::BeginMenu("Edge")) {
+		ImGui::DragFloat3("EdgeColor", &edgeColor_.x,0.01f,0.0f,1.0f);
+		ImGui::EndMenu();
+	}
 	ImGui::End();
 #endif
 	commandContext.SetConstants(static_cast<UINT>(RootParameter::kEdgeColor), edgeColor_.x, edgeColor_.y,edgeColor_.z);

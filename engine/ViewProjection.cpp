@@ -9,14 +9,17 @@ bool ViewProjection::isUseDebugCamera = false;
 void ViewProjection::SwitchIsUseDebugCamera()
 {
 #ifdef _DEBUG
-    ImGui::Begin("switchDebugCamera");
-    if (ImGui::Button("SwitchDebugDraw")) {
-        if (ViewProjection::isUseDebugCamera == false) {
-            ViewProjection::isUseDebugCamera = true;
+    ImGui::Begin("Game");
+    if (ImGui::BeginMenu("Camera")) {
+        if (ImGui::Button("SwitchDebugCamera")) {
+            if (ViewProjection::isUseDebugCamera == false) {
+                ViewProjection::isUseDebugCamera = true;
+            }
+            else {
+                ViewProjection::isUseDebugCamera = false;
+            }
         }
-        else {
-            ViewProjection::isUseDebugCamera = false;
-        }
+        ImGui::EndMenu();
     }
     ImGui::End();
 #endif 
@@ -48,6 +51,12 @@ void ViewProjection::Update() {
     bufferData.viewProjection = viewProjection;
     bufferData.inverseViewProjection = inverseViewProjection_;
     bufferData.worldMatrix = worldMatrix_;
+
+    bufferData.billBorMatrix = matView_;
+    bufferData.billBorMatrix.m[3][0] = 0.0f;
+    bufferData.billBorMatrix.m[3][1] = 0.0f;
+    bufferData.billBorMatrix.m[3][2] = 0.0f;
+    bufferData.billBorMatrix = Inverse(bufferData.billBorMatrix);
     bufferData.viewPosition = tranlation;
 
     constBuffer_.Copy(bufferData);

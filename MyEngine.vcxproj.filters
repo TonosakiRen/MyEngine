@@ -427,6 +427,15 @@
     <ClCompile Include="engine\CommandSignature.cpp">
       <Filter>Engine\Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="engine\AppendBuffer.cpp">
+      <Filter>Engine\GPUResource</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\MeshletModel.cpp">
+      <Filter>Engine\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\ByteAddressBuffer.cpp">
+      <Filter>Engine\GPUResource</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -753,6 +762,15 @@
     <ClInclude Include="engine\CommandSignature.h">
       <Filter>Engine\Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="engine\AppendBuffer.h">
+      <Filter>Engine\GPUResource</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\MeshletModel.h">
+      <Filter>Engine\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\ByteAddressBuffer.h">
+      <Filter>Engine\GPUResource</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\ModelPS.hlsl">
@@ -773,10 +791,10 @@
     <FxCompile Include="Resources\shaders\SpriteVS.hlsl">
       <Filter>shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Resources\shaders\ParticleBoxPS.hlsl">
+    <FxCompile Include="Resources\shaders\ParticleModelPS.hlsl">
       <Filter>shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Resources\shaders\ParticleBoxVS.hlsl">
+    <FxCompile Include="Resources\shaders\ParticleModelVS.hlsl">
       <Filter>shaders</Filter>
     </FxCompile>
     <FxCompile Include="Resources\shaders\PostEffectPS.hlsl">
@@ -870,6 +888,18 @@
       <Filter>shaders</Filter>
     </FxCompile>
     <FxCompile Include="Resources\shaders\ReducationPS.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\MeshTestMS.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\MeshTestPS.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\InitializeParticleCS.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\SkinningCS.hlsl">
       <Filter>shaders</Filter>
     </FxCompile>
   </ItemGroup>

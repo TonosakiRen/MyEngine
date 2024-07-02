@@ -9,6 +9,7 @@ struct ViewProjection {
 	float32_t4x4 viewProjection;
 	float32_t4x4 inverseViewProjection;
 	float32_t4x4 worldMatrix;
+	float32_t4x4 billBordMatrix;
 	float32_t3 viewPosition;
 };
 ConstantBuffer<ViewProjection> gViewProjection  : register(b0);
@@ -28,7 +29,8 @@ struct VSOutput {
 
 VSOutput main(VSInput input) {
 	VSOutput output; 
-	output.svpos = mul(float32_t4(input.pos, 1.0f), mul(gWorldTransforms[input.instanceId].world, gViewProjection.viewProjection));
+	float32_t4x4 billbordedWorld = gWorldTransforms[input.instanceId].world * gViewProjection.billBordMatrix;
+	output.svpos = mul(float32_t4(input.pos, 1.0f), mul(billbordedWorld, gViewProjection.viewProjection));
 	output.normal = mul(input.normal, (float32_t3x3)gWorldTransforms[input.instanceId].worldInverseTranspose);
 	output.uv = input.uv;
 	return output;

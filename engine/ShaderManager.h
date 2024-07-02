@@ -18,6 +18,7 @@ public:
         kHull,
         kDomain,
         kCompute,
+        kMesh,
 
         kNumTypes
     };

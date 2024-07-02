@@ -141,7 +141,7 @@ void Sprite::Draw(CommandContext& commandContext,SpriteData& spriteData) {
 
 	commandContext.SetConstantBuffer(0, spriteData.constBuffer_.GetGPUVirtualAddress());
 
-	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(commandContext, 1, spriteData.textureHandle_);
+	TextureManager::GetInstance()->SetDescriptorTable(commandContext, 1, spriteData.textureHandle_);
 	
 	commandContext.DrawInstanced(4, 1, 0, 0);
 }

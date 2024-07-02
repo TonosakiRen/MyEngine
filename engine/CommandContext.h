@@ -91,6 +91,7 @@ public:
     void UAVBarrier(GPUResource& resource);
 
     void Dispatch(uint32_t x,uint32_t y,uint32_t z);
+    void DispatchMesh(uint32_t x, uint32_t y, uint32_t z);
 
     void Draw(UINT vertexCount, UINT vertexStartOffset = 0);
     void DrawIndexed(UINT indexCount, UINT startIndexLocation = 0, INT baseVertexLocation = 0);
@@ -99,13 +100,13 @@ public:
 
     void ExecuteIndirect(ID3D12CommandSignature* commandSignature, UINT maxCommandCount, ID3D12Resource* argumentBuffer, UINT64 argumentBufferOffset, ID3D12Resource* countBuffer, UINT64 countBufferOffset);
 
-    operator ID3D12GraphicsCommandList* () const { return commandList_.Get(); }
-
+    operator ID3D12GraphicsCommandList6* () const { return commandList_.Get(); }
+    
 private:
     static const uint32_t kMaxNumResourceBarriers = 16;
 
     Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator_;
-    Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList_;
+    Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList6> commandList_;
 
     D3D12_RESOURCE_BARRIER resourceBarriers_[kMaxNumResourceBarriers]{};
     std::vector<GPUResource*> releaseResources_;
@@ -408,6 +409,12 @@ inline void CommandContext::Dispatch(uint32_t x, uint32_t y, uint32_t z)
 {
     FlushResourceBarriers();
     commandList_->Dispatch(x,y,z);
+}
+
+inline void CommandContext::DispatchMesh(uint32_t x, uint32_t y, uint32_t z)
+{
+    FlushResourceBarriers();
+    commandList_->DispatchMesh(x, y, z);
 }
 
 inline void CommandContext::UAVBarrier(GPUResource& resource) {

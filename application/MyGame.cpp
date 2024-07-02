@@ -21,6 +21,7 @@ void MyGame::Initialize()
 	textureManager->Load("white1x1.png");
 
 	modelManager = ModelManager::GetInstance();
+	modelManager->Initialize(renderer->GetCommandContext());
 	modelManager->Load("box1x1.obj");
 
 	sceneManager = SceneManager::GetInstance();

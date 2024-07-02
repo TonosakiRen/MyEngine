@@ -33,7 +33,7 @@ public:
 
 	const D3D12_RESOURCE_DESC GetResoureDesc(const uint32_t textureHandle);
 
-	void SetGraphicsRootDescriptorTable(CommandContext& commandList, const  UINT rootParamIndex, const  uint32_t textureHandle);
+	void SetDescriptorTable(CommandContext& commandList, const  UINT rootParamIndex, const  uint32_t textureHandle);
 
 	DescriptorHandle GetSRV(const std::string& fileName);
 

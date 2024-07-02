@@ -43,6 +43,18 @@ void SkinCluster::Create(const Skeleton& skeleton, const uint32_t modelHandle) {
             }
         }
     }
+
+    influences_.Create(sizeof(VertexInfluence), UINT(modelData.meshes[0].GetVerticies().size()));
+    influences_.Copy(influenceResource_.GetCPUData(), UINT(sizeof(VertexInfluence) * modelData.meshes[0].GetVerticies().size()));
+
+    skinnedVertices_.Create(sizeof(Mesh::VertexData), UINT(modelData.meshes[0].GetVerticies().size()));
+
+    skinnedBufferView_.BufferLocation = skinnedVertices_->GetGPUVirtualAddress();
+    skinnedBufferView_.SizeInBytes = UINT(sizeof(Mesh::VertexData) * modelData.meshes[0].GetVerticies().size());
+    skinnedBufferView_.StrideInBytes = sizeof(Mesh::VertexData);
+
+    skinningInformation_.Create(sizeof(SkinningInformation));
+    skinningInformation_.Copy(uint32_t(modelData.meshes[0].GetVerticies().size()));
 }
 
 void SkinCluster::Update()

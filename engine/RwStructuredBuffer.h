@@ -14,7 +14,7 @@ public:
 
     size_t GetBufferSize() const { return bufferSize_; }
 
-    DescriptorHandle GetUAV() {
+    const DescriptorHandle& GetUAV() const {
         return uavHandle_;
     }
 
@@ -22,5 +22,4 @@ protected:
     void Destroy();
 
     DescriptorHandle uavHandle_;
-    bool isCopy_ = false;
 };

@@ -108,8 +108,11 @@ void Smooth::Draw(ColorBuffer& originalBuffer, CommandContext& commandContext) {
 
 	// SRVをセット
 	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kTexture), originalBuffer.GetSRV());
-	ImGui::Begin("Smooth");
-	ImGui::DragFloat("t", &t_, 0.01f, 0.0f, 1.0f);
+	ImGui::Begin("Engine");
+	if (ImGui::BeginMenu("Smooth")) {
+		ImGui::DragFloat("t", &t_, 0.01f, 0.0f, 1.0f);
+		ImGui::EndMenu();
+	}
 	ImGui::End();
 	commandContext.SetConstant(static_cast<UINT>(RootParameter::kT), 0, t_);
 
