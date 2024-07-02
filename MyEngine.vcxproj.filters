@@ -866,9 +866,6 @@
     <FxCompile Include="Resources\shaders\GrayScale.hlsl">
       <Filter>shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Resources\shaders\SkinningVS.hlsl">
-      <Filter>shaders</Filter>
-    </FxCompile>
     <FxCompile Include="Resources\shaders\WirePS.hlsl">
       <Filter>shaders</Filter>
     </FxCompile>
