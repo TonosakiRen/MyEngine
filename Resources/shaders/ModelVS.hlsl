@@ -2,6 +2,7 @@
 struct WorldTransform {
 	float32_t4x4 world;
 	float32_t4x4 worldInverseTranspose;
+	float32_t scale;
 };
 ConstantBuffer<WorldTransform> gWorldTransform  : register(b0);
 

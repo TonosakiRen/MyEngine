@@ -50,6 +50,7 @@ private:
 
 	StructuredBuffer meshletBuffer_;
 	std::vector<DirectX::Meshlet> meshlets_;
+	UploadBuffer meshletInfo_;
 
 	//Meshlets計算用
 	std::vector<DirectX::XMFLOAT3> positions_;
@@ -60,6 +61,9 @@ private:
 
 	StructuredBuffer primitiveIndicesBuffer_;
 	std::vector<DirectX::MeshletTriangle> primitiveIndices_;
+
+	StructuredBuffer cullDataBuffer_;
+	std::vector<DirectX::CullData> cullData_;
 
 	std::string name_;
 	uint32_t uvHandle_ = 0;

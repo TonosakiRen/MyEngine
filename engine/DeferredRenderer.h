@@ -10,12 +10,6 @@
 #include "UploadBuffer.h"
 
 class ViewProjection;
-class DirectionalLights;
-class PointLights;
-class AreaLights;
-class SpotLights;
-class ShadowSpotLights;
-class LightNumBuffer;
 class TileBasedRendering;
 
 class DeferredRenderer
@@ -49,7 +43,7 @@ public:
 	};
 
 	void Initialize(ColorBuffer* originalTexture, ColorBuffer* normalTexture, ColorBuffer* materialTexture, DepthBuffer* depthTexture);
-	void Render(CommandContext& commandContext, ColorBuffer* originalBuffer_, ViewProjection& viewProjection, DirectionalLights& directionalLight, PointLights& pointLights , AreaLights& areaLights, SpotLights& spotLights,ShadowSpotLights& shadowSpotLights, LightNumBuffer& lightNumBuffer, TileBasedRendering& tileBasedRendering);
+	void Render(CommandContext& commandContext, ColorBuffer* originalBuffer_, ViewProjection& viewProjection, TileBasedRendering& tileBasedRendering);
 
 private:
 	void CreatePipeline();

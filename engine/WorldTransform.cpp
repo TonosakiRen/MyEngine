@@ -6,6 +6,7 @@ void WorldTransform::Initialize(bool srtChange) {
     parent_ = nullptr;
     if (srtChange) {
         scale_ = { 1.0f,1.0f,1.0f };
+        maxScale_ = 1.0f;
         quaternion_ = IdentityQuaternion();
         translation_ = { 0.0f,0.0f,0.0f };
     }
@@ -19,6 +20,7 @@ void WorldTransform::Reset() {
     parent_ = nullptr;
    
     scale_ = { 1.0f,1.0f,1.0f };
+    maxScale_ = 1.0f;
     quaternion_ = IdentityQuaternion();
     translation_ = { 0.0f,0.0f,0.0f };
     
@@ -62,8 +64,11 @@ void WorldTransform::Update() {
         worldInverseTranspose_ = Transpose(Inverse(matWorld_));
     }
 
+    Vector3 scale = MakeScale(matWorld_);
+    maxScale_ = (std::max)({ scale.x,scale.y,scale.z });
+
     if (constBuffer_.GetCPUData()) {
-        constBuffer_.Copy(ConstBufferData{ matWorld_, worldInverseTranspose_ });
+        constBuffer_.Copy(ConstBufferData{ matWorld_, worldInverseTranspose_ ,maxScale_ });
     }
 }
 
@@ -103,8 +108,11 @@ void WorldTransform::Update(Matrix4x4 localMatrix) {
         worldInverseTranspose_ = Transpose(Inverse(matWorld_));
     }
 
+    Vector3 scale = MakeScale(matWorld_);
+    maxScale_ = (std::max)({ scale.x,scale.y,scale.z });
+
     if (constBuffer_.GetCPUData()) {
-        constBuffer_.Copy(ConstBufferData{ matWorld_, worldInverseTranspose_ });
+        constBuffer_.Copy(ConstBufferData{ matWorld_, worldInverseTranspose_ ,maxScale_ });
     }
 }
 
@@ -150,7 +158,10 @@ void WorldTransform::Update(uint32_t modelIndex) {
         worldInverseTranspose_ = Transpose(Inverse(matWorld_));
     }
 
+    Vector3 scale = MakeScale(matWorld_);
+    maxScale_ = (std::max)({ scale.x,scale.y,scale.z });
+
     if (constBuffer_.GetCPUData()) {
-        constBuffer_.Copy(ConstBufferData{ matWorld_, worldInverseTranspose_ });
+        constBuffer_.Copy(ConstBufferData{ matWorld_, worldInverseTranspose_ ,maxScale_ });
     }
 }

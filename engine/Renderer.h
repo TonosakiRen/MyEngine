@@ -10,7 +10,6 @@
 
 #include "DeferredRenderer.h"
 #include "EdgeRenderer.h"
-#include "LightNumBuffer.h"
 #include "TileBasedRendering.h"
 #include "Transition.h"
 #include "GrayScale.h"
@@ -22,6 +21,8 @@ class ViewProjection;
 class DirectionalLights;
 class ShadowSpotLights;
 class DrawManager;
+class LightManager;
+class ImGuiManager;
 
 class Renderer
 {
@@ -42,9 +43,9 @@ public:
 
     void MainRender(ViewProjection& viewProjection);
 
-    void DeferredRender(ViewProjection& viewProjection, DirectionalLights& directionalLight,PointLights& pointLights,AreaLights& areaLights, SpotLights& spotLights, ShadowSpotLights& shadowSpotLights);
-    void ShadowMapRender(DirectionalLights& directionalLights);
-    void SpotLightShadowMapRender(ShadowSpotLights& shadowSpotLights);
+    void DeferredRender(ViewProjection& viewProjection);
+    void ShadowMapRender();
+    void SpotLightShadowMapRender();
 
     void UIRender();
     void EndRender();
@@ -73,6 +74,8 @@ private:
 
     DirectXCommon* graphics_ = nullptr;
     DrawManager* drawManager_ = nullptr;
+    LightManager* lightManager_ = nullptr;
+    ImGuiManager* ImGuiManager_ = nullptr;
     std::unique_ptr<SwapChain> swapChain_;
     CommandContext commandContext_;
 
@@ -82,23 +85,29 @@ private:
     std::unique_ptr<ColorBuffer> resultBuffer_;
 
     std::unique_ptr<DeferredRenderer> deferredRenderer_;
-    std::unique_ptr<EdgeRenderer> edgeRenderer_;
 
-    std::unique_ptr<Bloom> bloom_;
     std::unique_ptr<PostEffect> postEffect_;
 
-    std::unique_ptr<LightNumBuffer> lightNumBuffer_;
+    std::unique_ptr<EdgeRenderer> edgeRenderer_;
+    std::unique_ptr<Bloom> bloom_;
+    std::unique_ptr<GrayScale> grayScale_;
+    std::unique_ptr<Vignette> vignette_;
+    std::unique_ptr<Smooth> smooth_;
+
+    bool isEdge_ = true;
+    bool isBloom_ = true;
+    bool isGrayScale_ = false;
+    bool isVignette_ = false;
+    bool isSmooth_ = false;
 
     std::unique_ptr<TileBasedRendering> tileBasedRendering_;
 
     std::unique_ptr<Transition> transition_;
 
-    std::unique_ptr<GrayScale> grayScale_;
-
-    std::unique_ptr<Vignette> vignette_;
-
     std::unique_ptr<Wire> wire_;
+    bool isWire_ = false;
 
-    std::unique_ptr<Smooth> smooth_;
+
+
 };
 

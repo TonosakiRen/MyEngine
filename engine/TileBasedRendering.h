@@ -4,9 +4,6 @@
 #include "RootSignature.h"
 #include "UploadBuffer.h"
 #include "DescriptorHandle.h"
-#include "PointLights.h"
-#include "SpotLights.h"
-#include "ShadowSpotLights.h"
 #include "StructuredBuffer.h"
 #include "DefaultStructuredBuffer.h"
 #include "RwStructuredBuffer.h"
@@ -50,16 +47,12 @@ public:
 	static const uint32_t kTileNum = kTileWidthNum * kTileHeightNum;
 
 	void Initialize();
-	void Update(const ViewProjection& viewProjection,const PointLights& pointLights,const SpotLights& spotLights,const ShadowSpotLights& shadowSpotLights);
-	void ComputeUpdate(CommandContext& commandContext,const ViewProjection& viewProjection, PointLights& pointLights, const SpotLights& spotLights, const ShadowSpotLights& shadowSpotLights, LightNumBuffer& lightNumBuffer);
+	void ComputeUpdate(CommandContext& commandContext,const ViewProjection& viewProjection);
 
 
 	void CreatePipeline();
 	//初期化視推台
 	Frustum GetTileFrustrum(const int& width, const int& height);
-
-	//当たり判定
-	bool IsHitSphere(const Frustum& frustum,const Vector3& position,const float radius);
 
 public:
 

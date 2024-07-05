@@ -12,6 +12,7 @@
 #include "TextureManager.h"
 #include "Sky.h"
 #include "DrawManager.h"
+#include "LightManager.h"
 
 Renderer* Renderer::GetInstance() {
     static Renderer instance;
@@ -62,6 +63,8 @@ void Renderer::Initialize() {
     drawManager_ = DrawManager::GetInstance();
     drawManager_->Initialize(commandContext_);
 
+    lightManager_ = LightManager::GetInstance();
+
     // ブルームを初期化
     bloom_ = std::make_unique<Bloom>();
     bloom_->Initialize(colorBuffers_[kColor].get());
@@ -75,11 +78,8 @@ void Renderer::Initialize() {
     edgeRenderer_->Initialize(colorBuffers_[kColor].get(), colorBuffers_[kNormal].get(), mainDepthBuffer_.get());
 
     // ImGuiを初期化
-    auto imguiManager = ImGuiManager::GetInstance();
-    imguiManager->Initialize(window);
-
-    lightNumBuffer_ = std::make_unique<LightNumBuffer>();
-    lightNumBuffer_->Create();
+    ImGuiManager_ = ImGuiManager::GetInstance();
+    ImGuiManager_->Initialize(window);
 
     tileBasedRendering_ = std::make_unique<TileBasedRendering>();
     tileBasedRendering_->Initialize();
@@ -132,38 +132,57 @@ void Renderer::MainRender(ViewProjection& viewProjection) {
 
 }
 
-void Renderer::DeferredRender(ViewProjection& viewProjection, DirectionalLights& directionalLight, PointLights& pointLights,AreaLights& areaLights ,SpotLights& spotLights, ShadowSpotLights& shadowSpotLights)
+void Renderer::DeferredRender(ViewProjection& viewProjection)
 {
     wire_->AllDraw(commandContext_, viewProjection);
-    tileBasedRendering_->ComputeUpdate(commandContext_, viewProjection, pointLights, spotLights, shadowSpotLights, *lightNumBuffer_);
-    deferredRenderer_->Render(commandContext_, resultBuffer_.get(), viewProjection, directionalLight, pointLights, areaLights ,spotLights,shadowSpotLights, *lightNumBuffer_, *tileBasedRendering_);
-
-    edgeRenderer_->Render(commandContext_, resultBuffer_.get());
-    bloom_->Render(commandContext_, resultBuffer_.get());
-    grayScale_->Draw(*resultBuffer_.get(), commandContext_);
-    vignette_->Draw(*resultBuffer_.get(), commandContext_);
-    //smooth_->Draw(*resultBuffer_.get(), commandContext_);
+    tileBasedRendering_->ComputeUpdate(commandContext_, viewProjection);
+    deferredRenderer_->Render(commandContext_, resultBuffer_.get(), viewProjection, *tileBasedRendering_);
+    ImGui::Begin("Engine");
+    if (ImGui::BeginMenu("PostEffect")) {
+        ImGui::Checkbox("bloom", &isBloom_);
+        ImGui::Checkbox("edge", &isEdge_);
+        ImGui::Checkbox("grayScale", &isGrayScale_);
+        ImGui::Checkbox("vignette", &isVignette_);
+        ImGui::Checkbox("smooth", &isSmooth_);
+        ImGui::EndMenu();
+    }
+    if (isBloom_) {
+        bloom_->Render(commandContext_, resultBuffer_.get());
+    }
+    if (isEdge_) {
+        edgeRenderer_->Render(commandContext_, resultBuffer_.get());
+    }
+    if (isGrayScale_) {
+        grayScale_->Draw(*resultBuffer_.get(), commandContext_);
+    }
+    if (isVignette_) {
+        vignette_->Draw(*resultBuffer_.get(), commandContext_);
+    }
+    if (isSmooth_) {
+        smooth_->Draw(*resultBuffer_.get(), commandContext_);
+    }
+    ImGui::End();
 }
 
-void Renderer::ShadowMapRender(DirectionalLights& directionalLights)
+void Renderer::ShadowMapRender()
 {
     commandContext_.SetViewportAndScissorRect(0, 0, DirectionalLights::shadowWidth, DirectionalLights::shadowHeight);
 
-    drawManager_->ShadowDraw(directionalLights);
+    drawManager_->ShadowDraw();
 
     for (int i = 0; i < DirectionalLights::lightNum; i++) {
-        commandContext_.TransitionResource(directionalLights.lights_[i].shadowMap_, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+        commandContext_.TransitionResource(lightManager_->directionalLights_->lights_[i].shadowMap_, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
     }
 }
 
-void Renderer::SpotLightShadowMapRender(ShadowSpotLights& shadowSpotLights)
+void Renderer::SpotLightShadowMapRender()
 {
     commandContext_.SetViewportAndScissorRect(0, 0, ShadowSpotLights::shadowWidth, ShadowSpotLights::shadowHeight);
 
-    drawManager_->ShadowSpotLightDraw(shadowSpotLights);
+    drawManager_->ShadowSpotLightDraw();
 
     for (int i = 0; i < ShadowSpotLights::lightNum; i++) {
-        commandContext_.TransitionResource(shadowSpotLights.lights_[i].shadowMap_, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+        commandContext_.TransitionResource(lightManager_->shadowSpotLights_->lights_[i].shadowMap_, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
     }
 }
 
@@ -194,8 +213,7 @@ void Renderer::EndRender()
     postEffect_->Draw(resultBuffer_->GetSRV(), commandContext_);
 
     // ImGuiを描画
-    auto imguiManager = ImGuiManager::GetInstance();
-    imguiManager->Draw(commandContext_);
+    ImGuiManager_->Draw(commandContext_);
 
     commandContext_.TransitionResource(swapChain_->GetColorBuffer(), D3D12_RESOURCE_STATE_PRESENT);
     commandContext_.Close();
@@ -222,7 +240,6 @@ void Renderer::Shutdown() {
     edgeRenderer_.reset();
     bloom_.reset();
     postEffect_.reset();
-    lightNumBuffer_.reset();
     bloom_.reset();
     tileBasedRendering_.reset();
     transition_.reset();
@@ -237,8 +254,7 @@ void Renderer::Shutdown() {
     commandContext_.ShutDown();
 
     graphics_->Shutdown();
-    auto imguiManager = ImGuiManager::GetInstance();
-    imguiManager->Finalize();
+    ImGuiManager_->Finalize();
 }
 
 

@@ -188,6 +188,20 @@ void ModelManager::CreateMeshes(ModelData& modelData)
 
 		mesh.primitiveIndicesBuffer_.Create(sizeof(DirectX::MeshletTriangle), UINT(mesh.primitiveIndices_.size()));
 		mesh.primitiveIndicesBuffer_.Copy(mesh.primitiveIndices_.data(), sizeof(DirectX::MeshletTriangle)* mesh.primitiveIndices_.size());
+
+		mesh.meshletInfo_.Create(sizeof(uint32_t));
+		mesh.meshletInfo_.Copy(uint32_t(mesh.meshlets_.size()));
+
+		//meshletカリング作成
+		mesh.cullData_.resize(mesh.meshlets_.size());
+		DirectX::ComputeCullData(mesh.positions_.data(), mesh.positions_.size(),
+			mesh.meshlets_.data(), mesh.meshlets_.size(),
+			reinterpret_cast<uint32_t*>(mesh.uniqueVertexIndex.data()), mesh.uniqueVertexIndex.size(),
+			mesh.primitiveIndices_.data(), mesh.primitiveIndices_.size(),
+			mesh.cullData_.data());
+
+		mesh.cullDataBuffer_.Create(sizeof(DirectX::CullData), UINT(mesh.cullData_.size()));
+		mesh.cullDataBuffer_.Copy(mesh.cullData_.data(), sizeof(DirectX::CullData) * mesh.cullData_.size());
 	}
 
 	//node
@@ -362,9 +376,10 @@ void ModelManager::DrawMeshletInstanced(CommandContext& commandContext, const  u
 		commandContext.SetDescriptorTable(UINT(MeshletModel::RootParameter::kMeshlets), mesh.meshletBuffer_.GetSRV());
 		commandContext.SetDescriptorTable(UINT(MeshletModel::RootParameter::kPrimitiveIndices), mesh.primitiveIndicesBuffer_.GetSRV());
 		commandContext.SetDescriptorTable(UINT(MeshletModel::RootParameter::kUniqueVertexIndices), mesh.uniqueVertexIndexBuffer_.GetSRV());
+		commandContext.SetDescriptorTable(UINT(MeshletModel::RootParameter::kCullData), mesh.cullDataBuffer_.GetSRV());
 
 		// 描画コマンド
-		commandContext.DispatchMesh(uint32_t(mesh.meshlets_.size()),1,1);
+		commandContext.DispatchMesh(uint32_t((mesh.meshlets_.size() + 32 - 1) / 32),1,1);
 	}
 }
 
@@ -414,9 +429,10 @@ void ModelManager::DrawMeshletInstanced(CommandContext& commandContext, const ui
 		commandContext.SetDescriptorTable(UINT(MeshletModel::RootParameter::kMeshlets), mesh.meshletBuffer_.GetSRV());
 		commandContext.SetDescriptorTable(UINT(MeshletModel::RootParameter::kPrimitiveIndices), mesh.primitiveIndicesBuffer_.GetSRV());
 		commandContext.SetDescriptorTable(UINT(MeshletModel::RootParameter::kUniqueVertexIndices), mesh.uniqueVertexIndexBuffer_.GetSRV());
+		commandContext.SetDescriptorTable(UINT(MeshletModel::RootParameter::kCullData), mesh.cullDataBuffer_.GetSRV());
 
 		// 描画コマンド
-		commandContext.DispatchMesh(uint32_t(mesh.meshlets_.size()), 1, 1);
+		commandContext.DispatchMesh(uint32_t((mesh.meshlets_.size() + 32 - 1) / 32), 1, 1);
 	}
 }
 

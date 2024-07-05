@@ -2,6 +2,7 @@
 #include "WinApp.h"
 #include "Input.h"
 #include "ImGuiManager.h"
+#include "Wire.h"
 
 
 bool ViewProjection::isUseDebugCamera = false;
@@ -27,6 +28,7 @@ void ViewProjection::SwitchIsUseDebugCamera()
 
 void ViewProjection::Initialize() {
     constBuffer_.Create(sizeof(ConstBufferData));
+    frustumBuffer_.Create(sizeof(Frustum));
     Update();
 }
 
@@ -45,6 +47,7 @@ void ViewProjection::Update() {
     inverseViewProjection_ = Inverse(viewProjection);
     frustum_ = MakeFrustrum(inverseViewProjection_);
     worldFrustum_ = frustum_ * worldMatrix_;
+    frustumBuffer_.Copy(worldFrustum_.plane, sizeof(worldFrustum_.plane));
 
     // 定数バッファに書き込み
     ConstBufferData bufferData;
@@ -60,6 +63,11 @@ void ViewProjection::Update() {
     bufferData.viewPosition = tranlation;
 
     constBuffer_.Copy(bufferData);
+}
+
+void ViewProjection::Draw()
+{
+    Wire::Draw(worldFrustum_);
 }
 
 bool ViewProjection::Shake(Vector3 shakeValue, int& frame)

@@ -6,13 +6,8 @@
 #include <assert.h>
 #include "Renderer.h"
 #include "ViewProjection.h"
-#include "DirectionalLights.h"
-#include "PointLights.h"
-#include "AreaLights.h"
-#include "SpotLights.h"
-#include "LightNumBuffer.h"
-#include "ShadowSpotLights.h"
 #include "TileBasedRendering.h"
+#include "LightManager.h"
 
 using namespace Microsoft::WRL;
 
@@ -25,8 +20,11 @@ void DeferredRenderer::Initialize(ColorBuffer* colorTexture, ColorBuffer* normal
 	CreatePipeline();
 }
 
-void DeferredRenderer::Render(CommandContext& commandContext, ColorBuffer* originalBuffer,ViewProjection& viewProjection, DirectionalLights& directionalLight, PointLights& pointLights, AreaLights& areaLights ,SpotLights& spotLights, ShadowSpotLights& shadowSpotLights, LightNumBuffer& lightNumBuffer, TileBasedRendering& tileBasedRendering)
+void DeferredRenderer::Render(CommandContext& commandContext, ColorBuffer* originalBuffer,ViewProjection& viewProjection, TileBasedRendering& tileBasedRendering)
 {
+
+	LightManager* lightManager = LightManager::GetInstance();
+
 	commandContext.TransitionResource(*originalBuffer, D3D12_RESOURCE_STATE_RENDER_TARGET);
 	commandContext.SetRenderTarget(originalBuffer->GetRTV());
 	commandContext.SetViewportAndScissorRect(0, 0, originalBuffer->GetWidth(), originalBuffer->GetHeight());
@@ -45,16 +43,16 @@ void DeferredRenderer::Render(CommandContext& commandContext, ColorBuffer* origi
 	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kMaterialTexture), materialTexture_->GetSRV());
 	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kDepthTexture), depthTexture_->GetSRV());
 
-	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kDirectionalLights), directionalLight.srvHandle_);
-	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kPointLights), pointLights.structureBuffer_.GetSRV());
-	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kAreaLights), areaLights.structureBuffer_.GetSRV());
-	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kSpotLights), spotLights.srvHandle_);
-	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kShadowSpotLights), shadowSpotLights.srvHandle_);
+	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kDirectionalLights), lightManager->directionalLights_->srvHandle_);
+	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kPointLights), lightManager->pointLights_->structureBuffer_.GetSRV());
+	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kAreaLights), lightManager->areaLights_->structureBuffer_.GetSRV());
+	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kSpotLights), lightManager->spotLights_->srvHandle_);
+	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kShadowSpotLights), lightManager->shadowSpotLights_->srvHandle_);
 
 	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::k2DTextures), DirectXCommon::GetInstance()->GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV).GetDiscriptorStartHandle());
 
 	commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
-	commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kLightNum), lightNumBuffer.GetGPUVirtualAddress());
+	commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kLightNum), lightManager->lightNumBuffer_->GetGPUVirtualAddress());
 
 
 	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kTBRInformation), tileBasedRendering.rwTilesInformation_.GetUAV());

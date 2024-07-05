@@ -4,7 +4,7 @@
 class LightNumBuffer
 {
 public:
-	void Create();
+	void Initialize();
 
 	struct LightNum {
 		uint32_t directionalLightNum;

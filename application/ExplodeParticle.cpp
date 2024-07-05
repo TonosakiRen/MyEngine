@@ -1,16 +1,16 @@
 #include "ExplodeParticle.h"
 #include "ImGuiManager.h"
-#include "PointLights.h"
 #include "DrawManager.h"
+#include "LightManager.h"
 
 ExplodeParticle::ExplodeParticle()
 {
 	particle_ = std::make_unique<ParticleModelData>(kParticleNum);
 }
 
-void ExplodeParticle::Initialize(Vector3 minDirection, Vector3 maxDirection, PointLights* pointLights)
+void ExplodeParticle::Initialize(Vector3 minDirection, Vector3 maxDirection)
 {
-	pointLights_ = pointLights;
+	pointLights_ = LightManager::GetInstance()->pointLights_.get();
 	acceleration_ = { 0.0f,0.0f,-0.1f };
 	particle_->Initialize();
 	emitterWorldTransform_.SetIsScaleParent(false);

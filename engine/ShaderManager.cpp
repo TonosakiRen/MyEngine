@@ -20,7 +20,8 @@ namespace {
         L"hs_6_0",
         L"ds_6_0",
         L"cs_6_0",
-		L"ms_6_5"
+		L"ms_6_5",
+		L"as_6_5"
     };
 
 }

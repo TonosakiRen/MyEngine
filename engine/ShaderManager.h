@@ -19,6 +19,7 @@ public:
         kDomain,
         kCompute,
         kMesh,
+        kAmplification,
 
         kNumTypes
     };

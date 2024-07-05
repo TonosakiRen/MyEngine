@@ -24,8 +24,7 @@
 #include "FloorRenderer.h"
 #include "ViewProjection.h"
 
-#include "DirectionalLights.h"
-#include "ShadowSpotLights.h"
+#include "LightManager.h"
 #include "Calling.h"
 
 class DrawManager
@@ -74,8 +73,8 @@ private:
 	void Initialize(CommandContext& CommandContext);
 	void Finalize();
 	void AllDraw(const ViewProjection& viewProjection);
-	void ShadowDraw(DirectionalLights& directionalLights);
-	void ShadowSpotLightDraw(ShadowSpotLights& shadowSpotLights);
+	void ShadowDraw();
+	void ShadowSpotLightDraw();
 	void ResetCalls();
 
 private:
@@ -94,6 +93,8 @@ private:
 
 	std::unique_ptr<Calling> calling_;
 	CommandContext* commandContext_;
+
+	LightManager* lightManager_;
 
 	std::vector<std::function<void()>> calls[kCallNum];
 private:

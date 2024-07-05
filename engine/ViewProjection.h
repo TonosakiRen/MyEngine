@@ -17,15 +17,24 @@ public:
 		Vector3 viewPosition;
 	};
 
+	struct FrustumBufferData {
+		Plane plane[6];
+	};
+
 	static void SwitchIsUseDebugCamera();
 
 	void Initialize();
 	void Update();
+	void Draw();
 
 	bool Shake(Vector3 shakeValue, int& frame);
 
 	D3D12_GPU_VIRTUAL_ADDRESS GetGPUVirtualAddress() const {
 		return constBuffer_.GetGPUVirtualAddress();
+	}
+
+	D3D12_GPU_VIRTUAL_ADDRESS GetFrustumGPUVirtualAddress() const {
+		return frustumBuffer_.GetGPUVirtualAddress();
 	}
 
 	void SetFarZ(float farZ) {
@@ -95,4 +104,5 @@ protected:
 	Frustum worldFrustum_;
 
 	UploadBuffer constBuffer_;
+	UploadBuffer frustumBuffer_;
 };

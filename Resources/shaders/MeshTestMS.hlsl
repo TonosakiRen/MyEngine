@@ -1,6 +1,7 @@
 struct WorldTransform {
 	float32_t4x4 world;
 	float32_t4x4 worldInverseTranspose;
+	float32_t scale;
 };
 ConstantBuffer<WorldTransform> gWorldTransform  : register(b0);
 
@@ -12,6 +13,11 @@ struct ViewProjection {
 	float32_t3 viewPosition;
 };
 ConstantBuffer<ViewProjection> gViewProjection  : register(b1);
+
+struct MeshletInfo {
+	uint32_t meshletNum;
+};
+ConstantBuffer<MeshletInfo> meshletInfo  : register(b2);
 
 struct Vertex {
 	float32_t3 pos;
@@ -86,17 +92,28 @@ uint32_t GetVertexIndex(Meshlet m, in uint32_t vertIndex)
 	//return index;
 }
 
+struct Payload {
+	uint32_t meshletIndices[32];
+};
+
 
 [numthreads(128, 1, 1)]
 [OutputTopology("triangle")]
 void main(
 	uint32_t gtid : SV_GroupThreadID,
 	uint32_t gid : SV_GroupID,
+	in payload Payload payload,
 	out vertices MSOutput verts[256] ,
 	out indices uint32_t3 tris[256])
 {
 	
-	Meshlet m = meshlets[gid];
+	uint32_t meshletIndex = payload.meshletIndices[gid];
+
+	if (meshletIndex >= meshletInfo.meshletNum) {
+		return;
+	}
+
+	Meshlet m = meshlets[meshletIndex];
 
 	SetMeshOutputCounts(m.vertCount, m.primCount);
 
@@ -106,6 +123,6 @@ void main(
 
 	if (gtid < m.vertCount) {
 		uint32_t vertexIndex = GetVertexIndex(m, gtid);
-		verts[gtid] = GetVertexAttribute(vertexIndex, gid);
+		verts[gtid] = GetVertexAttribute(vertexIndex, meshletIndex);
 	}
 }

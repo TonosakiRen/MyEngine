@@ -8,7 +8,7 @@ class ExplodeParticle
 public:
 	static const uint32_t kParticleNum = 60;
 	ExplodeParticle();
-	void Initialize(Vector3 minDirection, Vector3 maxDirection, PointLights* pointLights);
+	void Initialize(Vector3 minDirection, Vector3 maxDirection);
 	void Update();
 	void Draw(Vector4 color = { 1.0f,1.0f,1.0f,1.0f });
 	void SetDirection(Vector3 minDirection, Vector3 maxDirection) {

@@ -10,6 +10,7 @@ public:
 	struct ConstBufferData {
 		Matrix4x4 matWorld;
 		Matrix4x4 worldInverseTranspose;
+		Vector3 scale;
 	};
 
 	//bufferに送る場合の初期化
@@ -74,6 +75,8 @@ public:
 	Vector3 translation_ = { 0.0f,0.0f,0.0f };
 	Matrix4x4 matWorld_;
 	Matrix4x4 worldInverseTranspose_;
+
+	float maxScale_ = 1.0f;
 private:
 	WorldTransform* parent_ = nullptr;
 	bool isScaleParent_ = true;

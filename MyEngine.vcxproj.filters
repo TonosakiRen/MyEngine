@@ -436,6 +436,9 @@
     <ClCompile Include="engine\ByteAddressBuffer.cpp">
       <Filter>Engine\GPUResource</Filter>
     </ClCompile>
+    <ClCompile Include="engine\LightManager.cpp">
+      <Filter>Engine\Light</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -771,6 +774,9 @@
     <ClInclude Include="engine\ByteAddressBuffer.h">
       <Filter>Engine\GPUResource</Filter>
     </ClInclude>
+    <ClInclude Include="engine\LightManager.h">
+      <Filter>Engine\Light</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\ModelPS.hlsl">
@@ -897,6 +903,9 @@
       <Filter>shaders</Filter>
     </FxCompile>
     <FxCompile Include="Resources\shaders\SkinningCS.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\CullAS.hlsl">
       <Filter>shaders</Filter>
     </FxCompile>
   </ItemGroup>

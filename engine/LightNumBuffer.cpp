@@ -5,7 +5,7 @@
 #include "ShadowSpotLights.h"
 #include "AreaLights.h"
 
-void LightNumBuffer::Create()
+void LightNumBuffer::Initialize()
 {
 	lightNumBuffer_.Create(sizeof(LightNum));
 	LightNum lightNum{ DirectionalLights::lightNum,PointLights::lightNum,AreaLights::lightNum,SpotLights::lightNum, ShadowSpotLights::lightNum};

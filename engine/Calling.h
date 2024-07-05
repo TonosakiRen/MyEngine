@@ -44,7 +44,7 @@ public:
 	bool isDraw(const uint32_t modelHandle,const WorldTransform& worldTransform);
 	uint32_t GetTileIndex();
 
-	bool isFrustumSphereCollision(const Frustum& frustum,const Sphere& sphere);
+	bool IsFrustumSphereCollision(const Frustum& frustum,const Sphere& sphere);
 
     //とりあえずModelPipelineをカリング
     enum class RootParameter {

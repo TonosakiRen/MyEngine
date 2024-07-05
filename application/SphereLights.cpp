@@ -1,6 +1,6 @@
 #include "SphereLights.h"
 #include "ImGuiManager.h"
-#include "PointLights.h"
+#include "LightManager.h"
 #include "DrawManager.h"
 #include "ModelManager.h"
 #include <string>
@@ -10,9 +10,9 @@ SphereLights::SphereLights()
 	particle_ = std::make_unique<ParticleModelData>(kSphereNum);
 }
 
-void SphereLights::Initialize(PointLights* pointLights)
+void SphereLights::Initialize()
 {
-	pointLights_ = pointLights;
+	pointLights_ = LightManager::GetInstance()->pointLights_.get();
 	particle_->Initialize();
 
 	spheres_.resize(kSphereNum);

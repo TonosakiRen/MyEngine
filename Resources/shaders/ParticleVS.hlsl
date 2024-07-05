@@ -1,9 +1,9 @@
 
-struct WorldTransform {
+struct ParticleData {
 	float32_t4x4 world;
 	float32_t4x4 worldInverseTranspose;
 };
-StructuredBuffer<WorldTransform> gWorldTransforms  : register(t0);
+StructuredBuffer<ParticleData> gParticleData  : register(t0);
 
 struct ViewProjection {
 	float32_t4x4 viewProjection;
@@ -29,9 +29,9 @@ struct VSOutput {
 
 VSOutput main(VSInput input) {
 	VSOutput output; 
-	float32_t4x4 billbordedWorld = gWorldTransforms[input.instanceId].world * gViewProjection.billBordMatrix;
+	float32_t4x4 billbordedWorld = gParticleData[input.instanceId].world * gViewProjection.billBordMatrix;
 	output.svpos = mul(float32_t4(input.pos, 1.0f), mul(billbordedWorld, gViewProjection.viewProjection));
-	output.normal = mul(input.normal, (float32_t3x3)gWorldTransforms[input.instanceId].worldInverseTranspose);
+	output.normal = mul(input.normal, (float32_t3x3)gParticleData[input.instanceId].worldInverseTranspose);
 	output.uv = input.uv;
 	return output;
 }

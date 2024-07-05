@@ -6,6 +6,7 @@ class TextureManager;
 class ModelManager;
 class SceneManager;
 class GameObjectManager;
+class LightManager;
 
 
 class MyGame : public Framework
@@ -23,5 +24,6 @@ public:
 	ModelManager* modelManager = nullptr;
 	SceneManager* sceneManager = nullptr;
 	GameObjectManager* gameObjectManager = nullptr;
+	LightManager* lightManager_ = nullptr;
 };
 

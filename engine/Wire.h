@@ -35,6 +35,7 @@ public:
 	static void Draw(const std::vector<Vector3>& vertices);
 	static void Draw(const Vector3& start, const Vector3& end);
 	static void Draw(const Skeleton& skeleton, const WorldTransform& worldTransform);
+	static void Draw(const Frustum& frustum);
 
 private: 
 	void CreatePipeline();

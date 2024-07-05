@@ -28,7 +28,7 @@ void GamePlayScene::Initialize()
 	skybox_->Initialize("box1x1Inverse.obj");
 
 	explodeParticle_ = std::make_unique<ExplodeParticle>();
-	explodeParticle_->Initialize(Vector3{ -1.0f,-1.0f,-1.0f }, Vector3{ 1.0f,1.0f,1.0f }, GameScene::pointLights);
+	explodeParticle_->Initialize(Vector3{ -1.0f,-1.0f,-1.0f }, Vector3{ 1.0f,1.0f,1.0f });
 
 	whiteParticle_ = std::make_unique<WhiteParticle>();
 	whiteParticle_->SetIsEmit(true);
@@ -44,7 +44,7 @@ void GamePlayScene::Initialize()
 	player = player_.get();
 
 	sphereLights_ = std::make_unique<SphereLights>();
-	sphereLights_->Initialize(GameScene::pointLights);
+	sphereLights_->Initialize();
 
 	GameObjectManager::GetInstance()->Load();
 	gameObjects_ = &GameObjectManager::GetInstance()->gameObjects_;

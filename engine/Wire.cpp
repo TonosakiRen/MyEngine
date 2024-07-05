@@ -188,3 +188,21 @@ void Wire::Draw(const Skeleton& skeleton,const WorldTransform& worldTransform)
         }
     }
 }
+
+void Wire::Draw(const Frustum& frustum)
+{
+    Draw(frustum.vertex[0], frustum.vertex[1]);
+    Draw(frustum.vertex[0], frustum.vertex[2]);
+    Draw(frustum.vertex[2], frustum.vertex[3]);
+    Draw(frustum.vertex[3], frustum.vertex[1]);
+
+    Draw(frustum.vertex[4], frustum.vertex[5]);
+    Draw(frustum.vertex[4], frustum.vertex[6]);
+    Draw(frustum.vertex[6], frustum.vertex[7]);
+    Draw(frustum.vertex[7], frustum.vertex[5]);
+
+    Draw(frustum.vertex[0], frustum.vertex[4]);
+    Draw(frustum.vertex[1], frustum.vertex[5]);
+    Draw(frustum.vertex[2], frustum.vertex[6]);
+    Draw(frustum.vertex[3], frustum.vertex[7]);
+}

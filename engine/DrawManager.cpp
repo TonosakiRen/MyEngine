@@ -31,6 +31,8 @@ DrawManager* DrawManager::GetInstance() {
 
 void DrawManager::Initialize(CommandContext& CommandContext)
 {
+	lightManager_ = LightManager::GetInstance();
+
 	commandContext_ = &CommandContext;
 	defaultMaterial_ = std::make_unique<Material>();
 	defaultMaterial_->Initialize();
@@ -82,7 +84,7 @@ void DrawManager::AllDraw(const ViewProjection& viewProjection)
 		call();
 	}
 
-	meshletModelPipeline_->PreDraw(*commandContext_, viewProjection);
+	meshletModelPipeline_->PreDraw(*commandContext_, viewProjection, *calling_->currentViewProjection);
 	for (auto& call : calls[kMeshletModel]) {
 		call();
 	}
@@ -113,18 +115,18 @@ void DrawManager::AllDraw(const ViewProjection& viewProjection)
 	}
 }
 
-void DrawManager::ShadowDraw(DirectionalLights& directionalLights)
+void DrawManager::ShadowDraw()
 {
-	shadowPipeline_->PreDraw(*commandContext_, directionalLights);
+	shadowPipeline_->PreDraw(*commandContext_, *lightManager_->directionalLights_);
 	for (auto& call : calls[kShadow]) {
 		call();
 	}
 }
 
-void DrawManager::ShadowSpotLightDraw(ShadowSpotLights& shadowSpotLights)
+void DrawManager::ShadowSpotLightDraw()
 {
 
-	spotLightShadowPipeline_->PreDraw(*commandContext_, shadowSpotLights);
+	spotLightShadowPipeline_->PreDraw(*commandContext_, *lightManager_->shadowSpotLights_);
 	for (auto& call : calls[kSpotLightShadow]) {
 		call();
 	}

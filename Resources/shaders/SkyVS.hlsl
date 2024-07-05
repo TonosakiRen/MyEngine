@@ -2,6 +2,7 @@
 struct WorldTransform {
 	float32_t4x4 world;
 	float32_t4x4 worldInverseTranspose;
+	float32_t scale;
 };
 ConstantBuffer<WorldTransform> gWorldTransform  : register(b0);
 
@@ -12,7 +13,6 @@ struct ViewProjection {
 	float32_t3 viewPosition;
 };
 ConstantBuffer<ViewProjection> gViewProjection  : register(b1);
-
 
 struct VSOutput {
 	float32_t4 pos : SV_POSITION0;

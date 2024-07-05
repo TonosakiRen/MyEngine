@@ -217,6 +217,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\Framework.cpp" />
     <ClCompile Include="engine\GPUResource.cpp" />
     <ClCompile Include="engine\GrayScale.cpp" />
+    <ClCompile Include="engine\LightManager.cpp" />
     <ClCompile Include="engine\LightNumBuffer.cpp" />
     <ClCompile Include="engine\GameObjectManager.cpp" />
     <ClCompile Include="engine\MeshletModel.cpp" />
@@ -328,6 +329,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\FloorRenderer.h" />
     <ClInclude Include="engine\Framework.h" />
     <ClInclude Include="engine\GrayScale.h" />
+    <ClInclude Include="engine\LightManager.h" />
     <ClInclude Include="engine\LightNumBuffer.h" />
     <ClInclude Include="engine\GameObjectManager.h" />
     <ClInclude Include="engine\MeshletModel.h" />
@@ -403,6 +405,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\WorldTransform.h" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="Resources\shaders\CullAS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Demo|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
     <FxCompile Include="Resources\shaders\EdgePS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>

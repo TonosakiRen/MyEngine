@@ -16,7 +16,7 @@ void MeshletModel::Finalize()
     pipelineState_.reset();
 }
 
-void MeshletModel::PreDraw(CommandContext& commandContext, const ViewProjection& viewProjection) {
+void MeshletModel::PreDraw(CommandContext& commandContext, const ViewProjection& viewProjection, const ViewProjection& cullingViewProjection) {
   
     commandContext.SetPipelineState(*pipelineState_);
     commandContext.SetGraphicsRootSignature(*rootSignature_);
@@ -24,15 +24,21 @@ void MeshletModel::PreDraw(CommandContext& commandContext, const ViewProjection&
     // CBVをセット（ビュープロジェクション行列）
     commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
 
+    commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kFrustum), cullingViewProjection.GetFrustumGPUVirtualAddress());
+
     commandContext.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 
 void MeshletModel::CreatePipeline() {
     HRESULT result = S_FALSE;
     ComPtr<IDxcBlob> msBlob;    
-    ComPtr<IDxcBlob> psBlob;    
+    ComPtr<IDxcBlob> psBlob;   
+    ComPtr<IDxcBlob> asBlob;
 
     auto shaderManager = ShaderManager::GetInstance();
+
+    asBlob = shaderManager->Compile(L"CullAS.hlsl", ShaderManager::kAmplification);
+    assert(asBlob != nullptr);
 
     msBlob = shaderManager->Compile(L"MeshTestMS.hlsl",ShaderManager::kMesh);
     assert(msBlob != nullptr);
@@ -46,12 +52,13 @@ void MeshletModel::CreatePipeline() {
     {
 
         // デスクリプタレンジ
-        CD3DX12_DESCRIPTOR_RANGE descRangeSRV[5];
+        CD3DX12_DESCRIPTOR_RANGE descRangeSRV[6];
         descRangeSRV[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0); 
         descRangeSRV[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1);
         descRangeSRV[2].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 2);
         descRangeSRV[3].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 3);
         descRangeSRV[4].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 4);
+        descRangeSRV[5].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 5);
 
         // ルートパラメータ
         CD3DX12_ROOT_PARAMETER rootparams[int(RootParameter::parameterNum)] = {};
@@ -60,10 +67,13 @@ void MeshletModel::CreatePipeline() {
         rootparams[int(RootParameter::kMeshlets)].InitAsDescriptorTable(1, &descRangeSRV[2], D3D12_SHADER_VISIBILITY_ALL);
         rootparams[int(RootParameter::kUniqueVertexIndices)].InitAsDescriptorTable(1, &descRangeSRV[3], D3D12_SHADER_VISIBILITY_ALL);
         rootparams[int(RootParameter::kPrimitiveIndices)].InitAsDescriptorTable(1, &descRangeSRV[4], D3D12_SHADER_VISIBILITY_ALL);
+        rootparams[int(RootParameter::kCullData)].InitAsDescriptorTable(1, &descRangeSRV[5], D3D12_SHADER_VISIBILITY_ALL);
+
 
         rootparams[int(RootParameter::kWorldTransform)].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_ALL);
         rootparams[int(RootParameter::kViewProjection)].InitAsConstantBufferView(1, 0, D3D12_SHADER_VISIBILITY_ALL);
         rootparams[int(RootParameter::kMaterial)].InitAsConstantBufferView(2, 0, D3D12_SHADER_VISIBILITY_ALL);
+        rootparams[int(RootParameter::kFrustum)].InitAsConstantBufferView(3, 0, D3D12_SHADER_VISIBILITY_ALL);
 
         // スタティックサンプラー
         CD3DX12_STATIC_SAMPLER_DESC samplerDesc =
@@ -83,6 +93,7 @@ void MeshletModel::CreatePipeline() {
 
     {
         D3DX12_MESH_SHADER_PIPELINE_STATE_DESC pipeline = {};
+        pipeline.AS = CD3DX12_SHADER_BYTECODE(asBlob->GetBufferPointer(), asBlob->GetBufferSize());
         pipeline.MS = CD3DX12_SHADER_BYTECODE(msBlob->GetBufferPointer(), msBlob->GetBufferSize());
         pipeline.PS = CD3DX12_SHADER_BYTECODE(psBlob->GetBufferPointer(), psBlob->GetBufferSize());
 

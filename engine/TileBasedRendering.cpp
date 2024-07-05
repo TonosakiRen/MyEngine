@@ -6,6 +6,7 @@
 #include "Helper.h"
 #include "CommandContext.h"
 #include "LightNumBuffer.h"
+#include "LightManager.h"
 using namespace Microsoft::WRL;
 void TileBasedRendering::Initialize()
 {
@@ -37,113 +38,7 @@ void TileBasedRendering::Initialize()
 
 }
 
-void TileBasedRendering::Update(const ViewProjection& viewProjection, const PointLights& pointLights,const SpotLights& spotLights, const ShadowSpotLights& shadowSpotLights)
-{
-
-    //初期化
-    if (viewProjection_ != &viewProjection) {
-        viewProjection_ = &viewProjection;
-        Matrix4x4 m = MakeAffineMatrix(Vector3{ 1.0f,1.0f,1.0f }, Vector3{ 0.0f,0.0f,0.0f }, Vector3{ 0.0f,0.0f,0.0f });
-        Matrix4x4 in = Inverse(m);
-        initialFrustum_ = MakeFrustrum(Inverse(in * viewProjection_->GetMatProjection()));
-        for (int i = 0; i < kTileNum; i++) {
-            int height = i / kTileWidthNum;
-            int width = i % kTileWidthNum;
-            initialTileFrustrum_[i] = GetTileFrustrum(width, height);
-        }
-
-    }
-    
-    for (int i = 0; i < kTileNum; i++) {
-        tilesInformation_[i].pointLightNum = 0;
-        tilesInformation_[i].spotLightNum = 0;
-        tilesInformation_[i].shadowSpotLightNum = 0;
-        tilesInformation_[i].pointLightIndex.clear();
-        tilesInformation_[i].spotLightIndex.clear();
-        tilesInformation_[i].shadowSpotLightIndex.clear();
-
-        tileFrustrum_[i] = initialTileFrustrum_[i] * viewProjection_->GetWorldMatrix();
-    }
-
-    for (uint32_t i = 0; i < PointLights::lightNum;i++) {
-        if (pointLights.lights_[i].isActive) {
-            for (uint32_t j = 0; j < kTileNum; j++) {
-                //pointLights.lights_[i];
-                bool isHit = IsHitSphere(tileFrustrum_[j], MakeTranslation(pointLights.lights_[i].worldTransform.matWorld_), pointLights.lights_[i].radius);
-                //当たった
-                if (isHit) {
-                    tilesInformation_[j].pointLightNum++;
-                    tilesInformation_[j].pointLightIndex.push_back(i);
-                }
-            }
-        }
-    }
-
-    for (uint32_t i = 0; i < SpotLights::lightNum; i++) {
-        if (spotLights.lights_[i].isActive) {
-            for (uint32_t j = 0; j < kTileNum; j++) {
-                //tilesInformation_[j];
-                //spotLights.lights_[i];
-                //当たった
-                if (true) {
-                    tilesInformation_[j].spotLightNum++;
-                    tilesInformation_[j].spotLightIndex.push_back(i);
-                }
-            }
-        }
-    }
-
-    for (uint32_t i = 0; i < ShadowSpotLights::lightNum; i++) {
-        if (shadowSpotLights.lights_[i].isActive) {
-            for (uint32_t j = 0; j < kTileNum; j++) {
-                //tilesInformation_[j];
-                //shadowSpotLights.lights_[i];
-                //当たった
-                if (true) {
-                    tilesInformation_[j].shadowSpotLightNum++;
-                    tilesInformation_[j].shadowSpotLightIndex.push_back(i);
-                }
-            }
-        }
-    }
-
-    //コピー
-    std::vector<ConstBufferData> bufferData;
-    bufferData.reserve(kTileNum);
-
-    uint32_t pointLightIndex[kTileNum * PointLights::lightNum ];
-    uint32_t spotLightLightIndex[kTileNum * SpotLights::lightNum ];
-    uint32_t shadowSpotLightLightIndex[kTileNum * ShadowSpotLights::lightNum];
-
-    for (uint32_t i = 0; i < kTileNum; i++) {
-        ConstBufferData data;
-      
-        data.pointLightNum = tilesInformation_[i].pointLightNum;
-        data.spotLightNum = tilesInformation_[i].spotLightNum;
-        data.shadowSpotLightNum = tilesInformation_[i].shadowSpotLightNum;
-
-        for (int j = 0; uint32_t index : tilesInformation_[i].pointLightIndex) {
-            pointLightIndex[i * PointLights::lightNum + j] = index;
-            j++;
-        }
-        for (int j = 0; uint32_t index : tilesInformation_[i].spotLightIndex) {
-            spotLightLightIndex[i * SpotLights::lightNum + j] = index;
-            j++;
-        }
-        for (int j = 0; uint32_t index : tilesInformation_[i].shadowSpotLightIndex) {
-            shadowSpotLightLightIndex[i * ShadowSpotLights::lightNum + j] = index;
-            j++;
-        }
-        bufferData.emplace_back(data);
-    }
-
-    tileInformationBuffer_.Copy(bufferData.data(), sizeof(bufferData[0]) * bufferData.size());
-    pointLightIndexBuffer_.Copy(pointLightIndex);
-    spotLightIndexBuffer_.Copy(spotLightLightIndex);
-    shadowSpotLightIndexBuffer_.Copy(shadowSpotLightLightIndex);
-}
-
-void TileBasedRendering::ComputeUpdate(CommandContext& commandContext, const ViewProjection& viewProjection, PointLights& pointLights, const SpotLights& spotLights, const ShadowSpotLights& shadowSpotLights, LightNumBuffer& lightNumBuffer)
+void TileBasedRendering::ComputeUpdate(CommandContext& commandContext, const ViewProjection& viewProjection)
 {
     //初期化
     if (viewProjection_ != &viewProjection) {
@@ -159,6 +54,7 @@ void TileBasedRendering::ComputeUpdate(CommandContext& commandContext, const Vie
         }
     }
 
+    LightManager* lightManager = LightManager::GetInstance();
 
     //dispatch
     commandContext.SetPipelineState(pipelineState_);
@@ -174,8 +70,8 @@ void TileBasedRendering::ComputeUpdate(CommandContext& commandContext, const Vie
     commandContext.SetComputeDescriptorTable(UINT(RootParameter::kSpotLightIndex), rwSpotLightIndex_.GetUAV());
     commandContext.SetComputeDescriptorTable(UINT(RootParameter::kShadowSpotLightIndex), rwShadowSpotLightIndex_.GetUAV());
     commandContext.SetComputeDescriptorTable(UINT(RootParameter::kInitialTileFrustum), initialTileFrustrumBuffer_.GetSRV(commandContext));
-    commandContext.SetComputeDescriptorTable(UINT(RootParameter::kPointLights), pointLights.structureBuffer_.GetSRV());
-    commandContext.SetComputeConstantBuffer(UINT(RootParameter::kLightNum),lightNumBuffer.GetGPUVirtualAddress());
+    commandContext.SetComputeDescriptorTable(UINT(RootParameter::kPointLights), lightManager->pointLights_->structureBuffer_.GetSRV());
+    commandContext.SetComputeConstantBuffer(UINT(RootParameter::kLightNum), lightManager->lightNumBuffer_->GetGPUVirtualAddress());
     commandContext.SetComputeConstantBuffer(UINT(RootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
 
     commandContext.Dispatch(1,1,1);
@@ -266,28 +162,4 @@ Frustum TileBasedRendering::GetTileFrustrum(const int& width, const int& height)
     result = MakeFrustum(vertex[0], vertex[1], vertex[2], vertex[3], vertex[4], vertex[5], vertex[6], vertex[7]);
 
     return result;
-}
-
-bool TileBasedRendering::IsHitSphere(const Frustum& frustum, const Vector3& position, const float radius)
-{
-    int hitNum = 0;
-    //平面の法線と内積をとる
-    for (int i = 0; i < 6; i++) {
-        //プラスであれば外側距離を測る,内側の場合マイナス
-        float a = Dot(frustum.plane[i].normal, position) - frustum.plane[i].distance;
-        if (a < 0.0f) {
-            hitNum++;
-        }
-        else {
-            if (std::abs(a) < radius) {
-                hitNum++;
-            }
-        }
-    }
-
-    if (hitNum == 6) {
-        return true;
-    }
-
-    return false;
 }

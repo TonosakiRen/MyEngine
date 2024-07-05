@@ -18,11 +18,6 @@
 #include "DrawManager.h"
 
 ViewProjection* GameScene::currentViewProjection_ = nullptr;
-DirectionalLights* GameScene::directionLights = nullptr;
-PointLights* GameScene::pointLights = nullptr;
-AreaLights* GameScene::areaLights = nullptr;
-SpotLights* GameScene::spotLights = nullptr;
-ShadowSpotLights* GameScene::shadowSpotLights = nullptr;
 
 GameScene::GameScene() {};
 
@@ -42,31 +37,7 @@ void GameScene::Initialize() {
 	camera_ = std::make_unique<Camera>();
 	camera_->Initialize(initializeCameraPos, MakeFromEulerAngle(initializeCameraRotate));
 
-	directionalLights_ = std::make_unique<DirectionalLights>();
-	directionalLights_->Initialize();
-	directionalLights_->Update();
-
-	pointLights_ = std::make_unique<PointLights>();
-	pointLights_->Initialize();
-
-	areaLights_ = std::make_unique<AreaLights>();
-	areaLights_->Initialize();
-
-	shadowSpotLights_ = std::make_unique<ShadowSpotLights>();
-	shadowSpotLights_->Initialize();
-	shadowSpotLights_->Update();
-
-	spotLights_ = std::make_unique<SpotLights>();
-	spotLights_->Initialize();
-	spotLights_->Update();
-
-	currentViewProjection_ = debugCamera_.get();
-	directionLights = directionalLights_.get();
-	pointLights = pointLights_.get();
-	areaLights = areaLights_.get();
-	spotLights = spotLights_.get();
-	shadowSpotLights = shadowSpotLights_.get();
-
+	
 	compute_ = std::make_unique<Compute>();
 	compute_->Initialize();
 
@@ -75,6 +46,8 @@ void GameScene::Initialize() {
 	sceneManager_->SetNextScene(scene);
 
 	DrawManager::GetInstance()->SetCallingViewProjection(*camera_);
+	lightManager_ = LightManager::GetInstance();
+	lightManager_->Initialize();
 }
 
 void GameScene::Update(CommandContext& commandContext){
@@ -95,64 +68,47 @@ void GameScene::Update(CommandContext& commandContext){
 		}
 		else {
 			currentViewProjection_ = camera_.get();
+		}
 			if (GamePlayScene::player) {
 				camera_->Update(MakeTranslation(GamePlayScene::player->GetWorldTransform().matWorld_));
 			}
 			else {
 				camera_->Update();
 			}
-		}
 
-
+		camera_->Draw();
 
 		
 		// light
 #ifdef USE_IMGUI
 		ImGui::Begin("Game");
 		if (ImGui::BeginMenu("DirectionalLight")) {
-			ImGui::DragFloat3("lightDirection", &directionalLights_->lights_[0].direction.x, 0.01f);
-			ImGui::DragFloat3("lightPosition", &directionalLights_->lights_[0].position.x, 1.0f);
-			ImGui::DragFloat4("lightColor", &directionalLights_->lights_[0].color.x, 1.0f, 0.0f, 255.0f);
-			ImGui::DragFloat("intensity", &directionalLights_->lights_[0].intensity, 0.01f, 0.0f);
+			ImGui::DragFloat3("lightDirection", &lightManager_->directionalLights_->lights_[0].direction.x, 0.01f);
+			ImGui::DragFloat3("lightPosition", &lightManager_->directionalLights_->lights_[0].position.x, 1.0f);
+			ImGui::DragFloat4("lightColor", &lightManager_->directionalLights_->lights_[0].color.x, 1.0f, 0.0f, 255.0f);
+			ImGui::DragFloat("intensity", &lightManager_->directionalLights_->lights_[0].intensity, 0.01f, 0.0f);
 			ImGui::EndMenu();
 		}
 #endif
-		directionalLights_->lights_[0].direction = Normalize(directionalLights_->lights_[0].direction);
-		directionalLights_->Update();
+		lightManager_->directionalLights_->lights_[0].direction = Normalize(lightManager_->directionalLights_->lights_[0].direction);
 
 #ifdef USE_IMGUI
-		if (ImGui::BeginMenu("spotLight")) {
-			ImGui::DragFloat3("lightPosition", &spotLights_->lights_[0].worldTransform.translation_.x, 0.01f);
-			ImGui::DragFloat3("lightColor", &spotLights_->lights_[0].color.x, 1.0f, 0.0f, 255.0f);
-			ImGui::DragFloat("intensity", &spotLights_->lights_[0].intensity, 0.01f, 0.0f);
-			ImGui::DragFloat3("direction", &spotLights_->lights_[0].direction.x, 0.01f, 0.0f);
-			ImGui::DragFloat("distance", &spotLights_->lights_[0].distance, 0.01f, 0.0f);
-			ImGui::DragFloat("decay", &spotLights_->lights_[0].decay, 0.01f, 0.0f);
-			ImGui::DragFloat("cosAngle", &spotLights_->lights_[0].cosAngle, Radian(1.0f), 0.0f, Radian(179.0f));
-			ImGui::EndMenu();
-		};
-
 		if (ImGui::BeginMenu("areaLights")) {
-			ImGui::DragFloat3("origin", &areaLights->lights_[0].segment.origin.x);
-			ImGui::DragFloat3("diff", &areaLights->lights_[0].segment.diff.x);
-			ImGui::DragFloat3("lightColor", &areaLights->lights_[0].color.x, 1.0f, 0.0f, 255.0f);
-			ImGui::DragFloat("intensity", &areaLights->lights_[0].intensity, 0.01f, 0.0f);
-			ImGui::DragFloat("range", &areaLights->lights_[0].range, 0.01f, 0.0f);
-			ImGui::DragFloat("decay", &areaLights->lights_[0].decay, 0.01f, 0.0f);
+			ImGui::DragFloat3("origin", &lightManager_->areaLights_->lights_[0].segment.origin.x);
+			ImGui::DragFloat3("diff", &lightManager_->areaLights_->lights_[0].segment.diff.x);
+			ImGui::DragFloat3("lightColor", &lightManager_->areaLights_->lights_[0].color.x, 1.0f, 0.0f, 255.0f);
+			ImGui::DragFloat("intensity", &lightManager_->areaLights_->lights_[0].intensity, 0.01f, 0.0f);
+			ImGui::DragFloat("range", &lightManager_->areaLights_->lights_[0].range, 0.01f, 0.0f);
+			ImGui::DragFloat("decay", &lightManager_->areaLights_->lights_[0].decay, 0.01f, 0.0f);
 			ImGui::EndMenu();
 		};
 		ImGui::End();
 
-		areaLights_->Update();
-
 #endif
-		areaLights_->Update();
-		spotLights_->lights_[0].direction = Normalize(spotLights_->lights_[0].direction);
-		spotLights_->Update();
 	}	
 
 	sceneManager_->Update();
-		
+	lightManager_->Update();
 
 	//コンピュートシェーダテスト
 	{

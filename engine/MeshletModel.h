@@ -26,9 +26,11 @@ public:
 		kMeshlets,
 		kUniqueVertexIndices,
 		kPrimitiveIndices,
+		kCullData,
 
 		kWorldTransform, 
 		kViewProjection, 
+		kFrustum,
 		kMaterial,
 
 		parameterNum
@@ -36,7 +38,7 @@ public:
 
 	void Initialize();
 	void Finalize();
-	void PreDraw(CommandContext& commandContext, const ViewProjection& viewProjection);
+	void PreDraw(CommandContext& commandContext, const ViewProjection& viewProjection , const ViewProjection& cullingViewProjection);
 
 	void Draw(CommandContext& commandContext, uint32_t modelHandle, const WorldTransform& worldTransform, const Material& material,const uint32_t textureHandle = 0);
 	void Draw(CommandContext& commandContext, uint32_t modelHandle, const WorldTransform& worldTransform, SkinCluster& skinCluster, const Material& material, const uint32_t textureHandle = 0);

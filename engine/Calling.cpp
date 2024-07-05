@@ -17,21 +17,11 @@ bool Calling::isDraw(const uint32_t modelHandle,const WorldTransform& worldTrans
 {
 	Sphere sphere = modelManager->GetModelSphere(modelHandle);
 	sphere.center += MakeTranslation(worldTransform.matWorld_);
-	Vector3 scale = MakeScale(worldTransform.matWorld_);
-	float maxScale = scale.x;
-	if (scale.y > maxScale) {
-		if (scale.z > scale.y) {
-			maxScale = scale.z;
-		}
-		else {
-			maxScale = scale.y;
-		}
-	}
-	sphere.radius *= maxScale;
+	sphere.radius *= worldTransform.maxScale_;
 
 	Frustum frustum = currentViewProjection->GetWorldFrustum();
 
-	return(isFrustumSphereCollision(frustum,sphere));
+	return(IsFrustumSphereCollision(frustum,sphere));
 }
 
 uint32_t Calling::GetTileIndex()
@@ -39,7 +29,7 @@ uint32_t Calling::GetTileIndex()
 	return 0;
 }
 
-bool Calling::isFrustumSphereCollision(const Frustum& frustum, const Sphere& sphere)
+bool Calling::IsFrustumSphereCollision(const Frustum& frustum, const Sphere& sphere)
 {
 	//平面の法線と内積をとる
 	for (uint32_t i = 0; i < 6; i++) {

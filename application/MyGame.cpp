@@ -7,6 +7,7 @@
 #include "ShaderManager.h"
 #include "Renderer.h"
 #include "GameObjectManager.h"
+#include "LightManager.h"
 
 
 void MyGame::Initialize()
@@ -24,6 +25,9 @@ void MyGame::Initialize()
 	modelManager->Initialize(renderer->GetCommandContext());
 	modelManager->Load("box1x1.obj");
 
+	lightManager_ = LightManager::GetInstance();
+	lightManager_->Initialize();
+
 	sceneManager = SceneManager::GetInstance();
 
 	gameObjectManager = GameObjectManager::GetInstance();
@@ -40,6 +44,7 @@ void MyGame::Finalize()
 	sceneManager->Finalize();
 	modelManager->Finalize();
 	textureManager->Finalize();
+	lightManager_->Finalize();
 	gameObjectManager->Finalize();
 
 	delete gameScene;
@@ -61,7 +66,7 @@ void MyGame::Update()
 
 	// ゲームシーンの毎フレーム処理
 	gameScene->Update(renderer->GetCommandContext());
-	
+	lightManager_->Update();
 	if (sceneManager->GetNextScene()) {
 		renderer->StartTransition();
 	};
@@ -74,13 +79,13 @@ void MyGame::Draw()
 
 	gameScene->Draw();
 
-	renderer->ShadowMapRender(gameScene->GetDirectionalLights());
+	renderer->ShadowMapRender();
 
-	renderer->SpotLightShadowMapRender(gameScene->GetShadowSpotLights());
+	renderer->SpotLightShadowMapRender();
 
 	renderer->MainRender(gameScene->GetViewProjection());
 
-	renderer->DeferredRender(gameScene->GetViewProjection(), gameScene->GetDirectionalLights(), gameScene->GetPointLights(), gameScene->GetAreaLights(), gameScene->GetSpotLights(), gameScene->GetShadowSpotLights());
+	renderer->DeferredRender(gameScene->GetViewProjection());
 
 	renderer->UIRender();
 

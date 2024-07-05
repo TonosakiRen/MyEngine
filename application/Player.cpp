@@ -81,7 +81,7 @@ void Player::Update(const ViewProjection& viewProjection)
 	ImGui::End();
 #endif
 
-	//fireParticle_->Update();
+	fireParticle_->Update();
 
 	//collider_.AdjustmentScale();
 	worldTransform_.Update();
