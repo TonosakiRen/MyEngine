@@ -43,9 +43,7 @@ void TileBasedRendering::ComputeUpdate(CommandContext& commandContext, const Vie
     //初期化
     if (viewProjection_ != &viewProjection) {
         viewProjection_ = &viewProjection;
-        Matrix4x4 m = MakeAffineMatrix(Vector3{ 1.0f,1.0f,1.0f }, Vector3{ 0.0f,0.0f,0.0f }, Vector3{ 0.0f,0.0f,0.0f });
-        Matrix4x4 in = Inverse(m);
-        initialFrustum_ = MakeFrustrum(Inverse(in * viewProjection_->GetMatProjection()));
+        initialFrustum_ = viewProjection_->GetFrustum();
         for (int i = 0; i < kTileNum; i++) {
             int height = i / kTileWidthNum;
             int width = i % kTileWidthNum;

@@ -58,7 +58,7 @@ public:
 	}
 
 	const Frustum GetWorldFrustum() const {
-		return frustum_;
+		return worldFrustum_;
 	}
 
 	const Quaternion GetQuaternion() const {
