@@ -1,6 +1,12 @@
 
 #define MY_TEXTURE2D_SPACE space1
 
+#define PointLightNum 256
+#define SpotLightNum 1
+#define ShadowSpotLightNum 1
+#define AreaLightNum 1
+#define DirectionalLightNum 1
+
 struct VSOutput {
 	float32_t4  svpos : SV_POSITION;
 	float32_t2  uv : TEXCOORD;
@@ -79,28 +85,18 @@ struct ShadowSpotLight {
 };
 StructuredBuffer<ShadowSpotLight> gShadowSpotLights  : register(t8);
 
-struct LightNum {
-	uint32_t  directionalLight;
-	uint32_t  pointLight;
-	uint32_t  areaLight;
-	uint32_t  spotLight;
-	uint32_t  shadowSpotLight;
-};
-
-ConstantBuffer<LightNum> lightNum : register(b1);
-
-struct TBRInformation {
+struct TileInformation {
 	uint32_t pointLightNum;
 	uint32_t spotLightNum;
 	uint32_t shadowSpotLightNum;
+
+	uint32_t pointLightIndex[PointLightNum];
+	uint32_t spotLightIndex[SpotLightNum];
+	uint32_t shadowSpotLightIndex[ShadowSpotLightNum];
 };
-RWStructuredBuffer<TBRInformation> gTBRInformation  : register(u0);
+RWStructuredBuffer<TileInformation> gTileInformation  : register(u0);
 
-RWStructuredBuffer<uint32_t> gTBRPointLightIndex  : register(u1);
-RWStructuredBuffer<uint32_t> gTBRSpotLightIndex  : register(u2);
-RWStructuredBuffer<uint32_t> gTBRShadowSpotLightIndex  : register(u3);
-
-ConstantBuffer<Param> tileNum : register(b2);
+ConstantBuffer<Param> tileNum : register(b1);
 
 
 float3 GetWorldPosition(in float2 texcoord, in float depth, in float4x4 viewProjectionInverseMatrix) {
@@ -156,125 +152,119 @@ float4 main(VSOutput input) : SV_TARGET
 
 		uint32_t tileNumber = tile.y * tileNum.param.x + tile.x;
 
-		TBRInformation tileInformation = gTBRInformation[tileNumber];
-
-		uint32_t startPointLightIndex = lightNum.pointLight * tileNumber;
+		TileInformation tileInformation = gTileInformation[tileNumber];
 
 		float32_t3 viewDirection = normalize(gViewProjection.viewPosition - worldPos);
 
-		for (int i = 0; i < tileInformation.pointLightNum; i++) {
+		//for (int i = 0; i < tileInformation.pointLightNum; i++) {
 
-			int index = gTBRPointLightIndex[startPointLightIndex + i];
+		//	int index = tileInformation.pointLightIndex[i];
 
-			float32_t3 pointLightDirection = worldPos - gPointLights[index].position;
-			float32_t distance = length(pointLightDirection);
-			pointLightDirection = pointLightDirection / distance;
-			float32_t factor = pow(saturate(-distance / gPointLights[index].radius + 1.0), gPointLights[index].decay);
+		//	float32_t3 pointLightDirection = worldPos - gPointLights[index].position;
+		//	float32_t distance = length(pointLightDirection);
+		//	pointLightDirection = pointLightDirection / distance;
+		//	float32_t factor = pow(saturate(-distance / gPointLights[index].radius + 1.0), gPointLights[index].decay);
 
-			//pointLightDiffuse
-			float32_t NdotL = dot(normal, -pointLightDirection);
-			float32_t cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
-			float32_t3 pointLightdiffuse = gPointLights[index].color.xyz * cos * gPointLights[index].intensity * factor;
+		//	//pointLightDiffuse
+		//	float32_t NdotL = dot(normal, -pointLightDirection);
+		//	float32_t cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
+		//	float32_t3 pointLightdiffuse = gPointLights[index].color.xyz * cos * gPointLights[index].intensity * factor;
 
-			//pointLightSpecular
-			float32_t3 reflectVec = reflect(pointLightDirection, normal);
-			float32_t specluerPower = 10.0f;
-			float32_t RdotE = dot(reflectVec, viewDirection);
-			float32_t specularPow = pow(saturate(RdotE), specluerPower);
-			float32_t3 pointLightSpecluer = gPointLights[index].color.xyz * gPointLights[index].intensity * specularPow * factor;
+		//	//pointLightSpecular
+		//	float32_t3 reflectVec = reflect(pointLightDirection, normal);
+		//	float32_t specluerPower = 10.0f;
+		//	float32_t RdotE = dot(reflectVec, viewDirection);
+		//	float32_t specularPow = pow(saturate(RdotE), specluerPower);
+		//	float32_t3 pointLightSpecluer = gPointLights[index].color.xyz * gPointLights[index].intensity * specularPow * factor;
 
-			lighting += (pointLightdiffuse + pointLightSpecluer);
-		}
+		//	lighting += (pointLightdiffuse + pointLightSpecluer);
+		//}
 
-		//spotLight
+		////spotLight
 
-		uint32_t startSpotLightIndex = lightNum.spotLight * tileNumber;
+		//for (int j = 0; j < tileInformation.spotLightNum; j++) {
 
-		for (int j = 0; j < tileInformation.spotLightNum; j++) {
+		//	int index = tileInformation.spotLightIndex[j];
 
-			int index = gTBRSpotLightIndex[startSpotLightIndex + j];
-
-			float32_t3 spotLightDirectionOnSurface = normalize(worldPos - gSpotLights[index].position);
-			float32_t distance = length(gSpotLights[index].position - worldPos);
-			float32_t factor = pow(saturate(-distance / gSpotLights[index].distance + 1.0), gSpotLights[index].decay);
-			float32_t cosAngle = dot(spotLightDirectionOnSurface, gSpotLights[index].direction);
-			float32_t falloffFactor = saturate((cosAngle - gSpotLights[index].cosAngle) / (1.0f - gSpotLights[index].cosAngle));
+		//	float32_t3 spotLightDirectionOnSurface = normalize(worldPos - gSpotLights[index].position);
+		//	float32_t distance = length(gSpotLights[index].position - worldPos);
+		//	float32_t factor = pow(saturate(-distance / gSpotLights[index].distance + 1.0), gSpotLights[index].decay);
+		//	float32_t cosAngle = dot(spotLightDirectionOnSurface, gSpotLights[index].direction);
+		//	float32_t falloffFactor = saturate((cosAngle - gSpotLights[index].cosAngle) / (1.0f - gSpotLights[index].cosAngle));
 
 
-			//spotLightDiffuse
-			float32_t NdotL = dot(normal, -spotLightDirectionOnSurface);
-			float32_t cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
-			float32_t3 spotLightdiffuse = gSpotLights[index].color.xyz * cos * gSpotLights[index].intensity * factor * falloffFactor;
+		//	//spotLightDiffuse
+		//	float32_t NdotL = dot(normal, -spotLightDirectionOnSurface);
+		//	float32_t cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
+		//	float32_t3 spotLightdiffuse = gSpotLights[index].color.xyz * cos * gSpotLights[index].intensity * factor * falloffFactor;
 
 
-			//spotLightSpecular
+		//	//spotLightSpecular
 
-			float32_t3 reflectVec = reflect(spotLightDirectionOnSurface, normal);
-			float32_t specluerPower = 10.0f;
-			float32_t RdotE = dot(reflectVec, viewDirection);
-			float32_t specularPow = pow(saturate(RdotE), specluerPower);
-			float32_t3 spotLightSpecluer = gSpotLights[index].color.xyz * gSpotLights[index].intensity * specularPow * factor * falloffFactor;
+		//	float32_t3 reflectVec = reflect(spotLightDirectionOnSurface, normal);
+		//	float32_t specluerPower = 10.0f;
+		//	float32_t RdotE = dot(reflectVec, viewDirection);
+		//	float32_t specularPow = pow(saturate(RdotE), specluerPower);
+		//	float32_t3 spotLightSpecluer = gSpotLights[index].color.xyz * gSpotLights[index].intensity * specularPow * factor * falloffFactor;
 
-			lighting += (spotLightdiffuse + spotLightSpecluer);
+		//	lighting += (spotLightdiffuse + spotLightSpecluer);
 
-		}
+		//}
 
-		//shadowSpotLight
+		////shadowSpotLight
 
-		uint32_t startShadowSpotLightIndex = lightNum.shadowSpotLight * tileNumber;
+		//for (int l = 0; l < tileInformation.shadowSpotLightNum; l++) {
 
-		for (int l = 0; l < tileInformation.shadowSpotLightNum; l++) {
+		//	int index = tileInformation.shadowSpotLightIndex[l];
 
-			int index = gTBRShadowSpotLightIndex[startShadowSpotLightIndex + l];
-
-			float32_t3 spotLightDirectionOnSurface = normalize(worldPos - gViewProjection.viewPosition);
-			float32_t distance = length(gShadowSpotLights[index].position - worldPos);
-			float32_t factor = pow(saturate(-distance / gShadowSpotLights[index].distance + 1.0), gShadowSpotLights[index].decay);
-			float32_t cosAngle = dot(spotLightDirectionOnSurface, gShadowSpotLights[index].direction);
-			float32_t falloffFactor = saturate((cosAngle - gShadowSpotLights[index].cosAngle) / (1.0f - gShadowSpotLights[index].cosAngle));
+		//	float32_t3 spotLightDirectionOnSurface = normalize(worldPos - gViewProjection.viewPosition);
+		//	float32_t distance = length(gShadowSpotLights[index].position - worldPos);
+		//	float32_t factor = pow(saturate(-distance / gShadowSpotLights[index].distance + 1.0), gShadowSpotLights[index].decay);
+		//	float32_t cosAngle = dot(spotLightDirectionOnSurface, gShadowSpotLights[index].direction);
+		//	float32_t falloffFactor = saturate((cosAngle - gShadowSpotLights[index].cosAngle) / (1.0f - gShadowSpotLights[index].cosAngle));
 
 
-			//spotLightDiffuse
-			float32_t NdotL = dot(normal, -spotLightDirectionOnSurface);
-			float32_t cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
-			float32_t3 spotLightdiffuse = gShadowSpotLights[index].color.xyz * cos * gShadowSpotLights[index].intensity * factor * falloffFactor;
+		//	//spotLightDiffuse
+		//	float32_t NdotL = dot(normal, -spotLightDirectionOnSurface);
+		//	float32_t cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
+		//	float32_t3 spotLightdiffuse = gShadowSpotLights[index].color.xyz * cos * gShadowSpotLights[index].intensity * factor * falloffFactor;
 
 
-			//spotLightSpecular
+		//	//spotLightSpecular
 
-			float32_t3 reflectVec = reflect(spotLightDirectionOnSurface, normal);
-			float32_t specluerPower = 10.0f;
-			float32_t RdotE = dot(reflectVec, viewDirection);
-			float32_t specularPow = pow(saturate(RdotE), specluerPower);
-			float32_t3 spotLightSpecluer = gShadowSpotLights[index].color.xyz * gShadowSpotLights[index].intensity * specularPow * factor * falloffFactor;
+		//	float32_t3 reflectVec = reflect(spotLightDirectionOnSurface, normal);
+		//	float32_t specluerPower = 10.0f;
+		//	float32_t RdotE = dot(reflectVec, viewDirection);
+		//	float32_t specularPow = pow(saturate(RdotE), specluerPower);
+		//	float32_t3 spotLightSpecluer = gShadowSpotLights[index].color.xyz * gShadowSpotLights[index].intensity * specularPow * factor * falloffFactor;
 
-			lighting += (spotLightdiffuse + spotLightSpecluer);
+		//	lighting += (spotLightdiffuse + spotLightSpecluer);
 
-			//影
-			float32_t4 wp = float4(worldPos.xyz, 1.0f);
-			float32_t4 lightViewPosition = mul(wp, gShadowSpotLights[index].viewProjection);
-			float32_t2 shadowMapUV = lightViewPosition.xy / lightViewPosition.w;
-			shadowMapUV *= float32_t2(0.5f, -0.5f);
-			shadowMapUV += 0.5f;
+		//	//影
+		//	float32_t4 wp = float4(worldPos.xyz, 1.0f);
+		//	float32_t4 lightViewPosition = mul(wp, gShadowSpotLights[index].viewProjection);
+		//	float32_t2 shadowMapUV = lightViewPosition.xy / lightViewPosition.w;
+		//	shadowMapUV *= float32_t2(0.5f, -0.5f);
+		//	shadowMapUV += 0.5f;
 
-			/*if (lightViewPosition.z > 0.0f) {
-				float32_t zInLVP = lightViewPosition.z / lightViewPosition.w;
+		//	/*if (lightViewPosition.z > 0.0f) {
+		//		float32_t zInLVP = lightViewPosition.z / lightViewPosition.w;
 
-				if (shadowMapUV.x > 0.0f && shadowMapUV.x < 1.0f
-					&& shadowMapUV.y > 0.0f && shadowMapUV.y < 1.0f
-					) {
-					float32_t zInShadowMap = Texture2DTable[gShadowSpotLights[index].descriptorIndex].Sample(smp, shadowMapUV).r;
-					if (zInShadowMap != 1.0f) {
-						if (zInLVP - 0.00001 > zInShadowMap) {
-							shading *= 0.5f;
-						}
-					}
-				}
-			}*/
+		//		if (shadowMapUV.x > 0.0f && shadowMapUV.x < 1.0f
+		//			&& shadowMapUV.y > 0.0f && shadowMapUV.y < 1.0f
+		//			) {
+		//			float32_t zInShadowMap = Texture2DTable[gShadowSpotLights[index].descriptorIndex].Sample(smp, shadowMapUV).r;
+		//			if (zInShadowMap != 1.0f) {
+		//				if (zInLVP - 0.00001 > zInShadowMap) {
+		//					shading *= 0.5f;
+		//				}
+		//			}
+		//		}
+		//	}*/
 
-		}
+		//}
 
-		for (int k = 0; k < lightNum.directionalLight; k++) {
+		for (int k = 0; k < DirectionalLightNum; k++) {
 
 			//directionalLightDiffuse
 			float32_t NdotL = dot(normal, -gDirectionLights[k].direction);
@@ -310,7 +300,7 @@ float4 main(VSOutput input) : SV_TARGET
 
 		}
 
-		for (int m = 0; m < lightNum.areaLight; m++) {
+		for (int m = 0; m < AreaLightNum; m++) {
 
 			float32_t segLen = length(gAreaLights[m].diff);
 			float32_t3 segDir = gAreaLights[m].diff * (1.0f / segLen);

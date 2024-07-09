@@ -30,14 +30,8 @@ public:
 
 		k2DTextures,
 
-		kLightNum,
-
 		kTBRInformation,
 		kTileNum,
-
-		kTBRPointLightIndex,
-		kTBRSpotLightIndex,
-		kTBRShadowSpotLightIndex,
 
 		ParameterNum
 	};

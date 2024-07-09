@@ -21,6 +21,10 @@ void PixelBuffer::CreateTextureResource(const std::wstring& name, const D3D12_RE
 
     state_ = D3D12_RESOURCE_STATE_COMMON;
 
+#ifdef _DEBUG
+    resource_->SetName(name.c_str());
+    name_ = name;
+#endif // _DEBUG
 }
 
 void PixelBuffer::AssociateWithResource(const std::wstring& name, ID3D12Resource* resource, D3D12_RESOURCE_STATES state) {
@@ -34,6 +38,10 @@ void PixelBuffer::AssociateWithResource(const std::wstring& name, ID3D12Resource
     height_ = desc.Height;
     arraySize_ = desc.DepthOrArraySize;
     format_ = desc.Format;
+#ifdef _DEBUG
+    resource_->SetName(name.c_str());
+    name_ = name;
+#endif // _DEBUG
 }
 
 D3D12_RESOURCE_DESC PixelBuffer::DescribeTex2D(

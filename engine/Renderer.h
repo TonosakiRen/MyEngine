@@ -28,10 +28,15 @@ class Renderer
 {
 public:
 
+    static bool isForwardRendering;
+
     enum RenderTargetType {
         kColor,
         kNormal,
-        kMaterial,
+
+        kFRenderTargetNum,
+
+        kMaterial = 2,
 
         kRenderTargetNum
     };
@@ -62,7 +67,7 @@ public:
         return transition_->GetIsNextScene();
     }
 
-    DXGI_FORMAT GetRTVFormat(RenderTargetType rtvType) { return colorBuffers_[rtvType]->GetFormat(); }
+    DXGI_FORMAT GetRTVFormat(RenderTargetType rtvType) { return colorBuffers_[static_cast<uint32_t>(rtvType)]->GetFormat(); }
     DXGI_FORMAT GetDSVFormat() { return mainDepthBuffer_->GetFormat(); }
 
     void ClearMainDepthBuffer() { commandContext_.ClearDepth(*mainDepthBuffer_); }
@@ -79,7 +84,7 @@ private:
     std::unique_ptr<SwapChain> swapChain_;
     CommandContext commandContext_;
 
-    std::unique_ptr<ColorBuffer> colorBuffers_[kRenderTargetNum];
+    std::unique_ptr<ColorBuffer> colorBuffers_[static_cast<int>(RenderTargetType::kRenderTargetNum)];
     std::unique_ptr<DepthBuffer> mainDepthBuffer_;
 
     std::unique_ptr<ColorBuffer> resultBuffer_;

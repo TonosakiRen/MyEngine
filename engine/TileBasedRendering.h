@@ -9,7 +9,9 @@
 #include "RwStructuredBuffer.h"
 #include "WinApp.h"
 #include "ViewProjection.h"
-class LightNumBuffer;
+
+#include "LightManager.h"
+
 class TileBasedRendering
 {
 public:
@@ -26,16 +28,15 @@ public:
 		uint32_t pointLightNum = 0;
 		uint32_t spotLightNum = 0;
 		uint32_t shadowSpotLightNum = 0;
+		uint32_t pointLightIndex[PointLights::lightNum];
+		uint32_t spotLightIndex[SpotLights::lightNum];
+		uint32_t shadowSpotLightIndex[ShadowSpotLights::lightNum];
 	};
 
 	enum class RootParameter {
 		kTileInformation,
-		kPointLightIndex,
-		kSpotLightIndex,
-		kShadowSpotLightIndex,
 		kInitialTileFrustum,
 		kPointLights,
-		kLightNum,
 		kViewProjection,
 		ParameterNum
 	};
@@ -67,26 +68,10 @@ public:
 	Frustum tileFrustrum_[kTileNum];
 
 	const ViewProjection* viewProjection_ = nullptr;
-
-	DefaultStructuredBuffer tileInformationBuffer_;
-
-	DefaultStructuredBuffer pointLightIndexBuffer_;
-
-	StructuredBuffer spotLightIndexBuffer_;
-
-	StructuredBuffer shadowSpotLightIndexBuffer_;
-
-
 	
 	DefaultStructuredBuffer initialTileFrustrumBuffer_;
 
 	RwStructuredBuffer rwTilesInformation_;
-
-	RwStructuredBuffer rwPointLightIndex_;
-
-	RwStructuredBuffer rwSpotLightIndex_;
-
-	RwStructuredBuffer rwShadowSpotLightIndex_;
 
 };
 

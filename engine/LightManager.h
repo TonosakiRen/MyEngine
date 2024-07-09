@@ -4,7 +4,6 @@
 #include <memory>
 #include "AreaLights.h"
 #include "DirectionalLights.h"
-#include "LightNumBuffer.h"
 #include "PointLights.h"
 #include "ShadowSpotLights.h"
 #include "SpotLights.h"
@@ -20,7 +19,6 @@ public:
 
 	std::unique_ptr<AreaLights> areaLights_;
 	std::unique_ptr<DirectionalLights> directionalLights_;
-	std::unique_ptr<LightNumBuffer> lightNumBuffer_;
 	std::unique_ptr<PointLights> pointLights_;
 	std::unique_ptr<ShadowSpotLights> shadowSpotLights_;
 	std::unique_ptr<SpotLights> spotLights_;

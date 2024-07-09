@@ -38,9 +38,12 @@ public:
 
 private: 
 	void CreatePipeline();
-
+	void CreateForwardPipeline();
 private:
 	std::unique_ptr<RootSignature> rootSignature_;
 	std::unique_ptr<PipelineState> pipelineState_;
+
+	std::unique_ptr<RootSignature> fRootSignature_;
+	std::unique_ptr<PipelineState> fPipelineState_;
 };
 

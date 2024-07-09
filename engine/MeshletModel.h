@@ -44,9 +44,12 @@ public:
 	void Draw(CommandContext& commandContext, uint32_t modelHandle, const WorldTransform& worldTransform, SkinCluster& skinCluster, const Material& material, const uint32_t textureHandle = 0);
 private: 
 	void CreatePipeline();
-
+	void CreateForwardPipeline();
 private:
 	std::unique_ptr<RootSignature> rootSignature_;
 	std::unique_ptr<PipelineState> pipelineState_;
+
+	std::unique_ptr<RootSignature> fRootSignature_;
+	std::unique_ptr<PipelineState> fPipelineState_;
 };
 

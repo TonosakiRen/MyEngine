@@ -11,7 +11,6 @@ void LightManager::Finalize()
 {
 	areaLights_.reset();
 	directionalLights_.reset();
-	lightNumBuffer_.reset();
 	pointLights_.reset();
 	shadowSpotLights_.reset();
 	spotLights_.reset();
@@ -23,8 +22,6 @@ void LightManager::Initialize()
 	areaLights_->Initialize();
 	directionalLights_ = std::make_unique<DirectionalLights>();
 	directionalLights_->Initialize();
-	lightNumBuffer_ = std::make_unique<LightNumBuffer>();
-	lightNumBuffer_->Initialize();
 	pointLights_ = std::make_unique<PointLights>();
 	pointLights_->Initialize();
 	shadowSpotLights_ = std::make_unique<ShadowSpotLights>();

@@ -52,15 +52,10 @@ void DeferredRenderer::Render(CommandContext& commandContext, ColorBuffer* origi
 	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::k2DTextures), DirectXCommon::GetInstance()->GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV).GetDiscriptorStartHandle());
 
 	commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
-	commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kLightNum), lightManager->lightNumBuffer_->GetGPUVirtualAddress());
 
 
 	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kTBRInformation), tileBasedRendering.rwTilesInformation_.GetUAV());
 	commandContext.SetConstants(static_cast<UINT>(RootParameter::kTileNum),TileBasedRendering::kTileWidthNum, TileBasedRendering::kTileHeightNum);
-
-	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kTBRPointLightIndex), tileBasedRendering.rwPointLightIndex_.GetUAV());
-	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kTBRSpotLightIndex), tileBasedRendering.rwSpotLightIndex_.GetUAV());
-	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kTBRShadowSpotLightIndex), tileBasedRendering.rwShadowSpotLightIndex_.GetUAV());
 
 	commandContext.DrawInstanced(3, 1, 0, 0);
 }
@@ -96,10 +91,6 @@ void DeferredRenderer::CreatePipeline()
 
 		ranges[10].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 0);
 
-		ranges[11].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 1);
-		ranges[12].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 2);
-		ranges[13].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 3);
-
 		CD3DX12_ROOT_PARAMETER rootParameters[(int)RootParameter::ParameterNum]{};
 		rootParameters[(int)RootParameter::kColorTexture].InitAsDescriptorTable(1, &ranges[(int)RootParameter::kColorTexture]);
 		rootParameters[(int)RootParameter::kNormalTexture].InitAsDescriptorTable(1, &ranges[(int)RootParameter::kNormalTexture]);
@@ -115,14 +106,8 @@ void DeferredRenderer::CreatePipeline()
 
 		rootParameters[(int)RootParameter::k2DTextures].InitAsDescriptorTable(1, &ranges[9]);
 
-		rootParameters[(int)RootParameter::kLightNum].InitAsConstantBufferView(1, 0, D3D12_SHADER_VISIBILITY_ALL);
-
 		rootParameters[(int)RootParameter::kTBRInformation].InitAsDescriptorTable(1, &ranges[10]);
-		rootParameters[(int)RootParameter::kTileNum].InitAsConstants(2, 2);
-
-		rootParameters[(int)RootParameter::kTBRPointLightIndex].InitAsDescriptorTable(1, &ranges[11]);
-		rootParameters[(int)RootParameter::kTBRSpotLightIndex].InitAsDescriptorTable(1, &ranges[12]);
-		rootParameters[(int)RootParameter::kTBRShadowSpotLightIndex].InitAsDescriptorTable(1, &ranges[13]);
+		rootParameters[(int)RootParameter::kTileNum].InitAsConstants(2, 1);
 
 
 		// スタティックサンプラー

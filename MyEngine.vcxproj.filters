@@ -107,6 +107,27 @@
     <Filter Include="Engine\GameObjectManager">
       <UniqueIdentifier>{00d6d0a4-5148-4aa1-90a0-cc8392bce01a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine\Wire">
+      <UniqueIdentifier>{b8116e94-7d79-464a-ad71-8c7503e2fb35}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Mesh">
+      <UniqueIdentifier>{f818dff0-656e-45f0-9f8e-f479f1eaac69}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shaders\F+">
+      <UniqueIdentifier>{d4cb5cdf-fbd4-45fc-8af5-3930ef25126c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shaders\PostEffect">
+      <UniqueIdentifier>{e47ecd7f-e5a9-461f-ac06-1f184710c405}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shaders\Transition">
+      <UniqueIdentifier>{8bcd18f6-0501-49d4-92ef-603e62fa05c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shaders\Compute">
+      <UniqueIdentifier>{4c86af85-f1e3-4f9b-8085-7aec3f9fd0dc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\DeferredRendering">
+      <UniqueIdentifier>{b2d9e214-8644-45e9-8e6c-fe2b386b8f83}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="externals\imgui\imgui.cpp">
@@ -223,12 +244,6 @@
     <ClCompile Include="engine\ModelManager.cpp">
       <Filter>Engine\Model</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Mesh.cpp">
-      <Filter>Engine\Model</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\DeferredRenderer.cpp">
-      <Filter>Engine\PostEffect</Filter>
-    </ClCompile>
     <ClCompile Include="engine\EdgeRenderer.cpp">
       <Filter>Engine\PostEffect</Filter>
     </ClCompile>
@@ -284,9 +299,6 @@
       <Filter>Engine\ShadowMap</Filter>
     </ClCompile>
     <ClCompile Include="engine\ShadowSpotLights.cpp">
-      <Filter>Engine\Light</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\LightNumBuffer.cpp">
       <Filter>Engine\Light</Filter>
     </ClCompile>
     <ClCompile Include="engine\Transition.cpp">
@@ -373,9 +385,6 @@
     <ClCompile Include="engine\AnimationManager.cpp">
       <Filter>Engine\Animation</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Skeleton.cpp">
-      <Filter>Engine\Model</Filter>
-    </ClCompile>
     <ClCompile Include="engine\GrayScale.cpp">
       <Filter>Engine\PostEffect</Filter>
     </ClCompile>
@@ -384,9 +393,6 @@
     </ClCompile>
     <ClCompile Include="engine\SkinCluster.cpp">
       <Filter>Engine\Animation</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\Wire.cpp">
-      <Filter>Engine\Model</Filter>
     </ClCompile>
     <ClCompile Include="engine\Vignette.cpp">
       <Filter>Engine\PostEffect</Filter>
@@ -441,6 +447,18 @@
     </ClCompile>
     <ClCompile Include="engine\Cellular.cpp">
       <Filter>Engine\FloorRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\Wire.cpp">
+      <Filter>Engine\Wire</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\Skeleton.cpp">
+      <Filter>Engine\Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\Mesh.cpp">
+      <Filter>Engine\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\DeferredRenderer.cpp">
+      <Filter>Engine\DeferredRendering</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -570,12 +588,6 @@
     <ClInclude Include="engine\Model.h">
       <Filter>Engine\Model</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Mesh.h">
-      <Filter>Engine\Model</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\DeferredRenderer.h">
-      <Filter>Engine\PostEffect</Filter>
-    </ClInclude>
     <ClInclude Include="engine\EdgeRenderer.h">
       <Filter>Engine\PostEffect</Filter>
     </ClInclude>
@@ -625,9 +637,6 @@
       <Filter>Engine\ShadowMap</Filter>
     </ClInclude>
     <ClInclude Include="engine\ShadowSpotLights.h">
-      <Filter>Engine\Light</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\LightNumBuffer.h">
       <Filter>Engine\Light</Filter>
     </ClInclude>
     <ClInclude Include="engine\ModelManager.h">
@@ -717,9 +726,6 @@
     <ClInclude Include="engine\AnimationManager.h">
       <Filter>Engine\Animation</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Skeleton.h">
-      <Filter>Engine\Model</Filter>
-    </ClInclude>
     <ClInclude Include="engine\GrayScale.h">
       <Filter>Engine\PostEffect</Filter>
     </ClInclude>
@@ -728,9 +734,6 @@
     </ClInclude>
     <ClInclude Include="engine\SkinCluster.h">
       <Filter>Engine\Animation</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\Wire.h">
-      <Filter>Engine\Model</Filter>
     </ClInclude>
     <ClInclude Include="engine\Vignette.h">
       <Filter>Engine\PostEffect</Filter>
@@ -749,9 +752,6 @@
     </ClInclude>
     <ClInclude Include="engine\SpriteData.h">
       <Filter>Engine\Sprite</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\FloorRenderer.h">
-      <Filter>Engine\FloorRenderer</Filter>
     </ClInclude>
     <ClInclude Include="engine\CubeColorBuffer.h">
       <Filter>Engine\GPUResource</Filter>
@@ -782,6 +782,21 @@
     </ClInclude>
     <ClInclude Include="engine\Cellular.h">
       <Filter>Engine\FloorRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Wire.h">
+      <Filter>Engine\Wire</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Skeleton.h">
+      <Filter>Engine\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Mesh.h">
+      <Filter>Engine\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\FloorRenderer.h">
+      <Filter>Engine\FloorRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\DeferredRenderer.h">
+      <Filter>Engine\DeferredRendering</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -815,34 +830,7 @@
     <FxCompile Include="Resources\shaders\PostEffectVS.hlsl">
       <Filter>shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Resources\shaders\GaussianBlurPS.hlsl">
-      <Filter>shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Resources\shaders\HorizontalGaussianBlurVS.hlsl">
-      <Filter>shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Resources\shaders\VerticalGaussianBlurVS.hlsl">
-      <Filter>shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Resources\shaders\BloomPS.hlsl">
-      <Filter>shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Resources\shaders\LuminanceExtractionrPS.hlsl">
-      <Filter>shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Resources\shaders\CS.hlsl">
-      <Filter>shaders</Filter>
-    </FxCompile>
     <FxCompile Include="Resources\shaders\DeferredRenderingPS.hlsl">
-      <Filter>shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Resources\shaders\MultiplyPS.hlsl">
-      <Filter>shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Resources\shaders\EdgePS.hlsl">
-      <Filter>shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Resources\shaders\EdgeVS.hlsl">
       <Filter>shaders</Filter>
     </FxCompile>
     <FxCompile Include="Resources\shaders\ShadowMapPS.hlsl">
@@ -857,15 +845,6 @@
     <FxCompile Include="Resources\shaders\SpotLightShadowMapVS.hlsl">
       <Filter>shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Resources\shaders\TransitionPS.hlsl">
-      <Filter>shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Resources\shaders\TransitionVS.hlsl">
-      <Filter>shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Resources\shaders\TBR.hlsl">
-      <Filter>shaders</Filter>
-    </FxCompile>
     <FxCompile Include="Resources\shaders\SkyPS.hlsl">
       <Filter>shaders</Filter>
     </FxCompile>
@@ -875,19 +854,10 @@
     <FxCompile Include="Resources\shaders\VoronoiPS.hlsl">
       <Filter>shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Resources\shaders\GrayScale.hlsl">
-      <Filter>shaders</Filter>
-    </FxCompile>
     <FxCompile Include="Resources\shaders\WirePS.hlsl">
       <Filter>shaders</Filter>
     </FxCompile>
     <FxCompile Include="Resources\shaders\WireVS.hlsl">
-      <Filter>shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Resources\shaders\Vignette.hlsl">
-      <Filter>shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Resources\shaders\SmoothPS.hlsl">
       <Filter>shaders</Filter>
     </FxCompile>
     <FxCompile Include="Resources\shaders\FloorPS.hlsl">
@@ -896,19 +866,10 @@
     <FxCompile Include="Resources\shaders\FloorVS.hlsl">
       <Filter>shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Resources\shaders\ReducationPS.hlsl">
-      <Filter>shaders</Filter>
-    </FxCompile>
     <FxCompile Include="Resources\shaders\MeshTestMS.hlsl">
       <Filter>shaders</Filter>
     </FxCompile>
     <FxCompile Include="Resources\shaders\MeshTestPS.hlsl">
-      <Filter>shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Resources\shaders\InitializeParticleCS.hlsl">
-      <Filter>shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Resources\shaders\SkinningCS.hlsl">
       <Filter>shaders</Filter>
     </FxCompile>
     <FxCompile Include="Resources\shaders\CullAS.hlsl">
@@ -916,6 +877,75 @@
     </FxCompile>
     <FxCompile Include="Resources\shaders\CellularPS.hlsl">
       <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\forward+\FFloorPS.hlsl">
+      <Filter>shaders\F+</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\forward+\FMeshTestPS.hlsl">
+      <Filter>shaders\F+</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\forward+\FModelPS.hlsl">
+      <Filter>shaders\F+</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\forward+\FParticleModelPS.hlsl">
+      <Filter>shaders\F+</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\forward+\FParticlePS.hlsl">
+      <Filter>shaders\F+</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\EdgePS.hlsl">
+      <Filter>shaders\PostEffect</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\EdgeVS.hlsl">
+      <Filter>shaders\PostEffect</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\BloomPS.hlsl">
+      <Filter>shaders\PostEffect</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\GaussianBlurPS.hlsl">
+      <Filter>shaders\PostEffect</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\GrayScale.hlsl">
+      <Filter>shaders\PostEffect</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\HorizontalGaussianBlurVS.hlsl">
+      <Filter>shaders\PostEffect</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\LuminanceExtractionrPS.hlsl">
+      <Filter>shaders\PostEffect</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\MultiplyPS.hlsl">
+      <Filter>shaders\PostEffect</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\ReducationPS.hlsl">
+      <Filter>shaders\PostEffect</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\SmoothPS.hlsl">
+      <Filter>shaders\PostEffect</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\Vignette.hlsl">
+      <Filter>shaders\PostEffect</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\TransitionVS.hlsl">
+      <Filter>shaders\Transition</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\TransitionPS.hlsl">
+      <Filter>shaders\Transition</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\CS.hlsl">
+      <Filter>shaders\Compute</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\InitializeParticleCS.hlsl">
+      <Filter>shaders\Compute</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\SkinningCS.hlsl">
+      <Filter>shaders\Compute</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\TBR.hlsl">
+      <Filter>shaders\Compute</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\VerticalGaussianBlurVS.hlsl">
+      <Filter>shaders\PostEffect</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>

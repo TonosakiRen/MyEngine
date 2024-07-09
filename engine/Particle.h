@@ -43,12 +43,17 @@ public:
 	void Draw(CommandContext& commandContext, ParticleData& bufferData, const Material& material , const uint32_t textureHadle = 0);
 	void CreateMesh();
 	void CreatePipeline();
+	void CreateForwardPipeline();
 
 private:
 
 private:
 	std::unique_ptr<RootSignature> rootSignature_;
 	std::unique_ptr<PipelineState> pipelineState_;
+
+	std::unique_ptr<RootSignature> fRootSignature_;
+	std::unique_ptr<PipelineState> fPipelineState_;
+
 	Matrix4x4 billBordMatrix;
 
 	D3D12_VERTEX_BUFFER_VIEW vbView_;
