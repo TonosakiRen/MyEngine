@@ -128,8 +128,6 @@ void Player::Draw() {
 	DrawManager::GetInstance()->DrawManager::DrawModel(leftHandModelWorldTransform_,ModelManager::GetInstance()->Load("box1x1.obj"));
 
 	const ModelData& a =  ModelManager::GetInstance()->GetModelData(modelHandle_);
-
-	//Wire::Draw(a.modelSphere,worldTransform_);
 }
 
 void Player::Fire()
