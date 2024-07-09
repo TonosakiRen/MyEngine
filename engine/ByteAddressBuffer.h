@@ -8,7 +8,7 @@ class ByteAddressBuffer
 public:
     ~ByteAddressBuffer();
 
-	void Create(size_t bufferSize, UINT numElements);
+	void Create(const std::wstring& name, size_t bufferSize, UINT numElements);
 	const DescriptorHandle& GetSRV() const { return srvHandle_; }
 
 

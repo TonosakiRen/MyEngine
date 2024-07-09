@@ -15,27 +15,22 @@
 
 class CommandContext;
 
-class Voronoi
+class Cellular
 {
 public:
 
-	Voronoi();
-
-	struct VertexData {
-		Vector4 pos;
-		Vector2 uv;
-	};
+	Cellular();
 
 	struct Point {
 		Vector2 point;
-		Vector4 color;
 		uint32_t index;
 	};
 
-	void Initialize(uint32_t pointNum);
+	void Initialize(uint32_t tileWidthNum);
 	void Render(CommandContext& commandContext);
+	void Finalize();
 
-	ColorBuffer& GetResult() { return voronoiTexture_; }
+	ColorBuffer& GetResult() { return *cellularTexture_.get(); }
 private:
 	void InitializeGraphicsPipeline();
 private:
@@ -44,12 +39,14 @@ private:
 
 	StructuredBuffer point_;
 
-	Voronoi(const Voronoi&) = delete;
-	Voronoi& operator=(const Voronoi&) = delete;
+	Cellular(const Cellular&) = delete;
+	Cellular& operator=(const Cellular&) = delete;
 
-	ColorBuffer voronoiTexture_;
+	std::unique_ptr<ColorBuffer> cellularTexture_;
 
 
-	uint32_t pointNum_ = 0;
+	float maxDistance_ = 0;
+	float tileWidth_ = 0;
+	uint32_t tileWidthNum_ = 0;
 };
 

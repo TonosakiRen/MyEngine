@@ -137,7 +137,7 @@ void DeferredRenderer::CreatePipeline()
 		rootSignatureDesc.NumStaticSamplers = 1;
 		rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
-		rootSignature_.Create(rootSignatureDesc);
+		rootSignature_.Create(L"deferredPipeline", rootSignatureDesc);
 
 	}
 
@@ -165,7 +165,7 @@ void DeferredRenderer::CreatePipeline()
 
 		gpipeline.pRootSignature = rootSignature_;
 
-		pipelineState_.Create(gpipeline);
+		pipelineState_.Create(L"deferredPipeline", gpipeline);
 
 	}
 

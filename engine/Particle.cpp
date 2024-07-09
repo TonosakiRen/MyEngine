@@ -77,7 +77,7 @@ void Particle::CreatePipeline() {
         rootSignatureDesc.NumStaticSamplers = 1;
         rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
-        rootSignature_->Create(rootSignatureDesc);
+        rootSignature_->Create(L"particleRootSignature", rootSignatureDesc);
 
     }
 
@@ -155,7 +155,7 @@ void Particle::CreatePipeline() {
         gpipeline.pRootSignature = *rootSignature_;
 
         // グラフィックスパイプラインの生成
-        pipelineState_->Create(gpipeline);
+        pipelineState_->Create(L"particlePiepline", gpipeline);
     }
 
 }
@@ -188,7 +188,7 @@ void Particle::CreateMesh() {
     // 頂点データのサイズ
     UINT sizeVB = static_cast<UINT>(sizeof(VertexData) * vertices_.size());
 
-    vertexBuffer_.Create(sizeVB);
+    vertexBuffer_.Create(L"particleVertexBuffer", sizeVB);
 
     vertexBuffer_.Copy(vertices_.data(), sizeVB);
 
@@ -200,7 +200,7 @@ void Particle::CreateMesh() {
     // インデックスデータのサイズ
     UINT sizeIB = static_cast<UINT>(sizeof(uint16_t) * indices_.size());
 
-    indexBuffer_.Create(sizeIB);
+    indexBuffer_.Create(L"particleIndexBuffer", sizeIB);
 
     indexBuffer_.Copy(indices_.data(), sizeIB);
 

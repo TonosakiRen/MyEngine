@@ -7,19 +7,24 @@
 
 using namespace Microsoft::WRL;
 
-void FloorRenderer::Initialize() {
+void FloorRenderer::Initialize(CommandContext& commnadContext) {
     CreatePipeline();
     lineNum_ = std::make_unique<DefaultBuffer>();
     line_ = std::make_unique<StructuredBuffer>();
-    lineNum_->Create(sizeof(uint32_t));
-    line_->Create(sizeof(Segment), 1);
+    lineNum_->Create(L"lineNumBuffer", sizeof(uint32_t));
+    line_->Create(L"lineBuffer", sizeof(Segment), 1);
     Segment* segmnet = static_cast<Segment*>(line_->GetCPUData());
     segmnet->origin = { 0.0f,0.0f,-5.0f };
     segmnet->diff = { 0.0f,0.0f,10.0f };
+    cellular_ = std::make_unique<Cellular>();
+    cellular_->Initialize(6);
+    cellular_->Render(commnadContext);
 }
 
 void FloorRenderer::Finalize()
 {
+    cellular_->Finalize();
+    cellular_.reset();
     rootSignature_.reset();
     pipelineState_.reset();
 }
@@ -29,6 +34,9 @@ void FloorRenderer::PreDraw(CommandContext& commandContext, const ViewProjection
 
     commandContext.SetPipelineState(*pipelineState_);
     commandContext.SetGraphicsRootSignature(*rootSignature_);
+
+    // srvセット
+    commandContext.SetDescriptorTable(UINT(RootParameter::kCellular), cellular_->GetResult().GetSRV());
 
     // CBVをセット（ビュープロジェクション行列）
     commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
@@ -42,6 +50,9 @@ void FloorRenderer::PreDraw(CommandContext& commandContext, const ViewProjection
 #endif
 
     commandContext.SetConstants(static_cast<UINT>(RootParameter::kColor), HSVA_.x, HSVA_.y, HSVA_.z,HSVA_.w);
+
+    time_++;
+    commandContext.SetConstants(static_cast<UINT>(RootParameter::kTime), time_);
 
     commandContext.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
@@ -64,15 +75,20 @@ void FloorRenderer::CreatePipeline() {
     pipelineState_ = std::make_unique<PipelineState>();
 
     {
+        // デスクリプタレンジ
+        CD3DX12_DESCRIPTOR_RANGE descRangeSRV;
+        descRangeSRV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0); // t0 レジスタ
+
         // ルートパラメータ
         CD3DX12_ROOT_PARAMETER rootparams[int(RootParameter::parameterNum)] = {};
+        rootparams[int(RootParameter::kCellular)].InitAsDescriptorTable(1, &descRangeSRV);
         rootparams[int(RootParameter::kWorldTransform)].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_ALL);
         rootparams[int(RootParameter::kViewProjection)].InitAsConstantBufferView(1, 0, D3D12_SHADER_VISIBILITY_ALL);
         rootparams[int(RootParameter::kColor)].InitAsConstants(4,2, 0, D3D12_SHADER_VISIBILITY_ALL);
+        rootparams[int(RootParameter::kTime)].InitAsConstants(1, 3, 0, D3D12_SHADER_VISIBILITY_ALL);
 
         // スタティックサンプラー
-        CD3DX12_STATIC_SAMPLER_DESC samplerDesc =
-            CD3DX12_STATIC_SAMPLER_DESC(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR);
+        CD3DX12_STATIC_SAMPLER_DESC samplerDesc = CD3DX12_STATIC_SAMPLER_DESC(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR);
 
         // ルートシグネチャの設定
         D3D12_ROOT_SIGNATURE_DESC rootSignatureDesc;
@@ -82,7 +98,7 @@ void FloorRenderer::CreatePipeline() {
         rootSignatureDesc.NumStaticSamplers = 1;
         rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
-        rootSignature_->Create(rootSignatureDesc);
+        rootSignature_->Create(L"floorRootSignature", rootSignatureDesc);
 
     }
 
@@ -162,7 +178,7 @@ void FloorRenderer::CreatePipeline() {
         gpipeline.pRootSignature = *rootSignature_;
 
         // グラフィックスパイプラインの生成
-        pipelineState_->Create(gpipeline);
+        pipelineState_->Create(L"cellularPipeline", gpipeline);
     }
 }
 

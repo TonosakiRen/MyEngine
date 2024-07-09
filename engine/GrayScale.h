@@ -24,21 +24,15 @@ public:
 		ParameterNum
 	};
 
-	void Initialize(ColorBuffer& orinalBuffer);
+	void Initialize(ColorBuffer& originalBuffer);
 
-	void Draw(ColorBuffer& originalBuffer, CommandContext& commandContext);
-
-	ColorBuffer& GetResult() {
-		return resultBuffer_;
-	}
+	void Draw(ColorBuffer& originalBuffer, ColorBuffer& tmpBuffer, CommandContext& commandContext);
 
 private:
-	void CreatePipeline();
+	void CreatePipeline(ColorBuffer& originalBuffer);
 private:
 	RootSignature rootSignature_;
 	PipelineState pipelineState_;
-
-	ColorBuffer resultBuffer_;
 
 	float t_ = 0.0f;
 };

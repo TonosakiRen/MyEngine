@@ -7,7 +7,7 @@ void Material::Initialize() {
     rotation_ = { 0.0f,0.0f,0.0f };
     translation_ = { 0.0f,0.0f,0.0f };
     enableLighting_ = true;
-    constBuffer_.Create((sizeof(ConstBufferData) + 0xff) & ~0xff);
+    constBuffer_.Create(L"materialBuffer",(sizeof(ConstBufferData) + 0xff) & ~0xff);
     uvTransform_ = MakeIdentity4x4();
     Update();
 }

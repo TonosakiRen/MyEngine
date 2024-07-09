@@ -4,7 +4,7 @@
 void PointLights::Initialize() {
     
         lights_.resize(lightNum);
-        structureBuffer_.Create(sizeof(ConstBufferData), lightNum);    
+        structureBuffer_.Create(L"pointLightBuffer", sizeof(ConstBufferData), lightNum);
         for (int i = 0; i < lightNum; i++) {
             lights_[i].worldTransform.Update();
         }

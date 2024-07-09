@@ -1,6 +1,7 @@
 #include "DrawManager.h"
 #include <DirectXTex.h>
 #include <cassert>
+#include "Renderer.h"
 
 using namespace DirectX;
 
@@ -55,7 +56,7 @@ void DrawManager::Initialize(CommandContext& CommandContext)
 	skyPipeline_ = std::make_unique<Sky>();
 	skyPipeline_->Initialize(CommandContext);
 	floorPipeline_ = std::make_unique<FloorRenderer>();
-	floorPipeline_->Initialize();
+	floorPipeline_->Initialize(CommandContext);
 
 	calling_ = std::make_unique<Calling>();
 	calling_->Initialize();

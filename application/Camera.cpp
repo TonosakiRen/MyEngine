@@ -38,6 +38,19 @@ void Camera::Update(Vector3 playerPos)
 				Quaternion yq = MakeForYAxis(y);
 				quaternion_ = yq * quaternion_;
 			}
+
+			if (input->PushKey(DIK_UPARROW)) {
+				float y = -30000.0f * rotateSpeed;
+				Quaternion yq = MakeForXAxis(y);
+				quaternion_ = yq * quaternion_;
+			}
+
+			if (input->PushKey(DIK_DOWNARROW)) {
+				float y = 30000.0f * rotateSpeed;
+				Quaternion yq = MakeForXAxis(y);
+				quaternion_ = yq * quaternion_;
+			}
+			
 		}
 	}
 	else {

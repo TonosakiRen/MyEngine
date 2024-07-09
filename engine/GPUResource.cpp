@@ -5,6 +5,7 @@
 
 
 void GPUResource::CreateResource(
+    const std::wstring& name,
     const D3D12_HEAP_PROPERTIES& heapProperties,
     const D3D12_RESOURCE_DESC& desc,
     D3D12_RESOURCE_STATES initState,
@@ -22,4 +23,8 @@ void GPUResource::CreateResource(
 
     assert(SUCCEEDED(hr));
     state_ = initState;
+
+#ifdef _DEBUG
+    name_ = name;
+#endif // _DEBUG
 }

@@ -26,17 +26,17 @@ void GaussianBlur::Initialize(ColorBuffer* originalTexture)
     InitializeGraphicsPipeline();
 
     originalTexture_ = originalTexture;
-    horizontalBlurTexture_.Create(
+    horizontalBlurTexture_.Create(L"horizontalBlurTexture",
         originalTexture_->GetWidth() / 2,
         originalTexture_->GetHeight(),
         originalTexture_->GetFormat());
 
-    verticalBlurTexture_.Create(
+    verticalBlurTexture_.Create(L"verticalBlurTexture",
         originalTexture_->GetWidth() / 2,
         originalTexture_->GetHeight() / 2,
         originalTexture_->GetFormat());
 
-    constantBuffer_.Create(sizeof(weights_));
+    constantBuffer_.Create(L"GaussianConstBuffer", sizeof(weights_));
 
     UpdateWeightTable(1.0f);
 }
@@ -118,7 +118,7 @@ void GaussianBlur::InitializeGraphicsPipeline()
         rootSignatureDesc.NumStaticSamplers = 1;
         rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
-        sRootSignature->Create(rootSignatureDesc);
+        sRootSignature->Create(L"GaussianRootSignature", rootSignatureDesc);
 
     }
 
@@ -150,12 +150,12 @@ void GaussianBlur::InitializeGraphicsPipeline()
         gpipeline.pRootSignature = *sRootSignature;
 
         // グラフィックスパイプラインの生成
-        sHorizontalBlurPipelineState->Create(gpipeline);
+        sHorizontalBlurPipelineState->Create(L"horizontalBlurPipeline", gpipeline);
 
         gpipeline.VS = CD3DX12_SHADER_BYTECODE(verticalVsBlob->GetBufferPointer(), verticalVsBlob->GetBufferSize());
 
         // グラフィックスパイプラインの生成
-        sVerticalBlurPipelineState->Create(gpipeline);
+        sVerticalBlurPipelineState->Create(L"verticalBlurPipeline", gpipeline);
     }
 }
 

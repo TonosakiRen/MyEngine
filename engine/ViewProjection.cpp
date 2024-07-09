@@ -27,8 +27,8 @@ void ViewProjection::SwitchIsUseDebugCamera()
 }
 
 void ViewProjection::Initialize() {
-    constBuffer_.Create(sizeof(ConstBufferData));
-    frustumBuffer_.Create(sizeof(Frustum));
+    constBuffer_.Create(L"viewProjectionConstBuffer", sizeof(ConstBufferData));
+    frustumBuffer_.Create(L"viewProjectionFrustumBuffer", sizeof(Frustum));
     // localのFrsutumを作成
     Matrix4x4 worldMatrix = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f,1.0f }, {0.0f,0.0f,0.0f});
     Matrix4x4 matView = Inverse(worldMatrix);

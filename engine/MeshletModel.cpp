@@ -87,7 +87,7 @@ void MeshletModel::CreatePipeline() {
         rootSignatureDesc.NumStaticSamplers = 1;
         rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
-        rootSignature_->Create(rootSignatureDesc);
+        rootSignature_->Create(L"meshletRootSignature", rootSignatureDesc);
 
     }
 
@@ -156,7 +156,7 @@ void MeshletModel::CreatePipeline() {
         streamDesc.SizeInBytes = sizeof(psoStream);
 
         // グラフィックスパイプラインの生成
-        pipelineState_->Create(streamDesc);
+        pipelineState_->Create(L"meshletPipeline", streamDesc);
     }
 }
 

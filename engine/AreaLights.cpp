@@ -4,7 +4,7 @@
 void AreaLights::Initialize() {
     
      lights_.resize(lightNum);
-     structureBuffer_.Create(sizeof(ConstBufferData), lightNum);    
+     structureBuffer_.Create(L"areaLightBuffer", sizeof(ConstBufferData), lightNum);
 }
 
 void AreaLights::Update() {

@@ -10,7 +10,7 @@ class RwStructuredBuffer : public UAVBuffer {
 public:
     ~RwStructuredBuffer();
 
-    void Create(size_t bufferSize, UINT numElements);
+    void Create(const std::wstring& name, size_t bufferSize, UINT numElements);
 
     size_t GetBufferSize() const { return bufferSize_; }
 

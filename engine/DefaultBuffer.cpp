@@ -7,7 +7,7 @@ DefaultBuffer::~DefaultBuffer() {
     Destroy();
 }
 
-void DefaultBuffer::Create(size_t bufferSize) {
+void DefaultBuffer::Create(const std::wstring& name, size_t bufferSize) {
     HRESULT result = S_FALSE;
     auto device = DirectXCommon::GetInstance()->GetDevice();
 
@@ -27,15 +27,15 @@ void DefaultBuffer::Create(size_t bufferSize) {
     assert(SUCCEEDED(result));
 
 #ifdef _DEBUG
-    resource_->SetName(L"DefaultBuffer");
+    resource_->SetName(name.c_str());
 #endif // _DEBUG
 
     state_ = D3D12_RESOURCE_STATE_COMMON;
     bufferSize_ = bufferSize;
 }
 
-void DefaultBuffer::Create(size_t numElements, size_t elementSize) {
-    Create(numElements * elementSize);
+void DefaultBuffer::Create(const std::wstring& name, size_t numElements, size_t elementSize) {
+    Create(name, numElements * elementSize);
 }
 
 void DefaultBuffer::Destroy() {

@@ -88,6 +88,8 @@ private:
 
     std::unique_ptr<PostEffect> postEffect_;
 
+    std::unique_ptr<ColorBuffer> tmpBuffer_;
+
     std::unique_ptr<EdgeRenderer> edgeRenderer_;
     std::unique_ptr<Bloom> bloom_;
     std::unique_ptr<GrayScale> grayScale_;
@@ -106,8 +108,6 @@ private:
 
     std::unique_ptr<Wire> wire_;
     bool isWire_ = false;
-
-
 
 };
 

@@ -48,7 +48,7 @@ void Transition::CreatePipeline() {
 		rootSignatureDesc.NumStaticSamplers = 1;
 		rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
-		rootSignature_.Create(rootSignatureDesc);
+		rootSignature_.Create(L"transitionRootSignature", rootSignatureDesc);
 
 	}
 
@@ -89,7 +89,7 @@ void Transition::CreatePipeline() {
 		gpipeline.pRootSignature = rootSignature_;
 
 		// グラフィックスパイプラインの生成
-		pipelineState_.Create(gpipeline);
+		pipelineState_.Create(L"transitionPipeline", gpipeline);
 	}
 
 
@@ -97,7 +97,7 @@ void Transition::CreatePipeline() {
 
 void Transition::Initialize(ColorBuffer& resultBuffer) {
 	CreatePipeline();
-	saveResultBuffer_.Create(resultBuffer.GetWidth(), resultBuffer.GetHeight(), resultBuffer.GetFormat());
+	saveResultBuffer_.Create(L"saveResultTexture", resultBuffer.GetWidth(), resultBuffer.GetHeight(), resultBuffer.GetFormat());
 	isNextScene_ = false;
 }
 

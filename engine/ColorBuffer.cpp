@@ -2,8 +2,8 @@
 
 #include "DirectXCommon.h"
 
-void ColorBuffer::CreateFromSwapChain(ID3D12Resource* resource) {
-    AssociateWithResource(resource, D3D12_RESOURCE_STATE_PRESENT);
+void ColorBuffer::CreateFromSwapChain(const std::wstring& name, ID3D12Resource* resource) {
+    AssociateWithResource(name,resource, D3D12_RESOURCE_STATE_PRESENT);
 
     auto graphics = DirectXCommon::GetInstance();
     if (rtvHandle_.IsNull()) {
@@ -18,7 +18,7 @@ void ColorBuffer::CreateFromSwapChain(ID3D12Resource* resource) {
     graphics->GetDevice()->CreateRenderTargetView(resource_.Get(), &rtvDesc, rtvHandle_);
 }
 
-void ColorBuffer::Create(uint32_t width, uint32_t height, DXGI_FORMAT format) {
+void ColorBuffer::Create(const std::wstring& name, uint32_t width, uint32_t height, DXGI_FORMAT format) {
     auto flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
     auto desc = DescribeTex2D(width, height, 1, format, flags);
 
@@ -26,11 +26,11 @@ void ColorBuffer::Create(uint32_t width, uint32_t height, DXGI_FORMAT format) {
     clearValue.Format = format;
     memcpy(clearValue.Color, clearColor_, sizeof(clearValue.Color));
 
-    CreateTextureResource(desc, clearValue);
+    CreateTextureResource(name,desc, clearValue);
     CreateViews();
 }
 
-void ColorBuffer::CreateArray( uint32_t width, uint32_t height, uint32_t arraySize, DXGI_FORMAT format) {
+void ColorBuffer::CreateArray(const std::wstring& name, uint32_t width, uint32_t height, uint32_t arraySize, DXGI_FORMAT format) {
     auto flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
     auto desc = DescribeTex2D(width, height, arraySize, format, flags);
 
@@ -38,7 +38,7 @@ void ColorBuffer::CreateArray( uint32_t width, uint32_t height, uint32_t arraySi
     clearValue.Format = format;
     memcpy(clearValue.Color, clearColor_, sizeof(clearValue.Color));
 
-    CreateTextureResource(desc, clearValue);
+    CreateTextureResource(name,desc, clearValue);
     CreateViews();
 }
 

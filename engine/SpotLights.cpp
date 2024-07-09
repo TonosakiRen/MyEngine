@@ -6,7 +6,7 @@ void SpotLights::Initialize() {
         lights_.resize(lightNum);
         // インスタンシングデータのサイズ
         UINT sizeINB = static_cast<UINT>(sizeof(ConstBufferData) * lightNum);
-        structureBuffer_.Create(sizeINB);
+        structureBuffer_.Create(L"spotLightBuffer",sizeINB);
 
         D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
         srvDesc.Format = DXGI_FORMAT_UNKNOWN;

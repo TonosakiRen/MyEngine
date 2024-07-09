@@ -1,11 +1,16 @@
 
-Texture2D<float4> tex : register(t0);
+Texture2D<float> tex : register(t0);
 SamplerState smp : register(s0);
 
 struct Param {
 	float32_t4 color;
 };
 ConstantBuffer<Param> color  : register(b2);
+
+struct Time {
+	uint32_t t;
+};
+ConstantBuffer<Time> time  : register(b3);
 
 
 struct VSOutput {
@@ -35,6 +40,11 @@ PixelShaderOutput main(VSOutput input) {
 	// マテリアル
 	output.color = color.color;
 
+	float32_t2 uv = input.uv;
+	uv.y += time.t / 1000.0f;
+
+	float32_t textureColor = tex.Sample(smp, uv);
+	output.color.xyz -= textureColor;
 
 	output.normal.xyz = (normal.xyz + 1.0f) * 0.5f;
 	output.normal.w = 1.0f;

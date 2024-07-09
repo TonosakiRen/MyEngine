@@ -30,7 +30,7 @@ public:
 		Vector2 uv;
 	};
 	void Initialize(ColorBuffer* colorTexture,ColorBuffer* normalTexture, DepthBuffer* depthTexture);
-	void Render(CommandContext& commandContext, ColorBuffer* originalTexture);
+	void Render(CommandContext& commandContext, ColorBuffer& tmpBuffer, ColorBuffer* originalTexture);
 
 private:
 	void CreatePipeline();
@@ -41,8 +41,6 @@ private:
 	ColorBuffer* colorTexture_;
 	ColorBuffer* normalTexture_;
 	DepthBuffer* depthTexture_;
-
-	ColorBuffer edgeTexture_;
 
 	DescriptorHandle uavHandle_;
 

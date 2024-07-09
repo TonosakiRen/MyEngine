@@ -122,10 +122,7 @@ void ModelManager::CreateMeshes(ModelData& modelData)
 
 	modelData.modelSize = (maxModelSize - minModelSize);
 	modelData.modelCenter = maxModelSize - Vector3(modelData.modelSize / 2.0f);
-	//もしmodelの原点を一番下にしていたら
-	if (minModelSize.y < 0.5f && minModelSize.y > -0.5f) {
-		modelData.modelCenter.y = minModelSize.y;
-	}
+	
 	modelData.modelSphere.center = modelData.modelCenter;
 	if (modelData.modelSize.x > modelData.modelSize.y) {
 		if (modelData.modelSize.x > modelData.modelSize.z) {
@@ -148,7 +145,7 @@ void ModelManager::CreateMeshes(ModelData& modelData)
 		// 頂点データのサイズ
 		UINT sizeVB = static_cast<UINT>(sizeof(Mesh::VertexData) * mesh.vertices_.size());
 
-		mesh.vertexBuffer_.Create(sizeof(Mesh::VertexData), UINT(mesh.vertices_.size()));
+		mesh.vertexBuffer_.Create(L"vertexBuffer",sizeof(Mesh::VertexData), UINT(mesh.vertices_.size()));
 
 		mesh.vertexBuffer_.Copy(mesh.vertices_.data(), sizeVB);
 
@@ -161,7 +158,7 @@ void ModelManager::CreateMeshes(ModelData& modelData)
 		// インデックスデータのサイズ
 		UINT sizeIB = static_cast<UINT>(sizeof(uint32_t) * mesh.indices_.size());
 
-		mesh.indexBuffer_.Create(sizeof(uint32_t), UINT(mesh.indices_.size()));
+		mesh.indexBuffer_.Create(L"indexBuffer", sizeof(uint32_t), UINT(mesh.indices_.size()));
 
 		mesh.indexBuffer_.Copy(mesh.indices_.data(), sizeIB);
 
@@ -180,16 +177,16 @@ void ModelManager::CreateMeshes(ModelData& modelData)
 			mesh.uniqueVertexIndex,
 			mesh.primitiveIndices_));
 
-		mesh.meshletBuffer_.Create(sizeof(DirectX::Meshlet), UINT(mesh.meshlets_.size()));
+		mesh.meshletBuffer_.Create(L"meshletBUffer", sizeof(DirectX::Meshlet), UINT(mesh.meshlets_.size()));
 		mesh.meshletBuffer_.Copy(mesh.meshlets_.data(), sizeof(DirectX::Meshlet) * mesh.meshlets_.size());
 
-		mesh.uniqueVertexIndexBuffer_.Create(sizeof(uint8_t), UINT(mesh.uniqueVertexIndex.size()));
+		mesh.uniqueVertexIndexBuffer_.Create(L"uniqueVertexIndexBuffer", sizeof(uint8_t), UINT(mesh.uniqueVertexIndex.size()));
 		mesh.uniqueVertexIndexBuffer_.Copy(mesh.uniqueVertexIndex.data(), sizeof(uint8_t)* mesh.uniqueVertexIndex.size(), *commandContext_);
 
-		mesh.primitiveIndicesBuffer_.Create(sizeof(DirectX::MeshletTriangle), UINT(mesh.primitiveIndices_.size()));
+		mesh.primitiveIndicesBuffer_.Create(L"primitiveIndicesBuffer", sizeof(DirectX::MeshletTriangle), UINT(mesh.primitiveIndices_.size()));
 		mesh.primitiveIndicesBuffer_.Copy(mesh.primitiveIndices_.data(), sizeof(DirectX::MeshletTriangle)* mesh.primitiveIndices_.size());
 
-		mesh.meshletInfo_.Create(sizeof(uint32_t));
+		mesh.meshletInfo_.Create(L"meshletInfoBuffer", sizeof(uint32_t));
 		mesh.meshletInfo_.Copy(uint32_t(mesh.meshlets_.size()));
 
 		//meshletカリング作成
@@ -200,7 +197,7 @@ void ModelManager::CreateMeshes(ModelData& modelData)
 			mesh.primitiveIndices_.data(), mesh.primitiveIndices_.size(),
 			mesh.cullData_.data());
 
-		mesh.cullDataBuffer_.Create(sizeof(DirectX::CullData), UINT(mesh.cullData_.size()));
+		mesh.cullDataBuffer_.Create(L"cullDataBuffer", sizeof(DirectX::CullData), UINT(mesh.cullData_.size()));
 		mesh.cullDataBuffer_.Copy(mesh.cullData_.data(), sizeof(DirectX::CullData) * mesh.cullData_.size());
 	}
 
@@ -334,6 +331,11 @@ Node& ModelManager::GetRootNode(const uint32_t modelHandle)
 const ModelData& ModelManager::GetModelData(const uint32_t modelHandle)
 {
 	return  (*models_)[modelHandle];
+}
+
+const std::vector<CullData>& ModelManager::GetCullDataData(const uint32_t modelHandle)
+{
+	return  (*models_)[modelHandle].meshes[0].cullData_;
 }
 
 

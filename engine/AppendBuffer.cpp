@@ -8,12 +8,12 @@ AppendBuffer::~AppendBuffer() {
     Destroy();
 }
 
-void AppendBuffer::Create(size_t bufferSize, UINT numElements) {
+void AppendBuffer::Create(const std::wstring& name, size_t bufferSize, UINT numElements) {
     // データのサイズ
     UINT size = static_cast<UINT>(bufferSize * numElements);
     UINT countSize = static_cast<UINT>(sizeof(uint32_t));
 
-    UAVBuffer::Create(size + countSize);
+    UAVBuffer::Create(name,size + countSize);
 
     D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc{};
     uavDesc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;

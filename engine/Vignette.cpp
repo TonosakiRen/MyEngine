@@ -9,7 +9,7 @@
 using namespace DirectX;
 using namespace Microsoft::WRL;
 
-void Vignette::CreatePipeline() {
+void Vignette::CreatePipeline(ColorBuffer& orignalBuffer) {
 	ComPtr<IDxcBlob> vsBlob;
 	ComPtr<IDxcBlob> psBlob;
 
@@ -44,7 +44,7 @@ void Vignette::CreatePipeline() {
 		rootSignatureDesc.NumStaticSamplers = 1;
 		rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
-		rootSignature_.Create(rootSignatureDesc);
+		rootSignature_.Create(L"vignetteRootSignature", rootSignatureDesc);
 
 	}
 
@@ -79,29 +79,28 @@ void Vignette::CreatePipeline() {
 		gpipeline.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 
 		gpipeline.NumRenderTargets = 1;                            // 描画対象は1つ
-		gpipeline.RTVFormats[0] = Renderer::GetInstance()->GetRTVFormat(Renderer::kColor); // 0～255指定のRGBA
+		gpipeline.RTVFormats[0] = orignalBuffer.GetFormat(); // 0～255指定のRGBA
 		gpipeline.SampleDesc.Count = 1; // 1ピクセルにつき1回サンプリング
 
 		gpipeline.pRootSignature = rootSignature_;
 
 		// グラフィックスパイプラインの生成
-		pipelineState_.Create(gpipeline);
+		pipelineState_.Create(L"VignettePipeline", gpipeline);
 	}
 }
 
 
 
-void Vignette::Initialize(ColorBuffer& orinalBuffer) {
-	resultBuffer_.Create(orinalBuffer.GetWidth(), orinalBuffer.GetHeight(), orinalBuffer.GetFormat());
-	CreatePipeline();
+void Vignette::Initialize(ColorBuffer& originalBuffer) {
+	CreatePipeline(originalBuffer);
 }
 
-void Vignette::Draw(ColorBuffer& originalBuffer, CommandContext& commandContext) {
+void Vignette::Draw(ColorBuffer& originalBuffer, ColorBuffer& tmpBuffer, CommandContext& commandContext) {
 	
 	commandContext.TransitionResource(originalBuffer, D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
-	commandContext.TransitionResource(resultBuffer_, D3D12_RESOURCE_STATE_RENDER_TARGET);
+	commandContext.TransitionResource(tmpBuffer, D3D12_RESOURCE_STATE_RENDER_TARGET);
 
-	commandContext.SetRenderTarget(resultBuffer_.GetRTV());
+	commandContext.SetRenderTarget(tmpBuffer.GetRTV());
 	commandContext.SetPipelineState(pipelineState_);
 	commandContext.SetGraphicsRootSignature(rootSignature_);
 	commandContext.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -110,7 +109,7 @@ void Vignette::Draw(ColorBuffer& originalBuffer, CommandContext& commandContext)
 	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kTexture), originalBuffer.GetSRV());
 
 #ifdef USE_IMGUI
-	if (ImGui::BeginMenu("Smooth")) {
+	if (ImGui::BeginMenu("Vignette")) {
 		ImGui::DragFloat("t", &t_, 0.01f, 0.1f);
 		ImGui::DragFloat("scale", &scale_, 0.01f, 0.1f);
 		ImGui::EndMenu();
@@ -122,6 +121,6 @@ void Vignette::Draw(ColorBuffer& originalBuffer, CommandContext& commandContext)
 	  // 描画コマンド
 	commandContext.DrawInstanced(3,1,0,0);
 
-	commandContext.CopyBuffer(originalBuffer,resultBuffer_);
+	commandContext.CopyBuffer(originalBuffer, tmpBuffer);
 }
 

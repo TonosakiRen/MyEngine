@@ -2,7 +2,7 @@
 
 #include "DirectXCommon.h"
 
-void CubeColorBuffer::Create(uint32_t width, uint32_t height, DXGI_FORMAT format) {
+void CubeColorBuffer::Create(const std::wstring& name, uint32_t width, uint32_t height, DXGI_FORMAT format) {
     auto flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
     auto desc = DescribeTex2D(width, height, 6, format, flags);
 
@@ -10,7 +10,7 @@ void CubeColorBuffer::Create(uint32_t width, uint32_t height, DXGI_FORMAT format
     clearValue.Format = format;
     memcpy(clearValue.Color, clearColor_, sizeof(clearValue.Color));
 
-    CreateTextureResource(desc, clearValue);
+    CreateTextureResource(name,desc, clearValue);
     CreateViews();
 }
 

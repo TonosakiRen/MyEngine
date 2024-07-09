@@ -2,7 +2,7 @@
 #include <assert.h>
 #include "DirectXCommon.h"
 
-void ByteAddressBuffer::Create(size_t bufferSize , UINT numElements)
+void ByteAddressBuffer::Create(const std::wstring& name, size_t bufferSize , UINT numElements)
 {
 
     HRESULT result = S_FALSE;
@@ -11,7 +11,7 @@ void ByteAddressBuffer::Create(size_t bufferSize , UINT numElements)
     //インスタンシングデータのサイズ
     UINT sizeBAB = static_cast<UINT>(bufferSize * numElements);
 
-    copyBuffer_.Create(sizeBAB,&cpuData_);
+    copyBuffer_.Create(name,sizeBAB,&cpuData_);
 
     Destroy();
 

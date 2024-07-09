@@ -14,6 +14,7 @@
 #include "DrawManager.h"
 #include "LightManager.h"
 
+
 Renderer* Renderer::GetInstance() {
     static Renderer instance;
     return &instance;
@@ -39,25 +40,29 @@ void Renderer::Initialize() {
 
     // メインとなるバッファを初期化
     auto& swapChainBuffer = swapChain_->GetColorBuffer();
+
+    tmpBuffer_ = std::make_unique<ColorBuffer>();
+    tmpBuffer_->Create(L"tmpBuffer", swapChainBuffer.GetWidth(), swapChainBuffer.GetHeight(), DXGI_FORMAT_R8G8B8A8_UNORM_SRGB);
+
     float clearColor[4] = { 0.0f,0.0f,0.0f,1.0f };
     colorBuffers_[kColor] = std::make_unique<ColorBuffer>();
     colorBuffers_[kColor]->SetClearColor(clearColor);
-    colorBuffers_[kColor]->Create(swapChainBuffer.GetWidth(), swapChainBuffer.GetHeight(), DXGI_FORMAT_R8G8B8A8_UNORM_SRGB);
+    colorBuffers_[kColor]->Create(L"colorBuffer", swapChainBuffer.GetWidth(), swapChainBuffer.GetHeight(), DXGI_FORMAT_R8G8B8A8_UNORM_SRGB);
 
     resultBuffer_ = std::make_unique<ColorBuffer>();
-    resultBuffer_->Create(swapChainBuffer.GetWidth(), swapChainBuffer.GetHeight(), DXGI_FORMAT_R8G8B8A8_UNORM_SRGB);
+    resultBuffer_->Create(L"resultBuffer", swapChainBuffer.GetWidth(), swapChainBuffer.GetHeight(), DXGI_FORMAT_R8G8B8A8_UNORM_SRGB);
 
     mainDepthBuffer_ = std::make_unique<DepthBuffer>();
-    mainDepthBuffer_->Create(swapChainBuffer.GetWidth(), swapChainBuffer.GetHeight(), DXGI_FORMAT_D32_FLOAT);
+    mainDepthBuffer_->Create(L"mainDepthBuffer", swapChainBuffer.GetWidth(), swapChainBuffer.GetHeight(), DXGI_FORMAT_D32_FLOAT);
 
     float clearNormal[4] = { 0.0f,0.0f,0.0f,1.0f };
     colorBuffers_[kNormal] = std::make_unique<ColorBuffer>();
     colorBuffers_[kNormal]->SetClearColor(clearNormal);
-    colorBuffers_[kNormal]->Create(swapChainBuffer.GetWidth(), swapChainBuffer.GetHeight(), DXGI_FORMAT_R32G32B32A32_FLOAT);
+    colorBuffers_[kNormal]->Create(L"normalBuffer", swapChainBuffer.GetWidth(), swapChainBuffer.GetHeight(), DXGI_FORMAT_R32G32B32A32_FLOAT);
 
     colorBuffers_[kMaterial] = std::make_unique<ColorBuffer>();
     colorBuffers_[kMaterial]->SetClearColor(clearColor);
-    colorBuffers_[kMaterial]->Create(swapChainBuffer.GetWidth(), swapChainBuffer.GetHeight(), DXGI_FORMAT_R8_UNORM);
+    colorBuffers_[kMaterial]->Create(L"materialBuffer", swapChainBuffer.GetWidth(), swapChainBuffer.GetHeight(), DXGI_FORMAT_R8_UNORM);
 
     //ドローマネージャー
     drawManager_ = DrawManager::GetInstance();
@@ -74,6 +79,7 @@ void Renderer::Initialize() {
 
     deferredRenderer_ = std::make_unique<DeferredRenderer>();
     deferredRenderer_->Initialize(colorBuffers_[kColor].get(), colorBuffers_[kNormal].get(), colorBuffers_[kMaterial].get(), mainDepthBuffer_.get());
+
     edgeRenderer_ = std::make_unique<EdgeRenderer>();
     edgeRenderer_->Initialize(colorBuffers_[kColor].get(), colorBuffers_[kNormal].get(), mainDepthBuffer_.get());
 
@@ -150,16 +156,16 @@ void Renderer::DeferredRender(ViewProjection& viewProjection)
         bloom_->Render(commandContext_, resultBuffer_.get());
     }
     if (isEdge_) {
-        edgeRenderer_->Render(commandContext_, resultBuffer_.get());
+        edgeRenderer_->Render(commandContext_,*tmpBuffer_.get(), resultBuffer_.get());
     }
     if (isGrayScale_) {
-        grayScale_->Draw(*resultBuffer_.get(), commandContext_);
+        grayScale_->Draw(*resultBuffer_.get(), *tmpBuffer_.get(), commandContext_);
     }
     if (isVignette_) {
-        vignette_->Draw(*resultBuffer_.get(), commandContext_);
+        vignette_->Draw(*resultBuffer_.get(), *tmpBuffer_.get(), commandContext_);
     }
     if (isSmooth_) {
-        smooth_->Draw(*resultBuffer_.get(), commandContext_);
+        smooth_->Draw(*resultBuffer_.get(), *tmpBuffer_.get(), commandContext_);
     }
     ImGui::End();
 }
@@ -237,6 +243,7 @@ void Renderer::Shutdown() {
     mainDepthBuffer_.reset();
     resultBuffer_.reset();
     deferredRenderer_.reset();
+    tmpBuffer_.reset();
     edgeRenderer_.reset();
     bloom_.reset();
     postEffect_.reset();

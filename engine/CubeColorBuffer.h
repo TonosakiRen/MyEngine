@@ -5,7 +5,7 @@
 
 class CubeColorBuffer : public PixelBuffer {
 public:
-    void Create(uint32_t width, uint32_t height, DXGI_FORMAT format);
+    void Create(const std::wstring& name, uint32_t width, uint32_t height, DXGI_FORMAT format);
 
     void SetClearColor(const float* clearColor);
     const float* GetClearColor() const { return clearColor_; }

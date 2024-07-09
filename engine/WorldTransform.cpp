@@ -12,7 +12,7 @@ void WorldTransform::Initialize(bool srtChange) {
     }
     matWorld_ = MakeIdentity4x4();
     worldInverseTranspose_ = MakeIdentity4x4();
-    constBuffer_.Create((sizeof(ConstBufferData) + 0xff) & ~0xff);
+    constBuffer_.Create(L"worldTransformBuffer", (sizeof(ConstBufferData) + 0xff) & ~0xff);
     Update();
 }
 

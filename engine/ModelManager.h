@@ -68,6 +68,8 @@ public:
 
 	const ModelData& GetModelData(const uint32_t modelHandle);
 
+	const std::vector<CullData>& GetCullDataData(const uint32_t modelHandle);
+
 	void DrawInstanced(CommandContext& commandContext, const  uint32_t modelHandle);
 	void DrawInstanced(CommandContext& commandContext, const uint32_t modelHandle,const UINT textureRootParamterIndex, const uint32_t textureHandle = 0);
 	void DrawInstanced(CommandContext& commandContext, const  uint32_t modelHandle, UINT textureRootParamterIndex, DescriptorHandle descriptorHandle);

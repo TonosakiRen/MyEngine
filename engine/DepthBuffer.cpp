@@ -61,7 +61,7 @@ DXGI_FORMAT GetDepthFormat(DXGI_FORMAT format) {
     return DXGI_FORMAT_UNKNOWN;
 }
 
-void DepthBuffer::Create(uint32_t width, uint32_t height, DXGI_FORMAT format) {
+void DepthBuffer::Create(const std::wstring& name, uint32_t width, uint32_t height, DXGI_FORMAT format) {
     auto flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
     auto desc = DescribeTex2D(width, height, 1, format, flags);
 
@@ -69,11 +69,11 @@ void DepthBuffer::Create(uint32_t width, uint32_t height, DXGI_FORMAT format) {
     clearValue.Format = format;
     clearValue.DepthStencil.Depth = clearValue_;
 
-    CreateTextureResource(desc, clearValue);
+    CreateTextureResource(name, desc, clearValue);
     CreateViews();
 }
 
-void DepthBuffer::CreateArray(uint32_t width, uint32_t height, uint32_t arraySize, DXGI_FORMAT format) {
+void DepthBuffer::CreateArray(const std::wstring& name, uint32_t width, uint32_t height, uint32_t arraySize, DXGI_FORMAT format) {
     auto flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
     auto desc = DescribeTex2D(width, height, arraySize, format, flags);
 
@@ -81,7 +81,7 @@ void DepthBuffer::CreateArray(uint32_t width, uint32_t height, uint32_t arraySiz
     clearValue.Format = format;
     clearValue.DepthStencil.Depth = clearValue_;
 
-    CreateTextureResource(desc, clearValue);
+    CreateTextureResource(name, desc, clearValue);
     CreateViews();
 }
 

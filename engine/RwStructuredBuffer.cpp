@@ -8,11 +8,11 @@ RwStructuredBuffer::~RwStructuredBuffer() {
     Destroy();
 }
 
-void RwStructuredBuffer::Create(size_t bufferSize, UINT numElements) {
+void RwStructuredBuffer::Create(const std::wstring& name, size_t bufferSize, UINT numElements) {
     // インスタンシングデータのサイズ
     UINT sizeINB = static_cast<UINT>(bufferSize * numElements);
 
-    UAVBuffer::Create(sizeINB);
+    UAVBuffer::Create(name, sizeINB);
 
     D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc{};
     uavDesc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;

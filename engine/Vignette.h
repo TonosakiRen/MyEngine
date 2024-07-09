@@ -26,19 +26,13 @@ public:
 
 	void Initialize(ColorBuffer& orinalBuffer);
 
-	void Draw(ColorBuffer& originalBuffer, CommandContext& commandContext);
-
-	ColorBuffer& GetResult() {
-		return resultBuffer_;
-	}
+	void Draw(ColorBuffer& originalBuffer,ColorBuffer& tmpBuffer, CommandContext& commandContext);
 
 private:
-	void CreatePipeline();
+	void CreatePipeline(ColorBuffer& orignalBuffer);
 private:
 	RootSignature rootSignature_;
 	PipelineState pipelineState_;
-
-	ColorBuffer resultBuffer_;
 
 	float t_ = 0.8f;
 	float scale_ = 16.0f;

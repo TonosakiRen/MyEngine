@@ -1,4 +1,4 @@
-#include "Voronoi.h"
+#include "Cellular.h"
 #include "ShaderManager.h"
 #include "CommandContext.h"
 #include <vector>
@@ -7,52 +7,53 @@
 
 using namespace Microsoft::WRL;
 
-Voronoi::Voronoi()
+Cellular::Cellular()
 {
 }
 
-void Voronoi::Initialize(uint32_t pointNum)
+void Cellular::Initialize(uint32_t tileWidthNum)
 {
-
     InitializeGraphicsPipeline();
 
-    voronoiTexture_.Create(L"voronoiTexture", 1024, 1024, DXGI_FORMAT_R32G32B32A32_FLOAT);
+    uint32_t width = 1024;
 
-    point_.Create(L"voronoiPointBuffer", sizeof(Point), pointNum);
+    cellularTexture_ = std::make_unique<ColorBuffer>();
+    cellularTexture_->Create(L"cellularTexture",1024, 1024, DXGI_FORMAT_R32_FLOAT);
+
+    tileWidthNum_ = tileWidthNum;
+    tileWidth_ = float(width / tileWidthNum_);
+
+    maxDistance_ = tileWidth_ * 2.0f;
+
+    uint32_t pointNum = uint32_t(tileWidthNum_ * tileWidthNum_);
+
+
+
+    point_.Create(L"cellularPointBuffer", sizeof(Point), pointNum);
 
     std::vector<Point> randomPoint;
     randomPoint.reserve(pointNum);
-    for (uint32_t i = 0; i < pointNum; i++) {
-        float x = Rand(0.0f,float(voronoiTexture_.GetWidth()));
-        float y = Rand(0.0f, float(voronoiTexture_.GetHeight()));
 
-        Point tmp;
-        tmp.point = Vector2{ x,y };
-
-        //tmp.color = HSVA(Rand(0.0f,1.0f),1.0f,1.0f,1.0f);
-
-        tmp.index = i;
-        if (i % 350 == 0) {
-            tmp.color = HSVA(Rand(0.0f, 1.0f), 0.5f, 1.0f, 1.0f);
+    for (uint32_t y = 0; y < tileWidthNum_; y++) {
+        for (uint32_t x = 0; x < tileWidthNum_; x++) {
+            Point tmp;
+            float rndX = Rand(0.0f, float(tileWidth_)) + tileWidth_ * x;
+            float rndY = Rand(0.0f, float(tileWidth_)) + tileWidth_ * y;
+            tmp.point = Vector2{ rndX,rndY };
+            tmp.index = y * tileWidthNum_ +  x;
+            randomPoint.emplace_back(tmp);
         }
-        else {
-            tmp.color = { 0.0f,0.0f,0.0f,0.0f };
-        }
-
-        randomPoint.emplace_back(tmp);
     }
-
-    pointNum_ = pointNum;
 
     point_.Copy(randomPoint.data(), sizeof(Point) * pointNum);
 }
 
-void Voronoi::Render(CommandContext& commandContext)
+void Cellular::Render(CommandContext& commandContext)
 {
-    commandContext.TransitionResource(voronoiTexture_, D3D12_RESOURCE_STATE_RENDER_TARGET);
+    commandContext.TransitionResource(*cellularTexture_, D3D12_RESOURCE_STATE_RENDER_TARGET);
 
-    commandContext.ClearColor(voronoiTexture_);
-    commandContext.SetViewportAndScissorRect(0, 0, voronoiTexture_.GetWidth(), voronoiTexture_.GetHeight());
+    commandContext.ClearColor(*cellularTexture_);
+    commandContext.SetViewportAndScissorRect(0, 0, cellularTexture_->GetWidth(), cellularTexture_->GetHeight());
 
     commandContext.SetGraphicsRootSignature(*sRootSignature);
 
@@ -60,16 +61,21 @@ void Voronoi::Render(CommandContext& commandContext)
     commandContext.SetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
     commandContext.SetDescriptorTable(0, point_.GetSRV());
-    commandContext.SetConstant(1, 0, pointNum_);
+    commandContext.SetConstants(1, maxDistance_,tileWidthNum_, tileWidth_);
 
     
-    commandContext.SetRenderTarget(voronoiTexture_.GetRTV());
+    commandContext.SetRenderTarget(cellularTexture_->GetRTV());
     commandContext.DrawInstanced(3,1, 0, 0);
     
-    commandContext.TransitionResource(voronoiTexture_, D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
+    commandContext.TransitionResource(*cellularTexture_, D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
 }
 
-void Voronoi::InitializeGraphicsPipeline()
+void Cellular::Finalize()
+{
+    cellularTexture_.reset();
+}
+
+void Cellular::InitializeGraphicsPipeline()
 {
     ComPtr<IDxcBlob> vsBlob;
     ComPtr<IDxcBlob> psBlob;
@@ -80,7 +86,7 @@ void Voronoi::InitializeGraphicsPipeline()
     vsBlob = shaderManager->Compile(L"PostEffectVS.hlsl", ShaderManager::kVertex);
     assert(vsBlob != nullptr);
 
-    psBlob = shaderManager->Compile(L"VoronoiPS.hlsl", ShaderManager::kPixel);
+    psBlob = shaderManager->Compile(L"CellularPS.hlsl", ShaderManager::kPixel);
     assert(psBlob != nullptr);
 
     sRootSignature = std::make_unique<RootSignature>();
@@ -94,7 +100,7 @@ void Voronoi::InitializeGraphicsPipeline()
         // ルートパラメータ
         CD3DX12_ROOT_PARAMETER rootparams[2] = {};
         rootparams[0].InitAsDescriptorTable(1, &descRangeSRV);
-        rootparams[1].InitAsConstants(1, 0);
+        rootparams[1].InitAsConstants(3, 0);
 
         // スタティックサンプラー
         CD3DX12_STATIC_SAMPLER_DESC samplerDesc =
@@ -108,13 +114,12 @@ void Voronoi::InitializeGraphicsPipeline()
         rootSignatureDesc.NumStaticSamplers = 1;
         rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
-        sRootSignature->Create(L"voronoiRootSignature", rootSignatureDesc);
+        sRootSignature->Create(L"cellularRootSingature", rootSignatureDesc);
 
     }
 
     {
 
-        
         // グラフィックスパイプラインの流れを設定
         D3D12_GRAPHICS_PIPELINE_STATE_DESC gpipeline{};
         gpipeline.VS = CD3DX12_SHADER_BYTECODE(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize());
@@ -131,17 +136,16 @@ void Voronoi::InitializeGraphicsPipeline()
         // 深度バッファのフォーマット
         gpipeline.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 
-       
         // 図形の形状設定（三角形）
         gpipeline.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 
         gpipeline.NumRenderTargets = 1;                            // 描画対象は1つ
-        gpipeline.RTVFormats[0] = DXGI_FORMAT_R32G32B32A32_FLOAT; // 0～255指定のRGBA
+        gpipeline.RTVFormats[0] = DXGI_FORMAT_R32_FLOAT; // 0～255指定のRGBA
         gpipeline.SampleDesc.Count = 1; // 1ピクセルにつき1回サンプリング
 
         gpipeline.pRootSignature = *sRootSignature;
 
         // グラフィックスパイプラインの生成
-        sPipelineState->Create(L"voronoiPipeline", gpipeline);
+        sPipelineState->Create(L"cellularPipeline", gpipeline);
     }
 }

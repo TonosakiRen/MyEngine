@@ -87,12 +87,12 @@ void Compute::CreatePipeline()
 	rootSignatureDesc.pParameters = rootparams;
 	rootSignatureDesc.NumParameters = _countof(rootparams);
 
-	rootSignature_.Create(rootSignatureDesc);
+	rootSignature_.Create(L"computeRootSignature", rootSignatureDesc);
 
 	D3D12_COMPUTE_PIPELINE_STATE_DESC desc{};
 	desc.pRootSignature = rootSignature_;
 	desc.CS = CD3DX12_SHADER_BYTECODE(uavBlob->GetBufferPointer(), uavBlob->GetBufferSize());
 
-	pipelineState_.Create(desc);
+	pipelineState_.Create(L"computePipeline", desc);
 
 }

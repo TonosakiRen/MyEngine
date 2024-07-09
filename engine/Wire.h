@@ -14,13 +14,15 @@
 #include "Skeleton.h"
 #include "Mymath.h"
 
+#include <DirectXMesh.h>
+
 class DirectXCommon;
 
 class Wire
 {
 public:
 
-	static const uint32_t kLineNum = 5000;
+	static const uint32_t kLineNum = 100000;
 
 	enum class RootParameter {
 		kViewProjection, 
@@ -36,6 +38,8 @@ public:
 	static void Draw(const Vector3& start, const Vector3& end);
 	static void Draw(const Skeleton& skeleton, const WorldTransform& worldTransform);
 	static void Draw(const Frustum& frustum);
+	static void Draw(const DirectX::BoundingSphere& boundingSphere, const WorldTransform& worldTransform);
+	static void Draw(const Sphere& sphere, const WorldTransform& worldTransform);
 
 private: 
 	void CreatePipeline();

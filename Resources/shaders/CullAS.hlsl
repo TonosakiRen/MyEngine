@@ -50,7 +50,8 @@ bool IsVisible(CullData cullData, WorldTransform worldTransform) {
 	float32_t radius = cullData.sphere.radius * worldTransform.scale;
 
 	for (uint32_t i = 0; i < 6; i++) {
-		if (dot(frustum.plane[i].normal, center) - frustum.plane[i].distance > radius) {
+		float distance = dot(frustum.plane[i].normal, center) - frustum.plane[i].distance;
+		if (distance > radius) {
 			return false;
 		}
 	}
@@ -71,6 +72,6 @@ void main(uint32_t dtid : SV_DispatchThreadID)
 		payload.meshletIndices[index] = dtid;
 	}
 
-	uint32_t visibleCount = WaveActiveCountBits(true);
+	uint32_t visibleCount = WaveActiveCountBits(isVisible);
 	DispatchMesh(visibleCount, 1, 1, payload);
 }

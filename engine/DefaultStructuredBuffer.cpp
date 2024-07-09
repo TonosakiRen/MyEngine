@@ -9,11 +9,11 @@ DefaultStructuredBuffer::~DefaultStructuredBuffer() {
     Destroy();
 }
 
-void DefaultStructuredBuffer::Create(size_t bufferSize, UINT numElements) {
+void DefaultStructuredBuffer::Create(const std::wstring& name, size_t bufferSize, UINT numElements) {
     // インスタンシングデータのサイズ
     UINT sizeINB = static_cast<UINT>(bufferSize * numElements);
 
-    DefaultBuffer::Create(sizeINB);
+    DefaultBuffer::Create(name,sizeINB);
 
     D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
     srvDesc.Format = DXGI_FORMAT_UNKNOWN;
@@ -26,7 +26,7 @@ void DefaultStructuredBuffer::Create(size_t bufferSize, UINT numElements) {
     srvHandle_ = DirectXCommon::GetInstance()->AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
     DirectXCommon::GetInstance()->GetDevice()->CreateShaderResourceView(resource_.Get(), &srvDesc, srvHandle_);
 
-    uploadBuffer_.Create(sizeINB);
+    uploadBuffer_.Create(name, sizeINB);
 
 }
 

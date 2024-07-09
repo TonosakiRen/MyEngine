@@ -136,7 +136,7 @@ uint32_t TextureManager::LoadInternal(const std::string& fileName) {
 	CD3DX12_HEAP_PROPERTIES heapProps{};
 	heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
 
-	texture.resource.CreateResource(heapProps, texresDesc, D3D12_RESOURCE_STATE_COPY_DEST);
+	texture.resource.CreateResource(L"textureResource", heapProps, texresDesc, D3D12_RESOURCE_STATE_COPY_DEST);
 
 	// 中間リソースを読み込む
 	std::vector<D3D12_SUBRESOURCE_DATA> subresources;
@@ -150,7 +150,7 @@ uint32_t TextureManager::LoadInternal(const std::string& fileName) {
 	uint64_t intermediateSize = GetRequiredIntermediateSize(texture.resource, 0, UINT(subresources.size()));
 
  
-	texture.intermediateResource.Create(intermediateSize);
+	texture.intermediateResource.Create(L"intermediateResource", intermediateSize);
 
 	UpdateSubresources(*commandContext_, texture.resource, texture.intermediateResource, 0, 0, UINT(subresources.size()), subresources.data());
 	commandContext_->TransitionResource(texture.resource, D3D12_RESOURCE_STATE_GENERIC_READ);
@@ -269,21 +269,16 @@ uint32_t TextureManager::LoadUvInternal(const std::string& fileName, const std::
 	CD3DX12_HEAP_PROPERTIES heapProps{};
 	heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
 
-	texture.resource.CreateResource(heapProps, texresDesc, D3D12_RESOURCE_STATE_COPY_DEST);
+	texture.resource.CreateResource(L"uvTextureResource", heapProps, texresDesc, D3D12_RESOURCE_STATE_COPY_DEST);
 
 	// 中間リソースを読み込む
 	std::vector<D3D12_SUBRESOURCE_DATA> subresources;
 	PrepareUpload(device_, mipImages.GetImages(), mipImages.GetImageCount(), mipImages.GetMetadata(), subresources);
 
-
-#ifdef _DEBUG
-	texture.resource->SetName(L"Texture");
-#endif // _DEBUG
-
 	uint64_t intermediateSize = GetRequiredIntermediateSize(texture.resource, 0, UINT(subresources.size()));
 
 
-	texture.intermediateResource.Create(intermediateSize);
+	texture.intermediateResource.Create(L"uvIntermediaResource", intermediateSize);
 
 	UpdateSubresources(*commandContext_, texture.resource, texture.intermediateResource, 0, 0, UINT(subresources.size()), subresources.data());
 	commandContext_->TransitionResource(texture.resource, D3D12_RESOURCE_STATE_GENERIC_READ);

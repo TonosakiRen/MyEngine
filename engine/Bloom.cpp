@@ -11,7 +11,7 @@ using namespace Microsoft::WRL;
 void Bloom::Initialize(ColorBuffer* originalTexture)
 {
 
-    luminanceTexture_.Create(
+    luminanceTexture_.Create(L"luminanceTexture",
         originalTexture->GetWidth(),
         originalTexture->GetHeight(),
         originalTexture->GetFormat());
@@ -42,7 +42,7 @@ void Bloom::Initialize(ColorBuffer* originalTexture)
         rootSignatureDesc.NumStaticSamplers = 1;
         rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
-        rootSignature_.Create(rootSignatureDesc);
+        rootSignature_.Create(L"bloomRootSignature", rootSignatureDesc);
     }
 
     {
@@ -67,13 +67,13 @@ void Bloom::Initialize(ColorBuffer* originalTexture)
         psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
         psoDesc.SampleDesc.Count = 1;
 
-        luminacePipelineState_.Create(psoDesc);
+        luminacePipelineState_.Create(L"luminancePipeline", psoDesc);
 
         ps = shaderManager->Compile(L"BloomPS.hlsl", ShaderManager::kPixel);
         psoDesc.PS = CD3DX12_SHADER_BYTECODE(ps->GetBufferPointer(), ps->GetBufferSize());
 
         psoDesc.BlendState = Helper::BlendAdditive;
-        additivePipelineState_.Create(psoDesc);
+        additivePipelineState_.Create(L"additivePipeline", psoDesc);
     }
 
 }

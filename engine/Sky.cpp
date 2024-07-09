@@ -19,7 +19,7 @@ void Sky::Initialize(CommandContext& commnadContext) {
     reducation_->Initialize(voronoi_->GetResult());
     reducation_->Draw(voronoi_->GetResult(),commnadContext);
 
-    starTexture_.Create(reducation_->GetResult().GetWidth(), reducation_->GetResult().GetHeight(), reducation_->GetResult().GetFormat());
+    starTexture_.Create(L"starTexture", reducation_->GetResult().GetWidth(), reducation_->GetResult().GetHeight(), reducation_->GetResult().GetFormat());
     commnadContext.CopyCubeBuffer(starTexture_, reducation_->GetResult());
     commnadContext.TransitionResource(starTexture_, D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
 }
@@ -99,7 +99,7 @@ void Sky::CreatePipeline() {
         rootSignatureDesc.NumStaticSamplers = 1;
         rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
-        rootSignature_->Create(rootSignatureDesc);
+        rootSignature_->Create(L"skyRootSignature", rootSignatureDesc);
 
     }
 
@@ -175,7 +175,7 @@ void Sky::CreatePipeline() {
         gpipeline.pRootSignature = *rootSignature_;
 
         // グラフィックスパイプラインの生成
-        pipelineState_->Create(gpipeline);
+        pipelineState_->Create(L"skyPipeline", gpipeline);
     }
 }
 
@@ -233,7 +233,7 @@ void Sky::CreateMesh()
     // 頂点データのサイズ
     UINT sizeVB = static_cast<UINT>(sizeof(Vector4) * vertices_.size());
 
-    vertexBuffer_.Create(sizeVB);
+    vertexBuffer_.Create(L"skyBoxVertexBuffer", sizeVB);
 
     vertexBuffer_.Copy(vertices_.data(), sizeVB);
 

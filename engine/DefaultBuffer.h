@@ -6,8 +6,8 @@ class DefaultBuffer : public GPUResource {
 public:
     ~DefaultBuffer();
 
-    void Create(size_t bufferSize);
-    void Create(size_t numElements, size_t elementSize);
+    void Create(const std::wstring& name, size_t bufferSize);
+    void Create(const std::wstring& name, size_t numElements, size_t elementSize);
 
     size_t GetBufferSize() const { return bufferSize_; }
 

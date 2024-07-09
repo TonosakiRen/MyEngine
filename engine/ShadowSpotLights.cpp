@@ -5,13 +5,13 @@ void ShadowSpotLights::Initialize() {
         lights_.resize(lightNum);
 
         for (int i = 0; i < lightNum; i++) {
-            lights_[i].shadowMap_.Create(shadowWidth, shadowHeight, DXGI_FORMAT_D32_FLOAT);
-            lights_[i].constBuffer_.Create((sizeof(ConstBufferData) + 0xff) & ~0xff);
+            lights_[i].shadowMap_.Create(L"shadowMapSpotLight", shadowWidth, shadowHeight, DXGI_FORMAT_D32_FLOAT);
+            lights_[i].constBuffer_.Create(L"shadowSpotLightBuffer", (sizeof(ConstBufferData) + 0xff) & ~0xff);
             lights_[i].descriptorHeapIndex = lights_[i].shadowMap_.GetSRV().GetIndex();
         }
         // インスタンシングデータのサイズ
         UINT sizeINB = static_cast<UINT>(sizeof(ConstBufferData) * lightNum);
-        structureBuffer_.Create(sizeINB);
+        structureBuffer_.Create(L"shadowSpotLightStructuredBuffer",sizeINB);
 
         D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
         srvDesc.Format = DXGI_FORMAT_UNKNOWN;

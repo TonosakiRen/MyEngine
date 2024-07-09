@@ -195,6 +195,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\Camera.cpp" />
     <ClCompile Include="engine\ByteAddressBuffer.cpp" />
     <ClCompile Include="engine\Calling.cpp" />
+    <ClCompile Include="engine\Cellular.cpp" />
     <ClCompile Include="engine\Collider.cpp" />
     <ClCompile Include="engine\ColorBuffer.cpp" />
     <ClCompile Include="engine\CommandContext.cpp" />
@@ -307,6 +308,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\Camera.h" />
     <ClInclude Include="engine\ByteAddressBuffer.h" />
     <ClInclude Include="engine\Calling.h" />
+    <ClInclude Include="engine\Cellular.h" />
     <ClInclude Include="engine\Collider.h" />
     <ClInclude Include="engine\ColorBuffer.h" />
     <ClInclude Include="engine\CommandContext.h" />
@@ -405,6 +407,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\WorldTransform.h" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="Resources\shaders\CellularPS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Demo|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
     <FxCompile Include="Resources\shaders\CullAS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Demo|x64'">true</ExcludedFromBuild>

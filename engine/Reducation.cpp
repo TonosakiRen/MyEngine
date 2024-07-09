@@ -43,7 +43,7 @@ void Reducation::CreatePipeline() {
 		rootSignatureDesc.NumStaticSamplers = 1;
 		rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
-		rootSignature_.Create(rootSignatureDesc);
+		rootSignature_.Create(L"reducationRootSignature", rootSignatureDesc);
 
 	}
 
@@ -84,14 +84,14 @@ void Reducation::CreatePipeline() {
 		gpipeline.pRootSignature = rootSignature_;
 
 		// グラフィックスパイプラインの生成
-		pipelineState_.Create(gpipeline);
+		pipelineState_.Create(L"reducationPipeline", gpipeline);
 	}
 }
 
 
 
 void Reducation::Initialize(ColorBuffer& originalBuffer) {
-	resultBuffer_.Create(originalBuffer.GetWidth(), originalBuffer.GetHeight(), originalBuffer.GetFormat());
+	resultBuffer_.Create(L"reducationTexture", originalBuffer.GetWidth(), originalBuffer.GetHeight(), originalBuffer.GetFormat());
 	CreatePipeline();
 }
 

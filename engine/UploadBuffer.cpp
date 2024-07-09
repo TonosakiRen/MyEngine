@@ -7,7 +7,7 @@ UploadBuffer::~UploadBuffer() {
     Destroy();
 }
 
-void UploadBuffer::Create(size_t bufferSize) {
+void UploadBuffer::Create(const std::wstring& name, size_t bufferSize) {
     HRESULT result = S_FALSE;
     auto device = DirectXCommon::GetInstance()->GetDevice();
 
@@ -38,7 +38,7 @@ void UploadBuffer::Create(size_t bufferSize) {
     assert(SUCCEEDED(result));
 }
 
-void UploadBuffer::Create(size_t bufferSize,void** cpuData) {
+void UploadBuffer::Create(const std::wstring& name, size_t bufferSize,void** cpuData) {
     HRESULT result = S_FALSE;
     auto device = DirectXCommon::GetInstance()->GetDevice();
 
@@ -69,8 +69,8 @@ void UploadBuffer::Create(size_t bufferSize,void** cpuData) {
     assert(SUCCEEDED(result));
 }
 
-void UploadBuffer::Create(size_t numElements, size_t elementSize) {
-    Create(numElements * elementSize);
+void UploadBuffer::Create(const std::wstring& name, size_t numElements, size_t elementSize) {
+    Create(name, numElements * elementSize);
 }
 
 void UploadBuffer::Copy(const void* srcData, size_t copySize) const {

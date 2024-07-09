@@ -57,13 +57,13 @@ void Skinning::CreatePipeline()
     rootSignatureDesc.pParameters = rootparams;
     rootSignatureDesc.NumParameters = _countof(rootparams);
 
-    rootSignature_->Create(rootSignatureDesc);
+    rootSignature_->Create(L"skinningRootSignature", rootSignatureDesc);
 
     D3D12_COMPUTE_PIPELINE_STATE_DESC desc{};
     desc.pRootSignature = *rootSignature_;
     desc.CS = CD3DX12_SHADER_BYTECODE(uavBlob->GetBufferPointer(), uavBlob->GetBufferSize());
 
-    pipelineState_->Create(desc);
+    pipelineState_->Create(L"skinningPipeline", desc);
 }
 
 void Skinning::Dispatch(CommandContext& commandContext, const uint32_t modelHandle,SkinCluster& skinCluster)

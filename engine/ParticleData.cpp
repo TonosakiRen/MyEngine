@@ -11,7 +11,7 @@ ParticleData::ParticleData(uint32_t particleNum) : kParticleNum(particleNum) {
 
 void ParticleData::Initialize()
 {
-	structuredBuffer_.Create(sizeof(Data), kParticleNum);
+	structuredBuffer_.Create(L"particleDataBuffer", sizeof(Data), kParticleNum);
 	data_ = static_cast<Data*>(structuredBuffer_.GetCPUData());
 }
 

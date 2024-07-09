@@ -9,7 +9,7 @@
 using namespace DirectX;
 using namespace Microsoft::WRL;
 
-void GrayScale::CreatePipeline() {
+void GrayScale::CreatePipeline(ColorBuffer& orignalBuffer) {
 	ComPtr<IDxcBlob> vsBlob;
 	ComPtr<IDxcBlob> psBlob;
 
@@ -44,7 +44,7 @@ void GrayScale::CreatePipeline() {
 		rootSignatureDesc.NumStaticSamplers = 1;
 		rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
-		rootSignature_.Create(rootSignatureDesc);
+		rootSignature_.Create(L"grayScaleRootSignature", rootSignatureDesc);
 
 	}
 
@@ -79,29 +79,28 @@ void GrayScale::CreatePipeline() {
 		gpipeline.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 
 		gpipeline.NumRenderTargets = 1;                            // 描画対象は1つ
-		gpipeline.RTVFormats[0] = Renderer::GetInstance()->GetRTVFormat(Renderer::kColor); // 0～255指定のRGBA
+		gpipeline.RTVFormats[0] = orignalBuffer.GetFormat(); // 0～255指定のRGBA
 		gpipeline.SampleDesc.Count = 1; // 1ピクセルにつき1回サンプリング
 
 		gpipeline.pRootSignature = rootSignature_;
 
 		// グラフィックスパイプラインの生成
-		pipelineState_.Create(gpipeline);
+		pipelineState_.Create(L"grayScalePipeline", gpipeline);
 	}
 }
 
 
 
-void GrayScale::Initialize(ColorBuffer& orinalBuffer) {
-	resultBuffer_.Create(orinalBuffer.GetWidth(), orinalBuffer.GetHeight(), orinalBuffer.GetFormat());
-	CreatePipeline();
+void GrayScale::Initialize(ColorBuffer& orignalBuffer) {
+	CreatePipeline(orignalBuffer);
 }
 
-void GrayScale::Draw(ColorBuffer& originalBuffer, CommandContext& commandContext) {
+void GrayScale::Draw(ColorBuffer& originalBuffer, ColorBuffer& tmpBuffer, CommandContext& commandContext) {
 	
 	commandContext.TransitionResource(originalBuffer, D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
-	commandContext.TransitionResource(resultBuffer_, D3D12_RESOURCE_STATE_RENDER_TARGET);
+	commandContext.TransitionResource(tmpBuffer, D3D12_RESOURCE_STATE_RENDER_TARGET);
 
-	commandContext.SetRenderTarget(resultBuffer_.GetRTV());
+	commandContext.SetRenderTarget(tmpBuffer.GetRTV());
 	commandContext.SetPipelineState(pipelineState_);
 	commandContext.SetGraphicsRootSignature(rootSignature_);
 	commandContext.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -119,6 +118,6 @@ void GrayScale::Draw(ColorBuffer& originalBuffer, CommandContext& commandContext
 	  // 描画コマンド
 	commandContext.DrawInstanced(3,1,0,0);
 
-	commandContext.CopyBuffer(originalBuffer,resultBuffer_);
+	commandContext.CopyBuffer(originalBuffer, tmpBuffer);
 }
 

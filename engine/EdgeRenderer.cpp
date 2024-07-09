@@ -16,11 +16,10 @@ void EdgeRenderer::Initialize(ColorBuffer* colorTexture,ColorBuffer* normalTextu
 	colorTexture_ = colorTexture;
 	normalTexture_ = normalTexture;
 	depthTexture_ = depthTexture;
-	edgeTexture_.Create(colorTexture->GetWidth(), colorTexture->GetHeight(), colorTexture->GetFormat());
 	CreatePipeline();
 }
 
-void EdgeRenderer::Render(CommandContext& commandContext, ColorBuffer* originalTexture)
+void EdgeRenderer::Render(CommandContext& commandContext, ColorBuffer& tmpBuffer, ColorBuffer* originalTexture)
 {
 
 	commandContext.TransitionResource(*originalTexture, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
@@ -28,9 +27,9 @@ void EdgeRenderer::Render(CommandContext& commandContext, ColorBuffer* originalT
 	commandContext.TransitionResource(*depthTexture_, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
 	//Edge描画
-	commandContext.TransitionResource(edgeTexture_, D3D12_RESOURCE_STATE_RENDER_TARGET);
-	commandContext.SetRenderTarget(edgeTexture_.GetRTV());
-	commandContext.SetViewportAndScissorRect(0, 0, edgeTexture_.GetWidth(), edgeTexture_.GetHeight());
+	commandContext.TransitionResource(tmpBuffer, D3D12_RESOURCE_STATE_RENDER_TARGET);
+	commandContext.SetRenderTarget(tmpBuffer.GetRTV());
+	commandContext.SetViewportAndScissorRect(0, 0, tmpBuffer.GetWidth(), tmpBuffer.GetHeight());
 
 	commandContext.SetPipelineState(edgePipelineState_);
 	commandContext.SetGraphicsRootSignature(edgeRootSignature_);
@@ -51,7 +50,7 @@ void EdgeRenderer::Render(CommandContext& commandContext, ColorBuffer* originalT
 	// 描画コマンド
 	commandContext.DrawInstanced(3, 1, 0, 0);
 
-	commandContext.CopyBuffer(*originalTexture, edgeTexture_);
+	commandContext.CopyBuffer(*originalTexture, tmpBuffer);
 }
 
 void EdgeRenderer::CreatePipeline()
@@ -92,7 +91,7 @@ void EdgeRenderer::CreatePipeline()
 		rootSignatureDesc.NumStaticSamplers = 1;
 		rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
-		edgeRootSignature_.Create(rootSignatureDesc);
+		edgeRootSignature_.Create(L"edgeRootSignature", rootSignatureDesc);
 
 	}
 
@@ -119,7 +118,7 @@ void EdgeRenderer::CreatePipeline()
 
 		gpipeline.pRootSignature = edgeRootSignature_;
 
-		edgePipelineState_.Create(gpipeline);
+		edgePipelineState_.Create(L"edgePipeline", gpipeline);
 
 	}
 }

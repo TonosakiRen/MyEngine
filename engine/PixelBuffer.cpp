@@ -8,7 +8,7 @@
 
 #include "DirectXCommon.h"
 
-void PixelBuffer::CreateTextureResource(const D3D12_RESOURCE_DESC& desc, D3D12_CLEAR_VALUE clearValue) {
+void PixelBuffer::CreateTextureResource(const std::wstring& name, const D3D12_RESOURCE_DESC& desc, D3D12_CLEAR_VALUE clearValue) {
     resource_.Reset();
 
     auto device = DirectXCommon::GetInstance()->GetDevice();
@@ -23,7 +23,7 @@ void PixelBuffer::CreateTextureResource(const D3D12_RESOURCE_DESC& desc, D3D12_C
 
 }
 
-void PixelBuffer::AssociateWithResource(ID3D12Resource* resource, D3D12_RESOURCE_STATES state) {
+void PixelBuffer::AssociateWithResource(const std::wstring& name, ID3D12Resource* resource, D3D12_RESOURCE_STATES state) {
     assert(resource);
     auto desc = resource->GetDesc();
 

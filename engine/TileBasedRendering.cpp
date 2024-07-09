@@ -16,24 +16,24 @@ void TileBasedRendering::Initialize()
     CreatePipeline();
 
     {
-        initialTileFrustrumBuffer_.Create(sizeof(Frustum), kTileNum);
+        initialTileFrustrumBuffer_.Create(L"initialTileFrustum", sizeof(Frustum), kTileNum);
     }
 
     {
-        rwTilesInformation_.Create(sizeof(ConstBufferData), kTileNum);
+        rwTilesInformation_.Create(L"rwTileInformation", sizeof(ConstBufferData), kTileNum);
  
     }
 
     {
-        rwPointLightIndex_.Create(sizeof(uint32_t), kTileNum * PointLights::lightNum);
+        rwPointLightIndex_.Create(L"rwPointLightIndex", sizeof(uint32_t), kTileNum * PointLights::lightNum);
     }
 
     {
-        rwSpotLightIndex_.Create(sizeof(uint32_t), kTileNum * SpotLights::lightNum);
+        rwSpotLightIndex_.Create(L"rwSpotLightIndex", sizeof(uint32_t), kTileNum * SpotLights::lightNum);
     }
 
     {
-        rwShadowSpotLightIndex_.Create(sizeof(uint32_t), kTileNum * ShadowSpotLights::lightNum);
+        rwShadowSpotLightIndex_.Create(L"rwShadowSpotLightIndex", sizeof(uint32_t), kTileNum * ShadowSpotLights::lightNum);
     }
 
 }
@@ -108,13 +108,13 @@ void TileBasedRendering::CreatePipeline()
     rootSignatureDesc.pParameters = rootparams;
     rootSignatureDesc.NumParameters = _countof(rootparams);
 
-    rootSignature_.Create(rootSignatureDesc);
+    rootSignature_.Create(L"TBRRootSignature", rootSignatureDesc);
 
     D3D12_COMPUTE_PIPELINE_STATE_DESC desc{};
     desc.pRootSignature = rootSignature_;
     desc.CS = CD3DX12_SHADER_BYTECODE(uavBlob->GetBufferPointer(), uavBlob->GetBufferSize());
 
-    pipelineState_.Create(desc);
+    pipelineState_.Create(L"TBRPipeline", desc);
 }
 
 Frustum TileBasedRendering::GetTileFrustrum(const int& width, const int& height)

@@ -10,7 +10,7 @@ class DefaultStructuredBuffer : public DefaultBuffer {
 public:
     ~DefaultStructuredBuffer();
 
-    void Create(size_t bufferSize, UINT numElements);
+    void Create(const std::wstring& name, size_t bufferSize, UINT numElements);
 
     void Copy(const void* srcData, size_t copySize);
     template<class T>

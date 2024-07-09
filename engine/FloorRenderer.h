@@ -13,6 +13,8 @@
 #include "WorldTransform.h"
 #include "DefaultBuffer.h"
 
+#include "Cellular.h"
+
 
 class DirectXCommon;
 
@@ -20,16 +22,18 @@ class FloorRenderer
 {
 public:
 	enum class RootParameter {
+		kCellular,
+
 		kWorldTransform, 
 		kViewProjection, 
 		kColor,
-		
+		kTime,
 
 		parameterNum
 	};
 
 
-	void Initialize();
+	void Initialize(CommandContext& commnadContext);
 	void Finalize();
 	void PreDraw(CommandContext& commandContext, const ViewProjection& viewProjection);
 
@@ -43,6 +47,9 @@ private:
 	std::unique_ptr<StructuredBuffer> line_;
 	std::unique_ptr<DefaultBuffer> lineNum_;
 
-	Vector4 HSVA_ = { 0.0f,0.2f,0.45f,0.4f };;
+	std::unique_ptr < Cellular> cellular_;
+	uint32_t time_ = 0;
+
+	Vector4 HSVA_ = { 0.0f,0.2f,0.45f,0.4f };
 };
 

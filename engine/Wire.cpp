@@ -14,7 +14,7 @@ void Wire::Initialize() {
     vertexBufferView_ = std::make_unique<D3D12_VERTEX_BUFFER_VIEW>();
     vertexBuffer_ = std::make_unique<UploadBuffer>();
 
-    vertexBuffer_->Create(sizeof(Vector3) * kLineNum);
+    vertexBuffer_->Create(L"wireVertexBuffer", sizeof(Vector3) * kLineNum);
 
     // 頂点バッファビューの作成
     vertexBufferView_->BufferLocation = vertexBuffer_->GetGPUVirtualAddress();
@@ -87,7 +87,7 @@ void Wire::CreatePipeline() {
         rootSignatureDesc.NumStaticSamplers = 1;
         rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
-        rootSignature_->Create(rootSignatureDesc);
+        rootSignature_->Create(L"wireRootSignature", rootSignatureDesc);
 
     }
 
@@ -159,7 +159,7 @@ void Wire::CreatePipeline() {
         gpipeline.pRootSignature = *rootSignature_;
 
         // グラフィックスパイプラインの生成
-        pipelineState_->Create(gpipeline);
+        pipelineState_->Create(L"wirePipeline", gpipeline);
     }
 }
 
@@ -205,4 +205,71 @@ void Wire::Draw(const Frustum& frustum)
     Draw(frustum.vertex[1], frustum.vertex[5]);
     Draw(frustum.vertex[2], frustum.vertex[6]);
     Draw(frustum.vertex[3], frustum.vertex[7]);
+}
+
+void Wire::Draw(const DirectX::BoundingSphere& boundingSphere,const WorldTransform& worldTransform)
+{
+
+    float radius = boundingSphere.Radius * worldTransform.maxScale_;
+
+    const uint32_t kSubdivision = 15; //分割数
+    const float kLonEvery = float(2.0f * M_PI / kSubdivision);//経度分割一つ分の角度
+    const float kLatEvery = float(M_PI / kSubdivision);//緯度分割一つ分の角度
+    //緯度の方向に分割 -π/2 ～	π/2
+    for (uint32_t latIndex = 0; latIndex < kSubdivision; ++latIndex) {
+        float lat = float(-M_PI / 2.0f + kLatEvery * latIndex);//現在の緯度
+        //軽度の方向に分割 0 ～2π
+        for (uint32_t lonIndex = 0; lonIndex < kSubdivision; ++lonIndex) {
+            float lon = lonIndex * kLonEvery;//現在の経度
+            //world座標系でのa,b,cを求める
+            Vector3 a, b, c;
+            a = { std::cos(lat) * std::cos(lon),std::sin(lat),std::cos(lat) * std::sin(lon) };
+            b = { std::cos(lat + kLatEvery) * std::cos(lon),std::sin(lat + kLatEvery),std::cos(lat + kLatEvery) * std::sin(lon) };
+            c = { std::cos(lat) * std::cos(lon + kLonEvery),std::sin(lat),std::cos(lat) * std::sin(lon + kLonEvery) };
+            Vector3 center;
+            center.x = boundingSphere.Center.x;
+            center.y = boundingSphere.Center.y;
+            center.z = boundingSphere.Center.z;
+
+            center = center * worldTransform.matWorld_;
+
+            a = a * radius + center;
+            b = b * radius + center;
+            c = c * radius + center;
+
+            Draw(a,b);
+            Draw(a,c);
+        }
+    }
+}
+
+void Wire::Draw(const Sphere& sphere, const WorldTransform& worldTransform)
+{
+    float radius = sphere.radius * worldTransform.maxScale_;
+
+    const uint32_t kSubdivision = 15; //分割数
+    const float kLonEvery = float(2.0f * M_PI / kSubdivision);//経度分割一つ分の角度
+    const float kLatEvery = float(M_PI / kSubdivision);//緯度分割一つ分の角度
+    //緯度の方向に分割 -π/2 ～	π/2
+    for (uint32_t latIndex = 0; latIndex < kSubdivision; ++latIndex) {
+        float lat = float(-M_PI / 2.0f + kLatEvery * latIndex);//現在の緯度
+        //軽度の方向に分割 0 ～2π
+        for (uint32_t lonIndex = 0; lonIndex < kSubdivision; ++lonIndex) {
+            float lon = lonIndex * kLonEvery;//現在の経度
+            //world座標系でのa,b,cを求める
+            Vector3 a, b, c;
+            a = { std::cos(lat) * std::cos(lon),std::sin(lat),std::cos(lat) * std::sin(lon) };
+            b = { std::cos(lat + kLatEvery) * std::cos(lon),std::sin(lat + kLatEvery),std::cos(lat + kLatEvery) * std::sin(lon) };
+            c = { std::cos(lat) * std::cos(lon + kLonEvery),std::sin(lat),std::cos(lat) * std::sin(lon + kLonEvery) };
+
+            Vector3 center = sphere.center * worldTransform.matWorld_;
+
+            a = a * radius + center;
+            b = b * radius + center;
+            c = c * radius + center;
+
+            Draw(a, b);
+            Draw(a, c);
+        }
+    }
 }

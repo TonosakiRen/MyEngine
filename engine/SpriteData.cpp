@@ -26,7 +26,7 @@ void SpriteData::Initialize(uint32_t textureHandle, Vector2 position, Vector4 co
 
 	resourceDesc_ = TextureManager::GetInstance()->GetResoureDesc(textureHandle_);
 
-	vertexBuffer_.Create(sizeof(VertexData) * 4);
+	vertexBuffer_.Create(L"spriteVertexBuffer", sizeof(VertexData) * 4);
 
 	// 頂点バッファへのデータ転送
 	TransferVertices();
@@ -36,7 +36,7 @@ void SpriteData::Initialize(uint32_t textureHandle, Vector2 position, Vector4 co
 	vbView_.SizeInBytes = sizeof(VertexData) * 4;
 	vbView_.StrideInBytes = sizeof(VertexData);
 
-	constBuffer_.Create((sizeof(ConstBufferData) + 0xff) & ~0xff);
+	constBuffer_.Create(L"spriteConstBuffer", (sizeof(ConstBufferData) + 0xff) & ~0xff);
 }
 
 void SpriteData::SetTextureHandle(uint32_t textureHandle) {

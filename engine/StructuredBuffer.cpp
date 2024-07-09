@@ -1,11 +1,11 @@
 #include "StructuredBuffer.h"
 #include "DirectXCommon.h"
 
-void StructuredBuffer::Create(size_t bufferSize , UINT numElements)
+void StructuredBuffer::Create(const std::wstring& name, size_t bufferSize , UINT numElements)
 {
     // インスタンシングデータのサイズ
     UINT sizeINB = static_cast<UINT>(bufferSize * numElements);
-    UploadBuffer::Create(sizeINB);
+    UploadBuffer::Create(name, sizeINB);
 
     D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
     srvDesc.Format = DXGI_FORMAT_UNKNOWN;
