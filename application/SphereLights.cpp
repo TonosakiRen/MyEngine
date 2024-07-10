@@ -7,6 +7,7 @@
 
 SphereLights::SphereLights()
 {
+	//a
 	particle_ = std::make_unique<ParticleModelData>(kSphereNum);
 }
 
