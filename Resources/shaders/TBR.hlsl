@@ -1,7 +1,3 @@
-#define PointLightNum 256
-#define SpotLightNum 1
-#define ShadowSpotLightNum 1
-
 struct Plane {
 	float32_t3 normal;
 	float32_t distance;
@@ -14,10 +10,6 @@ struct TileInformation {
 	uint32_t pointLightNum;
 	uint32_t spotLightNum;
 	uint32_t shadowSpotLightNum;
-
-	uint32_t pointLightIndex[PointLightNum];
-	uint32_t spotLightIndex[SpotLightNum];
-	uint32_t shadowSpotLightIndex[ShadowSpotLightNum];
 };
 
 struct PointLight {
@@ -78,7 +70,7 @@ Frustum MakeFrustum(Frustum frustum) {
 Frustum Multiply(Frustum f, float32_t4x4 m) {
 
 	Frustum result;
-	
+
 	result.vertex[0] = Multiply(m, f.vertex[0]);
 	result.vertex[1] = Multiply(m, f.vertex[1]);
 	result.vertex[2] = Multiply(m, f.vertex[2]);
@@ -108,6 +100,14 @@ bool IsHitSphere(Frustum frustum, float32_t3 position, float32_t radius)
 	return true;
 }
 
+struct LightNum {
+	uint32_t  directionalLight;
+	uint32_t  pointLight;
+	uint32_t  areaLight;
+	uint32_t  spotLight;
+	uint32_t  shadowSpotLight;
+};
+
 struct ViewProjection {
 	float32_t4x4 viewProjection;
 	float32_t4x4 inverseViewProjection;
@@ -116,14 +116,18 @@ struct ViewProjection {
 	float32_t3 viewPosition;
 };
 
-ConstantBuffer<ViewProjection> gViewProjection  : register(b0);
+ConstantBuffer<LightNum> lightNum : register(b0);
+ConstantBuffer<ViewProjection> gViewProjection  : register(b1);
 
 RWStructuredBuffer<TileInformation> tileInformations : register(u0);
+RWStructuredBuffer<uint32_t> pointLightIndex : register(u1);
+RWStructuredBuffer<uint32_t> spotLightIndex : register(u2);
+RWStructuredBuffer<uint32_t> shadowSpotLightIndex : register(u3);
 
 StructuredBuffer<Frustum> initialTileFrustum : register(t0);
 StructuredBuffer<PointLight> gPointLights  : register(t1);
 [numthreads(16 * 2, 9 * 2, 1)]
-void main( uint32_t2 index : SV_GroupThreadID )
+void main(uint32_t2 index : SV_GroupThreadID)
 {
 
 	uint32_t tileIndex = index.x + (index.y * (16 * 2));
@@ -134,23 +138,23 @@ void main( uint32_t2 index : SV_GroupThreadID )
 
 	Frustum tileFrustnum = Multiply(initialTileFrustum[tileIndex], gViewProjection.worldMatrix);
 
-	for (uint32_t i = 0; i < PointLightNum;i++) {
+	for (uint32_t i = 0; i < lightNum.pointLight; i++) {
 		if (gPointLights[i].isActive == true) {
 			bool isHit = IsHitSphere(tileFrustnum, gPointLights[i].position, gPointLights[i].radius);
 			if (isHit) {
-				tileInformations[tileIndex].pointLightIndex[tileInformations[tileIndex].pointLightNum] = i;
+				pointLightIndex[tileIndex * lightNum.pointLight + tileInformations[tileIndex].pointLightNum] = i;
 				tileInformations[tileIndex].pointLightNum++;
 			}
 		}
 	}
 
-	for (uint32_t j = 0; j < SpotLightNum; j++) {
-		tileInformations[tileIndex].spotLightIndex[tileInformations[tileIndex].spotLightNum] = j;
+	for (uint32_t j = 0; j < lightNum.spotLight; j++) {
+		spotLightIndex[tileIndex * lightNum.spotLight + tileInformations[tileIndex].spotLightNum] = j;
 		tileInformations[tileIndex].spotLightNum++;
 	}
 
-	for (uint32_t k = 0; k < ShadowSpotLightNum; k++) {
-		tileInformations[tileIndex].shadowSpotLightIndex[tileInformations[tileIndex].shadowSpotLightNum] = k;
+	for (uint32_t k = 0; k < lightNum.shadowSpotLight; k++) {
+		shadowSpotLightIndex[tileIndex * lightNum.shadowSpotLight + tileInformations[tileIndex].shadowSpotLightNum] = k;
 		tileInformations[tileIndex].shadowSpotLightNum++;
 	}
 }
