@@ -46,5 +46,7 @@ PixelShaderOutput main(VSOutput input) {
 	output.normal.xyz = (normal.xyz + 1.0f) * 0.5f;
 	output.normal.w = 1.0f;
 
+
+
 	return output;
 }

@@ -176,8 +176,8 @@ void Renderer::DeferredRender(ViewProjection& viewProjection)
 
     }
     else {
-        tileBasedRendering_->ComputeUpdate(commandContext_, viewProjection);
-        deferredRenderer_->Render(commandContext_, resultBuffer_.get(), viewProjection, *tileBasedRendering_);
+       tileBasedRendering_->ComputeUpdate(commandContext_, viewProjection);
+       deferredRenderer_->Render(commandContext_, resultBuffer_.get(), viewProjection, *tileBasedRendering_);
     }
     ImGui::Begin("Engine");
     if (ImGui::BeginMenu("PostEffect")) {

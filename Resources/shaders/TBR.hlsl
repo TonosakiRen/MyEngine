@@ -138,19 +138,19 @@ void main( uint32_t2 index : SV_GroupThreadID )
 		if (gPointLights[i].isActive == true) {
 			bool isHit = IsHitSphere(tileFrustnum, gPointLights[i].position, gPointLights[i].radius);
 			if (isHit) {
-				tileInformations[tileIndex].pointLightIndex[i] = i;
+				tileInformations[tileIndex].pointLightIndex[tileInformations[tileIndex].pointLightNum] = i;
 				tileInformations[tileIndex].pointLightNum++;
 			}
 		}
 	}
 
 	for (uint32_t j = 0; j < SpotLightNum; j++) {
-		tileInformations[tileIndex].spotLightIndex[j] = j;
+		tileInformations[tileIndex].spotLightIndex[tileInformations[tileIndex].spotLightNum] = j;
 		tileInformations[tileIndex].spotLightNum++;
 	}
 
 	for (uint32_t k = 0; k < ShadowSpotLightNum; k++) {
-		tileInformations[tileIndex].shadowSpotLightIndex[k] = k;
+		tileInformations[tileIndex].shadowSpotLightIndex[tileInformations[tileIndex].shadowSpotLightNum] = k;
 		tileInformations[tileIndex].shadowSpotLightNum++;
 	}
 }

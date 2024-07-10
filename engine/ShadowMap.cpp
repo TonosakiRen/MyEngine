@@ -3,7 +3,6 @@
 #include "ModelManager.h"
 #include "ShaderManager.h"
 #include "Renderer.h"
-#include "LightNumBuffer.h"
 #include "DirectionalLights.h"
 
 using namespace Microsoft::WRL;

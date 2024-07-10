@@ -9,7 +9,7 @@ using namespace Microsoft::WRL;
 
 void Compute::Initialize()
 {
-	CreatePipeline();
+	/*CreatePipeline();
 
 	auto device = DirectXCommon::GetInstance()->GetDevice();
 	CD3DX12_RESOURCE_DESC desc = CD3DX12_RESOURCE_DESC::Buffer(UINT64(sizeof(uint32_t) * kNum), D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
@@ -46,18 +46,18 @@ void Compute::Initialize()
 		IID_PPV_ARGS(copyBuffer_.GetAddressOf())
 	);
 
-	copyBuffer_->Map(0, nullptr, &data_);
+	copyBuffer_->Map(0, nullptr, &data_);*/
 }
 
 void Compute::Dispatch(CommandContext& commandContext)
 {
-	commandContext.TransitionResource(rwStructureBuffer_, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+	/*commandContext.TransitionResource(rwStructureBuffer_, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
 	commandContext.SetPipelineState(pipelineState_);
 	commandContext.SetComputeRootSignature(rootSignature_);
 	commandContext.SetComputeUAVBuffer(0, rwStructureBuffer_->GetGPUVirtualAddress());
 	commandContext.Dispatch(kNum,1,1);
 
-	commandContext.CopyBuffer(copyBuffer_, rwStructureBuffer_);
+	commandContext.CopyBuffer(copyBuffer_, rwStructureBuffer_);*/
 	
 }
 
@@ -68,31 +68,31 @@ void* Compute::GetData()
 
 void Compute::UnMap()
 {
-	copyBuffer_->Unmap(0, nullptr);
+	/*copyBuffer_->Unmap(0, nullptr);*/
 }
 
 void Compute::CreatePipeline()
 {
-	ComPtr<IDxcBlob> uavBlob;
+	//ComPtr<IDxcBlob> uavBlob;
 
-	auto shaderManager = ShaderManager::GetInstance();
-	uavBlob = shaderManager->Compile(L"CS.hlsl", ShaderManager::kCompute);
-	assert(uavBlob != nullptr);
+	//auto shaderManager = ShaderManager::GetInstance();
+	//uavBlob = shaderManager->Compile(L"CS.hlsl", ShaderManager::kCompute);
+	//assert(uavBlob != nullptr);
 
-	CD3DX12_ROOT_PARAMETER rootparams[1]{};
-	rootparams[0].InitAsUnorderedAccessView(0);
+	//CD3DX12_ROOT_PARAMETER rootparams[1]{};
+	//rootparams[0].InitAsUnorderedAccessView(0);
 
-	// ルートシグネチャの設定
-	D3D12_ROOT_SIGNATURE_DESC rootSignatureDesc{};
-	rootSignatureDesc.pParameters = rootparams;
-	rootSignatureDesc.NumParameters = _countof(rootparams);
+	//// ルートシグネチャの設定
+	//D3D12_ROOT_SIGNATURE_DESC rootSignatureDesc{};
+	//rootSignatureDesc.pParameters = rootparams;
+	//rootSignatureDesc.NumParameters = _countof(rootparams);
 
-	rootSignature_.Create(L"computeRootSignature", rootSignatureDesc);
+	//rootSignature_.Create(L"computeRootSignature", rootSignatureDesc);
 
-	D3D12_COMPUTE_PIPELINE_STATE_DESC desc{};
-	desc.pRootSignature = rootSignature_;
-	desc.CS = CD3DX12_SHADER_BYTECODE(uavBlob->GetBufferPointer(), uavBlob->GetBufferSize());
+	//D3D12_COMPUTE_PIPELINE_STATE_DESC desc{};
+	//desc.pRootSignature = rootSignature_;
+	//desc.CS = CD3DX12_SHADER_BYTECODE(uavBlob->GetBufferPointer(), uavBlob->GetBufferSize());
 
-	pipelineState_.Create(L"computePipeline", desc);
+	//pipelineState_.Create(L"computePipeline", desc);
 
 }

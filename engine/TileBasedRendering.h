@@ -69,9 +69,9 @@ public:
 
 	const ViewProjection* viewProjection_ = nullptr;
 	
-	DefaultStructuredBuffer initialTileFrustrumBuffer_;
+	std::unique_ptr<DefaultStructuredBuffer> initialTileFrustrumBuffer_;
 
-	RwStructuredBuffer rwTilesInformation_;
+	std::unique_ptr<RwStructuredBuffer> rwTilesInformation_;
 
 };
 

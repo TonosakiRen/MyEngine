@@ -112,7 +112,7 @@ void GameScene::Update(CommandContext& commandContext){
 
 	//コンピュートシェーダテスト
 	{
-		compute_->Dispatch(commandContext);
+		/*compute_->Dispatch(commandContext);
 		uint32_t* date = static_cast<uint32_t*>(compute_->GetData());
 
 		int a = date[2];
@@ -120,7 +120,7 @@ void GameScene::Update(CommandContext& commandContext){
 		ImGui::Begin("Game");
 		ImGui::Text("ComputeTest : %d", int(a));
 		ImGui::End();
-		#endif
+		#endif*/
 	}
 
 }

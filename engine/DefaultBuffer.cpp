@@ -39,5 +39,7 @@ void DefaultBuffer::Create(const std::wstring& name, size_t numElements, size_t 
 }
 
 void DefaultBuffer::Destroy() {
-     resource_.Reset();
+    if (resource_) {
+        resource_.Reset();
+    }
 }

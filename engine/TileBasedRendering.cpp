@@ -15,11 +15,13 @@ void TileBasedRendering::Initialize()
     CreatePipeline();
 
     {
-        initialTileFrustrumBuffer_.Create(L"initialTileFrustum", sizeof(Frustum), kTileNum);
+        initialTileFrustrumBuffer_ = std::make_unique<DefaultStructuredBuffer>();
+        initialTileFrustrumBuffer_->Create(L"initialTileFrustum", sizeof(Frustum), kTileNum);
     }
 
     {
-        rwTilesInformation_.Create(L"rwTileInformation", sizeof(ConstBufferData), kTileNum);
+        rwTilesInformation_ = std::make_unique<RwStructuredBuffer>();
+        rwTilesInformation_->Create(L"rwTileInformation", sizeof(ConstBufferData), kTileNum);
  
     }
 
@@ -35,7 +37,7 @@ void TileBasedRendering::ComputeUpdate(CommandContext& commandContext, const Vie
             int height = i / kTileWidthNum;
             int width = i % kTileWidthNum;
             initialTileFrustrum_[i] = GetTileFrustrum(width, height);
-            initialTileFrustrumBuffer_.Copy(initialTileFrustrum_);
+            initialTileFrustrumBuffer_->Copy(initialTileFrustrum_);
         }
     }
 
@@ -45,14 +47,16 @@ void TileBasedRendering::ComputeUpdate(CommandContext& commandContext, const Vie
     commandContext.SetPipelineState(pipelineState_);
     commandContext.SetComputeRootSignature(rootSignature_);
 
-    commandContext.TransitionResource(rwTilesInformation_, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+    commandContext.TransitionResource(*rwTilesInformation_, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
 
-    commandContext.SetComputeDescriptorTable(UINT(RootParameter::kTileInformation), rwTilesInformation_.GetUAV());
-    commandContext.SetComputeDescriptorTable(UINT(RootParameter::kInitialTileFrustum), initialTileFrustrumBuffer_.GetSRV(commandContext));
+    commandContext.SetComputeDescriptorTable(UINT(RootParameter::kTileInformation), rwTilesInformation_->GetUAV());
+    commandContext.SetComputeDescriptorTable(UINT(RootParameter::kInitialTileFrustum), initialTileFrustrumBuffer_->GetSRV(commandContext));
     commandContext.SetComputeDescriptorTable(UINT(RootParameter::kPointLights), lightManager->pointLights_->structureBuffer_.GetSRV());
     commandContext.SetComputeConstantBuffer(UINT(RootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
 
     commandContext.Dispatch(1,1,1);
+    commandContext.UAVBarrier(*rwTilesInformation_);
+
 }
 
 void TileBasedRendering::CreatePipeline()
