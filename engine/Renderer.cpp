@@ -14,7 +14,7 @@
 #include "DrawManager.h"
 #include "LightManager.h"
 
-bool Renderer::isForwardRendering = false;
+Renderer::RenderingMode Renderer::renderingMode = Renderer::kDeferred;
 
 Renderer* Renderer::GetInstance() {
     static Renderer instance;
@@ -51,36 +51,32 @@ void Renderer::Initialize() {
     mainDepthBuffer_ = std::make_unique<DepthBuffer>();
     mainDepthBuffer_->Create(L"mainDepthBuffer", swapChainBuffer.GetWidth(), swapChainBuffer.GetHeight(), DXGI_FORMAT_D32_FLOAT);
 
-    if (isForwardRendering) {
+    float clearColor[4] = { 0.0f,0.0f,0.0f,1.0f };
+    colorBuffers_[kColor] = std::make_unique<ColorBuffer>();
+    colorBuffers_[kColor]->SetClearColor(clearColor);
+    colorBuffers_[kColor]->Create(L"colorBuffer", swapChainBuffer.GetWidth(), swapChainBuffer.GetHeight(), DXGI_FORMAT_R8G8B8A8_UNORM_SRGB);
 
-        float clearColor[4] = { 0.0f,0.0f,0.0f,1.0f };
-        colorBuffers_[kColor] = std::make_unique<ColorBuffer>();
-        colorBuffers_[kColor]->SetClearColor(clearColor);
-        colorBuffers_[kColor]->Create(L"colorBuffer", swapChainBuffer.GetWidth(), swapChainBuffer.GetHeight(), DXGI_FORMAT_R8G8B8A8_UNORM_SRGB);
+    float clearNormal[4] = { 0.0f,0.0f,0.0f,1.0f };
+    colorBuffers_[kNormal] = std::make_unique<ColorBuffer>();
+    colorBuffers_[kNormal]->SetClearColor(clearNormal);
+    colorBuffers_[kNormal]->Create(L"normalBuffer", swapChainBuffer.GetWidth(), swapChainBuffer.GetHeight(), DXGI_FORMAT_R32G32B32A32_FLOAT);
 
-        float clearNormal[4] = { 0.0f,0.0f,0.0f,1.0f };
-        colorBuffers_[kNormal] = std::make_unique<ColorBuffer>();
-        colorBuffers_[kNormal]->SetClearColor(clearNormal);
-        colorBuffers_[kNormal]->Create(L"normalBuffer", swapChainBuffer.GetWidth(), swapChainBuffer.GetHeight(), DXGI_FORMAT_R32G32B32A32_FLOAT);
 
-    }
-    else {
-        float clearColor[4] = { 0.0f,0.0f,0.0f,1.0f };
-        colorBuffers_[kColor] = std::make_unique<ColorBuffer>();
-        colorBuffers_[kColor]->SetClearColor(clearColor);
-        colorBuffers_[kColor]->Create(L"colorBuffer", swapChainBuffer.GetWidth(), swapChainBuffer.GetHeight(), DXGI_FORMAT_R8G8B8A8_UNORM_SRGB);
+    switch (renderingMode)
+    {
+    case Renderer::kForward:
 
-        float clearNormal[4] = { 0.0f,0.0f,0.0f,1.0f };
-        colorBuffers_[kNormal] = std::make_unique<ColorBuffer>();
-        colorBuffers_[kNormal]->SetClearColor(clearNormal);
-        colorBuffers_[kNormal]->Create(L"normalBuffer", swapChainBuffer.GetWidth(), swapChainBuffer.GetHeight(), DXGI_FORMAT_R32G32B32A32_FLOAT);
-
+        break;
+    case Renderer::kDeferred:
         colorBuffers_[kMaterial] = std::make_unique<ColorBuffer>();
         colorBuffers_[kMaterial]->SetClearColor(clearColor);
         colorBuffers_[kMaterial]->Create(L"materialBuffer", swapChainBuffer.GetWidth(), swapChainBuffer.GetHeight(), DXGI_FORMAT_R8_UNORM);
 
         deferredRenderer_ = std::make_unique<DeferredRenderer>();
         deferredRenderer_->Initialize(colorBuffers_[kColor].get(), colorBuffers_[kNormal].get(), colorBuffers_[kMaterial].get(), mainDepthBuffer_.get());
+        break;
+    default:
+        break;
     }
 
 
@@ -131,31 +127,46 @@ void Renderer::BeginFrame()
 
 void Renderer::MainRender(ViewProjection& viewProjection) {
 
+    tileBasedRendering_->ComputeUpdate(commandContext_, viewProjection);
     
     // メインカラーバッファをレンダ―ターゲットに
     commandContext_.TransitionResource(*colorBuffers_[kColor], D3D12_RESOURCE_STATE_RENDER_TARGET);
     commandContext_.TransitionResource(*colorBuffers_[kNormal], D3D12_RESOURCE_STATE_RENDER_TARGET);
-    if (isForwardRendering) {
 
-    }
-    else {
+    switch (renderingMode)
+    {
+    case Renderer::kForward:
+
+        break;
+    case Renderer::kDeferred:
         commandContext_.TransitionResource(*colorBuffers_[RenderTargetType::kMaterial], D3D12_RESOURCE_STATE_RENDER_TARGET);
+        break;
+    default:
+        break;
     }
+
     commandContext_.TransitionResource(*mainDepthBuffer_, D3D12_RESOURCE_STATE_DEPTH_WRITE);
 
-    if (isForwardRendering) {
-        D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle[] = { colorBuffers_[kColor]->GetRTV(),colorBuffers_[kNormal]->GetRTV()};
-        commandContext_.SetRenderTargets(kFRenderTargetNum, rtvHandle, mainDepthBuffer_->GetDSV());
+    std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> rtvHandle;
+    rtvHandle.reserve(static_cast<uint32_t>(RenderTargetType::kRenderTargetNum));
+    switch (renderingMode)
+    {
+    case Renderer::kForward:
+        rtvHandle = { colorBuffers_[kColor]->GetRTV(),colorBuffers_[kNormal]->GetRTV() };
+        commandContext_.SetRenderTargets(kFRenderTargetNum, rtvHandle.data(), mainDepthBuffer_->GetDSV());
         for (int i = 0; i < kFRenderTargetNum; i++) {
             commandContext_.ClearColor(*colorBuffers_[i]);
         }
-    }
-    else {
-        D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle[] = { colorBuffers_[kColor]->GetRTV(),colorBuffers_[kNormal]->GetRTV() ,colorBuffers_[static_cast<uint32_t>(RenderTargetType::kMaterial)]->GetRTV() };
-        commandContext_.SetRenderTargets(static_cast<uint32_t>(RenderTargetType::kRenderTargetNum), rtvHandle, mainDepthBuffer_->GetDSV());
+        break;
+    case Renderer::kDeferred:
+        rtvHandle = { colorBuffers_[kColor]->GetRTV(), colorBuffers_[kNormal]->GetRTV() ,colorBuffers_[static_cast<uint32_t>(RenderTargetType::kMaterial)]->GetRTV() };
+        commandContext_.SetRenderTargets(static_cast<uint32_t>(RenderTargetType::kRenderTargetNum), rtvHandle.data(), mainDepthBuffer_->GetDSV());
         for (int i = 0; i < static_cast<uint32_t>(RenderTargetType::kRenderTargetNum); i++) {
             commandContext_.ClearColor(*colorBuffers_[i]);
         }
+        break;
+    default:
+        break;
     }
 
     commandContext_.TransitionResource(*resultBuffer_, D3D12_RESOURCE_STATE_RENDER_TARGET);
@@ -164,7 +175,18 @@ void Renderer::MainRender(ViewProjection& viewProjection) {
     commandContext_.ClearDepth(*mainDepthBuffer_);
     commandContext_.SetViewportAndScissorRect(0, 0, colorBuffers_[kColor]->GetWidth(), colorBuffers_[kColor]->GetHeight());
 
-    drawManager_->AllDraw(viewProjection);
+    switch (renderingMode)
+    {
+    case Renderer::kForward:
+        drawManager_->AllDraw(PipelineType::kForward,viewProjection);
+        break;
+    case Renderer::kDeferred:
+        drawManager_->AllDraw(PipelineType::kDeferred,viewProjection);
+        break;
+    default:
+        break;
+    }
+    drawManager_->PostSpriteDraw();
     drawManager_->ResetCalls();
 
 }
@@ -172,13 +194,19 @@ void Renderer::MainRender(ViewProjection& viewProjection) {
 void Renderer::DeferredRender(ViewProjection& viewProjection)
 {
     wire_->AllDraw(commandContext_, viewProjection);
-    if (isForwardRendering) {
 
+    switch (renderingMode)
+    {
+    case Renderer::kForward:
+        
+        break;
+    case Renderer::kDeferred:
+        deferredRenderer_->Render(commandContext_, resultBuffer_.get(), viewProjection, *tileBasedRendering_);
+        break;
+    default:
+        break;
     }
-    else {
-       tileBasedRendering_->ComputeUpdate(commandContext_, viewProjection);
-       deferredRenderer_->Render(commandContext_, resultBuffer_.get(), viewProjection, *tileBasedRendering_);
-    }
+
     ImGui::Begin("Engine");
     if (ImGui::BeginMenu("PostEffect")) {
         ImGui::Checkbox("bloom", &isBloom_);
@@ -273,16 +301,22 @@ void Renderer::EndRender()
 
 void Renderer::Shutdown() {
 
-    if (isForwardRendering) {
+    switch (renderingMode)
+    {
+    case Renderer::kForward:
         for (int i = 0; i < kFRenderTargetNum; i++) {
             colorBuffers_[i].reset();
         }
-    }
-    else {
+        break;
+    case Renderer::kDeferred:
         for (int i = 0; i < static_cast<uint32_t>(RenderTargetType::kRenderTargetNum); i++) {
             colorBuffers_[i].reset();
         }
+        break;
+    default:
+        break;
     }
+
     mainDepthBuffer_.reset();
     resultBuffer_.reset();
     deferredRenderer_.reset();

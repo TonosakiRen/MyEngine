@@ -10,6 +10,9 @@ struct TileInformation {
 	uint32_t pointLightNum;
 	uint32_t spotLightNum;
 	uint32_t shadowSpotLightNum;
+	uint32_t pointLightOffset;
+	uint32_t spotLightOffset;
+	uint32_t shadowSpotLightOffset;
 };
 
 struct PointLight {
@@ -91,8 +94,8 @@ bool IsHitSphere(Frustum frustum, float32_t3 position, float32_t radius)
 	//平面の法線と内積をとる
 	for (uint32_t i = 0; i < 6; i++) {
 		//プラスであれば外側距離を測る,内側の場合マイナス
-		float32_t a = dot(frustum.plane[i].normal, position) - frustum.plane[i].distance;
-		if (a > radius) {
+		float32_t distance = dot(frustum.plane[i].normal, position) - frustum.plane[i].distance;
+		if (distance > radius) {
 			return false;
 		}
 	}
@@ -101,11 +104,12 @@ bool IsHitSphere(Frustum frustum, float32_t3 position, float32_t radius)
 }
 
 struct LightNum {
-	uint32_t  directionalLight;
-	uint32_t  pointLight;
-	uint32_t  areaLight;
-	uint32_t  spotLight;
-	uint32_t  shadowSpotLight;
+	uint32_t directionalLight;
+	uint32_t pointLight;
+	uint32_t areaLight;
+	uint32_t spotLight;
+	uint32_t shadowSpotLight;
+	uint32_t maxInTilePointLight;
 };
 
 struct ViewProjection {
@@ -126,15 +130,19 @@ RWStructuredBuffer<uint32_t> shadowSpotLightIndex : register(u3);
 
 StructuredBuffer<Frustum> initialTileFrustum : register(t0);
 StructuredBuffer<PointLight> gPointLights  : register(t1);
-[numthreads(16 * 2, 9 * 2, 1)]
+[numthreads(16, 9, 1)]
 void main(uint32_t2 index : SV_GroupThreadID)
 {
 
-	uint32_t tileIndex = index.x + (index.y * (16 * 2));
+	uint32_t tileIndex = index.x + (index.y * (16));
 
 	tileInformations[tileIndex].pointLightNum = 0;
 	tileInformations[tileIndex].spotLightNum = 0;
 	tileInformations[tileIndex].shadowSpotLightNum = 0;
+
+	tileInformations[tileIndex].pointLightOffset = tileIndex * lightNum.maxInTilePointLight;
+	tileInformations[tileIndex].spotLightOffset = tileIndex * lightNum.spotLight;
+	tileInformations[tileIndex].shadowSpotLightOffset = tileIndex * lightNum.shadowSpotLight;
 
 	Frustum tileFrustnum = Multiply(initialTileFrustum[tileIndex], gViewProjection.worldMatrix);
 
@@ -142,19 +150,25 @@ void main(uint32_t2 index : SV_GroupThreadID)
 		if (gPointLights[i].isActive == true) {
 			bool isHit = IsHitSphere(tileFrustnum, gPointLights[i].position, gPointLights[i].radius);
 			if (isHit) {
-				pointLightIndex[tileIndex * lightNum.pointLight + tileInformations[tileIndex].pointLightNum] = i;
-				tileInformations[tileIndex].pointLightNum++;
+				if (tileInformations[tileIndex].pointLightNum < lightNum.maxInTilePointLight) {
+					pointLightIndex[tileInformations[tileIndex].pointLightOffset + tileInformations[tileIndex].pointLightNum] = i;
+					tileInformations[tileIndex].pointLightNum++;
+				}
 			}
 		}
 	}
 
 	for (uint32_t j = 0; j < lightNum.spotLight; j++) {
-		spotLightIndex[tileIndex * lightNum.spotLight + tileInformations[tileIndex].spotLightNum] = j;
-		tileInformations[tileIndex].spotLightNum++;
+		if (tileInformations[tileIndex].spotLightNum < lightNum.spotLight) {
+			pointLightIndex[tileInformations[tileIndex].spotLightOffset + tileInformations[tileIndex].spotLightNum] = j;
+			tileInformations[tileIndex].spotLightNum++;
+		}
 	}
 
 	for (uint32_t k = 0; k < lightNum.shadowSpotLight; k++) {
-		shadowSpotLightIndex[tileIndex * lightNum.shadowSpotLight + tileInformations[tileIndex].shadowSpotLightNum] = k;
-		tileInformations[tileIndex].shadowSpotLightNum++;
+		if (tileInformations[tileIndex].pointLightNum < lightNum.shadowSpotLight) {
+			pointLightIndex[tileInformations[tileIndex].shadowSpotLightOffset + tileInformations[tileIndex].shadowSpotLightNum] = k;
+			tileInformations[tileIndex].shadowSpotLightNum++;
+		}
 	}
 }

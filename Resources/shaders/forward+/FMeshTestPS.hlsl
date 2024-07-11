@@ -9,6 +9,17 @@ struct Material {
 };
 ConstantBuffer<Material> gMaterial  : register(b2);
 
+struct TBRInformation {
+	uint32_t pointLightNum;
+	uint32_t spotLightNum;
+	uint32_t shadowSpotLightNum;
+
+	uint32_t pointLightOffset;
+	uint32_t spotLightOffset;
+	uint32_t shadowSpotLightOffset;
+};
+RWStructuredBuffer<TBRInformation> gTBRInformation  : register(u0);
+
 struct MSOutput {
 	float32_t4 pos : SV_POSITION;
 	float32_t3 normal : NORMAL;

@@ -460,6 +460,9 @@
     <ClCompile Include="engine\DeferredRenderer.cpp">
       <Filter>Engine\DeferredRendering</Filter>
     </ClCompile>
+    <ClCompile Include="engine\LightNumBuffer.cpp">
+      <Filter>Engine\Light</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -663,9 +666,6 @@
     <ClInclude Include="application\TitleScene.h">
       <Filter>Game\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="engine\TileBasedRendering.h">
-      <Filter>Engine\Light</Filter>
-    </ClInclude>
     <ClInclude Include="application\DustParticle.h">
       <Filter>Game\Particle</Filter>
     </ClInclude>
@@ -797,6 +797,12 @@
     </ClInclude>
     <ClInclude Include="engine\DeferredRenderer.h">
       <Filter>Engine\DeferredRendering</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\LightNumBuffer.h">
+      <Filter>Engine\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\TileBasedRendering.h">
+      <Filter>Engine\Light</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -941,11 +947,11 @@
     <FxCompile Include="Resources\shaders\SkinningCS.hlsl">
       <Filter>shaders\Compute</Filter>
     </FxCompile>
-    <FxCompile Include="Resources\shaders\TBR.hlsl">
-      <Filter>shaders\Compute</Filter>
-    </FxCompile>
     <FxCompile Include="Resources\shaders\VerticalGaussianBlurVS.hlsl">
       <Filter>shaders\PostEffect</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\TBRCS.hlsl">
+      <Filter>shaders\Compute</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>

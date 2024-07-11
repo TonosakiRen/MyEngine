@@ -23,11 +23,23 @@ class ParticleModel
 public:
 
 	enum class RootParameter {
-		kWorldTransform,
-		kViewProjection,
 		kTexture,
-		kMaterial,
+		kParticleData,
+		kDescriptorRangeNum,
 
+		kViewProjection = kDescriptorRangeNum,
+		kMaterial,
+		parameterNum
+	};
+
+	enum class ForwardRootParameter {
+		kTexture,
+		kParticleData,
+		kTileInformation,
+		kDescriptorRangeNum,
+
+		kViewProjection = kDescriptorRangeNum,
+		kMaterial,
 		parameterNum
 	};
 
@@ -39,7 +51,7 @@ public:
 
 	void Initialize();
 	void Finalize();
-	void PreDraw(CommandContext& commandContext, const ViewProjection& viewProjection);
+	void PreDraw(PipelineType pipelineType, CommandContext& commandContext, const ViewProjection& viewProjection);
 
 	void Draw(CommandContext& commandContext, ParticleModelData& bufferData, const Material& material, uint32_t modelHandle = 0);
 
@@ -48,9 +60,6 @@ private:
 	void CreatePipeline();
 	void CreateForwardPipeline();
 private:
-	std::unique_ptr<RootSignature> rootSignature_;
-	std::unique_ptr<PipelineState> pipelineState_;
-
-	std::unique_ptr<RootSignature> fRootSignature_;
-	std::unique_ptr<PipelineState> fPipelineState_;
+	std::unique_ptr<RootSignature> rootSignature_[kPipelineNum];
+	std::unique_ptr<PipelineState> pipelineState_[kPipelineNum];
 };

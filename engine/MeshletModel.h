@@ -27,9 +27,28 @@ public:
 		kUniqueVertexIndices,
 		kPrimitiveIndices,
 		kCullData,
+		kDescriptorRangeNum,
 
-		kWorldTransform, 
+		kWorldTransform = kDescriptorRangeNum,
 		kViewProjection, 
+		kFrustum,
+		kMaterial,
+
+		parameterNum
+	};
+
+	enum class ForwardRootParameter {
+		kTexture,
+		kVertices,
+		kMeshlets,
+		kUniqueVertexIndices,
+		kPrimitiveIndices,
+		kCullData,
+		kTileInformation,
+		kDescriptorRangeNum,
+
+		kWorldTransform = kDescriptorRangeNum,
+		kViewProjection,
 		kFrustum,
 		kMaterial,
 
@@ -38,7 +57,7 @@ public:
 
 	void Initialize();
 	void Finalize();
-	void PreDraw(CommandContext& commandContext, const ViewProjection& viewProjection , const ViewProjection& cullingViewProjection);
+	void PreDraw(PipelineType pipelineType, CommandContext& commandContext, const ViewProjection& viewProjection , const ViewProjection& cullingViewProjection);
 
 	void Draw(CommandContext& commandContext, uint32_t modelHandle, const WorldTransform& worldTransform, const Material& material,const uint32_t textureHandle = 0);
 	void Draw(CommandContext& commandContext, uint32_t modelHandle, const WorldTransform& worldTransform, SkinCluster& skinCluster, const Material& material, const uint32_t textureHandle = 0);
@@ -46,10 +65,7 @@ private:
 	void CreatePipeline();
 	void CreateForwardPipeline();
 private:
-	std::unique_ptr<RootSignature> rootSignature_;
-	std::unique_ptr<PipelineState> pipelineState_;
-
-	std::unique_ptr<RootSignature> fRootSignature_;
-	std::unique_ptr<PipelineState> fPipelineState_;
+	std::unique_ptr<RootSignature> rootSignature_[kPipelineNum];
+	std::unique_ptr<PipelineState> pipelineState_[kPipelineNum];
 };
 

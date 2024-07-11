@@ -8,6 +8,17 @@ struct Material {
 };
 ConstantBuffer<Material> gMaterial  : register(b1);
 
+struct TBRInformation {
+	uint32_t pointLightNum;
+	uint32_t spotLightNum;
+	uint32_t shadowSpotLightNum;
+
+	uint32_t pointLightOffset;
+	uint32_t spotLightOffset;
+	uint32_t shadowSpotLightOffset;
+};
+RWStructuredBuffer<TBRInformation> gTBRInformation  : register(u0);
+
 struct VSOutput {
 	float32_t4 pos : SV_POSITION; // システム用頂点座標
 	float32_t3 normal : NORMAL;     // 法線ベクトル

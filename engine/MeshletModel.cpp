@@ -13,16 +13,16 @@ void MeshletModel::Initialize() {
 
 void MeshletModel::Finalize()
 {
-    rootSignature_.reset();
-    pipelineState_.reset();
-    fRootSignature_.reset();
-    fPipelineState_.reset();
+    for (int i = 0; i < kPipelineNum; i++) {
+        rootSignature_[i].reset();
+        pipelineState_[i].reset();
+    }
 }
 
-void MeshletModel::PreDraw(CommandContext& commandContext, const ViewProjection& viewProjection, const ViewProjection& cullingViewProjection) {
+void MeshletModel::PreDraw(PipelineType pipelineType,CommandContext& commandContext, const ViewProjection& viewProjection, const ViewProjection& cullingViewProjection) {
   
-    commandContext.SetPipelineState(*pipelineState_);
-    commandContext.SetGraphicsRootSignature(*rootSignature_);
+    commandContext.SetPipelineState(*pipelineState_[pipelineType]);
+    commandContext.SetGraphicsRootSignature(*rootSignature_[pipelineType]);
 
     // CBVをセット（ビュープロジェクション行列）
     commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
@@ -49,28 +49,28 @@ void MeshletModel::CreatePipeline() {
     psBlob = shaderManager->Compile(L"MeshTestPS.hlsl", ShaderManager::kPixel);
     assert(psBlob != nullptr);
 
-    rootSignature_ = std::make_unique<RootSignature>();
-    pipelineState_ = std::make_unique<PipelineState>();
+    rootSignature_[kDeferred] = std::make_unique<RootSignature>();
+    pipelineState_[kDeferred] = std::make_unique<PipelineState>();
 
     {
 
         // デスクリプタレンジ
-        CD3DX12_DESCRIPTOR_RANGE descRangeSRV[6];
-        descRangeSRV[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0); 
-        descRangeSRV[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1);
-        descRangeSRV[2].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 2);
-        descRangeSRV[3].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 3);
-        descRangeSRV[4].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 4);
-        descRangeSRV[5].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 5);
+        CD3DX12_DESCRIPTOR_RANGE descRangeSRV[int(RootParameter::kDescriptorRangeNum)];
+        descRangeSRV[int(RootParameter::kTexture)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
+        descRangeSRV[int(RootParameter::kVertices)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1);
+        descRangeSRV[int(RootParameter::kMeshlets)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 2);
+        descRangeSRV[int(RootParameter::kUniqueVertexIndices)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 3);
+        descRangeSRV[int(RootParameter::kPrimitiveIndices)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 4);
+        descRangeSRV[int(RootParameter::kCullData)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 5);
 
         // ルートパラメータ
         CD3DX12_ROOT_PARAMETER rootparams[int(RootParameter::parameterNum)] = {};
-        rootparams[int(RootParameter::kTexture)].InitAsDescriptorTable(1, &descRangeSRV[0], D3D12_SHADER_VISIBILITY_ALL);
-        rootparams[int(RootParameter::kVertices)].InitAsDescriptorTable(1, &descRangeSRV[1], D3D12_SHADER_VISIBILITY_ALL);
-        rootparams[int(RootParameter::kMeshlets)].InitAsDescriptorTable(1, &descRangeSRV[2], D3D12_SHADER_VISIBILITY_ALL);
-        rootparams[int(RootParameter::kUniqueVertexIndices)].InitAsDescriptorTable(1, &descRangeSRV[3], D3D12_SHADER_VISIBILITY_ALL);
-        rootparams[int(RootParameter::kPrimitiveIndices)].InitAsDescriptorTable(1, &descRangeSRV[4], D3D12_SHADER_VISIBILITY_ALL);
-        rootparams[int(RootParameter::kCullData)].InitAsDescriptorTable(1, &descRangeSRV[5], D3D12_SHADER_VISIBILITY_ALL);
+        rootparams[int(RootParameter::kTexture)].InitAsDescriptorTable(1, &descRangeSRV[int(RootParameter::kTexture)], D3D12_SHADER_VISIBILITY_ALL);
+        rootparams[int(RootParameter::kVertices)].InitAsDescriptorTable(1, &descRangeSRV[int(RootParameter::kVertices)], D3D12_SHADER_VISIBILITY_ALL);
+        rootparams[int(RootParameter::kMeshlets)].InitAsDescriptorTable(1, &descRangeSRV[int(RootParameter::kMeshlets)], D3D12_SHADER_VISIBILITY_ALL);
+        rootparams[int(RootParameter::kUniqueVertexIndices)].InitAsDescriptorTable(1, &descRangeSRV[int(RootParameter::kUniqueVertexIndices)], D3D12_SHADER_VISIBILITY_ALL);
+        rootparams[int(RootParameter::kPrimitiveIndices)].InitAsDescriptorTable(1, &descRangeSRV[int(RootParameter::kPrimitiveIndices)], D3D12_SHADER_VISIBILITY_ALL);
+        rootparams[int(RootParameter::kCullData)].InitAsDescriptorTable(1, &descRangeSRV[int(RootParameter::kCullData)], D3D12_SHADER_VISIBILITY_ALL);
 
 
         rootparams[int(RootParameter::kWorldTransform)].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_ALL);
@@ -90,7 +90,7 @@ void MeshletModel::CreatePipeline() {
         rootSignatureDesc.NumStaticSamplers = 1;
         rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
-        rootSignature_->Create(L"meshletRootSignature", rootSignatureDesc);
+        rootSignature_[kDeferred]->Create(L"meshletRootSignature", rootSignatureDesc);
 
     }
 
@@ -148,7 +148,7 @@ void MeshletModel::CreatePipeline() {
         pipeline.RTVFormats[int(Renderer::kNormal)] = Renderer::GetInstance()->GetRTVFormat(Renderer::kNormal);
         pipeline.SampleDesc.Count = 1; // 1ピクセルにつき1回サンプリング
 
-        pipeline.pRootSignature = *rootSignature_;
+        pipeline.pRootSignature = *rootSignature_[kDeferred];
 
         CD3DX12_PIPELINE_MESH_STATE_STREAM psoStream = CD3DX12_PIPELINE_MESH_STATE_STREAM(pipeline);
 
@@ -157,7 +157,7 @@ void MeshletModel::CreatePipeline() {
         streamDesc.SizeInBytes = sizeof(psoStream);
 
         // グラフィックスパイプラインの生成
-        pipelineState_->Create(L"meshletPipeline", streamDesc);
+        pipelineState_[kDeferred]->Create(L"meshletPipeline", streamDesc);
     }
 }
 
@@ -179,34 +179,35 @@ void MeshletModel::CreateForwardPipeline()
     psBlob = shaderManager->Compile(L"forward+/FMeshTestPS.hlsl", ShaderManager::kPixel);
     assert(psBlob != nullptr);
 
-    fRootSignature_ = std::make_unique<RootSignature>();
-    fPipelineState_ = std::make_unique<PipelineState>();
+    rootSignature_[kForward] = std::make_unique<RootSignature>();
+    pipelineState_[kForward] = std::make_unique<PipelineState>();
 
     {
 
         // デスクリプタレンジ
-        CD3DX12_DESCRIPTOR_RANGE descRangeSRV[6];
-        descRangeSRV[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
-        descRangeSRV[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1);
-        descRangeSRV[2].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 2);
-        descRangeSRV[3].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 3);
-        descRangeSRV[4].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 4);
-        descRangeSRV[5].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 5);
+        CD3DX12_DESCRIPTOR_RANGE descRangeSRV[int(ForwardRootParameter::kDescriptorRangeNum)];
+        descRangeSRV[int(ForwardRootParameter::kTexture)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
+        descRangeSRV[int(ForwardRootParameter::kVertices)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1);
+        descRangeSRV[int(ForwardRootParameter::kMeshlets)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 2);
+        descRangeSRV[int(ForwardRootParameter::kUniqueVertexIndices)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 3);
+        descRangeSRV[int(ForwardRootParameter::kPrimitiveIndices)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 4);
+        descRangeSRV[int(ForwardRootParameter::kCullData)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 5);
+        descRangeSRV[int(ForwardRootParameter::kTileInformation)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 6);
 
         // ルートパラメータ
-        CD3DX12_ROOT_PARAMETER rootparams[int(RootParameter::parameterNum)] = {};
-        rootparams[int(RootParameter::kTexture)].InitAsDescriptorTable(1, &descRangeSRV[0], D3D12_SHADER_VISIBILITY_ALL);
-        rootparams[int(RootParameter::kVertices)].InitAsDescriptorTable(1, &descRangeSRV[1], D3D12_SHADER_VISIBILITY_ALL);
-        rootparams[int(RootParameter::kMeshlets)].InitAsDescriptorTable(1, &descRangeSRV[2], D3D12_SHADER_VISIBILITY_ALL);
-        rootparams[int(RootParameter::kUniqueVertexIndices)].InitAsDescriptorTable(1, &descRangeSRV[3], D3D12_SHADER_VISIBILITY_ALL);
-        rootparams[int(RootParameter::kPrimitiveIndices)].InitAsDescriptorTable(1, &descRangeSRV[4], D3D12_SHADER_VISIBILITY_ALL);
-        rootparams[int(RootParameter::kCullData)].InitAsDescriptorTable(1, &descRangeSRV[5], D3D12_SHADER_VISIBILITY_ALL);
+        CD3DX12_ROOT_PARAMETER rootparams[int(ForwardRootParameter::parameterNum)] = {};
+        rootparams[int(ForwardRootParameter::kTexture)].InitAsDescriptorTable(1, &descRangeSRV[int(ForwardRootParameter::kTexture)], D3D12_SHADER_VISIBILITY_ALL);
+        rootparams[int(ForwardRootParameter::kVertices)].InitAsDescriptorTable(1, &descRangeSRV[int(ForwardRootParameter::kVertices)], D3D12_SHADER_VISIBILITY_ALL);
+        rootparams[int(ForwardRootParameter::kMeshlets)].InitAsDescriptorTable(1, &descRangeSRV[int(ForwardRootParameter::kMeshlets)], D3D12_SHADER_VISIBILITY_ALL);
+        rootparams[int(ForwardRootParameter::kUniqueVertexIndices)].InitAsDescriptorTable(1, &descRangeSRV[int(ForwardRootParameter::kUniqueVertexIndices)], D3D12_SHADER_VISIBILITY_ALL);
+        rootparams[int(ForwardRootParameter::kPrimitiveIndices)].InitAsDescriptorTable(1, &descRangeSRV[int(ForwardRootParameter::kPrimitiveIndices)], D3D12_SHADER_VISIBILITY_ALL);
+        rootparams[int(ForwardRootParameter::kCullData)].InitAsDescriptorTable(1, &descRangeSRV[int(ForwardRootParameter::kCullData)], D3D12_SHADER_VISIBILITY_ALL);
+        rootparams[int(ForwardRootParameter::kTileInformation)].InitAsDescriptorTable(1, &descRangeSRV[int(ForwardRootParameter::kTileInformation)], D3D12_SHADER_VISIBILITY_ALL);
 
-
-        rootparams[int(RootParameter::kWorldTransform)].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_ALL);
-        rootparams[int(RootParameter::kViewProjection)].InitAsConstantBufferView(1, 0, D3D12_SHADER_VISIBILITY_ALL);
-        rootparams[int(RootParameter::kMaterial)].InitAsConstantBufferView(2, 0, D3D12_SHADER_VISIBILITY_ALL);
-        rootparams[int(RootParameter::kFrustum)].InitAsConstantBufferView(3, 0, D3D12_SHADER_VISIBILITY_ALL);
+        rootparams[int(ForwardRootParameter::kWorldTransform)].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_ALL);
+        rootparams[int(ForwardRootParameter::kViewProjection)].InitAsConstantBufferView(1, 0, D3D12_SHADER_VISIBILITY_ALL);
+        rootparams[int(ForwardRootParameter::kMaterial)].InitAsConstantBufferView(2, 0, D3D12_SHADER_VISIBILITY_ALL);
+        rootparams[int(ForwardRootParameter::kFrustum)].InitAsConstantBufferView(3, 0, D3D12_SHADER_VISIBILITY_ALL);
 
         // スタティックサンプラー
         CD3DX12_STATIC_SAMPLER_DESC samplerDesc =
@@ -220,7 +221,7 @@ void MeshletModel::CreateForwardPipeline()
         rootSignatureDesc.NumStaticSamplers = 1;
         rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
-        fRootSignature_->Create(L"meshletRootSignature", rootSignatureDesc);
+        rootSignature_[kForward]->Create(L"meshletRootSignature", rootSignatureDesc);
 
     }
 
@@ -278,7 +279,7 @@ void MeshletModel::CreateForwardPipeline()
         pipeline.RTVFormats[int(Renderer::kNormal)] = Renderer::GetInstance()->GetRTVFormat(Renderer::kNormal);
         pipeline.SampleDesc.Count = 1; // 1ピクセルにつき1回サンプリング
 
-        pipeline.pRootSignature = *rootSignature_;
+        pipeline.pRootSignature = *rootSignature_[kForward];
 
         CD3DX12_PIPELINE_MESH_STATE_STREAM psoStream = CD3DX12_PIPELINE_MESH_STATE_STREAM(pipeline);
 
@@ -287,7 +288,7 @@ void MeshletModel::CreateForwardPipeline()
         streamDesc.SizeInBytes = sizeof(psoStream);
 
         // グラフィックスパイプラインの生成
-        fPipelineState_->Create(L"meshletPipeline", streamDesc);
+        pipelineState_[kForward]->Create(L"meshletPipeline", streamDesc);
     }
 }
 

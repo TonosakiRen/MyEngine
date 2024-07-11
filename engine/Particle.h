@@ -23,9 +23,22 @@ public:
 
 
 	enum class RootParameter {
-		kWorldTransform,
-		kViewProjection,
 		kTexture,
+		kParticleData,
+		kDescriptorRangeNum,                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                		kDescriptorRange,
+
+		kViewProjection = kDescriptorRangeNum,
+		kMaterial,
+		parameterNum
+	};
+
+	enum class ForwardRootParameter {
+		kTexture,
+		kParticleData,
+		kTileInformation,
+		kDescriptorRangeNum,
+
+		kViewProjection = kDescriptorRangeNum,
 		kMaterial,
 		parameterNum
 	};
@@ -38,7 +51,7 @@ public:
 
 	void Initialize();
 	void Finalize();
-	void PreDraw(CommandContext& commandContext, const ViewProjection& viewProjection);
+	void PreDraw(PipelineType pipelineType, CommandContext& commandContext, const ViewProjection& viewProjection);
 
 	void Draw(CommandContext& commandContext, ParticleData& bufferData, const Material& material , const uint32_t textureHadle = 0);
 	void CreateMesh();
@@ -48,11 +61,8 @@ public:
 private:
 
 private:
-	std::unique_ptr<RootSignature> rootSignature_;
-	std::unique_ptr<PipelineState> pipelineState_;
-
-	std::unique_ptr<RootSignature> fRootSignature_;
-	std::unique_ptr<PipelineState> fPipelineState_;
+	std::unique_ptr<RootSignature> rootSignature_[kPipelineNum];
+	std::unique_ptr<PipelineState> pipelineState_[kPipelineNum];
 
 	Matrix4x4 billBordMatrix;
 

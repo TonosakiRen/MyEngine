@@ -28,8 +28,6 @@ class Renderer
 {
 public:
 
-    static bool isForwardRendering;
-
     enum RenderTargetType {
         kColor,
         kNormal,
@@ -40,6 +38,14 @@ public:
 
         kRenderTargetNum
     };
+
+    enum RenderingMode {
+        kForward,
+        kDeferred,
+
+        kRenderingModeNum
+    };
+
 
     static Renderer* GetInstance();
 
@@ -72,10 +78,17 @@ public:
 
     void ClearMainDepthBuffer() { commandContext_.ClearDepth(*mainDepthBuffer_); }
 
+
+    RenderingMode GetRenderingPass() {
+        return renderingMode;
+    }
+
 private:
     Renderer() = default;
     Renderer(const Renderer&) = delete;
     Renderer& operator=(const Renderer&) = delete;
+
+    static RenderingMode renderingMode;
 
     DirectXCommon* graphics_ = nullptr;
     DrawManager* drawManager_ = nullptr;

@@ -62,9 +62,12 @@ void DrawManager::Initialize(CommandContext& CommandContext)
 	calling_->Initialize();
 }
 
-void DrawManager::AllDraw(const ViewProjection& viewProjection)
+void DrawManager::AllDraw(PipelineType pipelineType,const ViewProjection& viewProjection)
 {
 
+
+	//不透明
+	
 	//SkinClusterUpdate
 	skinningPipeline_->PreDispatch(*commandContext_);
 	for (auto& call : calls[kSkinning]) {
@@ -80,36 +83,42 @@ void DrawManager::AllDraw(const ViewProjection& viewProjection)
 		call();
 	}
 
-	modelPipeline_->PreDraw(*commandContext_, viewProjection);
+	modelPipeline_->PreDraw(pipelineType ,*commandContext_, viewProjection);
 	for (auto& call : calls[kModel]) {
 		call();
 	}
 
-	meshletModelPipeline_->PreDraw(*commandContext_, viewProjection, *calling_->currentViewProjection);
+	meshletModelPipeline_->PreDraw(pipelineType, *commandContext_, viewProjection, *calling_->currentViewProjection);
 	for (auto& call : calls[kMeshletModel]) {
 		call();
 	}
 
-	particlePipeline_->PreDraw(*commandContext_, viewProjection);
+	particlePipeline_->PreDraw(pipelineType, *commandContext_, viewProjection);
 	for (auto& call : calls[kParticle]) {
 		call();
 	}
 
-	particleModelPipeline_->PreDraw(*commandContext_, viewProjection);
+	particleModelPipeline_->PreDraw(pipelineType, *commandContext_, viewProjection);
 	for (auto& call : calls[kParticleModel]) {
 		call();
 	}
 
-	skyPipeline_->PreDraw(*commandContext_, viewProjection);
-	for (auto& call : calls[kSky]) {
-		call();
-	}
 
+	//透明
 	floorPipeline_->PreDraw(*commandContext_, viewProjection);
 	for (auto& call : calls[kFloor]) {
 		call();
 	}
 
+	//背景
+	skyPipeline_->PreDraw(*commandContext_, viewProjection);
+	for (auto& call : calls[kSky]) {
+		call();
+	}
+}
+
+void DrawManager::PostSpriteDraw()
+{
 	spritePipeline_->PreDraw(*commandContext_);
 	for (auto& call : calls[kPostSprite]) {
 		call();

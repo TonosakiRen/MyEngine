@@ -17,12 +17,10 @@ void DeferredRenderer::Initialize(ColorBuffer* colorTexture, ColorBuffer* normal
 	depthTexture_ = depthTexture;
 	colorTexture_ = colorTexture;
 	materialTexture_ = materialTexture;
-	pipelineState_ = std::make_unique<PipelineState>();
-	rootSignature_ = std::make_unique<RootSignature>();
 	CreatePipeline();
 }
 
-void DeferredRenderer::Render(CommandContext& commandContext, ColorBuffer* originalBuffer,ViewProjection& viewProjection, TileBasedRendering& tileBasedRendering)
+void DeferredRenderer::Render(CommandContext& commandContext, ColorBuffer* originalBuffer, ViewProjection& viewProjection, TileBasedRendering& tileBasedRendering)
 {
 
 	LightManager* lightManager = LightManager::GetInstance();
@@ -36,8 +34,8 @@ void DeferredRenderer::Render(CommandContext& commandContext, ColorBuffer* origi
 	commandContext.TransitionResource(*materialTexture_, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 	commandContext.TransitionResource(*depthTexture_, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
-	commandContext.SetPipelineState(*pipelineState_);
-	commandContext.SetGraphicsRootSignature(*rootSignature_);
+	commandContext.SetPipelineState(pipelineState_);
+	commandContext.SetGraphicsRootSignature(rootSignature_);
 	commandContext.SetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kColorTexture), colorTexture_->GetSRV());
@@ -54,10 +52,15 @@ void DeferredRenderer::Render(CommandContext& commandContext, ColorBuffer* origi
 	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::k2DTextures), DirectXCommon::GetInstance()->GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV).GetDiscriptorStartHandle());
 
 	commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
+	commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kLightNum), lightManager->lightNumBuffer_->GetGPUVirtualAddress());
 
 
-	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kTBRInformation), tileBasedRendering.rwTilesInformation_->GetUAV());
-	commandContext.SetConstants(static_cast<UINT>(RootParameter::kTileNum),TileBasedRendering::kTileWidthNum, TileBasedRendering::kTileHeightNum);
+	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kTBRInformation), tileBasedRendering.rwTilesInformation_.GetUAV());
+	commandContext.SetConstants(static_cast<UINT>(RootParameter::kTileNum), TileBasedRendering::kTileWidthNum, TileBasedRendering::kTileHeightNum);
+
+	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kTBRPointLightIndex), tileBasedRendering.rwPointLightIndex_.GetUAV());
+	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kTBRSpotLightIndex), tileBasedRendering.rwSpotLightIndex_.GetUAV());
+	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kTBRShadowSpotLightIndex), tileBasedRendering.rwShadowSpotLightIndex_.GetUAV());
 
 	commandContext.DrawInstanced(3, 1, 0, 0);
 }
@@ -77,21 +80,25 @@ void DeferredRenderer::CreatePipeline()
 
 	{
 
-		CD3DX12_DESCRIPTOR_RANGE ranges[11]{};
-		ranges[(int)RootParameter::kColorTexture].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
-		ranges[(int)RootParameter::kNormalTexture].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1);
-		ranges[(int)RootParameter::kMaterialTexture].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 2);
-		ranges[(int)RootParameter::kDepthTexture].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 3);
+		CD3DX12_DESCRIPTOR_RANGE ranges[int(RootParameter::kDescriptorRageNum)]{};
+		ranges[int(RootParameter::kColorTexture)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
+		ranges[int(RootParameter::kNormalTexture)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1);
+		ranges[int(RootParameter::kMaterialTexture)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 2);
+		ranges[int(RootParameter::kDepthTexture)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 3);
 
-		ranges[(int)RootParameter::kDirectionalLights].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 4);
-		ranges[(int)RootParameter::kPointLights].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 5);
-		ranges[(int)RootParameter::kAreaLights].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 6);
-		ranges[(int)RootParameter::kSpotLights].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 7);
-		ranges[(int)RootParameter::kShadowSpotLights].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 8);
+		ranges[int(RootParameter::kDirectionalLights)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 4);
+		ranges[int(RootParameter::kPointLights)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 5);
+		ranges[int(RootParameter::kAreaLights)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 6);
+		ranges[int(RootParameter::kSpotLights)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 7);
+		ranges[int(RootParameter::kShadowSpotLights)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 8);
 
-		ranges[(int)RootParameter::k2DTextures].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, DirectXCommon::GetInstance()->DirectXCommon::kSrvHeapDescriptorNum, 0, 1);
+		ranges[int(RootParameter::k2DTextures)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, DirectXCommon::GetInstance()->DirectXCommon::kSrvHeapDescriptorNum, 0, 1);
 
-		ranges[(int)RootParameter::kTBRInformation].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 0);
+		ranges[int(RootParameter::kTBRInformation)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 0);
+
+		ranges[int(RootParameter::kTBRPointLightIndex)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 1);
+		ranges[int(RootParameter::kTBRSpotLightIndex)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 2);
+		ranges[int(RootParameter::kTBRShadowSpotLightIndex)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 3);
 
 		CD3DX12_ROOT_PARAMETER rootParameters[(int)RootParameter::ParameterNum]{};
 		rootParameters[(int)RootParameter::kColorTexture].InitAsDescriptorTable(1, &ranges[(int)RootParameter::kColorTexture]);
@@ -107,11 +114,16 @@ void DeferredRenderer::CreatePipeline()
 
 		rootParameters[(int)RootParameter::k2DTextures].InitAsDescriptorTable(1, &ranges[(int)RootParameter::k2DTextures]);
 
+
 		rootParameters[(int)RootParameter::kTBRInformation].InitAsDescriptorTable(1, &ranges[(int)RootParameter::kTBRInformation]);
 
-		rootParameters[(int)RootParameter::kViewProjection].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_ALL);
-		rootParameters[(int)RootParameter::kTileNum].InitAsConstants(2, 1);
+		rootParameters[(int)RootParameter::kTBRPointLightIndex].InitAsDescriptorTable(1, &ranges[(int)RootParameter::kTBRPointLightIndex]);
+		rootParameters[(int)RootParameter::kTBRSpotLightIndex].InitAsDescriptorTable(1, &ranges[(int)RootParameter::kTBRSpotLightIndex]);
+		rootParameters[(int)RootParameter::kTBRShadowSpotLightIndex].InitAsDescriptorTable(1, &ranges[(int)RootParameter::kTBRShadowSpotLightIndex]);
 
+		rootParameters[(int)RootParameter::kViewProjection].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_ALL);
+		rootParameters[(int)RootParameter::kLightNum].InitAsConstantBufferView(1, 0, D3D12_SHADER_VISIBILITY_ALL);
+		rootParameters[(int)RootParameter::kTileNum].InitAsConstants(2, 2);
 
 		// スタティックサンプラー
 		CD3DX12_STATIC_SAMPLER_DESC samplerDesc =
@@ -125,7 +137,7 @@ void DeferredRenderer::CreatePipeline()
 		rootSignatureDesc.NumStaticSamplers = 1;
 		rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
-		rootSignature_->Create(L"deferredRootSignature", rootSignatureDesc);
+		rootSignature_.Create(L"deferredRootSignature", rootSignatureDesc);
 
 	}
 
@@ -151,9 +163,9 @@ void DeferredRenderer::CreatePipeline()
 		gpipeline.RTVFormats[0] = Renderer::GetInstance()->GetRTVFormat(Renderer::kColor); // 0～255指定のRGBA
 		gpipeline.SampleDesc.Count = 1; // 1ピクセルにつき1回サンプリング
 
-		gpipeline.pRootSignature = *rootSignature_;
+		gpipeline.pRootSignature = rootSignature_;
 
-		pipelineState_->Create(L"deferredPipeline", gpipeline);
+		pipelineState_.Create(L"deferredPipeline", gpipeline);
 
 	}
 

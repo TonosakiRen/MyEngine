@@ -29,9 +29,17 @@ public:
 
 		k2DTextures,
 
+
 		kTBRInformation,
 
-		kViewProjection,
+		kTBRPointLightIndex,
+		kTBRSpotLightIndex,
+		kTBRShadowSpotLightIndex,
+
+		kDescriptorRageNum,
+
+		kViewProjection = kDescriptorRageNum,
+		kLightNum,
 		kTileNum,
 
 		ParameterNum
@@ -43,8 +51,8 @@ public:
 private:
 	void CreatePipeline();
 private:
-	std::unique_ptr<PipelineState> pipelineState_;
-	std::unique_ptr<RootSignature> rootSignature_;
+	PipelineState pipelineState_;
+	RootSignature rootSignature_;
 	ColorBuffer* colorTexture_;
 	ColorBuffer* normalTexture_;
 	ColorBuffer* materialTexture_;
@@ -58,4 +66,3 @@ private:
 
 
 };
-

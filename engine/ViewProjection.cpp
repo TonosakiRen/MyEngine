@@ -76,6 +76,7 @@ void ViewProjection::Update() {
 void ViewProjection::Draw()
 {
     Wire::Draw(worldFrustum_);
+
 }
 
 bool ViewProjection::Shake(Vector3 shakeValue, int& frame)

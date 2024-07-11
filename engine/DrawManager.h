@@ -72,7 +72,8 @@ private:
 
 	void Initialize(CommandContext& CommandContext);
 	void Finalize();
-	void AllDraw(const ViewProjection& viewProjection);
+	void AllDraw(PipelineType pipelineType,const ViewProjection& viewProjection);
+	void PostSpriteDraw();
 	void ShadowDraw();
 	void ShadowSpotLightDraw();
 	void ResetCalls();

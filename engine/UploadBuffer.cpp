@@ -27,7 +27,8 @@ void UploadBuffer::Create(const std::wstring& name, size_t bufferSize) {
     assert(SUCCEEDED(result));
 
 #ifdef _DEBUG
-    resource_->SetName(L"UploadBuffer");
+    resource_->SetName(name.c_str());
+    name_ = name;
 #endif // _DEBUG
 
 

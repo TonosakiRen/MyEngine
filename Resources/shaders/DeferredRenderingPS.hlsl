@@ -1,12 +1,6 @@
 
 #define MY_TEXTURE2D_SPACE space1
 
-#define PointLightNum 256
-#define SpotLightNum 1
-#define ShadowSpotLightNum 1
-#define AreaLightNum 1
-#define DirectionalLightNum 1
-
 struct VSOutput {
 	float32_t4  svpos : SV_POSITION;
 	float32_t2  uv : TEXCOORD;
@@ -85,18 +79,33 @@ struct ShadowSpotLight {
 };
 StructuredBuffer<ShadowSpotLight> gShadowSpotLights  : register(t8);
 
-struct TileInformation {
+struct LightNum {
+	uint32_t  directionalLight;
+	uint32_t  pointLight;
+	uint32_t  areaLight;
+	uint32_t  spotLight;
+	uint32_t  shadowSpotLight;
+	uint32_t maxInTilePointLight;
+};
+
+ConstantBuffer<LightNum> lightNum : register(b1);
+
+struct TBRInformation {
 	uint32_t pointLightNum;
 	uint32_t spotLightNum;
 	uint32_t shadowSpotLightNum;
 
-	uint32_t pointLightIndex[PointLightNum];
-	uint32_t spotLightIndex[SpotLightNum];
-	uint32_t shadowSpotLightIndex[ShadowSpotLightNum];
+	uint32_t pointLightOffset;
+	uint32_t spotLightOffset;
+	uint32_t shadowSpotLightOffset;
 };
-RWStructuredBuffer<TileInformation> gTileInformation  : register(u0);
+RWStructuredBuffer<TBRInformation> gTBRInformation  : register(u0);
 
-ConstantBuffer<Param> tileNum : register(b1);
+RWStructuredBuffer<uint32_t> gTBRPointLightIndex  : register(u1);
+RWStructuredBuffer<uint32_t> gTBRSpotLightIndex  : register(u2);
+RWStructuredBuffer<uint32_t> gTBRShadowSpotLightIndex  : register(u3);
+
+ConstantBuffer<Param> tileNum : register(b2);
 
 
 float3 GetWorldPosition(in float2 texcoord, in float depth, in float4x4 viewProjectionInverseMatrix) {
@@ -152,13 +161,13 @@ float4 main(VSOutput input) : SV_TARGET
 
 		uint32_t tileNumber = tile.y * tileNum.param.x + tile.x;
 
-		TileInformation tileInformation = gTileInformation[tileNumber];
+		TBRInformation tileInformation = gTBRInformation[tileNumber];
 
 		float32_t3 viewDirection = normalize(gViewProjection.viewPosition - worldPos);
 
 		for (int i = 0; i < tileInformation.pointLightNum; i++) {
 
-			int index = tileInformation.pointLightIndex[i];
+			int index = gTBRPointLightIndex[tileInformation.pointLightOffset + i];
 
 			float32_t3 pointLightDirection = worldPos - gPointLights[index].position;
 			float32_t distance = length(pointLightDirection);
@@ -184,7 +193,7 @@ float4 main(VSOutput input) : SV_TARGET
 
 		for (int j = 0; j < tileInformation.spotLightNum; j++) {
 
-			int index = tileInformation.spotLightIndex[j];
+			int index = gTBRSpotLightIndex[tileInformation.spotLightOffset + j];
 
 			float32_t3 spotLightDirectionOnSurface = normalize(worldPos - gSpotLights[index].position);
 			float32_t distance = length(gSpotLights[index].position - worldPos);
@@ -215,7 +224,7 @@ float4 main(VSOutput input) : SV_TARGET
 
 		for (int l = 0; l < tileInformation.shadowSpotLightNum; l++) {
 
-			int index = tileInformation.shadowSpotLightIndex[l];
+			int index = gTBRShadowSpotLightIndex[tileInformation.shadowSpotLightOffset + l];
 
 			float32_t3 spotLightDirectionOnSurface = normalize(worldPos - gViewProjection.viewPosition);
 			float32_t distance = length(gShadowSpotLights[index].position - worldPos);
@@ -264,7 +273,7 @@ float4 main(VSOutput input) : SV_TARGET
 
 		}
 
-		for (int k = 0; k < DirectionalLightNum; k++) {
+		for (int k = 0; k < lightNum.directionalLight; k++) {
 
 			//directionalLightDiffuse
 			float32_t NdotL = dot(normal, -gDirectionLights[k].direction);
@@ -300,7 +309,7 @@ float4 main(VSOutput input) : SV_TARGET
 
 		}
 
-		for (int m = 0; m < AreaLightNum; m++) {
+		for (int m = 0; m < lightNum.areaLight; m++) {
 
 			float32_t segLen = length(gAreaLights[m].diff);
 			float32_t3 segDir = gAreaLights[m].diff * (1.0f / segLen);

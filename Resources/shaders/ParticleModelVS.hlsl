@@ -3,7 +3,7 @@ struct ParticleData {
 	float32_t4x4 world;
 	float32_t4x4 worldInverseTranspose;
 };
-StructuredBuffer<ParticleData> gParticleData  : register(t0);
+StructuredBuffer<ParticleData> gParticleData  : register(t1);
 
 struct ViewProjection {
 	float32_t4x4 viewProjection;

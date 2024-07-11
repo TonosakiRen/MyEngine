@@ -19,3 +19,15 @@ private:
 #endif // _DEBUG
 };
 
+enum PipelineType {
+	kForward,
+	kDeferred,
+	//透明描画のパイプライン
+	kOpacityPipelineNum,
+
+	kDepth = 2,
+
+	//不透明描画のパイプライン
+	kPipelineNum
+};
+

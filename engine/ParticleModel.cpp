@@ -14,16 +14,16 @@ void ParticleModel::Initialize() {
 
 void ParticleModel::Finalize()
 {
-    rootSignature_.reset();
-    pipelineState_.reset();
-    fRootSignature_.reset();
-    fPipelineState_.reset();
+    for (int i = 0; i < kPipelineNum; i++) {
+        rootSignature_[i].reset();
+        pipelineState_[i].reset();
+    }
 }
 
-void ParticleModel::PreDraw(CommandContext& commandContext, const ViewProjection& viewProjection) {
+void ParticleModel::PreDraw(PipelineType pipelineType,CommandContext& commandContext, const ViewProjection& viewProjection) {
     
-    commandContext.SetPipelineState(*pipelineState_);
-    commandContext.SetGraphicsRootSignature(*rootSignature_);
+    commandContext.SetPipelineState(*pipelineState_[pipelineType]);
+    commandContext.SetGraphicsRootSignature(*rootSignature_[pipelineType]);
     // CBVをセット（ビュープロジェクション行列）
     commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
   
@@ -43,23 +43,22 @@ void ParticleModel::CreatePipeline() {
     psBlob = shaderManager->Compile(L"ParticleModelPS.hlsl", ShaderManager::kPixel);
     assert(psBlob != nullptr);
 
-    rootSignature_ = std::make_unique<RootSignature>();
-    pipelineState_ = std::make_unique<PipelineState>();
+    rootSignature_[kDeferred] = std::make_unique<RootSignature>();
+    pipelineState_[kDeferred] = std::make_unique<PipelineState>();
 
     {
 
-        CD3DX12_DESCRIPTOR_RANGE descRangeSRV;
-        descRangeSRV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0); // t0
+        CD3DX12_DESCRIPTOR_RANGE descRangeSRV[int(RootParameter::kDescriptorRangeNum)];
+        descRangeSRV[int(RootParameter::kTexture)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0); // t0
+        descRangeSRV[int(RootParameter::kParticleData)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1); // t1
 
-        CD3DX12_DESCRIPTOR_RANGE descRangeSRVTexture;
-        descRangeSRVTexture.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1); // t1
 
         CD3DX12_ROOT_PARAMETER rootparams[int(RootParameter::parameterNum)] = {};
-        rootparams[int(RootParameter::kWorldTransform)].InitAsDescriptorTable(1, &descRangeSRV, D3D12_SHADER_VISIBILITY_ALL);
-        rootparams[int(RootParameter::kViewProjection)].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_ALL);
-        rootparams[int(RootParameter::kTexture)].InitAsDescriptorTable(1, &descRangeSRVTexture, D3D12_SHADER_VISIBILITY_ALL);
-        rootparams[int(RootParameter::kMaterial)].InitAsConstantBufferView(1, 0, D3D12_SHADER_VISIBILITY_ALL);
+        rootparams[int(RootParameter::kTexture)].InitAsDescriptorTable(1, &descRangeSRV[int(RootParameter::kTexture)], D3D12_SHADER_VISIBILITY_ALL);
+        rootparams[int(RootParameter::kParticleData)].InitAsDescriptorTable(1, &descRangeSRV[int(RootParameter::kParticleData)], D3D12_SHADER_VISIBILITY_ALL);
 
+        rootparams[int(RootParameter::kViewProjection)].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_ALL);
+        rootparams[int(RootParameter::kMaterial)].InitAsConstantBufferView(1, 0, D3D12_SHADER_VISIBILITY_ALL);
 
         // スタティックサンプラー
         CD3DX12_STATIC_SAMPLER_DESC samplerDesc =
@@ -73,7 +72,7 @@ void ParticleModel::CreatePipeline() {
         rootSignatureDesc.NumStaticSamplers = 1;
         rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
-        rootSignature_->Create(L"particleModelRootSignature", rootSignatureDesc);
+        rootSignature_[kDeferred]->Create(L"particleModelRootSignature", rootSignatureDesc);
 
     }
 
@@ -147,10 +146,10 @@ void ParticleModel::CreatePipeline() {
         gpipeline.RTVFormats[int(Renderer::kMaterial)] = Renderer::GetInstance()->GetRTVFormat(Renderer::kMaterial);
         gpipeline.SampleDesc.Count = 1;
 
-        gpipeline.pRootSignature = *rootSignature_;
+        gpipeline.pRootSignature = *rootSignature_[kDeferred];
 
         // グラフィックスパイプラインの生成
-        pipelineState_->Create(L"particleModelPipeline", gpipeline);
+        pipelineState_[kDeferred]->Create(L"particleModelPipeline", gpipeline);
     }
 
 }
@@ -168,22 +167,25 @@ void ParticleModel::CreateForwardPipeline()
     psBlob = shaderManager->Compile(L"forward+/FParticleModelPS.hlsl", ShaderManager::kPixel);
     assert(psBlob != nullptr);
 
-    fRootSignature_ = std::make_unique<RootSignature>();
-    fPipelineState_ = std::make_unique<PipelineState>();
+    rootSignature_[kForward] = std::make_unique<RootSignature>();
+    pipelineState_[kForward] = std::make_unique<PipelineState>();
 
     {
 
-        CD3DX12_DESCRIPTOR_RANGE descRangeSRV;
-        descRangeSRV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0); // t0
+        CD3DX12_DESCRIPTOR_RANGE descRangeSRV[int(ForwardRootParameter::kDescriptorRangeNum)];
+        descRangeSRV[int(ForwardRootParameter::kTexture)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0); // t0
+        descRangeSRV[int(ForwardRootParameter::kParticleData)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1); // t1
+        descRangeSRV[int(ForwardRootParameter::kTileInformation)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 2); // t2
 
-        CD3DX12_DESCRIPTOR_RANGE descRangeSRVTexture;
-        descRangeSRVTexture.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1); // t1
 
-        CD3DX12_ROOT_PARAMETER rootparams[int(RootParameter::parameterNum)] = {};
-        rootparams[int(RootParameter::kWorldTransform)].InitAsDescriptorTable(1, &descRangeSRV, D3D12_SHADER_VISIBILITY_ALL);
-        rootparams[int(RootParameter::kViewProjection)].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_ALL);
-        rootparams[int(RootParameter::kTexture)].InitAsDescriptorTable(1, &descRangeSRVTexture, D3D12_SHADER_VISIBILITY_ALL);
-        rootparams[int(RootParameter::kMaterial)].InitAsConstantBufferView(1, 0, D3D12_SHADER_VISIBILITY_ALL);
+        CD3DX12_ROOT_PARAMETER rootparams[int(ForwardRootParameter::parameterNum)] = {};
+        rootparams[int(ForwardRootParameter::kTexture)].InitAsDescriptorTable(1, &descRangeSRV[int(ForwardRootParameter::kTexture)], D3D12_SHADER_VISIBILITY_ALL);
+        rootparams[int(ForwardRootParameter::kParticleData)].InitAsDescriptorTable(1, &descRangeSRV[int(ForwardRootParameter::kParticleData)], D3D12_SHADER_VISIBILITY_ALL);
+        rootparams[int(ForwardRootParameter::kTileInformation)].InitAsDescriptorTable(1, &descRangeSRV[int(ForwardRootParameter::kTileInformation)], D3D12_SHADER_VISIBILITY_ALL);
+
+        rootparams[int(ForwardRootParameter::kViewProjection)].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_ALL);
+        rootparams[int(ForwardRootParameter::kMaterial)].InitAsConstantBufferView(1, 0, D3D12_SHADER_VISIBILITY_ALL);
+
 
         // スタティックサンプラー
         CD3DX12_STATIC_SAMPLER_DESC samplerDesc =
@@ -197,7 +199,7 @@ void ParticleModel::CreateForwardPipeline()
         rootSignatureDesc.NumStaticSamplers = 1;
         rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
-        fRootSignature_->Create(L"particleModelRootSignature", rootSignatureDesc);
+        rootSignature_[kForward]->Create(L"particleModelRootSignature", rootSignatureDesc);
 
     }
 
@@ -269,17 +271,17 @@ void ParticleModel::CreateForwardPipeline()
         gpipeline.RTVFormats[int(Renderer::kNormal)] = Renderer::GetInstance()->GetRTVFormat(Renderer::kNormal);
         gpipeline.SampleDesc.Count = 1;
 
-        gpipeline.pRootSignature = *rootSignature_;
+        gpipeline.pRootSignature = *rootSignature_[kForward];
 
         // グラフィックスパイプラインの生成
-        fPipelineState_->Create(L"particleModelPipeline", gpipeline);
+        pipelineState_[kForward]->Create(L"particleModelPipeline", gpipeline);
     }
 }
 
 void ParticleModel::Draw(CommandContext& commandContext, ParticleModelData& bufferData, const Material& material, uint32_t modelHandle)
 {
  
-    commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kWorldTransform), bufferData.structuredBuffer_.GetSRV());
+    commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kParticleData), bufferData.structuredBuffer_.GetSRV());
 
     commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kMaterial), material.GetGPUVirtualAddress());
 

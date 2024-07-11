@@ -5,7 +5,9 @@
 #include "ShaderManager.h"
 #include "Helper.h"
 #include "CommandContext.h"
-
+#include "LightNumBuffer.h"
+#include "LightManager.h"
+#include "Wire.h"
 using namespace Microsoft::WRL;
 void TileBasedRendering::Initialize()
 {
@@ -15,14 +17,24 @@ void TileBasedRendering::Initialize()
     CreatePipeline();
 
     {
-        initialTileFrustrumBuffer_ = std::make_unique<DefaultStructuredBuffer>();
-        initialTileFrustrumBuffer_->Create(L"initialTileFrustum", sizeof(Frustum), kTileNum);
+        initialTileFrustrumBuffer_.Create(L"initialTileFrustumBuffer", sizeof(Frustum), kTileNum);
     }
 
     {
-        rwTilesInformation_ = std::make_unique<RwStructuredBuffer>();
-        rwTilesInformation_->Create(L"rwTileInformation", sizeof(ConstBufferData), kTileNum);
- 
+        rwTilesInformation_.Create(L"rwTileInformation", sizeof(ConstBufferData), kTileNum);
+
+    }
+
+    {
+        rwPointLightIndex_.Create(L"rwPointLightIndex", sizeof(uint32_t), kTileNum * kMaxInTilePointLight);
+    }
+
+    {
+        rwSpotLightIndex_.Create(L"rwSpotLightIndex", sizeof(uint32_t), kTileNum * SpotLights::lightNum);
+    }
+
+    {
+        rwShadowSpotLightIndex_.Create(L"rwShadowSpotLightIndex", sizeof(uint32_t), kTileNum * ShadowSpotLights::lightNum);
     }
 
 }
@@ -37,9 +49,10 @@ void TileBasedRendering::ComputeUpdate(CommandContext& commandContext, const Vie
             int height = i / kTileWidthNum;
             int width = i % kTileWidthNum;
             initialTileFrustrum_[i] = GetTileFrustrum(width, height);
-            initialTileFrustrumBuffer_->Copy(initialTileFrustrum_);
+            initialTileFrustrumBuffer_.Copy(initialTileFrustrum_);
         }
     }
+    
 
     LightManager* lightManager = LightManager::GetInstance();
 
@@ -47,16 +60,21 @@ void TileBasedRendering::ComputeUpdate(CommandContext& commandContext, const Vie
     commandContext.SetPipelineState(pipelineState_);
     commandContext.SetComputeRootSignature(rootSignature_);
 
-    commandContext.TransitionResource(*rwTilesInformation_, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+    commandContext.TransitionResource(rwTilesInformation_, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+    commandContext.TransitionResource(rwPointLightIndex_, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+    commandContext.TransitionResource(rwSpotLightIndex_, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+    commandContext.TransitionResource(rwShadowSpotLightIndex_, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
 
-    commandContext.SetComputeDescriptorTable(UINT(RootParameter::kTileInformation), rwTilesInformation_->GetUAV());
-    commandContext.SetComputeDescriptorTable(UINT(RootParameter::kInitialTileFrustum), initialTileFrustrumBuffer_->GetSRV(commandContext));
+    commandContext.SetComputeDescriptorTable(UINT(RootParameter::kTileInformation), rwTilesInformation_.GetUAV());
+    commandContext.SetComputeDescriptorTable(UINT(RootParameter::kPointLightIndex), rwPointLightIndex_.GetUAV());
+    commandContext.SetComputeDescriptorTable(UINT(RootParameter::kSpotLightIndex), rwSpotLightIndex_.GetUAV());
+    commandContext.SetComputeDescriptorTable(UINT(RootParameter::kShadowSpotLightIndex), rwShadowSpotLightIndex_.GetUAV());
+    commandContext.SetComputeDescriptorTable(UINT(RootParameter::kInitialTileFrustum), initialTileFrustrumBuffer_.GetSRV(commandContext));
     commandContext.SetComputeDescriptorTable(UINT(RootParameter::kPointLights), lightManager->pointLights_->structureBuffer_.GetSRV());
+    commandContext.SetComputeConstantBuffer(UINT(RootParameter::kLightNum), lightManager->lightNumBuffer_->GetGPUVirtualAddress());
     commandContext.SetComputeConstantBuffer(UINT(RootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
 
-    commandContext.Dispatch(1,1,1);
-    commandContext.UAVBarrier(*rwTilesInformation_);
-
+    commandContext.Dispatch(1, 1, 1);
 }
 
 void TileBasedRendering::CreatePipeline()
@@ -64,28 +82,35 @@ void TileBasedRendering::CreatePipeline()
     ComPtr<IDxcBlob> uavBlob;
 
     auto shaderManager = ShaderManager::GetInstance();
-    uavBlob = shaderManager->Compile(L"TBR.hlsl", ShaderManager::kCompute);
+    uavBlob = shaderManager->Compile(L"TBRCS.hlsl", ShaderManager::kCompute);
     assert(uavBlob != nullptr);
 
-    CD3DX12_DESCRIPTOR_RANGE ranges[3]{};
+    CD3DX12_DESCRIPTOR_RANGE ranges[6]{};
     ranges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, int(RootParameter::kTileInformation));
+    ranges[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, int(RootParameter::kPointLightIndex));
+    ranges[2].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, int(RootParameter::kSpotLightIndex));
+    ranges[3].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, int(RootParameter::kShadowSpotLightIndex));
 
-    ranges[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
-    ranges[2].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1);
+    ranges[4].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
+    ranges[5].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1);
 
 
     CD3DX12_ROOT_PARAMETER rootparams[int(RootParameter::ParameterNum)]{};
-    rootparams[int(RootParameter::kTileInformation)].InitAsDescriptorTable(1,&ranges[int(RootParameter::kTileInformation)]);
+    rootparams[int(RootParameter::kTileInformation)].InitAsDescriptorTable(1, &ranges[int(RootParameter::kTileInformation)]);
+    rootparams[int(RootParameter::kPointLightIndex)].InitAsDescriptorTable(1, &ranges[int(RootParameter::kPointLightIndex)]);
+    rootparams[int(RootParameter::kSpotLightIndex)].InitAsDescriptorTable(1, &ranges[int(RootParameter::kSpotLightIndex)]);
+    rootparams[int(RootParameter::kShadowSpotLightIndex)].InitAsDescriptorTable(1, &ranges[int(RootParameter::kShadowSpotLightIndex)]);
     rootparams[int(RootParameter::kInitialTileFrustum)].InitAsDescriptorTable(1, &ranges[int(RootParameter::kInitialTileFrustum)]);
     rootparams[int(RootParameter::kPointLights)].InitAsDescriptorTable(1, &ranges[int(RootParameter::kPointLights)]);
-    rootparams[int(RootParameter::kViewProjection)].InitAsConstantBufferView(0, 0);
+    rootparams[int(RootParameter::kLightNum)].InitAsConstantBufferView(0, 0);
+    rootparams[int(RootParameter::kViewProjection)].InitAsConstantBufferView(1, 0);
 
     // ルートシグネチャの設定
     D3D12_ROOT_SIGNATURE_DESC rootSignatureDesc{};
     rootSignatureDesc.pParameters = rootparams;
     rootSignatureDesc.NumParameters = _countof(rootparams);
 
-    rootSignature_.Create(L"TBRRootSignature", rootSignatureDesc);
+    rootSignature_.Create(L"TBRRootSignature",rootSignatureDesc);
 
     D3D12_COMPUTE_PIPELINE_STATE_DESC desc{};
     desc.pRootSignature = rootSignature_;
