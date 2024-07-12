@@ -50,7 +50,7 @@ private:
 
 	std::unique_ptr<WhiteParticle> whiteParticle_;
 	
-	std::unique_ptr<SphereLights> sphereLights_;
+	//std::unique_ptr<SphereLights> sphereLights_;
 
 	//Enemy
 	std::list<std::unique_ptr<Enemy>> enemies_;

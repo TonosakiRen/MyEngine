@@ -379,9 +379,6 @@
     <ClCompile Include="application\Skybox.cpp">
       <Filter>Game\Stage</Filter>
     </ClCompile>
-    <ClCompile Include="application\SphereLights.cpp">
-      <Filter>Game</Filter>
-    </ClCompile>
     <ClCompile Include="engine\AnimationManager.cpp">
       <Filter>Engine\Animation</Filter>
     </ClCompile>
@@ -462,6 +459,9 @@
     </ClCompile>
     <ClCompile Include="engine\LightNumBuffer.cpp">
       <Filter>Engine\Light</Filter>
+    </ClCompile>
+    <ClCompile Include="application\SphereLights.cpp">
+      <Filter>Game</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

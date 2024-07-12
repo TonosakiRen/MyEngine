@@ -3,17 +3,16 @@
 
 void PointLights::Initialize() {
     
-        lights_.resize(lightNum);
-        structureBuffer_.Create(L"pointLightBuffer", sizeof(ConstBufferData), lightNum);
-        for (int i = 0; i < lightNum; i++) {
-            lights_[i].worldTransform.Update();
-        }
+    structureBuffer_.Create(L"pointLightBuffer", sizeof(ConstBufferData), lightNum);
 }
 
 void PointLights::Update() {
     std::vector<ConstBufferData> bufferData;
     bufferData.reserve(lightNum);
-    for (int i = 0; i < lightNum; i++) {
+
+    assert(lights_.size() < lightNum);
+
+    for (int i = 0; i < lights_.size(); i++) {
         ConstBufferData data;
         data.color = lights_[i].color;
         lights_[i].worldTransform.Update();
@@ -24,5 +23,6 @@ void PointLights::Update() {
         data.isActive = static_cast<float>(lights_[i].isActive);
         bufferData.emplace_back(data);
     }
+
     structureBuffer_.Copy(bufferData.data(), sizeof(bufferData[0]) * bufferData.size());
 }

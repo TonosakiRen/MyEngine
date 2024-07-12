@@ -5,6 +5,8 @@
 #include <assert.h>
 #include "ModelManager.h"
 
+#include "LightManager.h"
+
 using namespace nlohmann;
 
 GameObjectManager* GameObjectManager::GetInstance() {
@@ -90,6 +92,34 @@ void GameObjectManager::Load()
 
 			}
 
+		}
+
+		// MESH
+		if (type.compare("LIGHT") == 0) {
+
+			// トランスフォームのパラメータ読み込み
+			nlohmann::json& transform = object["transform"];
+
+
+			if (object.contains("pointLight")) {
+				PointLights::PointLight pointLight;
+				//平行移動
+				pointLight.worldTransform.translation_.x = (float)transform["translation"][0];
+				pointLight.worldTransform.translation_.y = (float)transform["translation"][2];
+				pointLight.worldTransform.translation_.z = (float)transform["translation"][1];
+
+				nlohmann::json& light = object["pointLight"];
+				nlohmann::json& color = light["color"];
+				pointLight.color.x = color[0];
+				pointLight.color.y = color[1];
+				pointLight.color.z = color[2];
+				pointLight.isActive = true;
+				pointLight.decay = 1.0f;
+				pointLight.intensity = 3.0f;
+				pointLight.radius = 3.0f;
+
+				LightManager::GetInstance()->pointLights_->lights_.push_back(pointLight);
+			}
 		}
 	}
 }

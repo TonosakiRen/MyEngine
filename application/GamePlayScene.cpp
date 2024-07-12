@@ -43,8 +43,8 @@ void GamePlayScene::Initialize()
 	player_->Initialize("walk.gltf", playerBulletManager_.get());
 	player = player_.get();
 
-	sphereLights_ = std::make_unique<SphereLights>();
-	sphereLights_->Initialize();
+	/*sphereLights_ = std::make_unique<SphereLights>();
+	sphereLights_->Initialize();*/
 
 	GameObjectManager::GetInstance()->Load();
 	gameObjects_ = &GameObjectManager::GetInstance()->gameObjects_;
@@ -110,7 +110,7 @@ void GamePlayScene::Update()
 #endif
 	whiteParticle_->Update();
 
-	sphereLights_->Update();
+	//sphereLights_->Update();
 }
 
 void GamePlayScene::Draw()
@@ -127,7 +127,7 @@ void GamePlayScene::Draw()
 
 	skybox_->Draw();
 	//whiteParticle_->Draw();
-	sphereLights_->Draw();
+	//sphereLights_->Draw();
 	floor_->Draw();
 
 	for (auto& gameObject : *gameObjects_) {
