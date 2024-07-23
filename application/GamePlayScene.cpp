@@ -17,8 +17,8 @@ void GamePlayScene::Initialize()
 	floor_->Initialize("floor.obj");
 
 	sphere_ = std::make_unique<GameObject>();
-	sphere_->Initialize("sphere.obj");
-	sphere_->SetPosition({ 0.0f,8.0f,-3.0f });
+	sphere_->Initialize("box1x1.obj");
+	sphere_->SetPosition({ 0.0f,1.0f,0.0f });
 	sphere_->UpdateMatrix();
 
 	boxArea_ = std::make_unique<BoxArea>();
@@ -64,7 +64,7 @@ void GamePlayScene::Update()
 
 	skybox_->Update();
 
-	player_->Update(*GameScene::currentViewProjection_);
+	player_->Update(*GameScene::currentViewProjection);
 
 	//敵更新
 	for (const std::unique_ptr<Enemy>& enemy : enemies_) {
@@ -116,7 +116,7 @@ void GamePlayScene::Update()
 void GamePlayScene::Draw()
 {
 	player_->Draw();
-	sphere_->Draw();
+	sphere_->WaveDraw();
 	//敵描画
 	for (const std::unique_ptr<Enemy>& enemy : enemies_) {
 		enemy->Draw();
@@ -131,7 +131,7 @@ void GamePlayScene::Draw()
 	floor_->Draw();
 
 	for (auto& gameObject : *gameObjects_) {
-		gameObject->Draw();
+		gameObject->WaveDraw();
 	}
 }
 

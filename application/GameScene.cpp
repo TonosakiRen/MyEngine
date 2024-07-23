@@ -17,7 +17,8 @@
 #include "Skinning.h"
 #include "DrawManager.h"
 
-ViewProjection* GameScene::currentViewProjection_ = nullptr;
+ViewProjection* GameScene::currentViewProjection = nullptr;
+WavePoints* GameScene::wavePoints = nullptr;
 
 GameScene::GameScene() {};
 
@@ -48,6 +49,10 @@ void GameScene::Initialize() {
 	DrawManager::GetInstance()->SetCallingViewProjection(*camera_);
 	lightManager_ = LightManager::GetInstance();
 	lightManager_->Initialize();
+
+	wavePoints_ = std::make_unique<WavePoints>();
+	wavePoints_->Initialize();
+	wavePoints = wavePoints_.get();
 }
 
 void GameScene::Update(CommandContext& commandContext){
@@ -60,14 +65,18 @@ void GameScene::Update(CommandContext& commandContext){
 	ImGui::Text("%f", io.Framerate);
 	ImGui::End();
 #endif
+
+	wavePoints->Update();
+	wavePoints->Draw();
+
 	//camera light
 	{
 		if (ViewProjection::isUseDebugCamera) {
-			currentViewProjection_ = debugCamera_.get();
+			currentViewProjection = debugCamera_.get();
 			debugCamera_->Update();
 		}
 		else {
-			currentViewProjection_ = camera_.get();
+			currentViewProjection = camera_.get();
 		}
 			if (GamePlayScene::player) {
 				camera_->Update(MakeTranslation(GamePlayScene::player->GetWorldTransform().matWorld_));

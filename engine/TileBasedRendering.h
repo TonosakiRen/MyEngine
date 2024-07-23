@@ -13,6 +13,35 @@ class LightNumBuffer;
 class TileBasedRendering
 {
 public:
+	static const uint32_t kTileWidthNum = 16;
+	static const uint32_t kTileHeightNum = 9 ;
+	static const uint32_t kTileWidth = WinApp::kWindowWidth / kTileWidthNum;
+	static const uint32_t kTileHeight = WinApp::kWindowHeight / kTileHeightNum;
+	static const uint32_t kTileNum = kTileWidthNum * kTileHeightNum;
+
+	static const uint32_t kMaxInTilePointLight = 64;
+
+	void Initialize();
+	void ComputeUpdate(CommandContext& commandContext, const ViewProjection& viewProjection);
+
+	const DescriptorHandle& GetTileInformationGPUHandle() const {
+		return rwTilesInformation_.GetUAV();
+	}
+
+	const DescriptorHandle& GetPointLightIndexGPUHandle() const {
+		return rwPointLightIndex_.GetUAV();
+	}
+
+	const DescriptorHandle& GetSpotLightIndexGPUHandle() const {
+		return rwSpotLightIndex_.GetUAV();
+	}
+
+	const DescriptorHandle& GetShadowSpotLightIndexGPUHandle() const {
+		return rwShadowSpotLightIndex_.GetUAV();
+	}
+
+private:
+
 	struct TileInformation {
 		uint32_t pointLightNum = 0;
 		uint32_t spotLightNum = 0;
@@ -43,22 +72,12 @@ public:
 		ParameterNum
 	};
 
-	static const uint32_t kTileWidthNum = 16;
-	static const uint32_t kTileHeightNum = 9 ;
-	static const uint32_t kTileWidth = WinApp::kWindowWidth / kTileWidthNum;
-	static const uint32_t kTileHeight = WinApp::kWindowHeight / kTileHeightNum;
-	static const uint32_t kTileNum = kTileWidthNum * kTileHeightNum;
-
-	static const uint32_t kMaxInTilePointLight = 64;
-
-	void Initialize();
-	void ComputeUpdate(CommandContext& commandContext, const ViewProjection& viewProjection);
 
 	void CreatePipeline();
 	//初期化視推台
 	Frustum GetTileFrustrum(const int& width, const int& height);
 
-public:
+private:
 
 	PipelineState pipelineState_;
 	RootSignature rootSignature_;
@@ -72,24 +91,14 @@ public:
 
 	const ViewProjection* viewProjection_ = nullptr;
 
-	DefaultStructuredBuffer tileInformationBuffer_;
-
-	DefaultStructuredBuffer pointLightIndexBuffer_;
-
-	StructuredBuffer spotLightIndexBuffer_;
-
-	StructuredBuffer shadowSpotLightIndexBuffer_;
-
-
-
 	DefaultStructuredBuffer initialTileFrustrumBuffer_;
-
-	RwStructuredBuffer rwTilesInformation_;
 
 	RwStructuredBuffer rwPointLightIndex_;
 
 	RwStructuredBuffer rwSpotLightIndex_;
 
 	RwStructuredBuffer rwShadowSpotLightIndex_;
+
+	RwStructuredBuffer rwTilesInformation_;
 
 };

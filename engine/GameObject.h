@@ -7,6 +7,7 @@
 #include "ModelManager.h"
 #include "SkinCluster.h"
 #include <string>
+#include "WaveIndexData.h"
 class GameObject
 {
 public:
@@ -20,6 +21,9 @@ public:
 	void UpdateMatrix();
 	void UpdateMaterial(Vector4 color = { 1.0f,1.0f,1.0f,1.0f });
 	void Draw(Vector4 color = { 1.0f,1.0f,1.0f,1.0f });
+	//仮
+	WaveIndexData waveIndexData_;
+	void WaveDraw();
 
 	void SetEnableLighting(bool enableLighting) {
 		material_.enableLighting_ = enableLighting;

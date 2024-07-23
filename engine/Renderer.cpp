@@ -14,7 +14,8 @@
 #include "DrawManager.h"
 #include "LightManager.h"
 
-Renderer::RenderingMode Renderer::renderingMode = Renderer::kDeferred;
+Renderer::RenderingMode Renderer::renderingMode = Renderer::kForward;
+uint32_t Renderer::time = 0;
 
 Renderer* Renderer::GetInstance() {
     static Renderer instance;
@@ -109,6 +110,9 @@ void Renderer::Initialize() {
     grayScale_ = std::make_unique<GrayScale>();
     grayScale_->Initialize(*resultBuffer_);
 
+    hsvFilter_ = std::make_unique<HSVFilter>();
+    hsvFilter_->Initialize(*resultBuffer_);
+
     wire_ = std::make_unique<Wire>();
     wire_->Initialize();
 
@@ -178,10 +182,10 @@ void Renderer::MainRender(ViewProjection& viewProjection) {
     switch (renderingMode)
     {
     case Renderer::kForward:
-        drawManager_->AllDraw(PipelineType::kForward,viewProjection);
+        drawManager_->AllDraw(PipelineType::kForward,viewProjection,*tileBasedRendering_);
         break;
     case Renderer::kDeferred:
-        drawManager_->AllDraw(PipelineType::kDeferred,viewProjection);
+        drawManager_->AllDraw(PipelineType::kDeferred,viewProjection, *tileBasedRendering_);
         break;
     default:
         break;
@@ -198,7 +202,7 @@ void Renderer::DeferredRender(ViewProjection& viewProjection)
     switch (renderingMode)
     {
     case Renderer::kForward:
-        
+        commandContext_.CopyBuffer(*resultBuffer_, *colorBuffers_[kColor]);
         break;
     case Renderer::kDeferred:
         deferredRenderer_->Render(commandContext_, resultBuffer_.get(), viewProjection, *tileBasedRendering_);
@@ -212,6 +216,7 @@ void Renderer::DeferredRender(ViewProjection& viewProjection)
         ImGui::Checkbox("bloom", &isBloom_);
         ImGui::Checkbox("edge", &isEdge_);
         ImGui::Checkbox("grayScale", &isGrayScale_);
+        ImGui::Checkbox("HSVFilter", &isHSVFilter);
         ImGui::Checkbox("vignette", &isVignette_);
         ImGui::Checkbox("smooth", &isSmooth_);
         ImGui::EndMenu();
@@ -230,6 +235,9 @@ void Renderer::DeferredRender(ViewProjection& viewProjection)
     }
     if (isSmooth_) {
         smooth_->Draw(*resultBuffer_.get(), *tmpBuffer_.get(), commandContext_);
+    }
+    if (isHSVFilter) {
+        hsvFilter_->Draw(*resultBuffer_.get(), *tmpBuffer_.get(), commandContext_);
     }
     ImGui::End();
 }
@@ -297,6 +305,7 @@ void Renderer::EndRender()
     commandQueue.UpdateFixFPS();
 
     commandContext_.Reset();
+    time++;
 }
 
 void Renderer::Shutdown() {
@@ -328,6 +337,7 @@ void Renderer::Shutdown() {
     tileBasedRendering_.reset();
     transition_.reset();
     grayScale_.reset();
+    hsvFilter_.reset();
     wire_.reset();
     vignette_.reset();
     smooth_.reset();

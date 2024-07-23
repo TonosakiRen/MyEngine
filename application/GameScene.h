@@ -13,7 +13,7 @@
 #include "GameObject.h"
 #include "SceneManager.h"
 #include "LightManager.h"
-
+#include "WavePoints.h"
 
 #include <optional>
 class GameScene
@@ -28,7 +28,7 @@ public:
 	void Draw();
 
 	ViewProjection& GetViewProjection() {
-		return *currentViewProjection_;
+		return *currentViewProjection;
 	}
 
 	ViewProjection& GetGameViewProjection() {
@@ -36,7 +36,8 @@ public:
 	}
 
 public:
-	static ViewProjection* currentViewProjection_;
+	static ViewProjection* currentViewProjection;
+	static WavePoints* wavePoints;
 
 private: 
 	DirectXCommon* dxCommon_ = nullptr;
@@ -45,6 +46,7 @@ private:
 	LightManager* lightManager_ = nullptr;
 
 	std::unique_ptr <DebugCamera> debugCamera_;
+	std::unique_ptr<WavePoints> wavePoints_;
 	
 	std::unique_ptr<Camera> camera_;
 	std::unique_ptr<Compute> compute_;

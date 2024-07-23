@@ -16,6 +16,7 @@
 #include "Vignette.h"
 #include "Wire.h"
 #include "Smooth.h"
+#include "HSVFilter.h"
 
 class ViewProjection;
 class DirectionalLights;
@@ -49,6 +50,9 @@ public:
 
     static Renderer* GetInstance();
 
+
+    static uint32_t time;
+
     void Initialize();
     void BeginFrame();
 
@@ -79,7 +83,7 @@ public:
     void ClearMainDepthBuffer() { commandContext_.ClearDepth(*mainDepthBuffer_); }
 
 
-    RenderingMode GetRenderingPass() {
+    static RenderingMode GetRenderingMode() {
         return renderingMode;
     }
 
@@ -111,11 +115,13 @@ private:
     std::unique_ptr<EdgeRenderer> edgeRenderer_;
     std::unique_ptr<Bloom> bloom_;
     std::unique_ptr<GrayScale> grayScale_;
+    std::unique_ptr < HSVFilter> hsvFilter_;
     std::unique_ptr<Vignette> vignette_;
     std::unique_ptr<Smooth> smooth_;
 
     bool isEdge_ = true;
     bool isBloom_ = true;
+    bool isHSVFilter = true;
     bool isGrayScale_ = false;
     bool isVignette_ = false;
     bool isSmooth_ = false;

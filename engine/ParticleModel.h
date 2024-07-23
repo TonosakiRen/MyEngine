@@ -16,6 +16,8 @@
 
 #include "ParticleModelData.h"
 
+#include "Renderer.h"
+
 class DirectXCommon;
 
 class ParticleModel
@@ -51,7 +53,7 @@ public:
 
 	void Initialize();
 	void Finalize();
-	void PreDraw(PipelineType pipelineType, CommandContext& commandContext, const ViewProjection& viewProjection);
+	void PreDraw(PipelineType pipelineType, CommandContext& commandContext, const ViewProjection& viewProjection,const TileBasedRendering& tileBasedRendering);
 
 	void Draw(CommandContext& commandContext, ParticleModelData& bufferData, const Material& material, uint32_t modelHandle = 0);
 

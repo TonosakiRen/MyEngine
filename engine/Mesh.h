@@ -39,7 +39,7 @@ public:
 
 	const DescriptorHandle& GetVerticesSRV() const { return vertexBuffer_.GetSRV(); }
 
-private:
+public:
 	StructuredBuffer vertexBuffer_;
 	std::vector<VertexData> vertices_;
 	D3D12_VERTEX_BUFFER_VIEW vbView_{};

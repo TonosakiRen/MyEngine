@@ -6,79 +6,79 @@
 #include "PipelineState.h"
 #include "RootSignature.h"
 #include "UploadBuffer.h"
-#include "StructuredBuffer.h"
 #include "CommandContext.h"
 
 #include "ViewProjection.h"
 #include "WorldTransform.h"
-#include "DefaultBuffer.h"
+#include "DirectionalLights.h"
+#include "Material.h"
+#include "Mesh.h"
+#include "SkinCluster.h"
 
-#include "Cellular.h"
 #include "Renderer.h"
-
+#include "WaveData.h"
+#include "WaveIndexData.h"
 
 class DirectXCommon;
 
-class FloorRenderer
+class WaveModel
 {
 public:
 	enum class RootParameter {
-		kCellular,
+		kTexture,
 		kVertices,
 		kMeshlets,
 		kUniqueVertexIndices,
 		kPrimitiveIndices,
 		kCullData,
+		kWaveData,
 		kDescriptorRangeNum,
 
 		kWorldTransform = kDescriptorRangeNum,
 		kViewProjection, 
-		kColor,
-		kTime,
+		kMaterial,
 		kMeshletInfo,
 		kFrustum,
+		kTime,
+		kWaveIndexData,
 
 		parameterNum
 	};
 
 	enum class ForwardRootParameter {
-		kCellular,
+		kTexture,
 		kVertices,
 		kMeshlets,
 		kUniqueVertexIndices,
 		kPrimitiveIndices,
 		kCullData,
+		kWaveData,
+
 		kTileInformation,
 		kDescriptorRangeNum,
 
 		kWorldTransform = kDescriptorRangeNum,
 		kViewProjection,
-		kColor,
-		kTime,
+		kMaterial,
 		kMeshletInfo,
 		kFrustum,
+		kTime,
+		kWaveIndexData,
 
 		parameterNum
 	};
 
-	void Initialize(CommandContext& commnadContext);
+	void Initialize();
 	void Finalize();
-	void PreDraw(PipelineType pipelineType, CommandContext& commandContext, const ViewProjection& viewProjection, const ViewProjection& cullingViewProjection,const TileBasedRendering& tileBasedRendering);
+	void PreDraw(PipelineType pipelineType, CommandContext& commandContext, const ViewProjection& viewProjection , const ViewProjection& cullingViewProjection, const TileBasedRendering& tileBasedRendering);
 
-	void Draw(CommandContext& commandContext, uint32_t modelHandle,const WorldTransform& worldTransform);
-
+	void Draw(CommandContext& commandContext, uint32_t modelHandle, const WorldTransform& worldTransform,const WaveData& waveData, const WaveIndexData& waveIndexData, const Material& material,const uint32_t textureHandle = 0);
+	void Draw(CommandContext& commandContext, uint32_t modelHandle, const WorldTransform& worldTransform, const WaveData& waveData, const WaveIndexData& waveIndexData, SkinCluster& skinCluster, const Material& material, const uint32_t textureHandle = 0);
 private: 
 	void CreatePipeline();
 	void CreateForwardPipeline();
 private:
 	std::unique_ptr<RootSignature> rootSignature_[kPipelineNum];
 	std::unique_ptr<PipelineState> pipelineState_[kPipelineNum];
-
-	std::unique_ptr<StructuredBuffer> line_;
-	std::unique_ptr<DefaultBuffer> lineNum_;
-
-	std::unique_ptr < Cellular> cellular_;
-
-	Vector4 HSVA_ = { 0.0f,0.2f,0.45f,0.4f };
 };
 

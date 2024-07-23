@@ -5,6 +5,7 @@
 #include "Audio.h"
 #include "Wire.h"
 #include "DrawManager.h"
+#include "GameScene.h"
 
 void Player::Initialize(const std::string name, PlayerBulletManager* playerBulletManager)
 {
@@ -58,6 +59,8 @@ void Player::Initialize(const std::string name, PlayerBulletManager* playerBulle
 	fireParticle_->emitterWorldTransform_.SetParent(&rightHandWorldTransform_);
 	fireParticle_->emitterWorldTransform_.scale_ = { 0.5f,0.5f,0.5f };
 	fireParticle_->material_.color_ = {1.0f,0.0f,0.0f,1.0f};
+
+	waveIndexData_.Initialize();
 }
 
 void Player::Update(const ViewProjection& viewProjection)
@@ -118,6 +121,10 @@ void Player::Draw() {
 	if (input_->PushRightTrigger()) {
 		DrawManager::GetInstance()->DrawPostSprite(sprite2DReticle_);
 	}
+
+	auto& index = *waveIndexData_.GetData();
+	index.waveIndex[0] = 0;
+	index.waveDataNum = 1;
 	DrawManager::GetInstance()->DrawMeshletModel(worldTransform_, modelHandle_, skinCluster_);
 	Wire::Draw(skeleton_, worldTransform_);
 	leftHandWorldTransform_.Update(skeleton_.GetJoint("mixamorig:LeftHand").skeletonSpaceMatrix);
@@ -126,8 +133,6 @@ void Player::Draw() {
 	rightHandWorldTransform_.Update(skeleton_.GetJoint("mixamorig:RightHand").skeletonSpaceMatrix);
 	fireParticle_->Draw();
 	DrawManager::GetInstance()->DrawManager::DrawModel(leftHandModelWorldTransform_,ModelManager::GetInstance()->Load("box1x1.obj"));
-
-	const ModelData& a =  ModelManager::GetInstance()->GetModelData(modelHandle_);
 }
 
 void Player::Fire()

@@ -60,4 +60,6 @@ private:
     std::unique_ptr<DustParticle> fireParticle_;
 
     WorldTransform rightHandWorldTransform_;
+
+    WaveIndexData waveIndexData_;
 };

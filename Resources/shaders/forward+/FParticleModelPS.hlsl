@@ -37,8 +37,6 @@ PixelShaderOutput main(VSOutput input) {
 	PixelShaderOutput output;
 
 	float32_t3 normal = normalize(input.normal);
-	output.material = gMaterial.enableLighting;
-
 	output.color = float32_t4(0.0f, 0.0f, 0.0f, 1.0f);
 
 	// マテリアル

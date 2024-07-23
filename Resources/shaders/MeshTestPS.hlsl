@@ -12,6 +12,7 @@ ConstantBuffer<Material> gMaterial  : register(b2);
 struct MSOutput {
 	float32_t4 pos : SV_POSITION;
 	float32_t3 normal : NORMAL;
+	float32_t2 uv : TEXCOORD;
 	uint32_t meshletIndex : CUSTOM_MESHLET_ID;
 };
 

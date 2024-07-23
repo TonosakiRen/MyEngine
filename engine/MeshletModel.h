@@ -15,6 +15,8 @@
 #include "Mesh.h"
 #include "SkinCluster.h"
 
+#include "Renderer.h"
+
 class DirectXCommon;
 
 class MeshletModel
@@ -31,8 +33,9 @@ public:
 
 		kWorldTransform = kDescriptorRangeNum,
 		kViewProjection, 
-		kFrustum,
 		kMaterial,
+		kMeshletInfo,
+		kFrustum,
 
 		parameterNum
 	};
@@ -49,15 +52,16 @@ public:
 
 		kWorldTransform = kDescriptorRangeNum,
 		kViewProjection,
-		kFrustum,
 		kMaterial,
+		kMeshletInfo,
+		kFrustum,
 
 		parameterNum
 	};
 
 	void Initialize();
 	void Finalize();
-	void PreDraw(PipelineType pipelineType, CommandContext& commandContext, const ViewProjection& viewProjection , const ViewProjection& cullingViewProjection);
+	void PreDraw(PipelineType pipelineType, CommandContext& commandContext, const ViewProjection& viewProjection , const ViewProjection& cullingViewProjection,const TileBasedRendering& tileBasedRendering);
 
 	void Draw(CommandContext& commandContext, uint32_t modelHandle, const WorldTransform& worldTransform, const Material& material,const uint32_t textureHandle = 0);
 	void Draw(CommandContext& commandContext, uint32_t modelHandle, const WorldTransform& worldTransform, SkinCluster& skinCluster, const Material& material, const uint32_t textureHandle = 0);

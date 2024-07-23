@@ -128,6 +128,12 @@
     <Filter Include="Engine\DeferredRendering">
       <UniqueIdentifier>{b2d9e214-8644-45e9-8e6c-fe2b386b8f83}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine\Wave">
+      <UniqueIdentifier>{f835e169-236a-42e5-9a7d-56d2028452e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\WavePoint">
+      <UniqueIdentifier>{423c02bc-b014-4262-8315-6fcca4ffeb00}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="externals\imgui\imgui.cpp">
@@ -462,6 +468,21 @@
     </ClCompile>
     <ClCompile Include="application\SphereLights.cpp">
       <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\WaveModel.cpp">
+      <Filter>Engine\Wave</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\WaveData.cpp">
+      <Filter>Engine\Wave</Filter>
+    </ClCompile>
+    <ClCompile Include="application\WavePoints.cpp">
+      <Filter>Game\WavePoint</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\WaveIndexData.cpp">
+      <Filter>Engine\Wave</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\HSVFilter.cpp">
+      <Filter>Engine\PostEffect</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -804,6 +825,21 @@
     <ClInclude Include="engine\TileBasedRendering.h">
       <Filter>Engine\Light</Filter>
     </ClInclude>
+    <ClInclude Include="engine\WaveModel.h">
+      <Filter>Engine\Wave</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\WaveData.h">
+      <Filter>Engine\Wave</Filter>
+    </ClInclude>
+    <ClInclude Include="application\WavePoints.h">
+      <Filter>Game\WavePoint</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\WaveIndexData.h">
+      <Filter>Engine\Wave</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\HSVFilter.h">
+      <Filter>Engine\PostEffect</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\ModelPS.hlsl">
@@ -878,7 +914,7 @@
     <FxCompile Include="Resources\shaders\MeshTestPS.hlsl">
       <Filter>shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Resources\shaders\CullAS.hlsl">
+    <FxCompile Include="Resources\shaders\MeshTestAS.hlsl">
       <Filter>shaders</Filter>
     </FxCompile>
     <FxCompile Include="Resources\shaders\CellularPS.hlsl">
@@ -952,6 +988,24 @@
     </FxCompile>
     <FxCompile Include="Resources\shaders\TBRCS.hlsl">
       <Filter>shaders\Compute</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\WaveMS.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\WaveAS.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\forward+\FWavePS.hlsl">
+      <Filter>shaders\F+</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\FloorAS.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\FloorMS.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\HSVFilterPS.hlsl">
+      <Filter>shaders</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>

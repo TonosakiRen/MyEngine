@@ -22,7 +22,10 @@
 #include "SpotLightShadowMap.h"
 #include "Sky.h"
 #include "FloorRenderer.h"
+#include "WaveModel.h"
+
 #include "ViewProjection.h"
+#include "TileBasedRendering.h"
 
 #include "LightManager.h"
 #include "Calling.h"
@@ -46,6 +49,7 @@ public:
 		kSpotLightShadow,
 		kSky,
 		kFloor,
+		kWave,
 
 		kSkinning,
 
@@ -65,6 +69,8 @@ public:
 	void DrawShadow(const WorldTransform& worldTransform, const uint32_t modelHandle = 0);
 	void DrawSpotLightShadow(const WorldTransform& worldTransform, const uint32_t modelHandle = 0);
 	void DrawSky(const WorldTransform& worldTransform);
+	void DrawWaveModel(const WorldTransform& worldTransform, const WaveData& waveData, const WaveIndexData& waveIndexData, const uint32_t modelHandle = 0, const uint32_t textureHandle = 0, const Material& material = *defaultMaterial_.get());
+	void DrawWaveModel(const WorldTransform& worldTransform, const WaveData& waveData, const WaveIndexData& waveIndexData, const uint32_t modelHandle, SkinCluster& skinCluster, const uint32_t textureHandle = 0, const Material& material = *defaultMaterial_.get());
 	void DrawFloor(const WorldTransform& worldTransform, const uint32_t modelHandle = 0);
 
 	void SetCallingViewProjection(const ViewProjection& viewProjection) { calling_->SetViewProjection(&viewProjection); }
@@ -72,7 +78,7 @@ private:
 
 	void Initialize(CommandContext& CommandContext);
 	void Finalize();
-	void AllDraw(PipelineType pipelineType,const ViewProjection& viewProjection);
+	void AllDraw(PipelineType pipelineType,const ViewProjection& viewProjection,const TileBasedRendering& tileBasedRendering);
 	void PostSpriteDraw();
 	void ShadowDraw();
 	void ShadowSpotLightDraw();
@@ -89,6 +95,7 @@ private:
 	std::unique_ptr<SpotLightShadowMap> spotLightShadowPipeline_;
 	std::unique_ptr<Sky> skyPipeline_;
 	std::unique_ptr<FloorRenderer> floorPipeline_;
+	std::unique_ptr<WaveModel> waveModelPipeline_;
 
 	static std::unique_ptr<Material> defaultMaterial_;
 

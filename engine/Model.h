@@ -15,6 +15,8 @@
 #include "SkinCluster.h"
 #include "Mesh.h"
 
+#include "Renderer.h"
+
 class DirectXCommon;
 
 class Model
@@ -45,7 +47,7 @@ public:
 
 	void Initialize();
 	void Finalize();
-	void PreDraw(PipelineType pipelineType, CommandContext& commandContext, const ViewProjection& viewProjection);
+	void PreDraw(PipelineType pipelineType, CommandContext& commandContext, const ViewProjection& viewProjection,const TileBasedRendering& tileBasedRendering);
 
 	void Draw(CommandContext& commandContext, uint32_t modelHandle, const WorldTransform& worldTransform, const Material& material,const uint32_t textureHandle = 0);
 	void Draw(CommandContext& commandContext, uint32_t modelHandle, const WorldTransform& worldTransform,SkinCluster& skinCluster, const Material& material, const uint32_t textureHandle = 0);

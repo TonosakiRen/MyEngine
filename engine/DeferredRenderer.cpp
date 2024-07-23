@@ -55,12 +55,12 @@ void DeferredRenderer::Render(CommandContext& commandContext, ColorBuffer* origi
 	commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kLightNum), lightManager->lightNumBuffer_->GetGPUVirtualAddress());
 
 
-	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kTBRInformation), tileBasedRendering.rwTilesInformation_.GetUAV());
+	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kTBRInformation), tileBasedRendering.GetTileInformationGPUHandle());
 	commandContext.SetConstants(static_cast<UINT>(RootParameter::kTileNum), TileBasedRendering::kTileWidthNum, TileBasedRendering::kTileHeightNum);
 
-	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kTBRPointLightIndex), tileBasedRendering.rwPointLightIndex_.GetUAV());
-	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kTBRSpotLightIndex), tileBasedRendering.rwSpotLightIndex_.GetUAV());
-	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kTBRShadowSpotLightIndex), tileBasedRendering.rwShadowSpotLightIndex_.GetUAV());
+	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kTBRPointLightIndex), tileBasedRendering.GetPointLightIndexGPUHandle());
+	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kTBRSpotLightIndex), tileBasedRendering.GetSpotLightIndexGPUHandle());
+	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kTBRShadowSpotLightIndex), tileBasedRendering.GetShadowSpotLightIndexGPUHandle());
 
 	commandContext.DrawInstanced(3, 1, 0, 0);
 }

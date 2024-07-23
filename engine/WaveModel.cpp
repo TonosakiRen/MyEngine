@@ -1,12 +1,11 @@
-#include "FloorRenderer.h"
+#include "WaveModel.h"
 #include "TextureManager.h"
 #include "ModelManager.h"
 #include "ShaderManager.h"
-#include "ImGuiManager.h"
 
 using namespace Microsoft::WRL;
 
-void FloorRenderer::Initialize(CommandContext& commnadContext) {
+void WaveModel::Initialize() {
     switch (Renderer::GetRenderingMode())
     {
     case Renderer::kForward:
@@ -18,76 +17,35 @@ void FloorRenderer::Initialize(CommandContext& commnadContext) {
     default:
         break;
     }
-    lineNum_ = std::make_unique<DefaultBuffer>();
-    line_ = std::make_unique<StructuredBuffer>();
-    lineNum_->Create(L"lineNumBuffer", sizeof(uint32_t));
-    line_->Create(L"lineBuffer", sizeof(Segment), 1);
-    Segment* segmnet = static_cast<Segment*>(line_->GetCPUData());
-    segmnet->origin = { 0.0f,0.0f,-5.0f };
-    segmnet->diff = { 0.0f,0.0f,10.0f };
-    cellular_ = std::make_unique<Cellular>();
-    cellular_->Initialize(6);
-    cellular_->Render(commnadContext);
 }
 
-void FloorRenderer::Finalize()
+void WaveModel::Finalize()
 {
-    cellular_->Finalize();
-    cellular_.reset();
     for (int i = 0; i < kPipelineNum; i++) {
         rootSignature_[i].reset();
         pipelineState_[i].reset();
     }
 }
 
-void FloorRenderer::PreDraw(PipelineType pipelineType, CommandContext& commandContext, const ViewProjection& viewProjection, const ViewProjection& cullingViewProjection,const TileBasedRendering& tileBasedRendering) {
-
-#ifdef USE_IMGUI
-    ImGui::Begin("Engine");
-    if (ImGui::BeginMenu("Floor")) {
-        ImGui::DragFloat4("HSVA COLOR", &HSVA_.x, 0.01f, 0.0f, 1.0f);
-        ImGui::EndMenu();
-    }
-    ImGui::End();
-#endif
-
+void WaveModel::PreDraw(PipelineType pipelineType,CommandContext& commandContext, const ViewProjection& viewProjection, const ViewProjection& cullingViewProjection, const TileBasedRendering& tileBasedRendering) {
+  
     commandContext.SetPipelineState(*pipelineState_[pipelineType]);
     commandContext.SetGraphicsRootSignature(*rootSignature_[pipelineType]);
-
 
     // CBVをセット（ビュープロジェクション行列）
     switch (Renderer::GetRenderingMode())
     {
     case Renderer::kForward:
-
-        commandContext.SetDescriptorTable(UINT(ForwardRootParameter::kTileInformation), tileBasedRendering.GetTileInformationGPUHandle());
-        // srvセット
-        commandContext.SetDescriptorTable(UINT(ForwardRootParameter::kCellular), cellular_->GetResult().GetSRV());
-
-        // CBVをセット（ビュープロジェクション行列）
         commandContext.SetConstantBuffer(static_cast<UINT>(ForwardRootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
-
-        commandContext.SetConstants(static_cast<UINT>(ForwardRootParameter::kColor), HSVA_.x, HSVA_.y, HSVA_.z, HSVA_.w);
-
+        commandContext.SetConstantBuffer(static_cast<UINT>(ForwardRootParameter::kFrustum), cullingViewProjection.GetFrustumGPUVirtualAddress());
         commandContext.SetConstants(static_cast<UINT>(ForwardRootParameter::kTime), Renderer::time);
-
         commandContext.SetDescriptorTable(static_cast<UINT>(ForwardRootParameter::kTileInformation), tileBasedRendering.GetTileInformationGPUHandle());
 
-        commandContext.SetConstantBuffer(static_cast<UINT>(ForwardRootParameter::kFrustum), cullingViewProjection.GetFrustumGPUVirtualAddress());
         break;
     case Renderer::kDeferred:
-
-        // srvセット
-        commandContext.SetDescriptorTable(UINT(RootParameter::kCellular), cellular_->GetResult().GetSRV());
-
-        // CBVをセット（ビュープロジェクション行列）
         commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
-
-        commandContext.SetConstants(static_cast<UINT>(RootParameter::kColor), HSVA_.x, HSVA_.y, HSVA_.z, HSVA_.w);
-
-        commandContext.SetConstants(static_cast<UINT>(RootParameter::kTime), Renderer::time);
-
         commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kFrustum), cullingViewProjection.GetFrustumGPUVirtualAddress());
+        commandContext.SetConstants(static_cast<UINT>(RootParameter::kTime), Renderer::time);
         break;
     default:
         break;
@@ -96,57 +54,60 @@ void FloorRenderer::PreDraw(PipelineType pipelineType, CommandContext& commandCo
     commandContext.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 
-
-void FloorRenderer::CreatePipeline() {
+void WaveModel::CreatePipeline() {
     HRESULT result = S_FALSE;
-    ComPtr<IDxcBlob> msBlob;
-    ComPtr<IDxcBlob> psBlob;
+    ComPtr<IDxcBlob> msBlob;    
+    ComPtr<IDxcBlob> psBlob;   
     ComPtr<IDxcBlob> asBlob;
 
     auto shaderManager = ShaderManager::GetInstance();
 
-    asBlob = shaderManager->Compile(L"FloorAS.hlsl", ShaderManager::kAmplification);
+    asBlob = shaderManager->Compile(L"WaveAS.hlsl", ShaderManager::kAmplification);
     assert(asBlob != nullptr);
 
-    msBlob = shaderManager->Compile(L"FloorMS.hlsl", ShaderManager::kMesh);
+    msBlob = shaderManager->Compile(L"WaveMS.hlsl",ShaderManager::kMesh);
     assert(msBlob != nullptr);
 
-    psBlob = shaderManager->Compile(L"FloorPS.hlsl", ShaderManager::kPixel);
+    psBlob = shaderManager->Compile(L"MeshTestPS.hlsl", ShaderManager::kPixel);
     assert(psBlob != nullptr);
 
     rootSignature_[kDeferred] = std::make_unique<RootSignature>();
     pipelineState_[kDeferred] = std::make_unique<PipelineState>();
 
     {
+
         // デスクリプタレンジ
         CD3DX12_DESCRIPTOR_RANGE descRangeSRV[int(RootParameter::kDescriptorRangeNum)];
-        descRangeSRV[int(RootParameter::kCellular)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
+        descRangeSRV[int(RootParameter::kTexture)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
         descRangeSRV[int(RootParameter::kVertices)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1);
         descRangeSRV[int(RootParameter::kMeshlets)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 2);
         descRangeSRV[int(RootParameter::kUniqueVertexIndices)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 3);
         descRangeSRV[int(RootParameter::kPrimitiveIndices)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 4);
         descRangeSRV[int(RootParameter::kCullData)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 5);
-
-
+        descRangeSRV[int(RootParameter::kWaveData)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 6);
 
         // ルートパラメータ
         CD3DX12_ROOT_PARAMETER rootparams[int(RootParameter::parameterNum)] = {};
-        rootparams[int(RootParameter::kCellular)].InitAsDescriptorTable(1, &descRangeSRV[int(RootParameter::kCellular)]);
-        rootparams[int(RootParameter::kVertices)].InitAsDescriptorTable(1, &descRangeSRV[int(RootParameter::kVertices)]);
-        rootparams[int(RootParameter::kMeshlets)].InitAsDescriptorTable(1, &descRangeSRV[int(RootParameter::kMeshlets)]);
-        rootparams[int(RootParameter::kUniqueVertexIndices)].InitAsDescriptorTable(1, &descRangeSRV[int(RootParameter::kUniqueVertexIndices)]);
-        rootparams[int(RootParameter::kPrimitiveIndices)].InitAsDescriptorTable(1, &descRangeSRV[int(RootParameter::kPrimitiveIndices)]);
-        rootparams[int(RootParameter::kCullData)].InitAsDescriptorTable(1, &descRangeSRV[int(RootParameter::kCullData)]);
+        rootparams[int(RootParameter::kTexture)].InitAsDescriptorTable(1, &descRangeSRV[int(RootParameter::kTexture)], D3D12_SHADER_VISIBILITY_ALL);
+        rootparams[int(RootParameter::kVertices)].InitAsDescriptorTable(1, &descRangeSRV[int(RootParameter::kVertices)], D3D12_SHADER_VISIBILITY_ALL);
+        rootparams[int(RootParameter::kMeshlets)].InitAsDescriptorTable(1, &descRangeSRV[int(RootParameter::kMeshlets)], D3D12_SHADER_VISIBILITY_ALL);
+        rootparams[int(RootParameter::kUniqueVertexIndices)].InitAsDescriptorTable(1, &descRangeSRV[int(RootParameter::kUniqueVertexIndices)], D3D12_SHADER_VISIBILITY_ALL);
+        rootparams[int(RootParameter::kPrimitiveIndices)].InitAsDescriptorTable(1, &descRangeSRV[int(RootParameter::kPrimitiveIndices)], D3D12_SHADER_VISIBILITY_ALL);
+        rootparams[int(RootParameter::kCullData)].InitAsDescriptorTable(1, &descRangeSRV[int(RootParameter::kCullData)], D3D12_SHADER_VISIBILITY_ALL);
+        rootparams[int(RootParameter::kWaveData)].InitAsDescriptorTable(1, &descRangeSRV[int(RootParameter::kWaveData)], D3D12_SHADER_VISIBILITY_ALL);
+
 
         rootparams[int(RootParameter::kWorldTransform)].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_ALL);
         rootparams[int(RootParameter::kViewProjection)].InitAsConstantBufferView(1, 0, D3D12_SHADER_VISIBILITY_ALL);
-        rootparams[int(RootParameter::kColor)].InitAsConstants(4,2, 0, D3D12_SHADER_VISIBILITY_ALL);
-        rootparams[int(RootParameter::kTime)].InitAsConstants(1, 3, 0, D3D12_SHADER_VISIBILITY_ALL);
-        rootparams[int(RootParameter::kMeshletInfo)].InitAsConstantBufferView(4, 0, D3D12_SHADER_VISIBILITY_ALL);
-        rootparams[int(RootParameter::kFrustum)].InitAsConstantBufferView(5, 0, D3D12_SHADER_VISIBILITY_ALL);
+        rootparams[int(RootParameter::kMaterial)].InitAsConstantBufferView(2, 0, D3D12_SHADER_VISIBILITY_ALL);
+        rootparams[int(RootParameter::kMeshletInfo)].InitAsConstantBufferView(3, 0, D3D12_SHADER_VISIBILITY_ALL);
+        rootparams[int(RootParameter::kFrustum)].InitAsConstantBufferView(4, 0, D3D12_SHADER_VISIBILITY_ALL);
+        rootparams[int(RootParameter::kTime)].InitAsConstants(1, 5, 0, D3D12_SHADER_VISIBILITY_ALL);
+        rootparams[int(RootParameter::kWaveIndexData)].InitAsConstantBufferView(6, 0, D3D12_SHADER_VISIBILITY_ALL);
 
         // スタティックサンプラー
-        CD3DX12_STATIC_SAMPLER_DESC samplerDesc = CD3DX12_STATIC_SAMPLER_DESC(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR);
+        CD3DX12_STATIC_SAMPLER_DESC samplerDesc =
+            CD3DX12_STATIC_SAMPLER_DESC(0, D3D12_FILTER_MIN_MAG_MIP_POINT);
 
         // ルートシグネチャの設定
         D3D12_ROOT_SIGNATURE_DESC rootSignatureDesc;
@@ -156,16 +117,16 @@ void FloorRenderer::CreatePipeline() {
         rootSignatureDesc.NumStaticSamplers = 1;
         rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
-        rootSignature_[kDeferred]->Create(L"floorRootSignature", rootSignatureDesc);
+        rootSignature_[kDeferred]->Create(L"waveRootSignature", rootSignatureDesc);
 
     }
 
     {
-        // グラフィックスパイプラインの流れを設定
         D3DX12_MESH_SHADER_PIPELINE_STATE_DESC pipeline = {};
         pipeline.AS = CD3DX12_SHADER_BYTECODE(asBlob->GetBufferPointer(), asBlob->GetBufferSize());
         pipeline.MS = CD3DX12_SHADER_BYTECODE(msBlob->GetBufferPointer(), msBlob->GetBufferSize());
         pipeline.PS = CD3DX12_SHADER_BYTECODE(psBlob->GetBufferPointer(), psBlob->GetBufferSize());
+
         // サンプルマスク
         pipeline.SampleMask = D3D12_DEFAULT_SAMPLE_MASK; // 標準設定
         // ラスタライザステート
@@ -201,23 +162,21 @@ void FloorRenderer::CreatePipeline() {
         pipeline.BlendState.IndependentBlendEnable = true;
         pipeline.BlendState.RenderTarget[0] = blenddesc;
         pipeline.BlendState.RenderTarget[1] = blenddesc;
-        pipeline.BlendState.RenderTarget[2] = blenddesc2;
 
         // 深度バッファのフォーマット
         pipeline.DSVFormat = Renderer::GetInstance()->GetDSVFormat();
 
+
         // 図形の形状設定（三角形）
         pipeline.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 
-        pipeline.NumRenderTargets = Renderer::kRenderTargetNum;
+        pipeline.NumRenderTargets = Renderer::kFRenderTargetNum;
         pipeline.RTVFormats[int(Renderer::kColor)] = Renderer::GetInstance()->GetRTVFormat(Renderer::kColor);
         pipeline.RTVFormats[int(Renderer::kNormal)] = Renderer::GetInstance()->GetRTVFormat(Renderer::kNormal);
-        pipeline.RTVFormats[int(Renderer::kMaterial)] = Renderer::GetInstance()->GetRTVFormat(Renderer::kMaterial);
         pipeline.SampleDesc.Count = 1; // 1ピクセルにつき1回サンプリング
 
         pipeline.pRootSignature = *rootSignature_[kDeferred];
 
-        // グラフィックスパイプラインの生成
         CD3DX12_PIPELINE_MESH_STATE_STREAM psoStream = CD3DX12_PIPELINE_MESH_STATE_STREAM(pipeline);
 
         D3D12_PIPELINE_STATE_STREAM_DESC streamDesc = {};
@@ -225,11 +184,11 @@ void FloorRenderer::CreatePipeline() {
         streamDesc.SizeInBytes = sizeof(psoStream);
 
         // グラフィックスパイプラインの生成
-        pipelineState_[kDeferred]->Create(L"floorPipeline", streamDesc);
+        pipelineState_[kDeferred]->Create(L"wavePipeline", streamDesc);
     }
 }
 
-void FloorRenderer::CreateForwardPipeline()
+void WaveModel::CreateForwardPipeline()
 {
     HRESULT result = S_FALSE;
     ComPtr<IDxcBlob> msBlob;
@@ -238,48 +197,53 @@ void FloorRenderer::CreateForwardPipeline()
 
     auto shaderManager = ShaderManager::GetInstance();
 
-    asBlob = shaderManager->Compile(L"FloorAS.hlsl", ShaderManager::kAmplification);
+    asBlob = shaderManager->Compile(L"WaveAS.hlsl", ShaderManager::kAmplification);
     assert(asBlob != nullptr);
 
-    msBlob = shaderManager->Compile(L"FloorMS.hlsl", ShaderManager::kMesh);
+    msBlob = shaderManager->Compile(L"WaveMS.hlsl", ShaderManager::kMesh);
     assert(msBlob != nullptr);
 
-    psBlob = shaderManager->Compile(L"forward+/FFloorPS.hlsl", ShaderManager::kPixel);
+    psBlob = shaderManager->Compile(L"forward+/FWavePS.hlsl", ShaderManager::kPixel);
     assert(psBlob != nullptr);
 
     rootSignature_[kForward] = std::make_unique<RootSignature>();
     pipelineState_[kForward] = std::make_unique<PipelineState>();
 
     {
+
         // デスクリプタレンジ
         CD3DX12_DESCRIPTOR_RANGE descRangeSRV[int(ForwardRootParameter::kDescriptorRangeNum)];
-        descRangeSRV[int(ForwardRootParameter::kCellular)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
+        descRangeSRV[int(ForwardRootParameter::kTexture)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
         descRangeSRV[int(ForwardRootParameter::kVertices)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1);
         descRangeSRV[int(ForwardRootParameter::kMeshlets)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 2);
         descRangeSRV[int(ForwardRootParameter::kUniqueVertexIndices)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 3);
         descRangeSRV[int(ForwardRootParameter::kPrimitiveIndices)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 4);
         descRangeSRV[int(ForwardRootParameter::kCullData)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 5);
+        descRangeSRV[int(ForwardRootParameter::kWaveData)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 6);
         descRangeSRV[int(ForwardRootParameter::kTileInformation)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 0);
 
         // ルートパラメータ
         CD3DX12_ROOT_PARAMETER rootparams[int(ForwardRootParameter::parameterNum)] = {};
-        rootparams[int(ForwardRootParameter::kCellular)].InitAsDescriptorTable(1, &descRangeSRV[int(ForwardRootParameter::kCellular)]);
-        rootparams[int(ForwardRootParameter::kVertices)].InitAsDescriptorTable(1, &descRangeSRV[int(ForwardRootParameter::kVertices)]);
-        rootparams[int(ForwardRootParameter::kMeshlets)].InitAsDescriptorTable(1, &descRangeSRV[int(ForwardRootParameter::kMeshlets)]);
-        rootparams[int(ForwardRootParameter::kUniqueVertexIndices)].InitAsDescriptorTable(1, &descRangeSRV[int(ForwardRootParameter::kUniqueVertexIndices)]);
-        rootparams[int(ForwardRootParameter::kPrimitiveIndices)].InitAsDescriptorTable(1, &descRangeSRV[int(ForwardRootParameter::kPrimitiveIndices)]);
-        rootparams[int(ForwardRootParameter::kCullData)].InitAsDescriptorTable(1, &descRangeSRV[int(ForwardRootParameter::kCullData)]);
-        rootparams[int(ForwardRootParameter::kTileInformation)].InitAsDescriptorTable(1, &descRangeSRV[int(ForwardRootParameter::kTileInformation)]);
+        rootparams[int(ForwardRootParameter::kTexture)].InitAsDescriptorTable(1, &descRangeSRV[int(ForwardRootParameter::kTexture)], D3D12_SHADER_VISIBILITY_ALL);
+        rootparams[int(ForwardRootParameter::kVertices)].InitAsDescriptorTable(1, &descRangeSRV[int(ForwardRootParameter::kVertices)], D3D12_SHADER_VISIBILITY_ALL);
+        rootparams[int(ForwardRootParameter::kMeshlets)].InitAsDescriptorTable(1, &descRangeSRV[int(ForwardRootParameter::kMeshlets)], D3D12_SHADER_VISIBILITY_ALL);
+        rootparams[int(ForwardRootParameter::kUniqueVertexIndices)].InitAsDescriptorTable(1, &descRangeSRV[int(ForwardRootParameter::kUniqueVertexIndices)], D3D12_SHADER_VISIBILITY_ALL);
+        rootparams[int(ForwardRootParameter::kPrimitiveIndices)].InitAsDescriptorTable(1, &descRangeSRV[int(ForwardRootParameter::kPrimitiveIndices)], D3D12_SHADER_VISIBILITY_ALL);
+        rootparams[int(ForwardRootParameter::kCullData)].InitAsDescriptorTable(1, &descRangeSRV[int(ForwardRootParameter::kCullData)], D3D12_SHADER_VISIBILITY_ALL);
+        rootparams[int(ForwardRootParameter::kWaveData)].InitAsDescriptorTable(1, &descRangeSRV[int(ForwardRootParameter::kWaveData)], D3D12_SHADER_VISIBILITY_ALL);
+        rootparams[int(ForwardRootParameter::kTileInformation)].InitAsDescriptorTable(1, &descRangeSRV[int(ForwardRootParameter::kTileInformation)], D3D12_SHADER_VISIBILITY_ALL);
 
         rootparams[int(ForwardRootParameter::kWorldTransform)].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_ALL);
         rootparams[int(ForwardRootParameter::kViewProjection)].InitAsConstantBufferView(1, 0, D3D12_SHADER_VISIBILITY_ALL);
-        rootparams[int(ForwardRootParameter::kColor)].InitAsConstants(4, 2, 0, D3D12_SHADER_VISIBILITY_ALL);
-        rootparams[int(ForwardRootParameter::kTime)].InitAsConstants(1, 3, 0, D3D12_SHADER_VISIBILITY_ALL);
-        rootparams[int(ForwardRootParameter::kMeshletInfo)].InitAsConstantBufferView(4, 0, D3D12_SHADER_VISIBILITY_ALL);
-        rootparams[int(ForwardRootParameter::kFrustum)].InitAsConstantBufferView(5, 0, D3D12_SHADER_VISIBILITY_ALL);
+        rootparams[int(ForwardRootParameter::kMaterial)].InitAsConstantBufferView(2, 0, D3D12_SHADER_VISIBILITY_ALL);
+        rootparams[int(ForwardRootParameter::kMeshletInfo)].InitAsConstantBufferView(3, 0, D3D12_SHADER_VISIBILITY_ALL);
+        rootparams[int(ForwardRootParameter::kFrustum)].InitAsConstantBufferView(4, 0, D3D12_SHADER_VISIBILITY_ALL);
+        rootparams[int(ForwardRootParameter::kTime)].InitAsConstants(1, 5, 0, D3D12_SHADER_VISIBILITY_ALL);
+        rootparams[int(ForwardRootParameter::kWaveIndexData)].InitAsConstantBufferView(6, 0, D3D12_SHADER_VISIBILITY_ALL);
 
         // スタティックサンプラー
-        CD3DX12_STATIC_SAMPLER_DESC samplerDesc = CD3DX12_STATIC_SAMPLER_DESC(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR);
+        CD3DX12_STATIC_SAMPLER_DESC samplerDesc =
+            CD3DX12_STATIC_SAMPLER_DESC(0, D3D12_FILTER_MIN_MAG_MIP_POINT);
 
         // ルートシグネチャの設定
         D3D12_ROOT_SIGNATURE_DESC rootSignatureDesc;
@@ -289,13 +253,11 @@ void FloorRenderer::CreateForwardPipeline()
         rootSignatureDesc.NumStaticSamplers = 1;
         rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
-        rootSignature_[kForward]->Create(L"floorRootSignature", rootSignatureDesc);
+        rootSignature_[kForward]->Create(L"waveRootSignature", rootSignatureDesc);
 
     }
 
     {
-
-        // グラフィックスパイプラインの流れを設定
         D3DX12_MESH_SHADER_PIPELINE_STATE_DESC pipeline = {};
         pipeline.AS = CD3DX12_SHADER_BYTECODE(asBlob->GetBufferPointer(), asBlob->GetBufferSize());
         pipeline.MS = CD3DX12_SHADER_BYTECODE(msBlob->GetBufferPointer(), msBlob->GetBufferSize());
@@ -339,6 +301,7 @@ void FloorRenderer::CreateForwardPipeline()
 
         // 深度バッファのフォーマット
         pipeline.DSVFormat = Renderer::GetInstance()->GetDSVFormat();
+
 
         // 図形の形状設定（三角形）
         pipeline.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
@@ -357,23 +320,37 @@ void FloorRenderer::CreateForwardPipeline()
         streamDesc.SizeInBytes = sizeof(psoStream);
 
         // グラフィックスパイプラインの生成
-        pipelineState_[kForward]->Create(L"floorPipeline", streamDesc);
+        pipelineState_[kForward]->Create(L"wavePipeline", streamDesc);
     }
 }
 
-void FloorRenderer::Draw(CommandContext& commandContext, uint32_t modelHandle, const WorldTransform& worldTransform) {
-
+void WaveModel::Draw(CommandContext& commandContext, uint32_t modelHandle, const WorldTransform& worldTransform, const WaveData& waveData, const WaveIndexData& waveIndexData, const Material& material,const uint32_t textureHandle) {
 
     const ModelData& modelItem = ModelManager::GetInstance()->ModelManager::GetModelData(modelHandle);
 
-    // CBVをセット（ワールド行列）
+    // CBVをセット（マテリアル）
     switch (Renderer::GetRenderingMode())
     {
     case Renderer::kForward:
+        // CBVをセット（ワールド行列）
         commandContext.SetConstantBuffer(static_cast<UINT>(ForwardRootParameter::kWorldTransform), worldTransform.GetGPUVirtualAddress());
 
+        // CBVをセット（マテリアル）
+        commandContext.SetConstantBuffer(static_cast<UINT>(ForwardRootParameter::kMaterial), material.GetGPUVirtualAddress());
+
+        commandContext.SetDescriptorTable(static_cast<UINT>(ForwardRootParameter::kWaveData), waveData.GetGPUHandle());
+
+        commandContext.SetConstantBuffer(static_cast<UINT>(ForwardRootParameter::kWaveIndexData), waveIndexData.GetGPUVirtualAddress());
+
         for (const auto& mesh : modelItem.meshes) {
- 
+            // srvセット
+            if (mesh.GetUv() != 0) {
+                TextureManager::GetInstance()->SetDescriptorTable(commandContext, UINT(ForwardRootParameter::kTexture), mesh.GetUv());
+            }
+            else {
+                TextureManager::GetInstance()->SetDescriptorTable(commandContext, UINT(ForwardRootParameter::kTexture), textureHandle);
+            }
+
             //頂点セット
             commandContext.SetDescriptorTable(UINT(ForwardRootParameter::kVertices), mesh.vertexBuffer_.GetSRV());
             //Meshletセット
@@ -382,14 +359,31 @@ void FloorRenderer::Draw(CommandContext& commandContext, uint32_t modelHandle, c
             commandContext.SetDescriptorTable(UINT(ForwardRootParameter::kUniqueVertexIndices), mesh.uniqueVertexIndexBuffer_.GetSRV());
             commandContext.SetDescriptorTable(UINT(ForwardRootParameter::kCullData), mesh.cullDataBuffer_.GetSRV());
             commandContext.SetConstantBuffer(UINT(ForwardRootParameter::kMeshletInfo), mesh.meshletInfo_.GetGPUVirtualAddress());
+
             // 描画コマンド
             commandContext.DispatchMesh(uint32_t((mesh.meshlets_.size() + 32 - 1) / 32), 1, 1);
         }
         break;
     case Renderer::kDeferred:
+        // CBVをセット（ワールド行列）
         commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kWorldTransform), worldTransform.GetGPUVirtualAddress());
 
+        // CBVをセット（マテリアル）
+        commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kMaterial), material.GetGPUVirtualAddress());
+
+        commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kWaveData), waveData.GetGPUHandle());
+
+        commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kWaveIndexData), waveIndexData.GetGPUVirtualAddress());
+
+
         for (const auto& mesh : modelItem.meshes) {
+            // srvセット
+            if (mesh.GetUv() != 0) {
+                TextureManager::GetInstance()->SetDescriptorTable(commandContext, UINT(RootParameter::kTexture), mesh.GetUv());
+            }
+            else {
+                TextureManager::GetInstance()->SetDescriptorTable(commandContext, UINT(RootParameter::kTexture), textureHandle);
+            }
 
             //頂点セット
             commandContext.SetDescriptorTable(UINT(RootParameter::kVertices), mesh.vertexBuffer_.GetSRV());
@@ -407,5 +401,86 @@ void FloorRenderer::Draw(CommandContext& commandContext, uint32_t modelHandle, c
     default:
         break;
     }
+}
 
+void WaveModel::Draw(CommandContext& commandContext, uint32_t modelHandle, const WorldTransform& worldTransform, const WaveData& waveData, const WaveIndexData& waveIndexData, SkinCluster& skinCluster, const Material& material, const uint32_t textureHandle)
+{
+
+    const ModelData& modelItem = ModelManager::GetInstance()->ModelManager::GetModelData(modelHandle);
+
+    // CBVをセット（マテリアル）
+    switch (Renderer::GetRenderingMode())
+    {
+    case Renderer::kForward:
+        // CBVをセット（ワールド行列）
+        commandContext.SetConstantBuffer(static_cast<UINT>(ForwardRootParameter::kWorldTransform), worldTransform.GetGPUVirtualAddress());
+
+        // CBVをセット（マテリアル）
+        commandContext.SetConstantBuffer(static_cast<UINT>(ForwardRootParameter::kMaterial), material.GetGPUVirtualAddress());
+
+        commandContext.SetDescriptorTable(static_cast<UINT>(ForwardRootParameter::kWaveData), waveData.GetGPUHandle());
+
+        commandContext.SetConstantBuffer(static_cast<UINT>(ForwardRootParameter::kWaveIndexData), waveIndexData.GetGPUVirtualAddress());
+
+
+        for (const auto& mesh : modelItem.meshes) {
+            // srvセット
+            if (mesh.GetUv() != 0) {
+                TextureManager::GetInstance()->SetDescriptorTable(commandContext, UINT(ForwardRootParameter::kTexture), mesh.GetUv());
+            }
+            else {
+                TextureManager::GetInstance()->SetDescriptorTable(commandContext, UINT(ForwardRootParameter::kTexture), textureHandle);
+            }
+
+            //頂点セット
+            commandContext.TransitionResource(skinCluster.GetSkinnedVertices(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+            commandContext.SetDescriptorTable(UINT(ForwardRootParameter::kVertices), skinCluster.GetSkinnedVerticesUAV());
+            //Meshletセット
+            commandContext.SetDescriptorTable(UINT(ForwardRootParameter::kMeshlets), mesh.meshletBuffer_.GetSRV());
+            commandContext.SetDescriptorTable(UINT(ForwardRootParameter::kPrimitiveIndices), mesh.primitiveIndicesBuffer_.GetSRV());
+            commandContext.SetDescriptorTable(UINT(ForwardRootParameter::kUniqueVertexIndices), mesh.uniqueVertexIndexBuffer_.GetSRV());
+            commandContext.SetDescriptorTable(UINT(ForwardRootParameter::kCullData), mesh.cullDataBuffer_.GetSRV());
+            commandContext.SetConstantBuffer(UINT(ForwardRootParameter::kMeshletInfo), mesh.meshletInfo_.GetGPUVirtualAddress());
+
+            // 描画コマンド
+            commandContext.DispatchMesh(uint32_t((mesh.meshlets_.size() + 32 - 1) / 32), 1, 1);
+        }
+        break;
+    case Renderer::kDeferred:
+        // CBVをセット（ワールド行列）
+        commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kWorldTransform), worldTransform.GetGPUVirtualAddress());
+
+        // CBVをセット（マテリアル）
+        commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kMaterial), material.GetGPUVirtualAddress());
+
+        commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kWaveData), waveData.GetGPUHandle());
+
+        commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kWaveIndexData), waveIndexData.GetGPUVirtualAddress());
+
+        for (const auto& mesh : modelItem.meshes) {
+            // srvセット
+            if (mesh.GetUv() != 0) {
+                TextureManager::GetInstance()->SetDescriptorTable(commandContext, UINT(RootParameter::kTexture), mesh.GetUv());
+            }
+            else {
+                TextureManager::GetInstance()->SetDescriptorTable(commandContext, UINT(RootParameter::kTexture), textureHandle);
+            }
+
+            //頂点セット
+            commandContext.TransitionResource(skinCluster.GetSkinnedVertices(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+            commandContext.SetDescriptorTable(UINT(RootParameter::kVertices), skinCluster.GetSkinnedVerticesUAV());
+            //Meshletセット
+            commandContext.SetDescriptorTable(UINT(RootParameter::kMeshlets), mesh.meshletBuffer_.GetSRV());
+            commandContext.SetDescriptorTable(UINT(RootParameter::kPrimitiveIndices), mesh.primitiveIndicesBuffer_.GetSRV());
+            commandContext.SetDescriptorTable(UINT(RootParameter::kUniqueVertexIndices), mesh.uniqueVertexIndexBuffer_.GetSRV());
+            commandContext.SetDescriptorTable(UINT(RootParameter::kCullData), mesh.cullDataBuffer_.GetSRV());
+            commandContext.SetConstantBuffer(UINT(RootParameter::kMeshletInfo), mesh.meshletInfo_.GetGPUVirtualAddress());
+
+            // 描画コマンド
+            commandContext.DispatchMesh(uint32_t((mesh.meshlets_.size() + 32 - 1) / 32), 1, 1);
+        }
+        break;
+    default:
+        break;
+    }
 }

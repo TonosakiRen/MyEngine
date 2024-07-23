@@ -19,12 +19,20 @@ struct VSOutput {
 	float32_t4 pos : SV_POSITION;
 	float32_t3 normal : NORMAL;
 	float32_t2 uv : TEXCOORD;
+	float32_t depth : TEXCOORD1;
 };
 
 VSOutput main(float32_t3 pos : POSITION, float32_t3 normal : NORMAL, float32_t2 uv : TEXCOORD) {
 	VSOutput output; // ピクセルシェーダーに渡す値
-	output.pos = mul(float32_t4(pos,1.0f), mul(gWorldTransform.world, gViewProjection.viewProjection));
+
+	float32_t4 worldPosition = mul(float4(pos, 1.0f), gWorldTransform.world);
+	float32_t4 viewPosition = mul(worldPosition, gViewProjection.viewProjection);
+
+
+	output.pos = viewPosition;
 	output.normal = mul(normal, (float32_t3x3)gWorldTransform.worldInverseTranspose);
 	output.uv = uv;
+	output.depth = viewPosition.z / viewPosition.w;
+
 	return output;
 }

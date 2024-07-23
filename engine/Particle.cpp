@@ -1,13 +1,21 @@
 #include "Particle.h"
 #include "ShaderManager.h"
-#include "Renderer.h"
 #include "TextureManager.h"
 
 using namespace Microsoft::WRL;
 
 void Particle::Initialize() {
-    CreatePipeline();
-    CreateForwardPipeline();
+    switch (Renderer::GetRenderingMode())
+    {
+    case Renderer::kForward:
+        CreateForwardPipeline();
+        break;
+    case Renderer::kDeferred:
+        CreatePipeline();
+        break;
+    default:
+        break;
+    }
     CreateMesh();
 }
 
@@ -19,7 +27,7 @@ void Particle::Finalize()
     }
 }
 
-void Particle::PreDraw(PipelineType pipelineType,CommandContext& commandContext, const ViewProjection& viewProjection) {
+void Particle::PreDraw(PipelineType pipelineType,CommandContext& commandContext, const ViewProjection& viewProjection, const TileBasedRendering& tileBasedRendering) {
 
 
     billBordMatrix = viewProjection.GetMatView();
@@ -33,7 +41,18 @@ void Particle::PreDraw(PipelineType pipelineType,CommandContext& commandContext,
     commandContext.SetGraphicsRootSignature(*rootSignature_[pipelineType]);
 
     // CBVをセット（ビュープロジェクション行列）
-    commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
+    switch (Renderer::GetRenderingMode())
+    {
+    case Renderer::kForward:
+        commandContext.SetConstantBuffer(static_cast<UINT>(ForwardRootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
+        commandContext.SetDescriptorTable(static_cast<UINT>(ForwardRootParameter::kTileInformation), tileBasedRendering.GetTileInformationGPUHandle());
+        break;
+    case Renderer::kDeferred:
+        commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
+        break;
+    default:
+        break;
+    }
 
     commandContext.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
@@ -183,7 +202,7 @@ void Particle::CreateForwardPipeline()
         CD3DX12_DESCRIPTOR_RANGE descRangeSRV[int(ForwardRootParameter::kDescriptorRangeNum)];
         descRangeSRV[int(ForwardRootParameter::kTexture)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0); // t0
         descRangeSRV[int(ForwardRootParameter::kParticleData)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1); // t1
-        descRangeSRV[int(ForwardRootParameter::kTileInformation)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 2); // t2
+        descRangeSRV[int(ForwardRootParameter::kTileInformation)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 0); // u0
 
 
         CD3DX12_ROOT_PARAMETER rootparams[int(ForwardRootParameter::parameterNum)] = {};
@@ -274,10 +293,9 @@ void Particle::CreateForwardPipeline()
 
         gpipeline.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 
-        gpipeline.NumRenderTargets = Renderer::kRenderTargetNum;
+        gpipeline.NumRenderTargets = Renderer::kFRenderTargetNum;
         gpipeline.RTVFormats[int(Renderer::kColor)] = Renderer::GetInstance()->GetRTVFormat(Renderer::kColor);
         gpipeline.RTVFormats[int(Renderer::kNormal)] = Renderer::GetInstance()->GetRTVFormat(Renderer::kNormal);
-        gpipeline.RTVFormats[int(Renderer::kMaterial)] = Renderer::GetInstance()->GetRTVFormat(Renderer::kMaterial);
         gpipeline.SampleDesc.Count = 1;
 
 
@@ -342,11 +360,27 @@ void Particle::Draw(CommandContext& commandContext, ParticleData& bufferData, co
   
     commandContext.SetVertexBuffer(0, 1, &vbView_);
     commandContext.SetIndexBuffer(ibView_);
-    commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kParticleData), bufferData.structuredBuffer_.GetSRV());
-    commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kMaterial), material.GetGPUVirtualAddress());
 
-    TextureManager::GetInstance()->SetDescriptorTable(commandContext, static_cast<UINT>(RootParameter::kTexture), textureHandle);
+    switch (Renderer::GetRenderingMode())
+    {
+    case Renderer::kForward:
+        commandContext.SetDescriptorTable(static_cast<UINT>(ForwardRootParameter::kParticleData), bufferData.GetGPUHandle());
+        commandContext.SetConstantBuffer(static_cast<UINT>(ForwardRootParameter::kMaterial), material.GetGPUVirtualAddress());
 
-    commandContext.DrawIndexedInstanced(static_cast<UINT>(indices_.size()), static_cast<UINT>(bufferData.dataNum_), 0, 0, 0);
+        TextureManager::GetInstance()->SetDescriptorTable(commandContext, static_cast<UINT>(ForwardRootParameter::kTexture), textureHandle);
+
+        commandContext.DrawIndexedInstanced(static_cast<UINT>(indices_.size()), static_cast<UINT>(bufferData.GetDataNum()), 0, 0, 0);
+        break;
+    case Renderer::kDeferred:
+        commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kParticleData), bufferData.GetGPUHandle());
+        commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kMaterial), material.GetGPUVirtualAddress());
+
+        TextureManager::GetInstance()->SetDescriptorTable(commandContext, static_cast<UINT>(RootParameter::kTexture), textureHandle);
+
+        commandContext.DrawIndexedInstanced(static_cast<UINT>(indices_.size()), static_cast<UINT>(bufferData.GetDataNum()), 0, 0, 0);
+        break;
+    default:
+        break;
+    }
     bufferData.Reset();
 }

@@ -75,11 +75,7 @@ public:
 	void DrawInstanced(CommandContext& commandContext, const  uint32_t modelHandle, UINT textureRootParamterIndex, DescriptorHandle descriptorHandle);
 	void DrawInstancing(CommandContext& commandContext, const  uint32_t modelHandle, UINT instancingNum, UINT textureRootParamterIndex);
 
-	void DrawMeshletInstanced(CommandContext& commandContext, const  uint32_t modelHandle, const uint32_t textureHandle);
-
-
 	void DrawInstanced(CommandContext& commandContext, const uint32_t modelHandle,SkinCluster& skincluster, const UINT textureRootParamterIndex, const uint32_t textureHandle = 0);
-	void DrawMeshletInstanced(CommandContext& commandContext, const  uint32_t modelHandle, SkinCluster& skincluster, const uint32_t textureHandle = 0);
 
 	static Node ReadNode(aiNode* node);
 

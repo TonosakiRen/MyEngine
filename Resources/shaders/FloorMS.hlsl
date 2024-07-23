@@ -17,7 +17,7 @@ ConstantBuffer<ViewProjection> gViewProjection  : register(b1);
 struct MeshletInfo {
 	uint32_t meshletNum;
 };
-ConstantBuffer<MeshletInfo> meshletInfo  : register(b3);
+ConstantBuffer<MeshletInfo> meshletInfo  : register(b4);
 
 struct Vertex {
 	float32_t3 pos;
@@ -25,7 +25,7 @@ struct Vertex {
 	float32_t2 uv;
 };
 struct MSOutput {
-	float32_t4 pos : SV_POSITION; 
+	float32_t4 pos : SV_POSITION;
 	float32_t3 normal : NORMAL;
 	float32_t2 uv : TEXCOORD;
 	uint32_t meshletIndex : CUSTOM_MESHLET_ID;
@@ -107,10 +107,10 @@ void main(
 	uint32_t gtid : SV_GroupThreadID,
 	uint32_t gid : SV_GroupID,
 	in payload Payload payload,
-	out vertices MSOutput verts[256] ,
+	out vertices MSOutput verts[256],
 	out indices uint32_t3 tris[256])
 {
-	
+
 	uint32_t meshletIndex = payload.meshletIndices[gid];
 
 	if (meshletIndex >= meshletInfo.meshletNum) {

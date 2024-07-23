@@ -29,7 +29,6 @@ struct MSOutput {
 struct PixelShaderOutput {
 	float32_t4 color : SV_TARGET0;
 	float32_t4 normal : SV_TARGET1;
-	float32_t material : SV_TARGET2;
 };
 
 float32_t RandomRange(float32_t2 num, float32_t minValue, float32_t maxValue) {
@@ -44,7 +43,6 @@ PixelShaderOutput main(MSOutput input) {
 	PixelShaderOutput output;
 
 	float32_t3 normal = normalize(input.normal);
-	output.material = 1.0f;
 
 	// マテリアル
 	//float32_t4 tranformedUV = mul(float32_t4(input.uv, 0.0f, 1.0f), gMaterial.uvTransfrom);

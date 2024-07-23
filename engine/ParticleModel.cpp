@@ -1,15 +1,23 @@
 #include "ParticleModel.h"
 #include "ShaderManager.h"
 #include "DirectXCommon.h"
-#include "Renderer.h"
 #include "TextureManager.h"
 #include "ModelManager.h"
 
 using namespace Microsoft::WRL;
 
 void ParticleModel::Initialize() {
-    CreatePipeline();
-    CreateForwardPipeline();
+    switch (Renderer::GetRenderingMode())
+    {
+    case Renderer::kForward:
+        CreateForwardPipeline();
+        break;
+    case Renderer::kDeferred:
+        CreatePipeline();
+        break;
+    default:
+        break;
+    }
 }
 
 void ParticleModel::Finalize()
@@ -20,12 +28,23 @@ void ParticleModel::Finalize()
     }
 }
 
-void ParticleModel::PreDraw(PipelineType pipelineType,CommandContext& commandContext, const ViewProjection& viewProjection) {
+void ParticleModel::PreDraw(PipelineType pipelineType,CommandContext& commandContext, const ViewProjection& viewProjection, const TileBasedRendering& tileBasedRendering) {
     
     commandContext.SetPipelineState(*pipelineState_[pipelineType]);
     commandContext.SetGraphicsRootSignature(*rootSignature_[pipelineType]);
     // CBVをセット（ビュープロジェクション行列）
-    commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
+    switch (Renderer::GetRenderingMode())
+    {
+    case Renderer::kForward:
+        commandContext.SetConstantBuffer(static_cast<UINT>(ForwardRootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
+        commandContext.SetDescriptorTable(static_cast<UINT>(ForwardRootParameter::kTileInformation), tileBasedRendering.GetTileInformationGPUHandle());
+        break;
+    case Renderer::kDeferred:
+        commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
+        break;
+    default:
+        break;
+    }
   
     commandContext.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
@@ -175,7 +194,7 @@ void ParticleModel::CreateForwardPipeline()
         CD3DX12_DESCRIPTOR_RANGE descRangeSRV[int(ForwardRootParameter::kDescriptorRangeNum)];
         descRangeSRV[int(ForwardRootParameter::kTexture)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0); // t0
         descRangeSRV[int(ForwardRootParameter::kParticleData)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1); // t1
-        descRangeSRV[int(ForwardRootParameter::kTileInformation)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 2); // t2
+        descRangeSRV[int(ForwardRootParameter::kTileInformation)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 0); // t2
 
 
         CD3DX12_ROOT_PARAMETER rootparams[int(ForwardRootParameter::parameterNum)] = {};
@@ -280,12 +299,25 @@ void ParticleModel::CreateForwardPipeline()
 
 void ParticleModel::Draw(CommandContext& commandContext, ParticleModelData& bufferData, const Material& material, uint32_t modelHandle)
 {
- 
-    commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kParticleData), bufferData.structuredBuffer_.GetSRV());
+    switch (Renderer::GetRenderingMode())
+    {
+    case Renderer::kForward:
+        commandContext.SetDescriptorTable(static_cast<UINT>(ForwardRootParameter::kParticleData), bufferData.GetGPUHandle());
 
-    commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kMaterial), material.GetGPUVirtualAddress());
+        commandContext.SetConstantBuffer(static_cast<UINT>(ForwardRootParameter::kMaterial), material.GetGPUVirtualAddress());
 
-    ModelManager::GetInstance()->DrawInstancing(commandContext, modelHandle, static_cast<UINT>(bufferData.dataNum_), static_cast<UINT>(RootParameter::kTexture));
+        ModelManager::GetInstance()->DrawInstancing(commandContext, modelHandle, static_cast<UINT>(bufferData.GetDataNum()), static_cast<UINT>(ForwardRootParameter::kTexture));
+        break;
+    case Renderer::kDeferred:
+        commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kParticleData), bufferData.GetGPUHandle());
+
+        commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kMaterial), material.GetGPUVirtualAddress());
+
+        ModelManager::GetInstance()->DrawInstancing(commandContext, modelHandle, static_cast<UINT>(bufferData.GetDataNum()), static_cast<UINT>(RootParameter::kTexture));
+        break;
+    default:
+        break;
+    }
 
     bufferData.Reset();
 }

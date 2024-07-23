@@ -17,6 +17,8 @@
 
 #include "ParticleData.h"
 
+#include "Renderer.h"
+
 class Particle
 {
 public:
@@ -51,7 +53,7 @@ public:
 
 	void Initialize();
 	void Finalize();
-	void PreDraw(PipelineType pipelineType, CommandContext& commandContext, const ViewProjection& viewProjection);
+	void PreDraw(PipelineType pipelineType, CommandContext& commandContext, const ViewProjection& viewProjection,const TileBasedRendering& tileBasedRendering);
 
 	void Draw(CommandContext& commandContext, ParticleData& bufferData, const Material& material , const uint32_t textureHadle = 0);
 	void CreateMesh();

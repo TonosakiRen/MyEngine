@@ -2,13 +2,21 @@
 #include "TextureManager.h"
 #include "ModelManager.h"
 #include "ShaderManager.h"
-#include "Renderer.h"
 
 using namespace Microsoft::WRL;
 
 void MeshletModel::Initialize() {
-    CreatePipeline();
-    CreateForwardPipeline();
+    switch (Renderer::GetRenderingMode())
+    {
+    case Renderer::kForward:
+        CreateForwardPipeline();
+        break;
+    case Renderer::kDeferred:
+        CreatePipeline();
+        break;
+    default:
+        break;
+    }
 }
 
 void MeshletModel::Finalize()
@@ -19,15 +27,26 @@ void MeshletModel::Finalize()
     }
 }
 
-void MeshletModel::PreDraw(PipelineType pipelineType,CommandContext& commandContext, const ViewProjection& viewProjection, const ViewProjection& cullingViewProjection) {
+void MeshletModel::PreDraw(PipelineType pipelineType,CommandContext& commandContext, const ViewProjection& viewProjection, const ViewProjection& cullingViewProjection, const TileBasedRendering& tileBasedRendering) {
   
     commandContext.SetPipelineState(*pipelineState_[pipelineType]);
     commandContext.SetGraphicsRootSignature(*rootSignature_[pipelineType]);
 
     // CBVをセット（ビュープロジェクション行列）
-    commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
-
-    commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kFrustum), cullingViewProjection.GetFrustumGPUVirtualAddress());
+    switch (Renderer::GetRenderingMode())
+    {
+    case Renderer::kForward:
+        commandContext.SetConstantBuffer(static_cast<UINT>(ForwardRootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
+        commandContext.SetConstantBuffer(static_cast<UINT>(ForwardRootParameter::kFrustum), cullingViewProjection.GetFrustumGPUVirtualAddress());
+        commandContext.SetDescriptorTable(static_cast<UINT>(ForwardRootParameter::kTileInformation), tileBasedRendering.GetTileInformationGPUHandle());
+        break;
+    case Renderer::kDeferred:
+        commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
+        commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kFrustum), cullingViewProjection.GetFrustumGPUVirtualAddress());
+        break;
+    default:
+        break;
+    }
 
     commandContext.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
@@ -40,7 +59,7 @@ void MeshletModel::CreatePipeline() {
 
     auto shaderManager = ShaderManager::GetInstance();
 
-    asBlob = shaderManager->Compile(L"CullAS.hlsl", ShaderManager::kAmplification);
+    asBlob = shaderManager->Compile(L"MeshTestAS.hlsl", ShaderManager::kAmplification);
     assert(asBlob != nullptr);
 
     msBlob = shaderManager->Compile(L"MeshTestMS.hlsl",ShaderManager::kMesh);
@@ -170,7 +189,7 @@ void MeshletModel::CreateForwardPipeline()
 
     auto shaderManager = ShaderManager::GetInstance();
 
-    asBlob = shaderManager->Compile(L"CullAS.hlsl", ShaderManager::kAmplification);
+    asBlob = shaderManager->Compile(L"MeshTestAS.hlsl", ShaderManager::kAmplification);
     assert(asBlob != nullptr);
 
     msBlob = shaderManager->Compile(L"MeshTestMS.hlsl", ShaderManager::kMesh);
@@ -192,7 +211,7 @@ void MeshletModel::CreateForwardPipeline()
         descRangeSRV[int(ForwardRootParameter::kUniqueVertexIndices)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 3);
         descRangeSRV[int(ForwardRootParameter::kPrimitiveIndices)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 4);
         descRangeSRV[int(ForwardRootParameter::kCullData)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 5);
-        descRangeSRV[int(ForwardRootParameter::kTileInformation)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 6);
+        descRangeSRV[int(ForwardRootParameter::kTileInformation)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 0);
 
         // ルートパラメータ
         CD3DX12_ROOT_PARAMETER rootparams[int(ForwardRootParameter::parameterNum)] = {};
@@ -207,7 +226,8 @@ void MeshletModel::CreateForwardPipeline()
         rootparams[int(ForwardRootParameter::kWorldTransform)].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_ALL);
         rootparams[int(ForwardRootParameter::kViewProjection)].InitAsConstantBufferView(1, 0, D3D12_SHADER_VISIBILITY_ALL);
         rootparams[int(ForwardRootParameter::kMaterial)].InitAsConstantBufferView(2, 0, D3D12_SHADER_VISIBILITY_ALL);
-        rootparams[int(ForwardRootParameter::kFrustum)].InitAsConstantBufferView(3, 0, D3D12_SHADER_VISIBILITY_ALL);
+        rootparams[int(ForwardRootParameter::kMeshletInfo)].InitAsConstantBufferView(3, 0, D3D12_SHADER_VISIBILITY_ALL);
+        rootparams[int(ForwardRootParameter::kFrustum)].InitAsConstantBufferView(4, 0, D3D12_SHADER_VISIBILITY_ALL);
 
         // スタティックサンプラー
         CD3DX12_STATIC_SAMPLER_DESC samplerDesc =
@@ -294,22 +314,143 @@ void MeshletModel::CreateForwardPipeline()
 
 void MeshletModel::Draw(CommandContext& commandContext, uint32_t modelHandle, const WorldTransform& worldTransform, const Material& material,const uint32_t textureHandle) {
 
-    // CBVをセット（ワールド行列）
-    commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kWorldTransform), worldTransform.GetGPUVirtualAddress());
+    const ModelData& modelItem = ModelManager::GetInstance()->ModelManager::GetModelData(modelHandle);
 
     // CBVをセット（マテリアル）
-    commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kMaterial), material.GetGPUVirtualAddress());
+    switch (Renderer::GetRenderingMode())
+    {
+    case Renderer::kForward:
+        // CBVをセット（ワールド行列）
+        commandContext.SetConstantBuffer(static_cast<UINT>(ForwardRootParameter::kWorldTransform), worldTransform.GetGPUVirtualAddress());
 
-    ModelManager::GetInstance()->DrawMeshletInstanced(commandContext, modelHandle, textureHandle);
+        // CBVをセット（マテリアル）
+        commandContext.SetConstantBuffer(static_cast<UINT>(ForwardRootParameter::kMaterial), material.GetGPUVirtualAddress());
+
+        for (const auto& mesh : modelItem.meshes) {
+            // srvセット
+            if (mesh.GetUv() != 0) {
+                TextureManager::GetInstance()->SetDescriptorTable(commandContext, UINT(ForwardRootParameter::kTexture), mesh.GetUv());
+            }
+            else {
+                TextureManager::GetInstance()->SetDescriptorTable(commandContext, UINT(ForwardRootParameter::kTexture), textureHandle);
+            }
+
+            //頂点セット
+            commandContext.SetDescriptorTable(UINT(ForwardRootParameter::kVertices), mesh.vertexBuffer_.GetSRV());
+            //Meshletセット
+            commandContext.SetDescriptorTable(UINT(ForwardRootParameter::kMeshlets), mesh.meshletBuffer_.GetSRV());
+            commandContext.SetDescriptorTable(UINT(ForwardRootParameter::kPrimitiveIndices), mesh.primitiveIndicesBuffer_.GetSRV());
+            commandContext.SetDescriptorTable(UINT(ForwardRootParameter::kUniqueVertexIndices), mesh.uniqueVertexIndexBuffer_.GetSRV());
+            commandContext.SetDescriptorTable(UINT(ForwardRootParameter::kCullData), mesh.cullDataBuffer_.GetSRV());
+            commandContext.SetConstantBuffer(UINT(ForwardRootParameter::kMeshletInfo), mesh.meshletInfo_.GetGPUVirtualAddress());
+
+            // 描画コマンド
+            commandContext.DispatchMesh(uint32_t((mesh.meshlets_.size() + 32 - 1) / 32), 1, 1);
+        }
+        break;
+    case Renderer::kDeferred:
+        // CBVをセット（ワールド行列）
+        commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kWorldTransform), worldTransform.GetGPUVirtualAddress());
+
+        // CBVをセット（マテリアル）
+        commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kMaterial), material.GetGPUVirtualAddress());
+
+        for (const auto& mesh : modelItem.meshes) {
+            // srvセット
+            if (mesh.GetUv() != 0) {
+                TextureManager::GetInstance()->SetDescriptorTable(commandContext, UINT(RootParameter::kTexture), mesh.GetUv());
+            }
+            else {
+                TextureManager::GetInstance()->SetDescriptorTable(commandContext, UINT(RootParameter::kTexture), textureHandle);
+            }
+
+            //頂点セット
+            commandContext.SetDescriptorTable(UINT(RootParameter::kVertices), mesh.vertexBuffer_.GetSRV());
+            //Meshletセット
+            commandContext.SetDescriptorTable(UINT(RootParameter::kMeshlets), mesh.meshletBuffer_.GetSRV());
+            commandContext.SetDescriptorTable(UINT(RootParameter::kPrimitiveIndices), mesh.primitiveIndicesBuffer_.GetSRV());
+            commandContext.SetDescriptorTable(UINT(RootParameter::kUniqueVertexIndices), mesh.uniqueVertexIndexBuffer_.GetSRV());
+            commandContext.SetDescriptorTable(UINT(RootParameter::kCullData), mesh.cullDataBuffer_.GetSRV());
+            commandContext.SetConstantBuffer(UINT(RootParameter::kMeshletInfo), mesh.meshletInfo_.GetGPUVirtualAddress());
+
+            // 描画コマンド
+            commandContext.DispatchMesh(uint32_t((mesh.meshlets_.size() + 32 - 1) / 32), 1, 1);
+        }
+        break;
+    default:
+        break;
+    }
 }
 
 void MeshletModel::Draw(CommandContext& commandContext, uint32_t modelHandle, const WorldTransform& worldTransform, SkinCluster& skinCluster, const Material& material, const uint32_t textureHandle)
 {
-    // CBVをセット（ワールド行列）
-    commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kWorldTransform), worldTransform.GetGPUVirtualAddress());
+    const ModelData& modelItem = ModelManager::GetInstance()->ModelManager::GetModelData(modelHandle);
 
     // CBVをセット（マテリアル）
-    commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kMaterial), material.GetGPUVirtualAddress());
+    switch (Renderer::GetRenderingMode())
+    {
+    case Renderer::kForward:
+        // CBVをセット（ワールド行列）
+        commandContext.SetConstantBuffer(static_cast<UINT>(ForwardRootParameter::kWorldTransform), worldTransform.GetGPUVirtualAddress());
 
-    ModelManager::GetInstance()->DrawMeshletInstanced(commandContext, modelHandle, skinCluster, textureHandle);
+        // CBVをセット（マテリアル）
+        commandContext.SetConstantBuffer(static_cast<UINT>(ForwardRootParameter::kMaterial), material.GetGPUVirtualAddress());
+
+        for (const auto& mesh : modelItem.meshes) {
+            // srvセット
+            if (mesh.GetUv() != 0) {
+                TextureManager::GetInstance()->SetDescriptorTable(commandContext, UINT(ForwardRootParameter::kTexture), mesh.GetUv());
+            }
+            else {
+                TextureManager::GetInstance()->SetDescriptorTable(commandContext, UINT(ForwardRootParameter::kTexture), textureHandle);
+            }
+
+            //頂点セット
+            commandContext.TransitionResource(skinCluster.GetSkinnedVertices(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+            commandContext.SetDescriptorTable(UINT(ForwardRootParameter::kVertices), skinCluster.GetSkinnedVerticesUAV());
+            //Meshletセット
+            commandContext.SetDescriptorTable(UINT(ForwardRootParameter::kMeshlets), mesh.meshletBuffer_.GetSRV());
+            commandContext.SetDescriptorTable(UINT(ForwardRootParameter::kPrimitiveIndices), mesh.primitiveIndicesBuffer_.GetSRV());
+            commandContext.SetDescriptorTable(UINT(ForwardRootParameter::kUniqueVertexIndices), mesh.uniqueVertexIndexBuffer_.GetSRV());
+            commandContext.SetDescriptorTable(UINT(ForwardRootParameter::kCullData), mesh.cullDataBuffer_.GetSRV());
+            commandContext.SetConstantBuffer(UINT(ForwardRootParameter::kMeshletInfo), mesh.meshletInfo_.GetGPUVirtualAddress());
+
+            // 描画コマンド
+            commandContext.DispatchMesh(uint32_t((mesh.meshlets_.size() + 32 - 1) / 32), 1, 1);
+        }
+
+        break;
+    case Renderer::kDeferred:
+        // CBVをセット（ワールド行列）
+        commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kWorldTransform), worldTransform.GetGPUVirtualAddress());
+
+        // CBVをセット（マテリアル）
+        commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kMaterial), material.GetGPUVirtualAddress());
+
+        for (const auto& mesh : modelItem.meshes) {
+            // srvセット
+            if (mesh.GetUv() != 0) {
+                TextureManager::GetInstance()->SetDescriptorTable(commandContext, UINT(RootParameter::kTexture), mesh.GetUv());
+            }
+            else {
+                TextureManager::GetInstance()->SetDescriptorTable(commandContext, UINT(RootParameter::kTexture), textureHandle);
+            }
+
+            //頂点セット
+            commandContext.TransitionResource(skinCluster.GetSkinnedVertices(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+            commandContext.SetDescriptorTable(UINT(RootParameter::kVertices), skinCluster.GetSkinnedVerticesUAV());
+            //Meshletセット
+            commandContext.SetDescriptorTable(UINT(RootParameter::kMeshlets), mesh.meshletBuffer_.GetSRV());
+            commandContext.SetDescriptorTable(UINT(RootParameter::kPrimitiveIndices), mesh.primitiveIndicesBuffer_.GetSRV());
+            commandContext.SetDescriptorTable(UINT(RootParameter::kUniqueVertexIndices), mesh.uniqueVertexIndexBuffer_.GetSRV());
+            commandContext.SetDescriptorTable(UINT(RootParameter::kCullData), mesh.cullDataBuffer_.GetSRV());
+            commandContext.SetConstantBuffer(UINT(RootParameter::kMeshletInfo), mesh.meshletInfo_.GetGPUVirtualAddress());
+
+            // 描画コマンド
+            commandContext.DispatchMesh(uint32_t((mesh.meshlets_.size() + 32 - 1) / 32), 1, 1);
+        }
+        break;
+    default:
+        break;
+    }
 }

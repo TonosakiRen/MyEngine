@@ -12,12 +12,12 @@ struct Plane {
 struct Frustum {
 	Plane plane[6];
 };
-ConstantBuffer<Frustum> frustum  : register(b3);
+ConstantBuffer<Frustum> frustum  : register(b4);
 
 struct MeshletInfo {
 	uint32_t meshletNum;
 };
-ConstantBuffer<MeshletInfo> meshletInfo  : register(b2);
+ConstantBuffer<MeshletInfo> meshletInfo  : register(b3);
 
 struct Sphere {
 	float32_t3 position;

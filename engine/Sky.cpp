@@ -166,10 +166,9 @@ void Sky::CreatePipeline() {
         // 図形の形状設定（三角形）
         gpipeline.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 
-        gpipeline.NumRenderTargets = Renderer::kRenderTargetNum;
+        gpipeline.NumRenderTargets = Renderer::kFRenderTargetNum;
         gpipeline.RTVFormats[int(Renderer::kColor)] = Renderer::GetInstance()->GetRTVFormat(Renderer::kColor);
         gpipeline.RTVFormats[int(Renderer::kNormal)] = Renderer::GetInstance()->GetRTVFormat(Renderer::kNormal);
-        gpipeline.RTVFormats[int(Renderer::kMaterial)] = Renderer::GetInstance()->GetRTVFormat(Renderer::kMaterial);
         gpipeline.SampleDesc.Count = 1; // 1ピクセルにつき1回サンプリング
 
         gpipeline.pRootSignature = *rootSignature_;
@@ -250,8 +249,6 @@ void Sky::Draw(CommandContext& commandContext, const WorldTransform& worldTransf
     commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kWorldTransform),worldTransform.GetGPUVirtualAddress());
     // srvセット
     commandContext.SetDescriptorTable(UINT(RootParameter::kVoronoiTexture), starTexture_.GetSRV());
-
-    //ModelManager::GetInstance()->DrawInstanced(commandContext, ModelManager::GetInstance()->Load("box1x1Inverse.obj"));
 
     // 頂点バッファの設定
     commandContext.SetVertexBuffer(0, 1, &vbView_);

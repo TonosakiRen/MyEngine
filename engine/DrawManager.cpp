@@ -20,6 +20,7 @@ void DrawManager::Finalize()
 	skyPipeline_.reset();
 	defaultMaterial_.reset();
 	floorPipeline_.reset();
+	waveModelPipeline_.reset();
 
 	calls->clear();
 }
@@ -57,12 +58,14 @@ void DrawManager::Initialize(CommandContext& CommandContext)
 	skyPipeline_->Initialize(CommandContext);
 	floorPipeline_ = std::make_unique<FloorRenderer>();
 	floorPipeline_->Initialize(CommandContext);
+	waveModelPipeline_ = std::make_unique<WaveModel>();
+	waveModelPipeline_->Initialize();
 
 	calling_ = std::make_unique<Calling>();
 	calling_->Initialize();
 }
 
-void DrawManager::AllDraw(PipelineType pipelineType,const ViewProjection& viewProjection)
+void DrawManager::AllDraw(PipelineType pipelineType,const ViewProjection& viewProjection,const TileBasedRendering& tileBasedRendering)
 {
 
 
@@ -83,29 +86,34 @@ void DrawManager::AllDraw(PipelineType pipelineType,const ViewProjection& viewPr
 		call();
 	}
 
-	modelPipeline_->PreDraw(pipelineType ,*commandContext_, viewProjection);
+	modelPipeline_->PreDraw(pipelineType ,*commandContext_, viewProjection, tileBasedRendering);
 	for (auto& call : calls[kModel]) {
 		call();
 	}
 
-	meshletModelPipeline_->PreDraw(pipelineType, *commandContext_, viewProjection, *calling_->currentViewProjection);
+	meshletModelPipeline_->PreDraw(pipelineType, *commandContext_, viewProjection, *calling_->currentViewProjection, tileBasedRendering);
 	for (auto& call : calls[kMeshletModel]) {
 		call();
 	}
 
-	particlePipeline_->PreDraw(pipelineType, *commandContext_, viewProjection);
+	particlePipeline_->PreDraw(pipelineType, *commandContext_, viewProjection, tileBasedRendering);
 	for (auto& call : calls[kParticle]) {
 		call();
 	}
 
-	particleModelPipeline_->PreDraw(pipelineType, *commandContext_, viewProjection);
+	particleModelPipeline_->PreDraw(pipelineType, *commandContext_, viewProjection, tileBasedRendering);
 	for (auto& call : calls[kParticleModel]) {
+		call();
+	}
+
+	waveModelPipeline_->PreDraw(pipelineType, *commandContext_, viewProjection, *calling_->currentViewProjection, tileBasedRendering);
+	for (auto& call : calls[kWave]) {
 		call();
 	}
 
 
 	//透明
-	floorPipeline_->PreDraw(*commandContext_, viewProjection);
+	floorPipeline_->PreDraw(pipelineType ,*commandContext_, viewProjection, *calling_->currentViewProjection, tileBasedRendering);
 	for (auto& call : calls[kFloor]) {
 		call();
 	}
@@ -223,6 +231,23 @@ void DrawManager::DrawSky(const WorldTransform& worldTransform)
 {
 	drawCallNum_++;
 	calls[kSky].push_back([&]() {skyPipeline_->Draw(*commandContext_, worldTransform); });
+}
+
+void DrawManager::DrawWaveModel(const WorldTransform& worldTransform, const WaveData& waveData, const WaveIndexData& waveIndexData, const uint32_t modelHandle, const uint32_t textureHandle, const Material& material)
+{
+	drawCallNum_++;
+	if (calling_->isDraw(modelHandle, worldTransform)) {
+		calls[kWave].push_back([&, modelHandle, textureHandle]() {waveModelPipeline_->Draw(*commandContext_, modelHandle, worldTransform, waveData, waveIndexData, material, textureHandle); });
+	}
+}
+
+void DrawManager::DrawWaveModel(const WorldTransform& worldTransform, const WaveData& waveData, const WaveIndexData& waveIndexData, const uint32_t modelHandle, SkinCluster& skinCluster, const uint32_t textureHandle, const Material& material)
+{
+	drawCallNum_++;
+	if (calling_->isDraw(modelHandle, worldTransform)) {
+		calls[kSkinning].push_back([&, modelHandle]() {skinningPipeline_->Dispatch(*commandContext_, modelHandle, skinCluster); });
+		calls[kWave].push_back([&, modelHandle, textureHandle]() {waveModelPipeline_->Draw(*commandContext_, modelHandle, worldTransform, waveData, waveIndexData,skinCluster, material, textureHandle); });
+	}
 }
 
 void DrawManager::DrawFloor(const WorldTransform& worldTransform, const uint32_t modelHandle)
