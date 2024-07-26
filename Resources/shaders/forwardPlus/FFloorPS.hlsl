@@ -1,5 +1,6 @@
-#define RTWidth 1280
-#define RTHeight 720
+//#define RTWidth 1280
+//#define RTHeight 720
+#include "Common.hlsli"
 #define MY_TEXTURE2D_SPACE space1
 Texture2D<float4> Texture2DTable[]  : register(t0, MY_TEXTURE2D_SPACE);
 Texture2D<float> tex : register(t0);
