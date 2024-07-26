@@ -59,17 +59,17 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>$(SolutionDir)externals\imgui;$(SolutionDir)externals\DirectXTex;$(SolutionDir)externals\assimp\include;$(SolutionDir)externals\DirectXMesh;$(SolutionDir)externals\nlohmann;$(IncludePath)</IncludePath>
-    <OutDir>$(SolutionDir)..\Generated\Outputs\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)\Generated\Outputs\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\Generated\Obj\$(ProjectName)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>$(SolutionDir)externals\imgui;$(SolutionDir)externals\DirectXTex;$(SolutionDir)externals\assimp\include;$(SolutionDir)externals\DirectXMesh;$(SolutionDir)externals\nlohmann;$(IncludePath)</IncludePath>
-    <OutDir>$(SolutionDir)..\Generated\Outputs\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)\Generated\Outputs\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\Generated\Obj\$(ProjectName)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Demo|x64'">
     <IncludePath>$(SolutionDir)externals\imgui;$(SolutionDir)externals\DirectXTex;$(SolutionDir)externals\assimp\include;$(SolutionDir)externals\DirectXMesh;$(SolutionDir)externals\nlohmann;$(IncludePath)</IncludePath>
-    <OutDir>$(SolutionDir)..\Generated\Outputs\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)\Generated\Outputs\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\Generated\Obj\$(ProjectName)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
