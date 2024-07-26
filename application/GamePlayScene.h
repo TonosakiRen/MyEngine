@@ -63,5 +63,6 @@ private:
 
 
 	std::vector<std::unique_ptr<GameObject>>* gameObjects_;
+	int i = 0;
 };
 

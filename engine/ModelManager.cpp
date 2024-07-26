@@ -124,21 +124,7 @@ void ModelManager::CreateMeshes(ModelData& modelData)
 	modelData.modelCenter = maxModelSize - Vector3(modelData.modelSize / 2.0f);
 	
 	modelData.modelSphere.center = modelData.modelCenter;
-	if (modelData.modelSize.x > modelData.modelSize.y) {
-		if (modelData.modelSize.x > modelData.modelSize.z) {
-			modelData.modelSphere.radius = modelData.modelSize.x * 0.5f;
-		}else {
-			modelData.modelSphere.radius = modelData.modelSize.z * 0.5f;
-		}
-	}
-	else {
-		if (modelData.modelSize.y > modelData.modelSize.z) {
-			modelData.modelSphere.radius = modelData.modelSize.y * 0.5f;
-		}
-		else {
-			modelData.modelSphere.radius = modelData.modelSize.z * 0.5f;
-		}
-	}
+	modelData.modelSphere.radius = Length(modelData.modelSize) * 0.5f;
 
 	for (auto& mesh : modelData.meshes) {
 

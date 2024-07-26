@@ -29,6 +29,8 @@ struct MSOutput {
 	float32_t3 normal : NORMAL;
 	float32_t2 uv : TEXCOORD;
 	uint32_t meshletIndex : CUSTOM_MESHLET_ID;
+	float32_t3 worldPosition : POSITION0;
+	float32_t depth : TEXCOORD1;
 };
 struct Meshlet {
 	uint32_t vertCount;
@@ -47,12 +49,20 @@ MSOutput GetVertexAttribute(uint32_t vertexIndex, uint32_t meshletIndex)
 	Vertex v = input[vertexIndex];
 
 	MSOutput vout;
+
+	float32_t4 worldPosition = mul(float4(v.pos, 1.0f), gWorldTransform.world);
+	float32_t4 viewPosition = mul(worldPosition, gViewProjection.viewProjection);
+
 	// 座標変換
-	vout.pos = mul(float32_t4(v.pos, 1.0f), mul(gWorldTransform.world, gViewProjection.viewProjection));
+	vout.pos = viewPosition;
 	// 法線にワールド行列を適用
 	vout.normal = mul(v.normal, (float32_t3x3)gWorldTransform.worldInverseTranspose);
 
 	vout.uv = v.uv;
+
+	vout.worldPosition = worldPosition.xyz;
+
+	vout.depth = viewPosition.z / viewPosition.w;
 
 	// MeshletのIndexを出力
 	vout.meshletIndex = meshletIndex;

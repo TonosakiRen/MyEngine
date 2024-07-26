@@ -3,6 +3,7 @@
 #include "ModelManager.h"
 #include "ShaderManager.h"
 #include "ImGuiManager.h"
+#include "LightManager.h"
 
 using namespace Microsoft::WRL;
 
@@ -54,11 +55,22 @@ void FloorRenderer::PreDraw(PipelineType pipelineType, CommandContext& commandCo
     commandContext.SetPipelineState(*pipelineState_[pipelineType]);
     commandContext.SetGraphicsRootSignature(*rootSignature_[pipelineType]);
 
+    LightManager* lightManager = LightManager::GetInstance();
 
     // CBVをセット（ビュープロジェクション行列）
     switch (Renderer::GetRenderingMode())
     {
     case Renderer::kForward:
+
+
+
+        commandContext.SetDescriptorTable(static_cast<UINT>(ForwardRootParameter::kDirectionalLights), lightManager->directionalLights_->srvHandle_);
+        commandContext.SetDescriptorTable(static_cast<UINT>(ForwardRootParameter::kPointLights), lightManager->pointLights_->structureBuffer_.GetSRV());
+        commandContext.SetDescriptorTable(static_cast<UINT>(ForwardRootParameter::kAreaLights), lightManager->areaLights_->structureBuffer_.GetSRV());
+        commandContext.SetDescriptorTable(static_cast<UINT>(ForwardRootParameter::kSpotLights), lightManager->spotLights_->srvHandle_);
+        commandContext.SetDescriptorTable(static_cast<UINT>(ForwardRootParameter::kShadowSpotLights), lightManager->shadowSpotLights_->srvHandle_);
+
+        commandContext.SetDescriptorTable(static_cast<UINT>(ForwardRootParameter::k2DTextures), DirectXCommon::GetInstance()->GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV).GetDiscriptorStartHandle());
 
         commandContext.SetDescriptorTable(UINT(ForwardRootParameter::kTileInformation), tileBasedRendering.GetTileInformationGPUHandle());
         // srvセット
@@ -73,7 +85,16 @@ void FloorRenderer::PreDraw(PipelineType pipelineType, CommandContext& commandCo
 
         commandContext.SetDescriptorTable(static_cast<UINT>(ForwardRootParameter::kTileInformation), tileBasedRendering.GetTileInformationGPUHandle());
 
+        commandContext.SetDescriptorTable(static_cast<UINT>(ForwardRootParameter::kTBRPointLightIndex), tileBasedRendering.GetPointLightIndexGPUHandle());
+        commandContext.SetDescriptorTable(static_cast<UINT>(ForwardRootParameter::kTBRSpotLightIndex), tileBasedRendering.GetSpotLightIndexGPUHandle());
+        commandContext.SetDescriptorTable(static_cast<UINT>(ForwardRootParameter::kTBRShadowSpotLightIndex), tileBasedRendering.GetShadowSpotLightIndexGPUHandle());
+
         commandContext.SetConstantBuffer(static_cast<UINT>(ForwardRootParameter::kFrustum), cullingViewProjection.GetFrustumGPUVirtualAddress());
+
+        commandContext.SetDescriptorTable(static_cast<UINT>(ForwardRootParameter::k2DTextures), DirectXCommon::GetInstance()->GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV).GetDiscriptorStartHandle());
+
+        commandContext.SetConstants(static_cast<UINT>(ForwardRootParameter::kTileNum), TileBasedRendering::kTileWidthNum, TileBasedRendering::kTileHeightNum);
+
         break;
     case Renderer::kDeferred:
 
@@ -244,7 +265,7 @@ void FloorRenderer::CreateForwardPipeline()
     msBlob = shaderManager->Compile(L"FloorMS.hlsl", ShaderManager::kMesh);
     assert(msBlob != nullptr);
 
-    psBlob = shaderManager->Compile(L"forward+/FFloorPS.hlsl", ShaderManager::kPixel);
+    psBlob = shaderManager->Compile(L"forwardPlus/FFloorPS.hlsl", ShaderManager::kPixel);
     assert(psBlob != nullptr);
 
     rootSignature_[kForward] = std::make_unique<RootSignature>();
@@ -259,7 +280,16 @@ void FloorRenderer::CreateForwardPipeline()
         descRangeSRV[int(ForwardRootParameter::kUniqueVertexIndices)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 3);
         descRangeSRV[int(ForwardRootParameter::kPrimitiveIndices)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 4);
         descRangeSRV[int(ForwardRootParameter::kCullData)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 5);
+        descRangeSRV[int(ForwardRootParameter::kDirectionalLights)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 6);
+        descRangeSRV[int(ForwardRootParameter::kPointLights)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 7);
+        descRangeSRV[int(ForwardRootParameter::kAreaLights)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 8);
+        descRangeSRV[int(ForwardRootParameter::kSpotLights)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 9);
+        descRangeSRV[int(ForwardRootParameter::kShadowSpotLights)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 10);
         descRangeSRV[int(ForwardRootParameter::kTileInformation)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 0);
+        descRangeSRV[int(ForwardRootParameter::kTBRPointLightIndex)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 1);
+        descRangeSRV[int(ForwardRootParameter::kTBRSpotLightIndex)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 2);
+        descRangeSRV[int(ForwardRootParameter::kTBRShadowSpotLightIndex)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 3);
+        descRangeSRV[int(ForwardRootParameter::k2DTextures)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, DirectXCommon::GetInstance()->DirectXCommon::kSrvHeapDescriptorNum, 0, 1);
 
         // ルートパラメータ
         CD3DX12_ROOT_PARAMETER rootparams[int(ForwardRootParameter::parameterNum)] = {};
@@ -269,7 +299,16 @@ void FloorRenderer::CreateForwardPipeline()
         rootparams[int(ForwardRootParameter::kUniqueVertexIndices)].InitAsDescriptorTable(1, &descRangeSRV[int(ForwardRootParameter::kUniqueVertexIndices)]);
         rootparams[int(ForwardRootParameter::kPrimitiveIndices)].InitAsDescriptorTable(1, &descRangeSRV[int(ForwardRootParameter::kPrimitiveIndices)]);
         rootparams[int(ForwardRootParameter::kCullData)].InitAsDescriptorTable(1, &descRangeSRV[int(ForwardRootParameter::kCullData)]);
+        rootparams[(int)ForwardRootParameter::kDirectionalLights].InitAsDescriptorTable(1, &descRangeSRV[(int)ForwardRootParameter::kDirectionalLights]);
+        rootparams[(int)ForwardRootParameter::kPointLights].InitAsDescriptorTable(1, &descRangeSRV[(int)ForwardRootParameter::kPointLights]);
+        rootparams[(int)ForwardRootParameter::kAreaLights].InitAsDescriptorTable(1, &descRangeSRV[(int)ForwardRootParameter::kAreaLights]);
+        rootparams[(int)ForwardRootParameter::kSpotLights].InitAsDescriptorTable(1, &descRangeSRV[(int)ForwardRootParameter::kSpotLights]);
+        rootparams[(int)ForwardRootParameter::kShadowSpotLights].InitAsDescriptorTable(1, &descRangeSRV[(int)ForwardRootParameter::kShadowSpotLights]);
         rootparams[int(ForwardRootParameter::kTileInformation)].InitAsDescriptorTable(1, &descRangeSRV[int(ForwardRootParameter::kTileInformation)]);
+        rootparams[(int)ForwardRootParameter::kTBRPointLightIndex].InitAsDescriptorTable(1, &descRangeSRV[(int)ForwardRootParameter::kTBRPointLightIndex]);
+        rootparams[(int)ForwardRootParameter::kTBRSpotLightIndex].InitAsDescriptorTable(1, &descRangeSRV[(int)ForwardRootParameter::kTBRSpotLightIndex]);
+        rootparams[(int)ForwardRootParameter::kTBRShadowSpotLightIndex].InitAsDescriptorTable(1, &descRangeSRV[(int)ForwardRootParameter::kTBRShadowSpotLightIndex]);
+        rootparams[(int)ForwardRootParameter::k2DTextures].InitAsDescriptorTable(1, &descRangeSRV[(int)ForwardRootParameter::k2DTextures]);
 
         rootparams[int(ForwardRootParameter::kWorldTransform)].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_ALL);
         rootparams[int(ForwardRootParameter::kViewProjection)].InitAsConstantBufferView(1, 0, D3D12_SHADER_VISIBILITY_ALL);
@@ -277,6 +316,7 @@ void FloorRenderer::CreateForwardPipeline()
         rootparams[int(ForwardRootParameter::kTime)].InitAsConstants(1, 3, 0, D3D12_SHADER_VISIBILITY_ALL);
         rootparams[int(ForwardRootParameter::kMeshletInfo)].InitAsConstantBufferView(4, 0, D3D12_SHADER_VISIBILITY_ALL);
         rootparams[int(ForwardRootParameter::kFrustum)].InitAsConstantBufferView(5, 0, D3D12_SHADER_VISIBILITY_ALL);
+        rootparams[(int)ForwardRootParameter::kTileNum].InitAsConstants(2, 6);
 
         // スタティックサンプラー
         CD3DX12_STATIC_SAMPLER_DESC samplerDesc = CD3DX12_STATIC_SAMPLER_DESC(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR);

@@ -38,9 +38,12 @@ struct Vertex {
 	float32_t2 uv;
 };
 struct MSOutput {
-	float32_t4 pos : SV_POSITION; 
+	float32_t4 pos : SV_POSITION;
 	float32_t3 normal : NORMAL;
-	uint32_t meshletIndex : CUSTOM_MESHLET_ID;;
+	float32_t2 uv : TEXCOORD;
+	uint32_t meshletIndex : CUSTOM_MESHLET_ID;
+	float32_t3 worldPosition : POSITION0;
+	float32_t depth : TEXCOORD1;
 };
 struct Meshlet {
 	uint32_t vertCount;
@@ -59,6 +62,16 @@ struct WaveData {
 };
 StructuredBuffer<WaveData> waveData :register(t6);
 
+struct MSOutput3 {
+	MSOutput x;
+	MSOutput y;
+	MSOutput z;
+};
+
+float32_t3 MidPoint(float32_t3 point1,float32_t3 point2) {
+	return float32_t3((point1.x + point2.x) * 0.5f, (point1.y + point2.y) * 0.5f, (point1.z + point2.z) * 0.5f);
+}
+
 float32_t3 Multiply(float32_t4x4 m, float32_t3 vec) {
 	float32_t4 result;
 	result = mul(float32_t4(vec, 1.0f), m);
@@ -68,14 +81,7 @@ float32_t3 Multiply(float32_t4x4 m, float32_t3 vec) {
 	return result.xyz;
 }
 
-// 頂点出力情報を取得
-MSOutput GetVertexAttribute(uint32_t vertexIndex, uint32_t meshletIndex)
-{
-	Vertex v = input[vertexIndex];
-
-	float32_t3 worldPos;
-
-	worldPos = Multiply(gWorldTransform.world, v.pos);
+float32_t3 WaveVertex(float32_t3 worldPos) {
 
 	for (int i = 0; i < waveIndexData.waveDataNum; i++) {
 		WaveData data = waveData[waveIndexData.waveIndex[i]];
@@ -100,21 +106,101 @@ MSOutput GetVertexAttribute(uint32_t vertexIndex, uint32_t meshletIndex)
 
 			worldPos += waveDirection * sin(time.t * hz + distance * period) * amplitude;
 		}
-
 	}
+	return worldPos;
+}
 
+
+// 頂点出力情報を取得
+MSOutput GetVertexAttribute(uint32_t vertexIndex, uint32_t meshletIndex)
+{
+	Vertex v = input[vertexIndex];
+
+	float32_t3 worldPos;
+
+	worldPos = Multiply(gWorldTransform.world, v.pos);
+
+	worldPos = WaveVertex(worldPos);
+
+	float32_t4 viewPosition = mul(float32_t4(worldPos,1.0f), gViewProjection.viewProjection);
 
 	MSOutput vout;
 	// 座標変換
-	vout.pos = mul(float32_t4(worldPos, 1.0f), gViewProjection.viewProjection);
+	vout.pos = viewPosition;
 
 	// 法線にワールド行列を適用
 	vout.normal = mul(v.normal, (float32_t3x3)gWorldTransform.worldInverseTranspose);
+
+	vout.worldPosition = worldPos;
+
+	vout.depth = viewPosition.z / viewPosition.w;
 	// MeshletのIndexを出力
 	vout.meshletIndex = meshletIndex;
 
+	vout.uv = v.uv;
+
 	return vout;
 }
+
+// 頂点出力情報を取得
+MSOutput3 GetNewMeshletVertexAttribute(uint32_t vertexIndex1, uint32_t vertexIndex2, uint32_t vertexIndex3, uint32_t meshletIndex)
+{
+	Vertex v1 = input[vertexIndex1];
+	Vertex v2 = input[vertexIndex2];
+	Vertex v3 = input[vertexIndex3];
+
+	float32_t3 worldPos1;
+	float32_t3 worldPos2;
+	float32_t3 worldPos3;
+
+	worldPos1 = Multiply(gWorldTransform.world, v1.pos);
+	worldPos2 = Multiply(gWorldTransform.world, v2.pos);
+	worldPos3 = Multiply(gWorldTransform.world, v3.pos);
+
+	float32_t3 newWorldPos1 = MidPoint(worldPos1, worldPos2);
+	float32_t3 newWorldPos2 = MidPoint(worldPos2, worldPos3);
+	float32_t3 newWorldPos3 = MidPoint(worldPos3, worldPos1);
+
+	newWorldPos1 = WaveVertex(newWorldPos1);
+	newWorldPos2 = WaveVertex(newWorldPos2);
+	newWorldPos3 = WaveVertex(newWorldPos3);
+
+	MSOutput3 vout;
+
+	float32_t4 viewPosition1 = mul(float32_t4(newWorldPos1,1.0f), gViewProjection.viewProjection);
+	float32_t4 viewPosition2 = mul(float32_t4(newWorldPos2,1.0f), gViewProjection.viewProjection);
+	float32_t4 viewPosition3 = mul(float32_t4(newWorldPos3,1.0f), gViewProjection.viewProjection);
+	
+	// 座標変換
+	vout.x.pos = viewPosition1;
+	vout.y.pos = viewPosition2;
+	vout.z.pos = viewPosition3;
+
+	// 法線にワールド行列を適用
+	vout.x.normal = mul(v1.normal, (float32_t3x3)gWorldTransform.worldInverseTranspose);
+	vout.y.normal = mul(v2.normal, (float32_t3x3)gWorldTransform.worldInverseTranspose);
+	vout.z.normal = mul(v3.normal, (float32_t3x3)gWorldTransform.worldInverseTranspose);
+
+	vout.x.worldPosition = newWorldPos1;
+	vout.y.worldPosition = newWorldPos2;
+	vout.z.worldPosition = newWorldPos3;
+
+	// MeshletのIndexを出力
+	vout.x.meshletIndex = meshletIndex;
+	vout.y.meshletIndex = meshletIndex;
+	vout.z.meshletIndex = meshletIndex;
+
+	vout.x.depth = viewPosition1.z / viewPosition1.w;
+	vout.y.depth = viewPosition2.z / viewPosition2.w;
+	vout.z.depth = viewPosition3.z / viewPosition3.w;
+
+	vout.x.uv = v1.uv;
+	vout.y.uv = v2.uv;
+	vout.z.uv = v3.uv;
+
+	return vout;
+}
+
 
 uint32_t3 UnpackPrimitive(uint32_t primitive)
 {
@@ -152,10 +238,11 @@ uint32_t GetVertexIndex(Meshlet m, in uint32_t vertIndex)
 	//return index;
 }
 
+
 struct Payload {
 	uint32_t meshletIndices[32];
+	uint32_t hitWaveIndices[32];
 	uint32_t visibleCount;
-	int32_t isHitWaveIndex[32 * 5];
 };
 
 [numthreads(128, 1, 1)]
@@ -168,36 +255,23 @@ void main(
 	out indices uint32_t3 tris[256])
 {
 
-	uint32_t meshletIndex = payload.meshletIndices[gid];
+	Meshlet m;
+	uint32_t meshletIndex;
+	uint32_t tmp = gid;
 
-	//増やしたMESHLETの処理
-	/*if (gid > payload.visibleCount) {
-		for (uint32_t i = 0; i < 32; i++) {
-			for (uint32_t j = 0; j < 5; j++) {
-				int32_t waveIndex = payload.isHitWaveIndex[i * 5 + j];
-				if (waveIndex >= 0) {
-					uint32_t waveIndex = waveIndexData.waveIndex[i];
-
-					if (IsHit(cullData[dtid].sphere, waveData[waveIndex].position, WaveRadius)) {
-						payload.isHitWaveIndex[index * 5 + i] = waveIndex;
-					}
-					else {
-						payload.isHitWaveIndex[index * 5 + i] = -1;
-					}
-				}
-			}
-		}
-
-		return;
+	if (gid >= payload.visibleCount) {
+		tmp -= payload.visibleCount;
 	}
-	else {*/
-		if (meshletIndex >= meshletInfo.meshletNum) {
-			return;
-		}
 
-		Meshlet m = meshlets[meshletIndex];
+	meshletIndex = payload.meshletIndices[tmp];
 
-		SetMeshOutputCounts(m.vertCount, m.primCount);
+	m = meshlets[meshletIndex];
+
+	SetMeshOutputCounts(m.vertCount, m.primCount);
+
+	//通常のメッシュレットの処理
+	if (gid < payload.visibleCount) {
+		
 
 		if (gtid < m.primCount) {
 			tris[gtid] = GetPrimitive(m, gtid);
@@ -207,5 +281,39 @@ void main(
 			uint32_t vertexIndex = GetVertexIndex(m, gtid);
 			verts[gtid] = GetVertexAttribute(vertexIndex, meshletIndex);
 		}
-	//}
+		
+	}//増やしたメッシュレット
+	else {
+
+		if (gtid < m.primCount) {
+			if (gtid < m.primCount) {
+				uint32_t3 triangleIndex = GetPrimitive(m, gtid);
+				tris[gtid] = triangleIndex;
+
+				uint32_t vertexIndex1 = GetVertexIndex(m, triangleIndex.x);
+				uint32_t vertexIndex2 = GetVertexIndex(m, triangleIndex.y);
+				uint32_t vertexIndex3 = GetVertexIndex(m, triangleIndex.z);
+
+				MSOutput3 newVertex = GetNewMeshletVertexAttribute(vertexIndex1,vertexIndex2,vertexIndex3,meshletIndex);
+
+				verts[triangleIndex.x] = newVertex.x;
+				verts[triangleIndex.y] = newVertex.y;
+				verts[triangleIndex.z] = newVertex.z;
+			
+			}
+		}
+		
+	
+		//仮
+		/*if (gtid < m.primCount) {
+			tris[gtid] = GetPrimitive(m, gtid);
+		}
+
+		if (gtid.x < m.vertCount) {
+			uint32_t vertexIndex = GetVertexIndex(m, gtid);
+			verts[gtid] = GetVertexAttribute(vertexIndex, meshletIndex);
+		}*/
+
+	}
+	
 }

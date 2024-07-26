@@ -37,11 +37,22 @@ public:
 	enum class ForwardRootParameter {
 		kTexture,
 		kParticleData,
+		kDirectionalLights,
+		kPointLights,
+		kAreaLights,
+		kSpotLights,
+		kShadowSpotLights,
 		kTileInformation,
+		kTBRPointLightIndex,
+		kTBRSpotLightIndex,
+		kTBRShadowSpotLightIndex,
+		k2DTextures,
 		kDescriptorRangeNum,
 
 		kViewProjection = kDescriptorRangeNum,
 		kMaterial,
+		kTileNum,
+
 		parameterNum
 	};
 

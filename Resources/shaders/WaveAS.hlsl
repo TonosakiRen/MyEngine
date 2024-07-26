@@ -35,8 +35,8 @@ StructuredBuffer<CullData> cullData : register(t5);
 
 struct Payload {
 	uint32_t meshletIndices[32];
+	uint32_t hitWaveIndices[32];
 	uint32_t visibleCount;
-	int32_t isHitWaveIndex[32 * 5];
 };
 
 groupshared Payload payload;
@@ -86,6 +86,7 @@ bool IsHit(Sphere a, float32_t3 pos,float32_t radius) {
 void main(uint32_t dtid : SV_DispatchThreadID)
 {
 	bool isVisible = false;
+	bool isHitWave = false;
 	
 	if (dtid < meshletInfo.meshletNum) {
 		isVisible = IsVisible(cullData[dtid], worldTransform);
@@ -94,25 +95,23 @@ void main(uint32_t dtid : SV_DispatchThreadID)
 	if (isVisible) {
 		uint32_t index = WavePrefixCountBits(isVisible);
 		payload.meshletIndices[index] = dtid;
-
-
-		//payload.isHitWaveIndexにあたっているwaveIndexを追加、当たっていなかったら-1
-		for (uint32_t i = 0; i < waveIndexData.waveDataNum; i++) {
-			uint32_t waveIndex = waveIndexData.waveIndex[i];
-
-			if (IsHit(cullData[dtid].sphere, waveData[waveIndex].position, WaveRadius)) {
-				payload.isHitWaveIndex[index * 5 + i] = waveIndex;
-			}
-			else {
-				payload.isHitWaveIndex[index * 5 + i] = -1;
+		for (int i = 0; i < waveIndexData.waveDataNum;i++) {
+			WaveData wave = waveData[waveIndexData.waveIndex[i]];
+			if (IsHit(cullData[dtid].sphere, wave.position, WaveRadius)) {
+				isHitWave = true;
 			}
 		}
 
+		if (isHitWave) {
+			index = WavePrefixCountBits(isHitWave);
+			payload.hitWaveIndices[index] = dtid;
+		}
 	}
 
 	uint32_t visibleCount = WaveActiveCountBits(isVisible);
+	uint32_t hitCount = WaveActiveCountBits(isHitWave);
 
 	payload.visibleCount = visibleCount;
 
-	DispatchMesh(visibleCount + waveIndexData.waveDataNum, 1, 1, payload);
+	DispatchMesh(visibleCount + hitCount, 1, 1, payload);
 }

@@ -46,11 +46,9 @@ void MyGame::Finalize()
 	textureManager->Finalize();
 	lightManager_->Finalize();
 	gameObjectManager->Finalize();
+	renderer->Shutdown();
 
 	delete gameScene;
-
-	// ImGui解放
-	renderer->Shutdown();
 
 
 }

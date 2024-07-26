@@ -2,6 +2,11 @@
 Texture2D<float4> tex : register(t0);
 SamplerState smp : register(s0);
 
+struct TileNum{
+	float32_t2 param;
+};
+ConstantBuffer<TileNum> tileNum : register(b3);
+
 struct Material {
 	float32_t4 materialColor; //Materialの色
 	float32_t4x4 uvTransfrom;//uvtransform
@@ -13,7 +18,8 @@ struct VSOutput {
 	float32_t4 pos : SV_POSITION; // システム用頂点座標
 	float32_t3 normal : NORMAL;     // 法線ベクトル
 	float32_t2 uv : TEXCOORD;   
-	float32_t depth : TEXCOORD1;// uv値
+	float32_t3 worldPosition : POSITION0;
+	float32_t depth : TEXCOORD1;
 };
 
 struct PixelShaderOutput {
@@ -36,6 +42,8 @@ PixelShaderOutput main(VSOutput input) {
 
 	output.normal.xyz = (normal.xyz + 1.0f) * 0.5f;
 	output.normal.w = 1.0f;
+
+	
 
 	return output;
 }

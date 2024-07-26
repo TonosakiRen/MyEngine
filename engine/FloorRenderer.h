@@ -48,7 +48,18 @@ public:
 		kUniqueVertexIndices,
 		kPrimitiveIndices,
 		kCullData,
+		kDirectionalLights,
+		kPointLights,
+		kAreaLights,
+		kSpotLights,
+		kShadowSpotLights,
+
 		kTileInformation,
+		kTBRPointLightIndex,
+		kTBRSpotLightIndex,
+		kTBRShadowSpotLightIndex,
+
+		k2DTextures,
 		kDescriptorRangeNum,
 
 		kWorldTransform = kDescriptorRangeNum,
@@ -57,6 +68,7 @@ public:
 		kTime,
 		kMeshletInfo,
 		kFrustum,
+		kTileNum,
 
 		parameterNum
 	};

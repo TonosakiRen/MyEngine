@@ -75,6 +75,10 @@ void TileBasedRendering::ComputeUpdate(CommandContext& commandContext, const Vie
     commandContext.SetComputeConstantBuffer(UINT(RootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
 
     commandContext.Dispatch(1, 1, 1);
+    commandContext.UAVBarrier(rwTilesInformation_);
+    commandContext.UAVBarrier(rwPointLightIndex_);
+    commandContext.UAVBarrier(rwSpotLightIndex_);
+    commandContext.UAVBarrier(rwShadowSpotLightIndex_);
 }
 
 void TileBasedRendering::CreatePipeline()

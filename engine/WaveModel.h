@@ -54,7 +54,16 @@ public:
 		kCullData,
 		kWaveData,
 
+		kDirectionalLights,
+		kPointLights,
+		kAreaLights,
+		kSpotLights,
+		kShadowSpotLights,
 		kTileInformation,
+		kTBRPointLightIndex,
+		kTBRSpotLightIndex,
+		kTBRShadowSpotLightIndex,
+		k2DTextures,
 		kDescriptorRangeNum,
 
 		kWorldTransform = kDescriptorRangeNum,
@@ -64,6 +73,7 @@ public:
 		kFrustum,
 		kTime,
 		kWaveIndexData,
+		kTileNum,
 
 		parameterNum
 	};

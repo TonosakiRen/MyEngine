@@ -44,7 +44,7 @@ void HSVFilter::CreatePipeline(ColorBuffer& orignalBuffer) {
 		rootSignatureDesc.NumStaticSamplers = 1;
 		rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
-		rootSignature_.Create(L"grayScaleRootSignature", rootSignatureDesc);
+		rootSignature_.Create(L"hsvFilterRootSignature", rootSignatureDesc);
 
 	}
 
@@ -85,7 +85,7 @@ void HSVFilter::CreatePipeline(ColorBuffer& orignalBuffer) {
 		gpipeline.pRootSignature = rootSignature_;
 
 		// グラフィックスパイプラインの生成
-		pipelineState_.Create(L"grayScalePipeline", gpipeline);
+		pipelineState_.Create(L"hsvFilterPipeline", gpipeline);
 	}
 }
 
@@ -109,7 +109,7 @@ void HSVFilter::Draw(ColorBuffer& originalBuffer, ColorBuffer& tmpBuffer, Comman
 	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kTexture), originalBuffer.GetSRV());
 #ifdef USE_IMGUI
 	if (ImGui::BeginMenu("HSVFilter")) {
-		ImGui::DragFloat3("radius", &hsv_.x, 0.01f, -1.0f, 1.0f);
+		ImGui::DragFloat3("hsv", &hsv_.x, 0.01f, -1.0f, 1.0f);
 		ImGui::EndMenu();
 	}
 #endif

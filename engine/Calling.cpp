@@ -16,7 +16,7 @@ void Calling::Initialize()
 bool Calling::isDraw(const uint32_t modelHandle,const WorldTransform& worldTransform)
 {
 	Sphere sphere = modelManager->GetModelSphere(modelHandle);
-	sphere.center += sphere.center * worldTransform.matWorld_;
+	sphere.center = sphere.center * worldTransform.matWorld_;
 	sphere.radius *= worldTransform.maxScale_;
 
 	Frustum frustum = currentViewProjection->GetWorldFrustum();

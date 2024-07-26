@@ -78,12 +78,12 @@ void GameScene::Update(CommandContext& commandContext){
 		else {
 			currentViewProjection = camera_.get();
 		}
-			if (GamePlayScene::player) {
-				camera_->Update(MakeTranslation(GamePlayScene::player->GetWorldTransform().matWorld_));
-			}
-			else {
-				camera_->Update();
-			}
+		if (GamePlayScene::player) {
+			camera_->Update(MakeTranslation(GamePlayScene::player->GetWorldTransform().matWorld_));
+		}
+		else {
+			camera_->Update();
+		}
 
 		camera_->Draw();
 

@@ -29,9 +29,6 @@
     <Filter Include="Engine\Graphics">
       <UniqueIdentifier>{a34502d8-f614-4497-b439-9c13d35c5074}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\GameComponent">
-      <UniqueIdentifier>{0d50efd7-9491-40ef-915b-37715d373269}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Engine\Math">
       <UniqueIdentifier>{9094f20f-2560-4204-b596-b09d0dd3d68a}</UniqueIdentifier>
     </Filter>
@@ -113,9 +110,6 @@
     <Filter Include="Engine\Mesh">
       <UniqueIdentifier>{f818dff0-656e-45f0-9f8e-f479f1eaac69}</UniqueIdentifier>
     </Filter>
-    <Filter Include="shaders\F+">
-      <UniqueIdentifier>{d4cb5cdf-fbd4-45fc-8af5-3930ef25126c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="shaders\PostEffect">
       <UniqueIdentifier>{e47ecd7f-e5a9-461f-ac06-1f184710c405}</UniqueIdentifier>
     </Filter>
@@ -133,6 +127,12 @@
     </Filter>
     <Filter Include="Game\WavePoint">
       <UniqueIdentifier>{423c02bc-b014-4262-8315-6fcca4ffeb00}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\GameComponent">
+      <UniqueIdentifier>{0d50efd7-9491-40ef-915b-37715d373269}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shaders\FPlus">
+      <UniqueIdentifier>{d4cb5cdf-fbd4-45fc-8af5-3930ef25126c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -920,21 +920,6 @@
     <FxCompile Include="Resources\shaders\CellularPS.hlsl">
       <Filter>shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Resources\shaders\forward+\FFloorPS.hlsl">
-      <Filter>shaders\F+</Filter>
-    </FxCompile>
-    <FxCompile Include="Resources\shaders\forward+\FMeshTestPS.hlsl">
-      <Filter>shaders\F+</Filter>
-    </FxCompile>
-    <FxCompile Include="Resources\shaders\forward+\FModelPS.hlsl">
-      <Filter>shaders\F+</Filter>
-    </FxCompile>
-    <FxCompile Include="Resources\shaders\forward+\FParticleModelPS.hlsl">
-      <Filter>shaders\F+</Filter>
-    </FxCompile>
-    <FxCompile Include="Resources\shaders\forward+\FParticlePS.hlsl">
-      <Filter>shaders\F+</Filter>
-    </FxCompile>
     <FxCompile Include="Resources\shaders\EdgePS.hlsl">
       <Filter>shaders\PostEffect</Filter>
     </FxCompile>
@@ -995,9 +980,6 @@
     <FxCompile Include="Resources\shaders\WaveAS.hlsl">
       <Filter>shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Resources\shaders\forward+\FWavePS.hlsl">
-      <Filter>shaders\F+</Filter>
-    </FxCompile>
     <FxCompile Include="Resources\shaders\FloorAS.hlsl">
       <Filter>shaders</Filter>
     </FxCompile>
@@ -1007,10 +989,36 @@
     <FxCompile Include="Resources\shaders\HSVFilterPS.hlsl">
       <Filter>shaders</Filter>
     </FxCompile>
+    <FxCompile Include="Resources\shaders\forwardPlus\FFloorPS.hlsl">
+      <Filter>shaders\FPlus</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\forwardPlus\FMeshTestPS.hlsl">
+      <Filter>shaders\FPlus</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\forwardPlus\FModelPS.hlsl">
+      <Filter>shaders\FPlus</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\forwardPlus\FParticleModelPS.hlsl">
+      <Filter>shaders\FPlus</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\forwardPlus\FParticlePS.hlsl">
+      <Filter>shaders\FPlus</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\forwardPlus\FWavePS.hlsl">
+      <Filter>shaders\FPlus</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="MyEngine.rc">
       <Filter>shaders</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\shaders\Common.hlsli">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="Resources\shaders\forwardPlus\Common.hlsli">
+      <Filter>shaders\FPlus</Filter>
+    </None>
   </ItemGroup>
 </Project>
