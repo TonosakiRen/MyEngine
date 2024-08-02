@@ -12,7 +12,6 @@
 #include "CommandSignature.h"
 #include "PipelineState.h"
 #include "RootSignature.h"
-#include "AppendBuffer.h"
 
 class Calling
 {

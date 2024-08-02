@@ -120,7 +120,7 @@ void GamePlayScene::Update()
 void GamePlayScene::Draw()
 {
 	player_->Draw();
-	sphere_->WaveDraw();
+	//sphere_->WaveDraw();
 	
 	//敵描画
 	
