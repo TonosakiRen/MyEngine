@@ -14,6 +14,7 @@
 
 #include "Model.h"
 #include "MeshletModel.h"
+#include "MeshletEnvironmentMapModel.h"
 #include "Skinning.h"
 #include "Particle.h"
 #include "ParticleModel.h"
@@ -41,6 +42,7 @@ public:
 	enum Call {
 		kModel,
 		kMeshletModel,
+		kMeshletEnvironmentMap,
 		kParticle,
 		kParticleModel,
 		kPreSprite,
@@ -62,6 +64,8 @@ public:
 	void DrawModel(const WorldTransform& worldTransform, const uint32_t modelHandle, SkinCluster& skinCluster, const uint32_t textureHandle = 0, const Material& material = *defaultMaterial_.get());
 	void DrawMeshletModel(const WorldTransform& worldTransform, const uint32_t modelHandle = 0, const uint32_t textureHandle = 0, const Material& material = *defaultMaterial_.get());
 	void DrawMeshletModel(const WorldTransform& worldTransform, const uint32_t modelHandle, SkinCluster& skinCluster, const uint32_t textureHandle = 0, const Material& material = *defaultMaterial_.get());
+	void DrawEnvironmentMapMeshletModel(const WorldTransform& worldTransform, const uint32_t modelHandle = 0, const uint32_t textureHandle = 0, const Material& material = *defaultMaterial_.get());
+	void DrawEnvironmentMapMeshletModel(const WorldTransform& worldTransform, const uint32_t modelHandle, SkinCluster& skinCluster, const uint32_t textureHandle = 0, const Material& material = *defaultMaterial_.get());
 	void DrawParticle(ParticleData& bufferData, const uint32_t textureHandle = 0, const Material& material = *defaultMaterial_.get());
 	void DrawParticleModel(ParticleModelData& bufferData, const uint32_t modelHandle = 0, const Material& material = *defaultMaterial_.get());
 	void DrawPreSprite(SpriteData& spriteData);
@@ -87,6 +91,7 @@ private:
 private:
 	std::unique_ptr<Model> modelPipeline_;
 	std::unique_ptr<MeshletModel> meshletModelPipeline_;
+	std::unique_ptr<MeshletEnvironmentMapModel> meshletEnvironmentMapPipeline_;
 	std::unique_ptr<Skinning> skinningPipeline_;
 	std::unique_ptr<Particle> particlePipeline_;
 	std::unique_ptr<ParticleModel> particleModelPipeline_;

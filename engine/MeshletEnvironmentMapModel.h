@@ -14,14 +14,13 @@
 #include "Material.h"
 #include "Mesh.h"
 #include "SkinCluster.h"
+#include "Sky.h"
 
 #include "Renderer.h"
-#include "WaveData.h"
-#include "WaveIndexData.h"
 
 class DirectXCommon;
 
-class WaveModel
+class MeshletEnvironmentMapModel
 {
 public:
 	enum class RootParameter {
@@ -31,7 +30,6 @@ public:
 		kUniqueVertexIndices,
 		kPrimitiveIndices,
 		kCullData,
-		kWaveData,
 		kDescriptorRangeNum,
 
 		kWorldTransform = kDescriptorRangeNum,
@@ -39,9 +37,8 @@ public:
 		kMaterial,
 		kMeshletInfo,
 		kFrustum,
-		kTime,
-		kWaveIndexData,
-		kWaveParam,
+		kTopColor,
+		kBottomColor,
 
 		parameterNum
 	};
@@ -53,13 +50,12 @@ public:
 		kUniqueVertexIndices,
 		kPrimitiveIndices,
 		kCullData,
-		kWaveData,
-
 		kDirectionalLights,
 		kPointLights,
 		kAreaLights,
 		kSpotLights,
 		kShadowSpotLights,
+
 		kTileInformation,
 		kTBRPointLightIndex,
 		kTBRSpotLightIndex,
@@ -72,30 +68,26 @@ public:
 		kMaterial,
 		kMeshletInfo,
 		kFrustum,
-		kTime,
-		kWaveIndexData,
 		kTileNum,
-		kWaveParam,
+		kTopColor,
+		kBottomColor,
+
 
 		parameterNum
 	};
 
-	void Initialize();
+	void Initialize(Sky& sky);
 	void Finalize();
-	void PreDraw(PipelineType pipelineType, CommandContext& commandContext, const ViewProjection& viewProjection , const ViewProjection& cullingViewProjection, const TileBasedRendering& tileBasedRendering);
+	void PreDraw(PipelineType pipelineType, CommandContext& commandContext, const ViewProjection& viewProjection , const ViewProjection& cullingViewProjection,const TileBasedRendering& tileBasedRendering);
 
-	void Draw(CommandContext& commandContext, uint32_t modelHandle, const WorldTransform& worldTransform,const WaveData& waveData, const WaveIndexData& waveIndexData, const Material& material,const uint32_t textureHandle = 0);
-	void Draw(CommandContext& commandContext, uint32_t modelHandle, const WorldTransform& worldTransform, const WaveData& waveData, const WaveIndexData& waveIndexData, SkinCluster& skinCluster, const Material& material, const uint32_t textureHandle = 0);
+	void Draw(CommandContext& commandContext, uint32_t modelHandle, const WorldTransform& worldTransform, const Material& material);
+	void Draw(CommandContext& commandContext, uint32_t modelHandle, const WorldTransform& worldTransform, SkinCluster& skinCluster, const Material& material);
 private: 
 	void CreatePipeline();
 	void CreateForwardPipeline();
 private:
+	Sky* sky_;
 	std::unique_ptr<RootSignature> rootSignature_[kPipelineNum];
 	std::unique_ptr<PipelineState> pipelineState_[kPipelineNum];
-
-	float hz_ = 0.2f;
-	float period_ = 2.0f;
-	float amplitude_ = 0.05f;
-	float radius_ = 6.0f;
 };
 

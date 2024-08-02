@@ -43,10 +43,13 @@ void EdgeRenderer::Render(CommandContext& commandContext, ColorBuffer& tmpBuffer
 #ifdef _DEBUG
 	if (ImGui::BeginMenu("Edge")) {
 		ImGui::DragFloat3("EdgeColor", &edgeColor_.x,0.01f,0.0f,1.0f);
+		ImGui::DragFloat("normalThreshold", &normalThreshold_, 0.0001f, 0.0f);
+		ImGui::DragFloat("depthThreshold", &depthThreshold_, 0.0001f, 0.0f);
 		ImGui::EndMenu();
 	}
 #endif
 	commandContext.SetConstants(static_cast<UINT>(RootParameter::kEdgeColor), edgeColor_.x, edgeColor_.y,edgeColor_.z);
+	commandContext.SetConstants(static_cast<UINT>(RootParameter::kEdgeParam), normalThreshold_, depthThreshold_);
 	// 描画コマンド
 	commandContext.DrawInstanced(3, 1, 0, 0);
 
@@ -78,6 +81,7 @@ void EdgeRenderer::CreatePipeline()
 		rootParameters[(int)RootParameter::kNormalTexture].InitAsDescriptorTable(1, &ranges[(int)RootParameter::kNormalTexture]);
 		rootParameters[(int)RootParameter::kDepthTexture].InitAsDescriptorTable(1, &ranges[(int)RootParameter::kDepthTexture]);
 		rootParameters[int(RootParameter::kEdgeColor)].InitAsConstants(3, 0);
+		rootParameters[int(RootParameter::kEdgeParam)].InitAsConstants(2, 1);
 
 		// スタティックサンプラー
 		CD3DX12_STATIC_SAMPLER_DESC samplerDesc =

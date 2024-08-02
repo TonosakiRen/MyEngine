@@ -85,7 +85,7 @@ void GameScene::Update(CommandContext& commandContext){
 			camera_->Update();
 		}
 
-		camera_->Draw();
+		//camera_->Draw();
 
 		
 		// light
@@ -114,23 +114,11 @@ void GameScene::Update(CommandContext& commandContext){
 		ImGui::End();
 
 #endif
+
 	}	
 
 	sceneManager_->Update();
 	lightManager_->Update();
-
-	//コンピュートシェーダテスト
-	{
-		/*compute_->Dispatch(commandContext);
-		uint32_t* date = static_cast<uint32_t*>(compute_->GetData());
-
-		int a = date[2];
-#ifdef _DEBUG
-		ImGui::Begin("Game");
-		ImGui::Text("ComputeTest : %d", int(a));
-		ImGui::End();
-		#endif*/
-	}
 
 }
 

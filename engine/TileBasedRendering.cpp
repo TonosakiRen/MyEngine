@@ -71,6 +71,8 @@ void TileBasedRendering::ComputeUpdate(CommandContext& commandContext, const Vie
     commandContext.SetComputeDescriptorTable(UINT(RootParameter::kShadowSpotLightIndex), rwShadowSpotLightIndex_.GetUAV());
     commandContext.SetComputeDescriptorTable(UINT(RootParameter::kInitialTileFrustum), initialTileFrustrumBuffer_.GetSRV(commandContext));
     commandContext.SetComputeDescriptorTable(UINT(RootParameter::kPointLights), lightManager->pointLights_->structureBuffer_.GetSRV());
+    commandContext.SetComputeDescriptorTable(UINT(RootParameter::kSpotLights), lightManager->spotLights_->structureBuffer_.GetSRV());
+    commandContext.SetComputeDescriptorTable(UINT(RootParameter::kShadowSpotLights), lightManager->shadowSpotLights_->structureBuffer_.GetSRV());
     commandContext.SetComputeConstantBuffer(UINT(RootParameter::kLightNum), lightManager->lightNumBuffer_->GetGPUVirtualAddress());
     commandContext.SetComputeConstantBuffer(UINT(RootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
 
@@ -89,7 +91,7 @@ void TileBasedRendering::CreatePipeline()
     uavBlob = shaderManager->Compile(L"TBRCS.hlsl", ShaderManager::kCompute);
     assert(uavBlob != nullptr);
 
-    CD3DX12_DESCRIPTOR_RANGE ranges[6]{};
+    CD3DX12_DESCRIPTOR_RANGE ranges[8]{};
     ranges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, int(RootParameter::kTileInformation));
     ranges[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, int(RootParameter::kPointLightIndex));
     ranges[2].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, int(RootParameter::kSpotLightIndex));
@@ -97,6 +99,8 @@ void TileBasedRendering::CreatePipeline()
 
     ranges[4].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
     ranges[5].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1);
+    ranges[6].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 2);
+    ranges[7].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 3);
 
 
     CD3DX12_ROOT_PARAMETER rootparams[int(RootParameter::ParameterNum)]{};
@@ -106,6 +110,8 @@ void TileBasedRendering::CreatePipeline()
     rootparams[int(RootParameter::kShadowSpotLightIndex)].InitAsDescriptorTable(1, &ranges[int(RootParameter::kShadowSpotLightIndex)]);
     rootparams[int(RootParameter::kInitialTileFrustum)].InitAsDescriptorTable(1, &ranges[int(RootParameter::kInitialTileFrustum)]);
     rootparams[int(RootParameter::kPointLights)].InitAsDescriptorTable(1, &ranges[int(RootParameter::kPointLights)]);
+    rootparams[int(RootParameter::kSpotLights)].InitAsDescriptorTable(1, &ranges[int(RootParameter::kSpotLights)]);
+    rootparams[int(RootParameter::kShadowSpotLights)].InitAsDescriptorTable(1, &ranges[int(RootParameter::kShadowSpotLights)]);
     rootparams[int(RootParameter::kLightNum)].InitAsConstantBufferView(0, 0);
     rootparams[int(RootParameter::kViewProjection)].InitAsConstantBufferView(1, 0);
 

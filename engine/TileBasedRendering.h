@@ -67,6 +67,8 @@ private:
 		kShadowSpotLightIndex,
 		kInitialTileFrustum,
 		kPointLights,
+		kSpotLights,
+		kShadowSpotLights,
 		kLightNum,
 		kViewProjection,
 		ParameterNum

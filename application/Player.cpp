@@ -125,13 +125,13 @@ void Player::Draw() {
 	auto& index = *waveIndexData_.GetData();
 	index.waveIndex[0] = 0;
 	index.waveDataNum = 1;
-	DrawManager::GetInstance()->DrawMeshletModel(worldTransform_, modelHandle_, skinCluster_);
-	Wire::Draw(skeleton_, worldTransform_);
+	DrawManager::GetInstance()->DrawEnvironmentMapMeshletModel(worldTransform_, modelHandle_, skinCluster_);
+	//Wire::Draw(skeleton_, worldTransform_);
 	leftHandWorldTransform_.Update(skeleton_.GetJoint("mixamorig:LeftHand").skeletonSpaceMatrix);
 	leftHandModelWorldTransform_.Update();
 
 	rightHandWorldTransform_.Update(skeleton_.GetJoint("mixamorig:RightHand").skeletonSpaceMatrix);
-	fireParticle_->Draw();
+	//fireParticle_->Draw();
 	DrawManager::GetInstance()->DrawManager::DrawModel(leftHandModelWorldTransform_,ModelManager::GetInstance()->Load("box1x1.obj"));
 }
 

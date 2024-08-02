@@ -58,11 +58,6 @@ void UploadBuffer::Create(const std::wstring& name, size_t bufferSize,void** cpu
 
     assert(SUCCEEDED(result));
 
-#ifdef _DEBUG
-    resource_->SetName(L"UploadBuffer");
-#endif // _DEBUG
-
-
     state_ = D3D12_RESOURCE_STATE_GENERIC_READ;
     bufferSize_ = bufferSize;
 

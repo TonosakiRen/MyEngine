@@ -46,8 +46,8 @@ void DeferredRenderer::Render(CommandContext& commandContext, ColorBuffer* origi
 	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kDirectionalLights), lightManager->directionalLights_->srvHandle_);
 	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kPointLights), lightManager->pointLights_->structureBuffer_.GetSRV());
 	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kAreaLights), lightManager->areaLights_->structureBuffer_.GetSRV());
-	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kSpotLights), lightManager->spotLights_->srvHandle_);
-	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kShadowSpotLights), lightManager->shadowSpotLights_->srvHandle_);
+	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kSpotLights), lightManager->spotLights_->structureBuffer_.GetSRV());
+	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kShadowSpotLights), lightManager->shadowSpotLights_->structureBuffer_.GetSRV());
 
 	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::k2DTextures), DirectXCommon::GetInstance()->GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV).GetDiscriptorStartHandle());
 

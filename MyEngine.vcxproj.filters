@@ -134,6 +134,9 @@
     <Filter Include="shaders\FPlus">
       <UniqueIdentifier>{d4cb5cdf-fbd4-45fc-8af5-3930ef25126c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="shaders\Hlsli">
+      <UniqueIdentifier>{fde0058d-1793-4232-9456-820ca1c074b4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="externals\imgui\imgui.cpp">
@@ -436,14 +439,8 @@
     <ClCompile Include="engine\CommandSignature.cpp">
       <Filter>Engine\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="engine\AppendBuffer.cpp">
-      <Filter>Engine\GPUResource</Filter>
-    </ClCompile>
     <ClCompile Include="engine\MeshletModel.cpp">
       <Filter>Engine\Model</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\ByteAddressBuffer.cpp">
-      <Filter>Engine\GPUResource</Filter>
     </ClCompile>
     <ClCompile Include="engine\LightManager.cpp">
       <Filter>Engine\Light</Filter>
@@ -483,6 +480,12 @@
     </ClCompile>
     <ClCompile Include="engine\HSVFilter.cpp">
       <Filter>Engine\PostEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\MeshletEnvironmentMapModel.cpp">
+      <Filter>Engine\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\ByteAddressBuffer.cpp">
+      <Filter>Engine\GPUResource</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -789,14 +792,8 @@
     <ClInclude Include="engine\CommandSignature.h">
       <Filter>Engine\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="engine\AppendBuffer.h">
-      <Filter>Engine\GPUResource</Filter>
-    </ClInclude>
     <ClInclude Include="engine\MeshletModel.h">
       <Filter>Engine\Model</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ByteAddressBuffer.h">
-      <Filter>Engine\GPUResource</Filter>
     </ClInclude>
     <ClInclude Include="engine\LightManager.h">
       <Filter>Engine\Light</Filter>
@@ -839,6 +836,12 @@
     </ClInclude>
     <ClInclude Include="engine\HSVFilter.h">
       <Filter>Engine\PostEffect</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\MeshletEnvironmentMapModel.h">
+      <Filter>Engine\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\ByteAddressBuffer.h">
+      <Filter>Engine\GPUResource</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1007,6 +1010,9 @@
     <FxCompile Include="Resources\shaders\forwardPlus\FWavePS.hlsl">
       <Filter>shaders\FPlus</Filter>
     </FxCompile>
+    <FxCompile Include="Resources\shaders\forwardPlus\FMeshEnvironmentMapPS.hlsl">
+      <Filter>shaders\FPlus</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="MyEngine.rc">
@@ -1015,10 +1021,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\shaders\Common.hlsli">
-      <Filter>shaders</Filter>
+      <Filter>shaders\Hlsli</Filter>
     </None>
-    <None Include="Resources\shaders\forwardPlus\Common.hlsli">
-      <Filter>shaders\FPlus</Filter>
+    <None Include="Resources\shaders\Lighting.hlsli">
+      <Filter>shaders\Hlsli</Filter>
     </None>
   </ItemGroup>
 </Project>

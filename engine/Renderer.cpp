@@ -210,7 +210,7 @@ void Renderer::DeferredRender(ViewProjection& viewProjection)
     default:
         break;
     }
-
+#ifdef _DEBUG
     ImGui::Begin("Engine");
     if (ImGui::BeginMenu("PostEffect")) {
         ImGui::Checkbox("bloom", &isBloom_);
@@ -221,6 +221,7 @@ void Renderer::DeferredRender(ViewProjection& viewProjection)
         ImGui::Checkbox("smooth", &isSmooth_);
         ImGui::EndMenu();
     }
+#endif
     if (isBloom_) {
         bloom_->Render(commandContext_, resultBuffer_.get());
     }
@@ -240,6 +241,7 @@ void Renderer::DeferredRender(ViewProjection& viewProjection)
         hsvFilter_->Draw(*resultBuffer_.get(), *tmpBuffer_.get(), commandContext_);
     }
     ImGui::End();
+
 }
 
 void Renderer::ShadowMapRender()

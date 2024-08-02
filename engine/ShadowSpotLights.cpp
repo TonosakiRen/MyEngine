@@ -2,28 +2,15 @@
 #include "DirectXCommon.h"
 void ShadowSpotLights::Initialize() {
     
-        lights_.resize(lightNum);
+    structureBuffer_.Create(L"ShadowSpotLightBuffer", sizeof(ConstBufferData), lightNum);
+    lights_.resize(lightNum);
 
-        for (int i = 0; i < lightNum; i++) {
-            lights_[i].shadowMap_.Create(L"shadowMapSpotLight", shadowWidth, shadowHeight, DXGI_FORMAT_D32_FLOAT);
-            lights_[i].constBuffer_.Create(L"shadowSpotLightBuffer", (sizeof(ConstBufferData) + 0xff) & ~0xff);
-            lights_[i].descriptorHeapIndex = lights_[i].shadowMap_.GetSRV().GetIndex();
-        }
-        // インスタンシングデータのサイズ
-        UINT sizeINB = static_cast<UINT>(sizeof(ConstBufferData) * lightNum);
-        structureBuffer_.Create(L"shadowSpotLightStructuredBuffer",sizeINB);
-
-        D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
-        srvDesc.Format = DXGI_FORMAT_UNKNOWN;
-        srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-        srvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
-        srvDesc.Buffer.FirstElement = 0;
-        srvDesc.Buffer.NumElements = lightNum;
-        srvDesc.Buffer.StructureByteStride = sizeof(ConstBufferData);
-
-        srvHandle_ = DirectXCommon::GetInstance()->AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-        DirectXCommon::GetInstance()->GetDevice()->CreateShaderResourceView(structureBuffer_, &srvDesc, srvHandle_);
-        Update();
+    for (int i = 0; i < lightNum; i++) {
+        lights_[i].shadowMap_.Create(L"shadowMapSpotLight", shadowWidth, shadowHeight, DXGI_FORMAT_D32_FLOAT);
+        lights_[i].constBuffer_.Create(L"shadowSpotLightBuffer", (sizeof(ConstBufferData) + 0xff) & ~0xff);
+        lights_[i].descriptorHeapIndex = lights_[i].shadowMap_.GetSRV().GetIndex();
+    }
+    Update();
     
 }
 

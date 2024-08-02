@@ -2,7 +2,7 @@
 #include "Lighting.hlsli"
 #define MY_TEXTURE2D_SPACE space1
 Texture2D<float4> Texture2DTable[]  : register(t0, MY_TEXTURE2D_SPACE);
-Texture2D<float4> tex : register(t0);
+TextureCube<float32_t4> tex : register(t0);
 SamplerState smp : register(s0);
 
 RWStructuredBuffer<uint32_t> gTBRPointLightIndex  : register(u1);
@@ -15,16 +15,19 @@ StructuredBuffer<AreaLight> gAreaLights  : register(t8);
 StructuredBuffer<SpotLight> gSpotLights  : register(t9);
 StructuredBuffer<ShadowSpotLight> gShadowSpotLights  : register(t10);
 ConstantBuffer<TileNum> tileNum : register(b5);
+ConstantBuffer<Color> topColor : register(b6);
+ConstantBuffer<Color> bottomColor : register(b7);
 ConstantBuffer<Material> gMaterial  : register(b2);
 RWStructuredBuffer<TBRInformation> gTBRInformation  : register(u0);
+
 
 struct MSOutput {
 	float32_t4 pos : SV_POSITION;
 	float32_t3 normal : NORMAL;
 	float32_t2 uv : TEXCOORD;
 	uint32_t meshletIndex : CUSTOM_MESHLET_ID;
-	float32_t3 worldPosition : POSITION0;
-	float32_t depth : TEXCOORD1;
+	float32_t3  worldPosition : POSITION0;
+	float32_t  depth : TEXCOORD1;
 };
 
 struct PixelShaderOutput {
@@ -45,16 +48,21 @@ PixelShaderOutput main(MSOutput input) {
 
 	float32_t3 normal = normalize(input.normal);
 
+	float32_t3 cameraToPosition = normalize(input.worldPosition - gViewProjection.viewPosition);
+	float32_t3 reflectedVector = normalize(reflect(cameraToPosition,normal));
+	float32_t4 environmentColor = tex.Sample(smp,reflectedVector);
+	
+	float32_t gradationT = (reflectedVector.y + 1.0f) * 0.5f;
+	float32_t4 hsva = lerp(bottomColor.t,topColor.t,gradationT);
+	float32_t4 skyColor = {0.0f,0.0f,0.0f,1.0f};
+	skyColor.xyz = HSVToRGB(hsva.xyz);
+	skyColor += environmentColor;
+
 	// マテリアル
 	float32_t4 tranformedUV = mul(float32_t4(input.uv, 0.0f, 1.0f), gMaterial.uvTransfrom);
-	float32_t4 texColor = tex.Sample(smp, tranformedUV.xy);
-	float32_t4 color = gMaterial.materialColor * texColor;	
+	float32_t4 color = gMaterial.materialColor * skyColor;	
 
 	if (gMaterial.enableLighting) {
-
-		float32_t depth = input.depth;
-
-		float32_t3 worldPos = input.worldPosition;
 
 		float32_t3 lighting = { 0.0f,0.0f,0.0f };
 
@@ -65,13 +73,13 @@ PixelShaderOutput main(MSOutput input) {
 
 		TBRInformation tileInformation = gTBRInformation[tileNumber];
 
-		float32_t3 viewDirection = normalize(gViewProjection.viewPosition - worldPos);
+		float32_t3 viewDirection = normalize(gViewProjection.viewPosition -  input.worldPosition);
 
 		for (int i = 0; i < tileInformation.pointLightNum; i++) {
 
 			int index = gTBRPointLightIndex[tileInformation.pointLightOffset + i];
 
-			lighting += PointLightLighting(gPointLights[index],worldPos,viewDirection,normal);
+			lighting += PointLightLighting(gPointLights[index], input.worldPosition,viewDirection,normal);
 		}
 
 		//spotLight
@@ -80,7 +88,7 @@ PixelShaderOutput main(MSOutput input) {
 
 			int index = gTBRSpotLightIndex[tileInformation.spotLightOffset + j];
 
-			lighting += SpotLightLighting(gSpotLights[index],worldPos,viewDirection,normal);
+			lighting += SpotLightLighting(gSpotLights[index], input.worldPosition,viewDirection,normal);
 
 		}
 
@@ -90,10 +98,10 @@ PixelShaderOutput main(MSOutput input) {
 
 			int index = gTBRShadowSpotLightIndex[tileInformation.shadowSpotLightOffset + l];
 
-			lighting += ShadowSpotLightLighting(gShadowSpotLights[index],worldPos,viewDirection,normal);
+			lighting += ShadowSpotLightLighting(gShadowSpotLights[index], input.worldPosition,viewDirection,normal);
 
 			//影
-			float32_t4 wp = float4(worldPos.xyz, 1.0f);
+			float32_t4 wp = float4( input.worldPosition.xyz, 1.0f);
 			float32_t4 lightViewPosition = mul(wp, gShadowSpotLights[index].viewProjection);
 			float32_t2 shadowMapUV = lightViewPosition.xy / lightViewPosition.w;
 			shadowMapUV *= float32_t2(0.5f, -0.5f);
@@ -118,10 +126,10 @@ PixelShaderOutput main(MSOutput input) {
 
 		for (int k = 0; k < 1; k++) {
 
-			lighting += DirectionalLightLighting(gDirectionLights[k],worldPos,viewDirection,normal);
+			lighting += DirectionalLightLighting(gDirectionLights[k], input.worldPosition,viewDirection,normal);
 
 			//影
-			/*float32_t4 wp = float4(worldPos.xyz, 1.0f);
+			/*float32_t4 wp = float4( input.worldPosition.xyz, 1.0f);
 			float32_t4 lightViewPosition = mul(wp, gDirectionLights[k].viewProjection);
 			float32_t2 shadowMapUV = lightViewPosition.xy / lightViewPosition.w;
 			shadowMapUV *= float32_t2(0.5f, -0.5f);
@@ -142,7 +150,7 @@ PixelShaderOutput main(MSOutput input) {
 
 		for (int m = 0; m < 1; m++) {
 
-			lighting += AreaLightLighting(gAreaLights[m],worldPos,viewDirection,normal);
+			lighting += AreaLightLighting(gAreaLights[m], input.worldPosition,viewDirection,normal);
 		}
 		//アンビエント
 

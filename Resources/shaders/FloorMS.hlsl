@@ -1,22 +1,7 @@
-struct WorldTransform {
-	float32_t4x4 world;
-	float32_t4x4 worldInverseTranspose;
-	float32_t scale;
-};
+#include "Common.hlsli"
+#include "Lighting.hlsli"
 ConstantBuffer<WorldTransform> gWorldTransform  : register(b0);
-
-struct ViewProjection {
-	float32_t4x4 viewProjection;
-	float32_t4x4 inverseViewProjection;
-	float32_t4x4 worldMatrix;
-	float32_t4x4 billBordMatrix;
-	float32_t3 viewPosition;
-};
 ConstantBuffer<ViewProjection> gViewProjection  : register(b1);
-
-struct MeshletInfo {
-	uint32_t meshletNum;
-};
 ConstantBuffer<MeshletInfo> meshletInfo  : register(b4);
 
 struct Vertex {
@@ -32,12 +17,7 @@ struct MSOutput {
 	float32_t3 worldPosition : POSITION0;
 	float32_t depth : TEXCOORD1;
 };
-struct Meshlet {
-	uint32_t vertCount;
-	uint32_t vertOffset;
-	uint32_t primCount;
-	uint32_t primOffset;
-};
+
 StructuredBuffer<Vertex> input : register(t1);
 StructuredBuffer<Meshlet> meshlets :register(t2);
 ByteAddressBuffer uniqueVertexIndices : register(t3);
@@ -108,6 +88,8 @@ uint32_t GetVertexIndex(Meshlet m, in uint32_t vertIndex)
 
 struct Payload {
 	uint32_t meshletIndices[32];
+	uint32_t hitWaveIndices[32];
+	uint32_t visibleCount;
 };
 
 

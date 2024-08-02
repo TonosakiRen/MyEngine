@@ -38,6 +38,9 @@ public:
 
 	void Draw(CommandContext& commandContext,const WorldTransform& worldTransform);
 
+	CubeColorBuffer& GetStarTexture() { return starTexture_; }
+	const Vector4& GetTopColor() { return topHSVA_; }
+	const Vector4& GetBottomColor() { return bottomHSVA_; }
 private: 
 	void CreatePipeline();
 	void CreateMesh();

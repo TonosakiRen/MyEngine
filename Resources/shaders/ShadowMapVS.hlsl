@@ -1,17 +1,7 @@
-struct WorldTransform {
-	float32_t4x4 world;
-	float32_t4x4 worldInverseTranspose;
-	float32_t scale;
-};
+#include "Common.hlsli"
+#include "Lighting.hlsli"
 ConstantBuffer<WorldTransform> gWorldTransform  : register(b0);
-
-struct DirectionLight {
-	float32_t4 color;
-	float32_t3 direction;
-	float32_t intensity;
-	float32_t4x4 viewProjection;
-};
-ConstantBuffer<DirectionLight> gDirectionLight  : register(b1);
+ConstantBuffer<DirectionalLight> gDirectionLight  : register(b1);
 
 struct VSOutput {
 	float32_t4 svpos : SV_POSITION;

@@ -62,6 +62,8 @@ Microsoft::WRL::ComPtr<IDxcBlob> ShaderManager::Compile(const std::wstring& path
 		L"-Zi",L"-Qembed_debug",//デバック用の情報を埋め込む
 		L"-Od",//最適化を外しておく
 		L"-Zpr",//メモリレイアウト行優先
+		L"-I",
+		L"./Resources/shaders/"
 	};
 
 	//実際にshaderをコンパイルする

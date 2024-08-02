@@ -1,7 +1,7 @@
 #pragma once
 #include <d3d12.h>
 #include "Mymath.h"
-#include "UploadBuffer.h"
+#include "StructuredBuffer.h"
 #include "DepthBuffer.h"
 #include <vector>
 #include "WorldTransform.h"
@@ -13,7 +13,7 @@ public:
 	static const uint32_t  lightNum = 1;
 
 	struct SpotLight {
-		Vector4 color = { 1.0f, 0.0f, 1.0f,1.0f };
+		Vector4 color = { 1.0f, 1.0f, 1.0f,1.0f };
 		WorldTransform worldTransform;
 		float intensity = 5.0f;
 		Vector3 direction = { 0.0f,-1.0f,0.0f };
@@ -39,8 +39,7 @@ public:
 
 public:
 	std::vector<SpotLight> lights_;
-	UploadBuffer structureBuffer_;
-	DescriptorHandle srvHandle_;
+	StructuredBuffer structureBuffer_;
 private:
 
 };

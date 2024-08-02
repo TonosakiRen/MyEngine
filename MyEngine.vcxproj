@@ -189,7 +189,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\WavePoints.cpp" />
     <ClCompile Include="audio\Audio.cpp" />
     <ClCompile Include="engine\AnimationManager.cpp" />
-    <ClCompile Include="engine\AppendBuffer.cpp" />
     <ClCompile Include="engine\AreaLights.cpp" />
     <ClCompile Include="engine\Bloom.cpp" />
     <ClCompile Include="application\BoxArea.cpp" />
@@ -223,6 +222,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\LightManager.cpp" />
     <ClCompile Include="engine\GameObjectManager.cpp" />
     <ClCompile Include="engine\LightNumBuffer.cpp" />
+    <ClCompile Include="engine\MeshletEnvironmentMapModel.cpp" />
     <ClCompile Include="engine\MeshletModel.cpp" />
     <ClCompile Include="engine\ParticleData.cpp" />
     <ClCompile Include="engine\ParticleModelData.cpp" />
@@ -307,7 +307,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\WavePoints.h" />
     <ClInclude Include="audio\Audio.h" />
     <ClInclude Include="engine\AnimationManager.h" />
-    <ClInclude Include="engine\AppendBuffer.h" />
     <ClInclude Include="engine\AreaLights.h" />
     <ClInclude Include="engine\Bloom.h" />
     <ClInclude Include="application\BoxArea.h" />
@@ -341,6 +340,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\LightManager.h" />
     <ClInclude Include="engine\GameObjectManager.h" />
     <ClInclude Include="engine\LightNumBuffer.h" />
+    <ClInclude Include="engine\MeshletEnvironmentMapModel.h" />
     <ClInclude Include="engine\MeshletModel.h" />
     <ClInclude Include="engine\ParticleData.h" />
     <ClInclude Include="engine\ParticleModelData.h" />
@@ -433,6 +433,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="Resources\shaders\forwardPlus\FFloorPS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Demo|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\forwardPlus\FMeshEnvironmentMapPS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Demo|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -710,7 +715,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Demo|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </None>
-    <None Include="Resources\shaders\forwardPlus\Common.hlsli">
+    <None Include="Resources\shaders\Lighting.hlsli">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Demo|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>

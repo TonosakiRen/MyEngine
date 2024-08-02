@@ -21,6 +21,7 @@ public:
 		kNormalTexture,
 		kDepthTexture,
 		kEdgeColor,
+		kEdgeParam,
 
 		ParameterNum
 	};
@@ -45,7 +46,7 @@ private:
 	DescriptorHandle uavHandle_;
 
 	Vector3 edgeColor_ = { 0.0f,0.0f,0.0f };
-	float normalThreshold_ = 0.2f;
+	float normalThreshold_ = 0.7f;
 	float depthThreshold_ = 0.001f;
 
 };

@@ -1,7 +1,7 @@
 #pragma once
 #include <d3d12.h>
 #include "Mymath.h"
-#include "UploadBuffer.h"
+#include "StructuredBuffer.h"
 #include "DepthBuffer.h"
 #include <vector>
 #include "WorldTransform.h"
@@ -47,8 +47,7 @@ public:
 
 public:
 	std::vector<SpotLight> lights_;
-	UploadBuffer structureBuffer_;
-	DescriptorHandle srvHandle_;
+	StructuredBuffer structureBuffer_;
 private:
 	//影用viewProjection
 	float fovAngleY_ = 45.0f * std::numbers::pi_v <float> / 180.0f;

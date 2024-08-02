@@ -18,7 +18,7 @@ void GamePlayScene::Initialize()
 
 	sphere_ = std::make_unique<GameObject>();
 	sphere_->Initialize("box1x1x4.obj");
-	sphere_->SetPosition({ 0.0f,5.0f,15.0f });
+	sphere_->SetPosition({ 0.0f,0.0f,0.0f });
 	sphere_->SetScale({ 10.0f,10.0f,10.0f });
 	sphere_->UpdateMatrix();
 
@@ -44,8 +44,8 @@ void GamePlayScene::Initialize()
 	player_->Initialize("walk.gltf", playerBulletManager_.get());
 	player = player_.get();
 
-	/*sphereLights_ = std::make_unique<SphereLights>();
-	sphereLights_->Initialize();*/
+	sphereLights_ = std::make_unique<SphereLights>();
+	sphereLights_->Initialize();
 
 	GameObjectManager::GetInstance()->Load();
 	gameObjects_ = &GameObjectManager::GetInstance()->gameObjects_;
@@ -68,7 +68,8 @@ void GamePlayScene::Update()
 	player_->Update(*GameScene::currentViewProjection);
 
 	//敵更新
-	for (const std::unique_ptr<Enemy>& enemy : enemies_) {
+	
+	for (const auto& enemy : enemies_) {
 		enemy->Update();
 	}
 
@@ -80,14 +81,16 @@ void GamePlayScene::Update()
 		return false;
 	});
 
+	//当たり判定
+	CheckAllCollision();
+
+	
+
 	//敵弾更新
 	enemyBulletManager_->Update();
 
 	//敵弾更新
 	playerBulletManager_->Update();
-
-	//当たり判定
-	CheckAllCollision();
 
 	explodeParticle_->Update();
 
@@ -111,7 +114,7 @@ void GamePlayScene::Update()
 #endif
 	whiteParticle_->Update();
 
-	//sphereLights_->Update();
+	sphereLights_->Update();
 }
 
 void GamePlayScene::Draw()
@@ -120,16 +123,18 @@ void GamePlayScene::Draw()
 	sphere_->WaveDraw();
 	
 	//敵描画
+	
 	for (const std::unique_ptr<Enemy>& enemy : enemies_) {
 		enemy->Draw();
 	}
+	
 
 	enemyBulletManager_->Draw();
 	playerBulletManager_->Draw();
 
 	skybox_->Draw();
 	//whiteParticle_->Draw();
-	//sphereLights_->Draw();
+	sphereLights_->Draw();
 	floor_->Draw();
 
 	for (auto& gameObject : *gameObjects_) {

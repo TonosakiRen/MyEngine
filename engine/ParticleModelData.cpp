@@ -10,8 +10,9 @@ ParticleModelData::ParticleModelData(uint32_t particleNum) : kParticleNum(partic
 
 void ParticleModelData::Initialize()
 {
-	structuredBuffer_.Create(L"particleModelDataBuffer", sizeof(Data), kParticleNum);
-	data_ = static_cast<Data*>(structuredBuffer_.GetCPUData());
+	structuredBuffer_ = std::make_unique<StructuredBuffer>();
+	structuredBuffer_->Create(L"particleModelDataBuffer", sizeof(Data), kParticleNum);
+	data_ = static_cast<Data*>(structuredBuffer_->GetCPUData());
 }
 
 void ParticleModelData::PushBackData(const Data& data)

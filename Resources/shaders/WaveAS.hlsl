@@ -1,36 +1,8 @@
 #define WaveRadius 6.0f
-
-struct WorldTransform {
-	float32_t4x4 world;
-	float32_t4x4 worldInverseTranspose;
-	float32_t scale;
-};
+#include "Common.hlsli"
 ConstantBuffer<WorldTransform> worldTransform  : register(b0);
-
-struct Plane {
-	float32_t3 normal;
-	float32_t distance;
-};
-struct Frustum {
-	Plane plane[6];
-};
 ConstantBuffer<Frustum> frustum  : register(b4);
-
-struct MeshletInfo {
-	uint32_t meshletNum;
-};
 ConstantBuffer<MeshletInfo> meshletInfo  : register(b3);
-
-struct Sphere {
-	float32_t3 position;
-	float32_t radius;
-};
-
-struct CullData {
-	Sphere sphere;
-	uint32_t normalCone;
-	float32_t ApexOffset;
-};
 StructuredBuffer<CullData> cullData : register(t5);
 
 struct Payload {
@@ -41,26 +13,11 @@ struct Payload {
 
 groupshared Payload payload;
 
-struct WaveIndexData {
-	uint32_t waveDataNum;
-	uint32_t waveIndex[5];
-};
 ConstantBuffer<WaveIndexData> waveIndexData: register(b6);
 
-struct WaveData {
-	float32_t3 position;
-	float32_t t;
-};
 StructuredBuffer<WaveData> waveData :register(t6);
 
-float32_t3 Multiply(float32_t4x4 m, float32_t3 vec) {
-	float32_t4 result;
-	result = mul(float32_t4(vec, 1.0f), m);
-	result.x = result.x * rcp(result.w);
-	result.y = result.y * rcp(result.w);
-	result.z = result.z * rcp(result.w);
-	return result.xyz;
-}
+ConstantBuffer<WaveParam> waveParam: register(b8);
 
 bool IsVisible(CullData cullData, WorldTransform worldTransform) {
 	float32_t3 center = Multiply(worldTransform.world, cullData.sphere.position);
@@ -93,11 +50,12 @@ void main(uint32_t dtid : SV_DispatchThreadID)
 	}
 
 	if (isVisible) {
-		uint32_t index = WavePrefixCountBits(isVisible);
-		payload.meshletIndices[index] = dtid;
+		
+		uint32_t index;
+
 		for (int i = 0; i < waveIndexData.waveDataNum;i++) {
 			WaveData wave = waveData[waveIndexData.waveIndex[i]];
-			if (IsHit(cullData[dtid].sphere, wave.position, WaveRadius)) {
+			if (IsHit(cullData[dtid].sphere, wave.position, waveParam.radius)) {
 				isHitWave = true;
 			}
 		}
@@ -105,13 +63,17 @@ void main(uint32_t dtid : SV_DispatchThreadID)
 		if (isHitWave) {
 			index = WavePrefixCountBits(isHitWave);
 			payload.hitWaveIndices[index] = dtid;
+		}else{
+			index = WavePrefixCountBits(isVisible);
+			payload.meshletIndices[index] = dtid;
 		}
 	}
 
 	uint32_t visibleCount = WaveActiveCountBits(isVisible);
 	uint32_t hitCount = WaveActiveCountBits(isHitWave);
 
-	payload.visibleCount = visibleCount;
+	payload.visibleCount = visibleCount - hitCount;
+	//payload.hitCount = hitCount;
 
-	DispatchMesh(visibleCount + hitCount, 1, 1, payload);
+	DispatchMesh(visibleCount - hitCount + hitCount * 4, 1, 1, payload);
 }

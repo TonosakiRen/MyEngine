@@ -11,6 +11,7 @@ void DrawManager::Finalize()
 {
 	modelPipeline_.reset();
 	meshletModelPipeline_.reset();
+	meshletEnvironmentMapPipeline_.reset();
 	skinningPipeline_.reset();
 	particlePipeline_.reset();
 	particleModelPipeline_.reset();
@@ -56,6 +57,8 @@ void DrawManager::Initialize(CommandContext& CommandContext)
 	spotLightShadowPipeline_->Initialize();
 	skyPipeline_ = std::make_unique<Sky>();
 	skyPipeline_->Initialize(CommandContext);
+	meshletEnvironmentMapPipeline_ = std::make_unique<MeshletEnvironmentMapModel>();
+	meshletEnvironmentMapPipeline_->Initialize(*skyPipeline_.get());
 	floorPipeline_ = std::make_unique<FloorRenderer>();
 	floorPipeline_->Initialize(CommandContext);
 	waveModelPipeline_ = std::make_unique<WaveModel>();
@@ -96,6 +99,11 @@ void DrawManager::AllDraw(PipelineType pipelineType,const ViewProjection& viewPr
 		call();
 	}
 
+	meshletEnvironmentMapPipeline_->PreDraw(pipelineType, *commandContext_, viewProjection, *calling_->currentViewProjection, tileBasedRendering);
+	for (auto& call : calls[kMeshletEnvironmentMap]) {
+		call();
+	}
+
 	particlePipeline_->PreDraw(pipelineType, *commandContext_, viewProjection, tileBasedRendering);
 	for (auto& call : calls[kParticle]) {
 		call();
@@ -111,6 +119,11 @@ void DrawManager::AllDraw(PipelineType pipelineType,const ViewProjection& viewPr
 		call();
 	}
 
+	//背景
+	skyPipeline_->PreDraw(*commandContext_, viewProjection);
+	for (auto& call : calls[kSky]) {
+		call();
+	}
 
 	//透明
 	floorPipeline_->PreDraw(pipelineType ,*commandContext_, viewProjection, *calling_->currentViewProjection, tileBasedRendering);
@@ -118,11 +131,6 @@ void DrawManager::AllDraw(PipelineType pipelineType,const ViewProjection& viewPr
 		call();
 	}
 
-	//背景
-	skyPipeline_->PreDraw(*commandContext_, viewProjection);
-	for (auto& call : calls[kSky]) {
-		call();
-	}
 }
 
 void DrawManager::PostSpriteDraw()
@@ -182,12 +190,31 @@ void DrawManager::DrawMeshletModel(const WorldTransform& worldTransform, const u
 	}
 }
 
+
+
 void DrawManager::DrawMeshletModel(const WorldTransform& worldTransform, const uint32_t modelHandle, SkinCluster& skinCluster, const uint32_t textureHandle, const Material& material)
 {
 	drawCallNum_++;
 	if (calling_->isDraw(modelHandle, worldTransform)) {
 		calls[kSkinning].push_back([&, modelHandle]() {skinningPipeline_->Dispatch(*commandContext_, modelHandle, skinCluster); });
 		calls[kMeshletModel].push_back([&, modelHandle, textureHandle]() {meshletModelPipeline_->Draw(*commandContext_, modelHandle, worldTransform, skinCluster, material, textureHandle); });
+	}
+}
+
+void DrawManager::DrawEnvironmentMapMeshletModel(const WorldTransform& worldTransform, const uint32_t modelHandle, const uint32_t textureHandle, const Material& material)
+{
+	drawCallNum_++;
+	if (calling_->isDraw(modelHandle, worldTransform)) {
+		calls[kMeshletEnvironmentMap].push_back([&, modelHandle, textureHandle]() {meshletEnvironmentMapPipeline_->Draw(*commandContext_, modelHandle, worldTransform, material); });
+	}
+}
+
+void DrawManager::DrawEnvironmentMapMeshletModel(const WorldTransform& worldTransform, const uint32_t modelHandle, SkinCluster& skinCluster, const uint32_t textureHandle, const Material& material)
+{
+	drawCallNum_++;
+	if (calling_->isDraw(modelHandle, worldTransform)) {
+		calls[kSkinning].push_back([&, modelHandle]() {skinningPipeline_->Dispatch(*commandContext_, modelHandle, skinCluster); });
+		calls[kMeshletEnvironmentMap].push_back([&, modelHandle, textureHandle]() {meshletEnvironmentMapPipeline_->Draw(*commandContext_, modelHandle, worldTransform, skinCluster, material); });
 	}
 }
 

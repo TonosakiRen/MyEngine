@@ -1,4 +1,4 @@
-
+#include "Common.hlsli"
 Texture2D<float> tex : register(t0);
 SamplerState smp : register(s0);
 

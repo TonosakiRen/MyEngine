@@ -4,13 +4,14 @@
 void PointLights::Initialize() {
     
     structureBuffer_.Create(L"pointLightBuffer", sizeof(ConstBufferData), lightNum);
+    lights_.resize(lightNum);
 }
 
 void PointLights::Update() {
     std::vector<ConstBufferData> bufferData;
     bufferData.reserve(lightNum);
 
-    assert(lights_.size() < lightNum);
+    assert(lights_.size() <= lightNum);
 
     for (int i = 0; i < lights_.size(); i++) {
         ConstBufferData data;

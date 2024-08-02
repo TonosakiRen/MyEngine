@@ -5,14 +5,11 @@
 #include "ModelManager.h"
 #include <string>
 
-SphereLights::SphereLights()
-{
-	particle_ = std::make_unique<ParticleModelData>(kSphereNum);
-}
 
 void SphereLights::Initialize()
 {
 	pointLights_ = LightManager::GetInstance()->pointLights_.get();
+	particle_ = std::make_unique<ParticleModelData>(kSphereNum);
 	particle_->Initialize();
 
 	spheres_.resize(kSphereNum);

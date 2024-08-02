@@ -21,10 +21,10 @@ public:
 	void PushBackData(const Data& data);
 	void Reset();
 
-	const DescriptorHandle& GetGPUHandle() const { return structuredBuffer_.GetSRV(); }
+	const DescriptorHandle& GetGPUHandle() const { return structuredBuffer_->GetSRV(); }
 	const uint32_t GetDataNum() const { return dataNum_; }
 private:
-	StructuredBuffer structuredBuffer_;
+	std::unique_ptr<StructuredBuffer> structuredBuffer_;
 	Data* data_ = nullptr;
 	uint32_t dataNum_ = 0;
 };

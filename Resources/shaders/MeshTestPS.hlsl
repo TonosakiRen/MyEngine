@@ -1,12 +1,6 @@
-
+#include "Common.hlsli"
 Texture2D<float4> tex : register(t0);
 SamplerState smp : register(s0);
-
-struct Material {
-	float32_t4 materialColor; //Materialの色
-	float32_t4x4 uvTransfrom;//uvtransform
-	int32_t enableLighting; //lighitngするか
-};
 ConstantBuffer<Material> gMaterial  : register(b2);
 
 struct MSOutput {

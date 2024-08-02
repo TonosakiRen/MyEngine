@@ -94,7 +94,7 @@ void GameObjectManager::Load()
 
 		}
 
-		// MESH
+		// LIGHT
 		if (type.compare("LIGHT") == 0) {
 
 			// トランスフォームのパラメータ読み込み
@@ -117,8 +117,13 @@ void GameObjectManager::Load()
 				pointLight.decay = 1.0f;
 				pointLight.intensity = 3.0f;
 				pointLight.radius = 3.0f;
-
-				LightManager::GetInstance()->pointLights_->lights_.push_back(pointLight);
+				PointLights& pointLights = *LightManager::GetInstance()->pointLights_;
+				for (int i = 0; i < PointLights::lightNum; i++) {
+					if (pointLights.lights_[i].isActive == false) {
+						pointLights.lights_[i] = pointLight;
+						break;
+					}
+				}
 			}
 		}
 	}

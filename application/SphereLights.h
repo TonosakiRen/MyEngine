@@ -8,7 +8,6 @@ class SphereLights
 {
 public:
 	static const uint32_t kSphereNum = 64 * 2;
-	SphereLights();
 	void Initialize();
 	void Update();
 	void Draw(Vector4 color = { 1.0f,1.0f,1.0f,1.0f });

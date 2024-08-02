@@ -1,35 +1,12 @@
-#define WaveRadius 6.0f
-
-struct WorldTransform {
-	float32_t4x4 world;
-	float32_t4x4 worldInverseTranspose;
-	float32_t scale;
-};
+#include "Common.hlsli"
 ConstantBuffer<WorldTransform> gWorldTransform  : register(b0);
-
-struct ViewProjection {
-	float32_t4x4 viewProjection;
-	float32_t4x4 inverseViewProjection;
-	float32_t4x4 worldMatrix;
-	float32_t4x4 billBordMatrix;
-	float32_t3 viewPosition;
-};
 ConstantBuffer<ViewProjection> gViewProjection  : register(b1);
-
-struct MeshletInfo {
-	uint32_t meshletNum;
-};
 ConstantBuffer<MeshletInfo> meshletInfo  : register(b3);
 
 struct Time {
 	uint32_t t;
 };
 ConstantBuffer<Time> time  : register(b5);
-
-struct WaveIndexData {
-	uint32_t waveDataNum;
-	uint32_t waveIndex[5];
-};
 ConstantBuffer<WaveIndexData> waveIndexData: register(b6);
 
 struct Vertex {
@@ -45,21 +22,10 @@ struct MSOutput {
 	float32_t3 worldPosition : POSITION0;
 	float32_t depth : TEXCOORD1;
 };
-struct Meshlet {
-	uint32_t vertCount;
-	uint32_t vertOffset;
-	uint32_t primCount;
-	uint32_t primOffset;
-};
 StructuredBuffer<Vertex> input : register(t1);
 StructuredBuffer<Meshlet> meshlets :register(t2);
 ByteAddressBuffer uniqueVertexIndices : register(t3);
 StructuredBuffer<uint32_t> primitiveIndices :register(t4);
-
-struct WaveData {
-	float32_t3 position;
-	float32_t t;
-};
 StructuredBuffer<WaveData> waveData :register(t6);
 
 struct MSOutput3 {
@@ -67,19 +33,7 @@ struct MSOutput3 {
 	MSOutput y;
 	MSOutput z;
 };
-
-float32_t3 MidPoint(float32_t3 point1,float32_t3 point2) {
-	return float32_t3((point1.x + point2.x) * 0.5f, (point1.y + point2.y) * 0.5f, (point1.z + point2.z) * 0.5f);
-}
-
-float32_t3 Multiply(float32_t4x4 m, float32_t3 vec) {
-	float32_t4 result;
-	result = mul(float32_t4(vec, 1.0f), m);
-	result.x = result.x * rcp(result.w);
-	result.y = result.y * rcp(result.w);
-	result.z = result.z * rcp(result.w);
-	return result.xyz;
-}
+ConstantBuffer<WaveParam> waveParam: register(b8);
 
 float32_t3 WaveVertex(float32_t3 worldPos) {
 
@@ -92,19 +46,13 @@ float32_t3 WaveVertex(float32_t3 worldPos) {
 
 		float32_t3 waveDirection = normalize(diff);
 
-		float32_t influenceRadius = data.t * 6.0f;// 半径6.0fで影響
+		float32_t influenceRadius = data.t * waveParam.radius;// 半径6.0fで影響
+
+		float32_t amplitudeT = distance * rcp( waveParam.radius);
 
 		//歪み球の中
 		if (distance < influenceRadius) {
-
-			//	ドンくらい往復するか
-			float32_t hz = 0.2f;
-			// 離れ具合の波のできかた
-			float32_t period = 2.0f;
-			//波の振幅
-			float32_t amplitude = 0.05f;
-
-			worldPos += waveDirection * sin(time.t * hz + distance * period) * amplitude;
+			worldPos += waveDirection * sin(time.t * waveParam.hz + distance * waveParam.period) * waveParam.amplitude;
 		}
 	}
 	return worldPos;
@@ -142,8 +90,10 @@ MSOutput GetVertexAttribute(uint32_t vertexIndex, uint32_t meshletIndex)
 	return vout;
 }
 
+
+
 // 頂点出力情報を取得
-MSOutput3 GetNewMeshletVertexAttribute(uint32_t vertexIndex1, uint32_t vertexIndex2, uint32_t vertexIndex3, uint32_t meshletIndex)
+MSOutput3 GetNewMeshletVertexAttribute(uint32_t vertexIndex1, uint32_t vertexIndex2, uint32_t vertexIndex3, uint32_t meshletIndex,uint32_t triangleIndex)
 {
 	Vertex v1 = input[vertexIndex1];
 	Vertex v2 = input[vertexIndex2];
@@ -157,15 +107,61 @@ MSOutput3 GetNewMeshletVertexAttribute(uint32_t vertexIndex1, uint32_t vertexInd
 	worldPos2 = Multiply(gWorldTransform.world, v2.pos);
 	worldPos3 = Multiply(gWorldTransform.world, v3.pos);
 
-	float32_t3 newWorldPos1 = MidPoint(worldPos1, worldPos2);
-	float32_t3 newWorldPos2 = MidPoint(worldPos2, worldPos3);
-	float32_t3 newWorldPos3 = MidPoint(worldPos3, worldPos1);
+	float32_t3 midPoint1 = MidPoint(worldPos1, worldPos2);
+	float32_t3 midPoint2 = MidPoint(worldPos2, worldPos3);
+	float32_t3 midPoint3 = MidPoint(worldPos3, worldPos1);
+
+	float32_t3 midNormal1 = normalize(v1.normal + v2.normal);
+	float32_t3 midNormal2 = normalize(v2.normal + v3.normal);
+	float32_t3 midNormal3 = normalize(v3.normal + v1.normal);
+
+	float32_t3 newWorldPos1;
+	float32_t3 newWorldPos2;
+	float32_t3 newWorldPos3;
+
+	MSOutput3 vout;
+
+	if(triangleIndex == 0){
+		newWorldPos1 = worldPos1;
+		newWorldPos2 = midPoint1;
+		newWorldPos3 = midPoint3;
+		// 法線にワールド行列を適用
+		vout.x.normal = mul(v1.normal, (float32_t3x3)gWorldTransform.worldInverseTranspose);
+		vout.y.normal = mul(midNormal1, (float32_t3x3)gWorldTransform.worldInverseTranspose);
+		vout.z.normal = mul(midNormal3, (float32_t3x3)gWorldTransform.worldInverseTranspose);
+
+	}else if(triangleIndex == 1){
+		newWorldPos1 = midPoint1;
+		newWorldPos2 = worldPos2;
+		newWorldPos3 = midPoint2;
+		// 法線にワールド行列を適用
+		vout.x.normal = mul(midNormal1, (float32_t3x3)gWorldTransform.worldInverseTranspose);
+		vout.y.normal = mul(v2.normal, (float32_t3x3)gWorldTransform.worldInverseTranspose);
+		vout.z.normal = mul(midNormal2, (float32_t3x3)gWorldTransform.worldInverseTranspose);
+
+	}else if(triangleIndex == 2){
+		newWorldPos1 = midPoint3;
+		newWorldPos2 = midPoint1;
+		newWorldPos3 = midPoint2;
+		// 法線にワールド行列を適用
+		vout.x.normal = mul(midNormal3, (float32_t3x3)gWorldTransform.worldInverseTranspose);
+		vout.y.normal = mul(midNormal1, (float32_t3x3)gWorldTransform.worldInverseTranspose);
+		vout.z.normal = mul(midNormal2, (float32_t3x3)gWorldTransform.worldInverseTranspose);
+
+	}else if(triangleIndex == 3){
+		newWorldPos1 = midPoint3;
+		newWorldPos2 = midPoint2;
+		newWorldPos3 = worldPos3;
+			// 法線にワールド行列を適用
+		vout.x.normal = mul(midNormal3, (float32_t3x3)gWorldTransform.worldInverseTranspose);
+		vout.y.normal = mul(midNormal2, (float32_t3x3)gWorldTransform.worldInverseTranspose);
+		vout.z.normal = mul(v3.normal, (float32_t3x3)gWorldTransform.worldInverseTranspose);
+
+	}
 
 	newWorldPos1 = WaveVertex(newWorldPos1);
 	newWorldPos2 = WaveVertex(newWorldPos2);
 	newWorldPos3 = WaveVertex(newWorldPos3);
-
-	MSOutput3 vout;
 
 	float32_t4 viewPosition1 = mul(float32_t4(newWorldPos1,1.0f), gViewProjection.viewProjection);
 	float32_t4 viewPosition2 = mul(float32_t4(newWorldPos2,1.0f), gViewProjection.viewProjection);
@@ -175,11 +171,6 @@ MSOutput3 GetNewMeshletVertexAttribute(uint32_t vertexIndex1, uint32_t vertexInd
 	vout.x.pos = viewPosition1;
 	vout.y.pos = viewPosition2;
 	vout.z.pos = viewPosition3;
-
-	// 法線にワールド行列を適用
-	vout.x.normal = mul(v1.normal, (float32_t3x3)gWorldTransform.worldInverseTranspose);
-	vout.y.normal = mul(v2.normal, (float32_t3x3)gWorldTransform.worldInverseTranspose);
-	vout.z.normal = mul(v3.normal, (float32_t3x3)gWorldTransform.worldInverseTranspose);
 
 	vout.x.worldPosition = newWorldPos1;
 	vout.y.worldPosition = newWorldPos2;
@@ -243,6 +234,7 @@ struct Payload {
 	uint32_t meshletIndices[32];
 	uint32_t hitWaveIndices[32];
 	uint32_t visibleCount;
+	//uint32_t hitCount;
 };
 
 [numthreads(128, 1, 1)]
@@ -261,9 +253,10 @@ void main(
 
 	if (gid >= payload.visibleCount) {
 		tmp -= payload.visibleCount;
+		meshletIndex = payload.hitWaveIndices[tmp / 4];
+	}else{
+		meshletIndex = payload.meshletIndices[tmp];
 	}
-
-	meshletIndex = payload.meshletIndices[tmp];
 
 	m = meshlets[meshletIndex];
 
@@ -294,7 +287,9 @@ void main(
 				uint32_t vertexIndex2 = GetVertexIndex(m, triangleIndex.y);
 				uint32_t vertexIndex3 = GetVertexIndex(m, triangleIndex.z);
 
-				MSOutput3 newVertex = GetNewMeshletVertexAttribute(vertexIndex1,vertexIndex2,vertexIndex3,meshletIndex);
+
+
+				MSOutput3 newVertex = GetNewMeshletVertexAttribute(vertexIndex1,vertexIndex2,vertexIndex3,meshletIndex,tmp % 4);
 
 				verts[triangleIndex.x] = newVertex.x;
 				verts[triangleIndex.y] = newVertex.y;
