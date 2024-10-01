@@ -1,3 +1,5 @@
+#define PI 3.14159265359
+
 struct Material {
 	float32_t4 materialColor;
 	float32_t4x4 uvTransfrom;
@@ -48,14 +50,13 @@ struct MeshletInfo {
 	uint32_t meshletNum;
 };
 
-struct WaveIndexData {
-	uint32_t waveDataNum;
-	uint32_t waveIndex[5];
-};
+
 struct WaveData {
 	float32_t3 position;
 	float32_t t;
 };
+
+
 struct WaveParam{
 	float32_t hz;
 	float32_t period;

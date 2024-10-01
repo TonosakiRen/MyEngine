@@ -43,7 +43,7 @@ void DeferredRenderer::Render(CommandContext& commandContext, ColorBuffer* origi
 	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kMaterialTexture), materialTexture_->GetSRV());
 	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kDepthTexture), depthTexture_->GetSRV());
 
-	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kDirectionalLights), lightManager->directionalLights_->srvHandle_);
+	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kDirectionalLights), lightManager->directionalLights_->structureBuffer_.GetSRV());
 	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kPointLights), lightManager->pointLights_->structureBuffer_.GetSRV());
 	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kAreaLights), lightManager->areaLights_->structureBuffer_.GetSRV());
 	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kSpotLights), lightManager->spotLights_->structureBuffer_.GetSRV());

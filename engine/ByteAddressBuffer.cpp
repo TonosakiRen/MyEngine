@@ -1,34 +1,32 @@
 #include "ByteAddressBuffer.h"
 #include <assert.h>
 #include "DirectXCommon.h"
+#include "BufferManager.h"
 
 void ByteAddressBuffer::Create(const std::wstring& name, size_t bufferSize , UINT numElements)
 {
 
     HRESULT result = S_FALSE;
-    auto device = DirectXCommon::GetInstance()->GetDevice();
 
     //インスタンシングデータのサイズ
     UINT sizeBAB = static_cast<UINT>(bufferSize * numElements);
 
     copyBuffer_.Create(name,sizeBAB,&cpuData_);
 
-    Destroy();
 
     auto desc = CD3DX12_RESOURCE_DESC::Buffer(UINT64(sizeBAB));
     desc.Flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
 
     auto heapProps = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
 
-    result = device->CreateCommittedResource(
+    resource_ = BufferManager::GetInstance()->CreateResource(
+        index_,
         &heapProps,
         D3D12_HEAP_FLAG_NONE,
         &desc,
-        D3D12_RESOURCE_STATE_COMMON,
-        nullptr,
-        IID_PPV_ARGS(resource_.GetAddressOf()));
+        D3D12_RESOURCE_STATE_COMMON);
 
-    assert(SUCCEEDED(result));
+ 
 
     state_ = D3D12_RESOURCE_STATE_COMMON;
     bufferSize_ = sizeBAB;
@@ -47,11 +45,6 @@ void ByteAddressBuffer::Create(const std::wstring& name, size_t bufferSize , UIN
     DirectXCommon::GetInstance()->GetDevice()->CreateShaderResourceView(resource_.Get(), &srvDesc, srvHandle_);
 }
 
-ByteAddressBuffer::~ByteAddressBuffer()
-{
-    Destroy();
-}
-
 void ByteAddressBuffer::Copy(const void* srcData, size_t copySize, CommandContext& commandContext) {
     assert(copySize <= bufferSize_);
     memcpy(cpuData_, srcData, copySize);
@@ -63,12 +56,9 @@ void ByteAddressBuffer::SetZero()
 {
     std::memset(cpuData_, 0, bufferSize_);
 
-} 
-void ByteAddressBuffer::Destroy() {
-    if (cpuData_ && resource_) {
-        resource_.Reset();
-        copyBuffer_.~UploadBuffer();
-        cpuData_ = nullptr;
-    }
+}
+void ByteAddressBuffer::DestroyCopyBuffer()
+{
+    BufferManager::GetInstance()->ReleaseResource(copyBuffer_.GetIndex());
 }
 

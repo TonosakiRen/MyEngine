@@ -11,7 +11,7 @@ Voronoi::Voronoi()
 {
 }
 
-void Voronoi::Initialize(uint32_t pointNum)
+void Voronoi::Initialize(uint32_t pointNum,CommandContext& commandContext)
 {
 
     InitializeGraphicsPipeline();
@@ -44,7 +44,9 @@ void Voronoi::Initialize(uint32_t pointNum)
 
     pointNum_ = pointNum;
 
-    point_.Copy(randomPoint.data(), sizeof(Point) * pointNum);
+    point_.Copy(randomPoint.data(), sizeof(Point) * pointNum,commandContext);
+    commandContext.TransitionResource(point_, D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
+    point_.DestroyCopyBuffer();
 }
 
 void Voronoi::Render(CommandContext& commandContext)

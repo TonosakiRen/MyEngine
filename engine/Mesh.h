@@ -2,7 +2,7 @@
 #include <string>
 #include "Mymath.h"
 #include "UploadBuffer.h"
-#include "StructuredBuffer.h"
+#include "DefaultStructuredBuffer.h"
 #include "ByteAddressBuffer.h"
 #include <vector>
 #include <memory>
@@ -40,17 +40,17 @@ public:
 	const DescriptorHandle& GetVerticesSRV() const { return vertexBuffer_.GetSRV(); }
 
 public:
-	StructuredBuffer vertexBuffer_;
+	DefaultStructuredBuffer vertexBuffer_;
 	std::vector<VertexData> vertices_;
 	D3D12_VERTEX_BUFFER_VIEW vbView_{};
 
-	StructuredBuffer indexBuffer_;
+	DefaultStructuredBuffer indexBuffer_;
 	D3D12_INDEX_BUFFER_VIEW ibView_{};
 	std::vector<uint32_t> indices_;
 
-	StructuredBuffer meshletBuffer_;
+	DefaultStructuredBuffer meshletBuffer_;
 	std::vector<DirectX::Meshlet> meshlets_;
-	UploadBuffer meshletInfo_;
+	DefaultBuffer meshletInfo_;
 
 	//Meshlets計算用
 	std::vector<DirectX::XMFLOAT3> positions_;
@@ -59,10 +59,10 @@ public:
 	std::vector<uint8_t> uniqueVertexIndex;
 
 
-	StructuredBuffer primitiveIndicesBuffer_;
+	DefaultStructuredBuffer primitiveIndicesBuffer_;
 	std::vector<DirectX::MeshletTriangle> primitiveIndices_;
 
-	StructuredBuffer cullDataBuffer_;
+	DefaultStructuredBuffer cullDataBuffer_;
 	std::vector<DirectX::CullData> cullData_;
 
 	std::string name_;

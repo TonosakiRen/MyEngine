@@ -1,11 +1,40 @@
 #include "StructuredBuffer.h"
+#include "BufferManager.h"
 #include "DirectXCommon.h"
+#include <assert.h>
 
 void StructuredBuffer::Create(const std::wstring& name, size_t bufferSize , UINT numElements)
 {
     // インスタンシングデータのサイズ
+
+
     UINT sizeINB = static_cast<UINT>(bufferSize * numElements);
-    UploadBuffer::Create(name, sizeINB);
+
+    HRESULT result = S_FALSE;
+
+
+    auto desc = CD3DX12_RESOURCE_DESC::Buffer(sizeINB * 2);
+    auto heapProps = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
+
+    resource_ = BufferManager::GetInstance()->CreateResource(
+        index_,
+        &heapProps,
+        D3D12_HEAP_FLAG_NONE,
+        &desc,
+        D3D12_RESOURCE_STATE_GENERIC_READ);
+
+#ifdef _DEBUG
+    resource_->SetName(name.c_str());
+    name_ = name;
+#endif // _DEBUG
+
+
+    state_ = D3D12_RESOURCE_STATE_GENERIC_READ;
+    bufferSize_ = sizeINB;
+
+    result = resource_->Map(0, nullptr, &cpuData_);
+    assert(SUCCEEDED(result));
+
 
     D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
     srvDesc.Format = DXGI_FORMAT_UNKNOWN;
@@ -16,6 +45,11 @@ void StructuredBuffer::Create(const std::wstring& name, size_t bufferSize , UINT
     srvDesc.Buffer.StructureByteStride = UINT(bufferSize);
 
 
-    srvHandle_ = DirectXCommon::GetInstance()->AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-    DirectXCommon::GetInstance()->GetDevice()->CreateShaderResourceView(resource_.Get(), &srvDesc, srvHandle_);
+    srvHandle_[0] = DirectXCommon::GetInstance()->AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+    DirectXCommon::GetInstance()->GetDevice()->CreateShaderResourceView(resource_.Get(), &srvDesc, srvHandle_[0]);
+
+    srvDesc.Buffer.FirstElement = numElements;
+
+    srvHandle_[1] = DirectXCommon::GetInstance()->AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+    DirectXCommon::GetInstance()->GetDevice()->CreateShaderResourceView(resource_.Get(), &srvDesc, srvHandle_[1]);
 }

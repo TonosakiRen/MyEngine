@@ -15,23 +15,43 @@ void WavePoints::Initialize()
 }
 
 void WavePoints::Update() {
-	ImGui::DragFloat3("wavePosition", &points[0].position_.x, 0.1f);
-	ImGui::DragFloat("waveT", &points[0].t_, 0.01f,0.1f,1.0f);
+	
+	for (size_t i = 0; i < kWavePointNum; i++)
+	{
+		if (points[i].t_ >= 0.0f) {
+			points[i].t_ -= 0.01f;
+		}
+		points[i].t_ = std::clamp(points[i].t_, 0.0f, 1.0f);
+	}
+
 	waveData_->Copy(points);
 }
 
 void WavePoints::Draw()
 {
 
-	for (size_t i = 0; i < kWavePointNum; i++)
+	//for (size_t i = 0; i < kWavePointNum; i++)
+	//{
+	//	if (points[i].t_ > 0.0f) {
+	//		ParticleModelData::Data data;
+	//		data.matWorld = MakeAffineMatrix({ 0.1f,0.1f,0.1f }, {0.0f,0.0f,0.0f,1.0f}, points[i].position_);
+	//		data.worldInverseTranspose = Inverse(data.matWorld);
+	//		particle_->PushBackData(data);
+	//	}
+	//}
+
+	//DrawManager::GetInstance()->DrawParticleModel(*particle_, ModelManager::GetInstance()->Load("sphere.obj"));
+}
+
+uint32_t WavePoints::EmitPoint(const Vector3& pos)
+{
+	for (uint32_t i = 0; i < kWavePointNum; i++)
 	{
-		if (points[i].t_ > 0.0f) {
-			ParticleModelData::Data data;
-			data.matWorld = MakeAffineMatrix({ 0.1f,0.1f,0.1f }, {0.0f,0.0f,0.0f,1.0f}, points[i].position_);
-			data.worldInverseTranspose = Inverse(data.matWorld);
-			particle_->PushBackData(data);
+		if (points[i].t_ <= 0.0f) {
+			points[i].t_ = 1.0f;
+			points[i].position_ = pos;
+			return i;
 		}
 	}
-
-	DrawManager::GetInstance()->DrawParticleModel(*particle_, ModelManager::GetInstance()->Load("sphere.obj"));
+	return 0;
 }

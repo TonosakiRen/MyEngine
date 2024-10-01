@@ -14,12 +14,12 @@ void GamePlayScene::Initialize()
 	skydome_->Update();
 
 	floor_ = std::make_unique<Floor>();
-	floor_->Initialize("floor.obj");
+	floor_->Initialize("floor.obj",GameScene::wavePoints);
 
 	sphere_ = std::make_unique<GameObject>();
-	sphere_->Initialize("box1x1x4.obj");
+	sphere_->Initialize("sphere.obj");
 	sphere_->SetPosition({ 0.0f,0.0f,0.0f });
-	sphere_->SetScale({ 10.0f,10.0f,10.0f });
+	sphere_->SetScale({ 1.0f,1.0f,1.0f });
 	sphere_->UpdateMatrix();
 
 	boxArea_ = std::make_unique<BoxArea>();
@@ -29,7 +29,7 @@ void GamePlayScene::Initialize()
 	skybox_->Initialize("box1x1Inverse.obj");
 
 	explodeParticle_ = std::make_unique<ExplodeParticle>();
-	explodeParticle_->Initialize(Vector3{ -1.0f,-1.0f,-1.0f }, Vector3{ 1.0f,1.0f,1.0f });
+	explodeParticle_->Initialize(floor_.get(), GameScene::wavePoints);
 
 	whiteParticle_ = std::make_unique<WhiteParticle>();
 	whiteParticle_->SetIsEmit(true);
@@ -37,8 +37,8 @@ void GamePlayScene::Initialize()
 
 	enemyBulletManager_ = std::make_unique<EnemyBulletManager>();
 	playerBulletManager_ = std::make_unique<PlayerBulletManager>();
-	enemyBulletManager_->Initialize();
-	playerBulletManager_->Initialize();
+	enemyBulletManager_->Initialize(explodeParticle_.get());
+	playerBulletManager_->Initialize(explodeParticle_.get());
 
 	player_ = std::make_unique<Player>();
 	player_->Initialize("walk.gltf", playerBulletManager_.get());
@@ -53,6 +53,14 @@ void GamePlayScene::Initialize()
 	for (auto& gameObject : *gameObjects_) {
 		gameObject->Initialize();
 	}
+
+	trees_ = std::make_unique<Trees>();
+	trees_->Initialize();
+
+	lineAttack_ = std::make_unique<LineAttack>();
+	lineAttack_->Initialize();
+
+	input_ = Input::GetInstance();
 }
 
 void GamePlayScene::Finalize()
@@ -65,7 +73,17 @@ void GamePlayScene::Update()
 
 	skybox_->Update();
 
+	trees_->Update();
+
 	player_->Update(*GameScene::currentViewProjection);
+
+	floor_->Update();
+
+	if (!lineAttack_->GetIsEmit()) {
+		lineAttack_->Emit();
+	}
+
+	lineAttack_->Update();
 
 	//敵更新
 	
@@ -98,7 +116,7 @@ void GamePlayScene::Update()
 	const int spawnInterval = 300;
 	if (enemySpawnFrame_ <= 0) {
 		enemySpawnFrame_ = spawnInterval;
-		//EnemySpawn({ 0.0f,3.0f,0.0f });
+		EnemySpawn({ 0.0f,3.0f,0.0f });
 	}
 	enemySpawnFrame_--;
 
@@ -120,7 +138,10 @@ void GamePlayScene::Update()
 void GamePlayScene::Draw()
 {
 	player_->Draw();
-	//sphere_->WaveDraw();
+	lineAttack_->Draw();
+	//sphere_->Draw();
+	explodeParticle_->Draw();
+	trees_->Draw();
 	
 	//敵描画
 	
@@ -138,7 +159,7 @@ void GamePlayScene::Draw()
 	floor_->Draw();
 
 	for (auto& gameObject : *gameObjects_) {
-		gameObject->WaveDraw();
+		//gameObject->Draw();
 	}
 }
 
@@ -173,7 +194,11 @@ void GamePlayScene::EnemySpawn(const Vector3& position)
 	// 敵を生成、初期化
 	std::unique_ptr<Enemy> newEnemy = std::make_unique<Enemy>();
 	// 敵キャラに自キャラのアドレスを渡す
-	newEnemy->Initialize(modelHandle, position, enemyBulletManager_.get(), player_.get(), { 0.0f,0.0f, -1.0f });
+	float direction = 1.0f;
+	if (Rand()) {
+		direction *= -1.0f;
+	}
+	newEnemy->Initialize(modelHandle, position, enemyBulletManager_.get(), player_.get(), { direction,0.0f, 0.0f });
 	// 敵を登録する
 	enemies_.push_back(std::move(newEnemy));
 }

@@ -49,8 +49,9 @@ void TileBasedRendering::ComputeUpdate(CommandContext& commandContext, const Vie
             int height = i / kTileWidthNum;
             int width = i % kTileWidthNum;
             initialTileFrustrum_[i] = GetTileFrustrum(width, height);
-            initialTileFrustrumBuffer_.Copy(initialTileFrustrum_);
         }
+        initialTileFrustrumBuffer_.Copy(initialTileFrustrum_, commandContext);
+        commandContext.TransitionResource(initialTileFrustrumBuffer_, D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
     }
     
 
@@ -69,7 +70,7 @@ void TileBasedRendering::ComputeUpdate(CommandContext& commandContext, const Vie
     commandContext.SetComputeDescriptorTable(UINT(RootParameter::kPointLightIndex), rwPointLightIndex_.GetUAV());
     commandContext.SetComputeDescriptorTable(UINT(RootParameter::kSpotLightIndex), rwSpotLightIndex_.GetUAV());
     commandContext.SetComputeDescriptorTable(UINT(RootParameter::kShadowSpotLightIndex), rwShadowSpotLightIndex_.GetUAV());
-    commandContext.SetComputeDescriptorTable(UINT(RootParameter::kInitialTileFrustum), initialTileFrustrumBuffer_.GetSRV(commandContext));
+    commandContext.SetComputeDescriptorTable(UINT(RootParameter::kInitialTileFrustum), initialTileFrustrumBuffer_.GetSRV());
     commandContext.SetComputeDescriptorTable(UINT(RootParameter::kPointLights), lightManager->pointLights_->structureBuffer_.GetSRV());
     commandContext.SetComputeDescriptorTable(UINT(RootParameter::kSpotLights), lightManager->spotLights_->structureBuffer_.GetSRV());
     commandContext.SetComputeDescriptorTable(UINT(RootParameter::kShadowSpotLights), lightManager->shadowSpotLights_->structureBuffer_.GetSRV());

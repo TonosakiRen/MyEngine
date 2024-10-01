@@ -2,6 +2,7 @@
 struct ParticleData {
 	float32_t4x4 world;
 	float32_t4x4 worldInverseTranspose;
+	float32_t4 color;
 };
 StructuredBuffer<ParticleData> gParticleData  : register(t1);
 ConstantBuffer<ViewProjection> gViewProjection  : register(b0);
@@ -19,6 +20,7 @@ struct VSOutput {
 	float32_t2 uv : TEXCOORD;
 	float32_t3 worldPosition : POSITION0;
 	float32_t depth : TEXCOORD1;
+	uint32_t instanceId : TEXCOORD2;
 };
 
 VSOutput main(VSInput input) {
@@ -32,6 +34,7 @@ VSOutput main(VSInput input) {
 	output.uv = input.uv;
 	output.worldPosition = worldPosition.xyz;
 	output.depth = viewPosition.z / viewPosition.w;
+	output.instanceId = input.instanceId;
 
 
 	return output;

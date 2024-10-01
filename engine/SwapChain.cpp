@@ -4,6 +4,7 @@
 #include <assert.h>
 
 #include "DirectXCommon.h"
+#include "BufferManager.h"
 
 using namespace Microsoft::WRL;
 
@@ -42,15 +43,20 @@ void SwapChain::Create(HWND hWnd) {
         reinterpret_cast<IDXGISwapChain1**>(swapChain_.ReleaseAndGetAddressOf()))));
 
     for (uint32_t i = 0; i < kNumBuffers; ++i) {
-        ComPtr<ID3D12Resource> resource;
-        Helper::AssertIfFailed(swapChain_->GetBuffer(i, IID_PPV_ARGS(resource.GetAddressOf())));
+        Microsoft::WRL::ComPtr<ID3D12Resource> resource = nullptr;
+        Helper::AssertIfFailed(swapChain_->GetBuffer(i, IID_PPV_ARGS(&resource)));
+        uint32_t index = BufferManager::GetInstance()->AllocateResource(resource);
         buffers_[i] = std::make_unique<ColorBuffer>();
-        buffers_[i]->CreateFromSwapChain(L"swapChainBuffer", resource.Detach());
+        buffers_[i]->CreateFromSwapChain(L"swapChainBuffer", resource.Get(), index);
     }
+}
+
+void SwapChain::SwapBackBuffer()
+{
+    currentBufferIndex_ = (currentBufferIndex_ + 1) % kNumBuffers;
 }
 
 void SwapChain::Present() {
     static constexpr int32_t kThreasholdRefreshRate = 58;
     swapChain_->Present(refreshRate_ < kThreasholdRefreshRate ? 0 : 1, 0);
-    currentBufferIndex_ = (currentBufferIndex_ + 1) % kNumBuffers;
 }

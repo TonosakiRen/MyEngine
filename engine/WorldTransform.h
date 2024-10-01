@@ -73,8 +73,8 @@ public:
 	Vector3 scale_ = { 1.0f,1.0f,1.0f };
 	Quaternion quaternion_ = IdentityQuaternion();
 	Vector3 translation_ = { 0.0f,0.0f,0.0f };
-	Matrix4x4 matWorld_;
-	Matrix4x4 worldInverseTranspose_;
+	Matrix4x4 matWorld_{};
+	Matrix4x4 worldInverseTranspose_{};
 
 	float maxScale_ = 1.0f;
 private:

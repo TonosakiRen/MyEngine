@@ -8,13 +8,16 @@
 class GPUResource {
     friend class DirectXCommon;
     friend class CommandContext;
+    friend class ReleaseManager;
 public:
+    ~GPUResource();
+
     operator ID3D12Resource* () const { return resource_.Get(); }
 
     ID3D12Resource* operator->() { return resource_.Get(); }
-    const ID3D12Resource* operator->() const { resource_.Get(); }
+    const ID3D12Resource* operator->() const { resource_; }
 
-    ID3D12Resource** GetAddressOf() { return resource_.GetAddressOf(); }
+    ID3D12Resource** GetAddressOf() { return &resource_; }
 
     D3D12_GPU_VIRTUAL_ADDRESS GetGPUVirtualAddress() const { return resource_->GetGPUVirtualAddress(); }
 
@@ -26,9 +29,30 @@ public:
         D3D12_RESOURCE_STATES initState = D3D12_RESOURCE_STATE_COMMON,
         const D3D12_CLEAR_VALUE* optimizedClearValue = nullptr);
 
+    void SetName(const std::wstring& name) {
+        #ifdef _DEBUG
+        resource_->SetName(name.c_str());
+        name_ = name;
+        #endif // _DEBUG
+    }
+    void SetState(const D3D12_RESOURCE_STATES state) {
+        state_ = state;
+    }
+
+    HRESULT Map(void* cpuData) {
+        return(resource_->Map(0, nullptr, &cpuData));
+    }
+
+    uint32_t GetIndex() {
+        return index_;
+    }
+
+  
+
 protected:
-    Microsoft::WRL::ComPtr<ID3D12Resource> resource_;
+    Microsoft::WRL::ComPtr<ID3D12Resource> resource_ = nullptr;
     D3D12_RESOURCE_STATES state_ = D3D12_RESOURCE_STATE_COMMON;
+    uint32_t index_;
 
 #ifdef _DEBUG
     std::wstring name_;

@@ -8,7 +8,7 @@
 #include "GPUResource.h"
 #include "DescriptorHandle.h"
 #include <memory>
-#include "UploadBuffer.h"
+#include "CopyBuffer.h"
 
 class TextureManager
 {
@@ -17,7 +17,7 @@ public:
 
 	struct Texture {
 		GPUResource resource;
-		UploadBuffer intermediateResource;
+		CopyBuffer intermediateResource;
 		DescriptorHandle srvHandle;
 		std::string name;
 	};

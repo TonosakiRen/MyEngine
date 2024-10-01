@@ -46,7 +46,7 @@ public:
 
 	UploadBuffer vertexBuffer_;
 	UploadBuffer constBuffer_;
-	D3D12_VERTEX_BUFFER_VIEW vbView_{};
+	D3D12_VERTEX_BUFFER_VIEW vbView_[2];
 	UINT textureHandle_ = 0;
 	Matrix4x4 matWorld_{};
 	D3D12_RESOURCE_DESC resourceDesc_;

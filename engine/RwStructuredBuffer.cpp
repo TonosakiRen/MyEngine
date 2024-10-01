@@ -4,10 +4,6 @@
 #include "DirectXCommon.h"
 #include "CommandContext.h"
 
-RwStructuredBuffer::~RwStructuredBuffer() {
-    Destroy();
-}
-
 void RwStructuredBuffer::Create(const std::wstring& name, size_t bufferSize, UINT numElements) {
     // インスタンシングデータのサイズ
     UINT sizeINB = static_cast<UINT>(bufferSize * numElements);
@@ -26,8 +22,4 @@ void RwStructuredBuffer::Create(const std::wstring& name, size_t bufferSize, UIN
     DirectXCommon::GetInstance()->GetDevice()->CreateUnorderedAccessView(resource_.Get(), nullptr, &uavDesc, uavHandle_);
 }
 
-void RwStructuredBuffer::Destroy() {
-    if (resource_) {
-        resource_.Reset();
-    }
-}
+

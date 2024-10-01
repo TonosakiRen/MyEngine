@@ -6,10 +6,12 @@
 #include "Wire.h"
 #include "DrawManager.h"
 #include "GameScene.h"
+#include "Floor.h"
 
 void Player::Initialize(const std::string name, PlayerBulletManager* playerBulletManager)
 {
 	GameObject::Initialize(name);
+	material_.Update();
 	playerBulletManager_ = playerBulletManager;
 	input_ = Input::GetInstance();
 	modelSize_ = modelManager->GetModelSize(modelHandle_);
@@ -59,8 +61,7 @@ void Player::Initialize(const std::string name, PlayerBulletManager* playerBulle
 	fireParticle_->emitterWorldTransform_.SetParent(&rightHandWorldTransform_);
 	fireParticle_->emitterWorldTransform_.scale_ = { 0.5f,0.5f,0.5f };
 	fireParticle_->material_.color_ = {1.0f,0.0f,0.0f,1.0f};
-
-	waveIndexData_.Initialize();
+	fireParticle_->material_.Update();
 }
 
 void Player::Update(const ViewProjection& viewProjection)
@@ -87,6 +88,8 @@ void Player::Update(const ViewProjection& viewProjection)
 	fireParticle_->Update();
 
 	//collider_.AdjustmentScale();
+	skeleton_.Update();
+	skinCluster_.Update();
 	worldTransform_.Update();
 	modelWorldTransform_.Update();
 	worldTransform3DReticle_.Update();
@@ -122,9 +125,6 @@ void Player::Draw() {
 		DrawManager::GetInstance()->DrawPostSprite(sprite2DReticle_);
 	}
 
-	auto& index = *waveIndexData_.GetData();
-	index.waveIndex[0] = 0;
-	index.waveDataNum = 1;
 	DrawManager::GetInstance()->DrawEnvironmentMapMeshletModel(worldTransform_, modelHandle_, skinCluster_);
 	//Wire::Draw(skeleton_, worldTransform_);
 	leftHandWorldTransform_.Update(skeleton_.GetJoint("mixamorig:LeftHand").skeletonSpaceMatrix);
@@ -165,9 +165,6 @@ void Player::Animate()
 		animationTime_ = std::fmod(animationTime_, animation_.duration);
 	}*/
 	AnimationManager::ApplyAnimation(skeleton_, animation_, animationTime_);
-	skeleton_.Update();
-
-	skinCluster_.Update();
 	
 	/*NodeAnimation& rootNodeAnimation = animation_.nodeAnimations[ModelManager::GetInstance()->GetRootNode(rightHand_.GetModelHandle()).name];
 	rightHand_.GetWorldTransform()->translation_ = CalculateValue(rootNodeAnimation.translate.keyframes, animationTime_);
@@ -237,9 +234,9 @@ void Player::Move(const ViewProjection& viewProjection)
 	//worldTransform_.translation_.y = 3.0f + (std::sin(time) * 0.3f);
 	
 	worldTransform_.translation_ += move;
-	worldTransform_.translation_.x = clamp(worldTransform_.translation_.x , -25.0f + modelSize_.x / 2.0f , 25.0f - modelSize_.x / 2.0f);
+	worldTransform_.translation_.x = clamp(worldTransform_.translation_.x , -Floor::kFloorHalfSize + modelSize_.x / 2.0f , Floor::kFloorHalfSize - modelSize_.x / 2.0f);
 	worldTransform_.translation_.y = clamp(worldTransform_.translation_.y, 0.0f, FLT_MAX);
-	worldTransform_.translation_.z = clamp(worldTransform_.translation_.z, -25.0f + modelSize_.z / 2.0f, 25.0f - modelSize_.z / 2.0f);
+	worldTransform_.translation_.z = clamp(worldTransform_.translation_.z, -Floor::kFloorHalfSize + modelSize_.z / 2.0f, Floor::kFloorHalfSize - modelSize_.z / 2.0f);
 }
 
 void Player::ReticleUpdate(const ViewProjection& viewProjection)

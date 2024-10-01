@@ -133,7 +133,9 @@ void ModelManager::CreateMeshes(ModelData& modelData)
 
 		mesh.vertexBuffer_.Create(L"vertexBuffer",sizeof(Mesh::VertexData), UINT(mesh.vertices_.size()));
 
-		mesh.vertexBuffer_.Copy(mesh.vertices_.data(), sizeVB);
+		mesh.vertexBuffer_.Copy(mesh.vertices_.data(), sizeVB, *commandContext_);
+
+		mesh.vertexBuffer_.DestroyCopyBuffer();
 
 		// 頂点バッファビューの作成
 		mesh.vbView_.BufferLocation = mesh.vertexBuffer_->GetGPUVirtualAddress();
@@ -146,7 +148,9 @@ void ModelManager::CreateMeshes(ModelData& modelData)
 
 		mesh.indexBuffer_.Create(L"indexBuffer", sizeof(uint32_t), UINT(mesh.indices_.size()));
 
-		mesh.indexBuffer_.Copy(mesh.indices_.data(), sizeIB);
+		mesh.indexBuffer_.Copy(mesh.indices_.data(), sizeIB, *commandContext_);
+
+		mesh.indexBuffer_.DestroyCopyBuffer();
 
 		// インデックスバッファビューの作成
 		mesh.ibView_.BufferLocation = mesh.indexBuffer_->GetGPUVirtualAddress();
@@ -163,17 +167,21 @@ void ModelManager::CreateMeshes(ModelData& modelData)
 			mesh.uniqueVertexIndex,
 			mesh.primitiveIndices_));
 
-		mesh.meshletBuffer_.Create(L"meshletBUffer", sizeof(DirectX::Meshlet), UINT(mesh.meshlets_.size()));
-		mesh.meshletBuffer_.Copy(mesh.meshlets_.data(), sizeof(DirectX::Meshlet) * mesh.meshlets_.size());
+		mesh.meshletBuffer_.Create(L"meshletBuffer", sizeof(DirectX::Meshlet), UINT(mesh.meshlets_.size()));
+		mesh.meshletBuffer_.Copy(mesh.meshlets_.data(), sizeof(DirectX::Meshlet) * mesh.meshlets_.size(),*commandContext_);
+		mesh.meshletBuffer_.DestroyCopyBuffer();
 
 		mesh.uniqueVertexIndexBuffer_.Create(L"uniqueVertexIndexBuffer", sizeof(uint8_t), UINT(mesh.uniqueVertexIndex.size()));
 		mesh.uniqueVertexIndexBuffer_.Copy(mesh.uniqueVertexIndex.data(), sizeof(uint8_t)* mesh.uniqueVertexIndex.size(), *commandContext_);
+		mesh.uniqueVertexIndexBuffer_.DestroyCopyBuffer();
 
 		mesh.primitiveIndicesBuffer_.Create(L"primitiveIndicesBuffer", sizeof(DirectX::MeshletTriangle), UINT(mesh.primitiveIndices_.size()));
-		mesh.primitiveIndicesBuffer_.Copy(mesh.primitiveIndices_.data(), sizeof(DirectX::MeshletTriangle)* mesh.primitiveIndices_.size());
+		mesh.primitiveIndicesBuffer_.Copy(mesh.primitiveIndices_.data(), sizeof(DirectX::MeshletTriangle)* mesh.primitiveIndices_.size(), *commandContext_);
+		mesh.primitiveIndicesBuffer_.DestroyCopyBuffer();
 
 		mesh.meshletInfo_.Create(L"meshletInfoBuffer", sizeof(uint32_t));
-		mesh.meshletInfo_.Copy(uint32_t(mesh.meshlets_.size()));
+		mesh.meshletInfo_.Copy(uint32_t(mesh.meshlets_.size()),*commandContext_);
+		mesh.meshletInfo_.DestroyCopyBuffer();
 
 		//meshletカリング作成
 		mesh.cullData_.resize(mesh.meshlets_.size());
@@ -189,7 +197,8 @@ void ModelManager::CreateMeshes(ModelData& modelData)
 		}
 
 		mesh.cullDataBuffer_.Create(L"cullDataBuffer", sizeof(DirectX::CullData), UINT(mesh.cullData_.size()));
-		mesh.cullDataBuffer_.Copy(mesh.cullData_.data(), sizeof(DirectX::CullData) * mesh.cullData_.size());
+		mesh.cullDataBuffer_.Copy(mesh.cullData_.data(), sizeof(DirectX::CullData) * mesh.cullData_.size(), *commandContext_);
+		mesh.cullDataBuffer_.DestroyCopyBuffer();
 	}
 
 	//node
@@ -220,9 +229,12 @@ void ModelManager::DrawInstanced(CommandContext& commandContext, const  uint32_t
 {
 	assert(modelHandle < kNumModels);
 
-	const auto& modelItem = (*models_)[modelHandle];
+	auto& modelItem = (*models_)[modelHandle];
 
-	for (const auto& mesh : modelItem.meshes) {
+	for (auto& mesh : modelItem.meshes) {
+
+		commandContext_->TransitionResource(mesh.vertexBuffer_, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+		commandContext_->TransitionResource(mesh.indexBuffer_, D3D12_RESOURCE_STATE_INDEX_BUFFER);
 
 		// 頂点バッファの設定
 		commandContext.SetVertexBuffer(0, 1, mesh.GetVbView());
@@ -237,9 +249,9 @@ void ModelManager::DrawInstanced(CommandContext& commandContext, const  uint32_t
 void ModelManager::DrawInstanced(CommandContext& commandContext, const  uint32_t modelHandle,const UINT textureRootParamterIndex , const uint32_t textureHandle) {
 	assert(modelHandle < kNumModels);
 
-	const auto& modelItem = (*models_)[modelHandle];
+	auto& modelItem = (*models_)[modelHandle];
 
-	for (const auto& mesh : modelItem.meshes) {
+	for (auto& mesh : modelItem.meshes) {
 		// srvセット
 		if (mesh.GetUv() != 0) {
 			TextureManager::GetInstance()->SetDescriptorTable(commandContext, textureRootParamterIndex, mesh.GetUv());
@@ -247,6 +259,8 @@ void ModelManager::DrawInstanced(CommandContext& commandContext, const  uint32_t
 		else {
 			TextureManager::GetInstance()->SetDescriptorTable(commandContext, textureRootParamterIndex, textureHandle);
 		}
+		commandContext_->TransitionResource(mesh.vertexBuffer_, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+		commandContext_->TransitionResource(mesh.indexBuffer_, D3D12_RESOURCE_STATE_INDEX_BUFFER);
 		// 頂点バッファの設定
 		commandContext.SetVertexBuffer(0, 1, mesh.GetVbView());
 		// インデックスバッファの設定
@@ -259,9 +273,11 @@ void ModelManager::DrawInstanced(CommandContext& commandContext, const  uint32_t
 void ModelManager::DrawInstanced(CommandContext& commandContext, const  uint32_t modelHandle, UINT textureRootParamterIndex, DescriptorHandle descriptorHandle) {
 	assert(modelHandle < kNumModels);
 
-	const auto& modelItem = (*models_)[modelHandle];
+	auto& modelItem = (*models_)[modelHandle];
 
-	for (const auto& mesh : modelItem.meshes) {
+	for (auto& mesh : modelItem.meshes) {
+		commandContext_->TransitionResource(mesh.vertexBuffer_, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+		commandContext_->TransitionResource(mesh.indexBuffer_, D3D12_RESOURCE_STATE_INDEX_BUFFER);
 		// srvセット
 		commandContext.SetDescriptorTable(textureRootParamterIndex, descriptorHandle);
 		// 頂点バッファの設定
@@ -319,7 +335,7 @@ Node& ModelManager::GetRootNode(const uint32_t modelHandle)
 	return  (*models_)[modelHandle].rootNode;
 }
 
-const ModelData& ModelManager::GetModelData(const uint32_t modelHandle)
+ModelData& ModelManager::GetModelData(const uint32_t modelHandle)
 {
 	return  (*models_)[modelHandle];
 }
@@ -333,12 +349,15 @@ const std::vector<CullData>& ModelManager::GetCullDataData(const uint32_t modelH
 void ModelManager::DrawInstancing(CommandContext& commandContext, const uint32_t modelHandle, UINT instancingNum, UINT textureRootParamterIndex) {
 	assert(modelHandle < kNumModels);
 
-	const auto& modelItem = (*models_)[modelHandle];
+	auto& modelItem = (*models_)[modelHandle];
 	
 
-	for (const auto& mesh : modelItem.meshes) {
+	for (auto& mesh : modelItem.meshes) {
+		commandContext_->TransitionResource(mesh.vertexBuffer_, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+		commandContext_->TransitionResource(mesh.indexBuffer_, D3D12_RESOURCE_STATE_INDEX_BUFFER);
 		// srvセット
 		TextureManager::GetInstance()->SetDescriptorTable(commandContext, textureRootParamterIndex, mesh.GetUv());
+
 		// 頂点バッファの設定
 		commandContext.SetVertexBuffer(0, 1, mesh.GetVbView());
 		// インデックスバッファの設定
@@ -352,9 +371,11 @@ void ModelManager::DrawInstanced(CommandContext& commandContext, const uint32_t 
 {
 	assert(modelHandle < kNumModels);
 
-	const auto& modelItem = (*models_)[modelHandle];
+	auto& modelItem = (*models_)[modelHandle];
 
-	for (const auto& mesh : modelItem.meshes) {
+	for (auto& mesh : modelItem.meshes) {
+		commandContext_->TransitionResource(mesh.vertexBuffer_, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+		commandContext_->TransitionResource(mesh.indexBuffer_, D3D12_RESOURCE_STATE_INDEX_BUFFER);
 		// srvセット
 		if (mesh.GetUv() != 0) {
 			TextureManager::GetInstance()->SetDescriptorTable(commandContext, textureRootParamterIndex, mesh.GetUv());

@@ -8,8 +8,6 @@
 class WaveData
 {
 public:
-
-	static const uint32_t time = 600;
 	const uint32_t kWaveNum;
 
 	struct Data {
@@ -26,9 +24,9 @@ public:
 
 	const DescriptorHandle& GetGPUHandle() const { return structuredBuffer_.GetSRV(); }
 	
-	void Copy(const void* srcData, size_t copySize)const { structuredBuffer_.Copy(srcData, copySize); }
+	void Copy(const void* srcData, size_t copySize) { structuredBuffer_.Copy(srcData, copySize); }
 	template<class T>
-	void Copy(const T& srcData) const { structuredBuffer_.Copy(&srcData, sizeof(srcData)); }
+	void Copy(const T& srcData) { structuredBuffer_.Copy(&srcData, sizeof(srcData)); }
 
 private:
 	StructuredBuffer structuredBuffer_;

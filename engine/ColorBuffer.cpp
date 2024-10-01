@@ -1,9 +1,12 @@
 #include "ColorBuffer.h"
 
 #include "DirectXCommon.h"
+#include "BufferManager.h"
 
-void ColorBuffer::CreateFromSwapChain(const std::wstring& name, ID3D12Resource* resource) {
+void ColorBuffer::CreateFromSwapChain(const std::wstring& name, ID3D12Resource* resource,uint32_t index) {
     AssociateWithResource(name,resource, D3D12_RESOURCE_STATE_PRESENT);
+
+    index_ = index;
 
     auto graphics = DirectXCommon::GetInstance();
     if (rtvHandle_.IsNull()) {
@@ -16,6 +19,7 @@ void ColorBuffer::CreateFromSwapChain(const std::wstring& name, ID3D12Resource* 
     rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;//2DTextureとして書き込む
 
     graphics->GetDevice()->CreateRenderTargetView(resource_.Get(), &rtvDesc, rtvHandle_);
+   
 }
 
 void ColorBuffer::Create(const std::wstring& name, uint32_t width, uint32_t height, DXGI_FORMAT format) {

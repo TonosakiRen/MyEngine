@@ -27,6 +27,6 @@ private:
 	//速度
 	float speed_ = 0.06f;
 	// デスフラグ
-	bool isDead_ = false;
+	bool isDead_ = true;
 };
 

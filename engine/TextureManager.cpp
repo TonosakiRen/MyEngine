@@ -3,6 +3,7 @@
 #include <cassert>
 #include "DirectXCommon.h"
 #include "UploadBuffer.h"
+#include "BufferManager.h"
 using namespace DirectX;
 
 uint32_t TextureManager::Load(const std::string& fileName) {
@@ -155,7 +156,7 @@ uint32_t TextureManager::LoadInternal(const std::string& fileName) {
 	UpdateSubresources(*commandContext_, texture.resource, texture.intermediateResource, 0, 0, UINT(subresources.size()), subresources.data());
 	commandContext_->TransitionResource(texture.resource, D3D12_RESOURCE_STATE_GENERIC_READ);
 
-	commandContext_->ReleaseResource(texture.intermediateResource);
+	BufferManager::GetInstance()->ReleaseResource(texture.intermediateResource.GetIndex());
 		
 	// シェーダリソースビュー作成
 	texture.srvHandle = DirectXCommon::GetInstance()->AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
@@ -283,7 +284,7 @@ uint32_t TextureManager::LoadUvInternal(const std::string& fileName, const std::
 	UpdateSubresources(*commandContext_, texture.resource, texture.intermediateResource, 0, 0, UINT(subresources.size()), subresources.data());
 	commandContext_->TransitionResource(texture.resource, D3D12_RESOURCE_STATE_GENERIC_READ);
 
-	commandContext_->ReleaseResource(texture.intermediateResource);
+	BufferManager::GetInstance()->ReleaseResource(texture.intermediateResource.GetIndex());
 
 	// シェーダリソースビュー作成
 	texture.srvHandle = DirectXCommon::GetInstance()->AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);

@@ -8,6 +8,7 @@
 #include "Renderer.h"
 #include "GameObjectManager.h"
 #include "LightManager.h"
+#include "BufferManager.h"
 
 
 void MyGame::Initialize()
@@ -15,6 +16,8 @@ void MyGame::Initialize()
 
 	renderer = Renderer::GetInstance();
 	renderer->Initialize();
+
+	bufferManager = BufferManager::GetInstance();
 
 	// テクスチャマネージャの初期化
 	textureManager = TextureManager::GetInstance();
@@ -47,6 +50,7 @@ void MyGame::Finalize()
 	lightManager_->Finalize();
 	gameObjectManager->Finalize();
 	renderer->Shutdown();
+	bufferManager->Finalize();
 
 	delete gameScene;
 

@@ -1,8 +1,9 @@
 #include "PlayerBulletManager.h"
 #include "ModelManager.h"
 
-void PlayerBulletManager::Initialize()
+void PlayerBulletManager::Initialize(ExplodeParticle* explodeParticle)
 {
+	explodeParticle_ = explodeParticle;
 	playerBullets_.clear();
 	modelHandle_ = ModelManager::Load("sphere.obj");
 }
@@ -16,8 +17,11 @@ void PlayerBulletManager::Update()
 	}
 
 	// デスフラグの立った敵を削除
-	playerBullets_.remove_if([](std::unique_ptr<PlayerBullet>& playerBullet) {
+	playerBullets_.remove_if([&](std::unique_ptr<PlayerBullet>& playerBullet) {
 		if (playerBullet->IsDead()) {
+			if (playerBullet->GetWorldTransform()->translation_.y >= 0.0f) {
+				explodeParticle_->SetIsEmit(true, MakeTranslation(playerBullet->GetWorldTransform()->matWorld_));
+			}
 			return true;
 		}
 		return false;

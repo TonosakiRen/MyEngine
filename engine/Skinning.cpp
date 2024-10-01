@@ -76,5 +76,8 @@ void Skinning::Dispatch(CommandContext& commandContext, const uint32_t modelHand
     commandContext.SetComputeDescriptorTable(static_cast<UINT>(RootParameter::kInfluences), skinCluster.GetInfluencesSRV());
     commandContext.SetComputeDescriptorTable(static_cast<UINT>(RootParameter::kSkinnedVertices), skinCluster.GetSkinnedVerticesUAV());
     commandContext.SetComputeConstantBuffer(static_cast<UINT>(RootParameter::kSkinningInformation), skinCluster.GetSkinningInformationGPUAddress());
+    Mesh& mesh = modelManager->GetModelData(modelHandle).meshes[0];
+    commandContext.TransitionResource(mesh.vertexBuffer_, D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
+    commandContext.TransitionResource(mesh.indexBuffer_, D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
     commandContext.Dispatch(UINT(modelManager->GetModelData(modelHandle).meshes[0].GetVerticies().size() + 1023) / 1024,1,1);
 }

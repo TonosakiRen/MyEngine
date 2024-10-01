@@ -5,8 +5,6 @@ void SpotLights::Initialize() {
    
     structureBuffer_.Create(L"pointLightBuffer", sizeof(ConstBufferData), lightNum);
     lights_.resize(lightNum);
-    // インスタンシングデータのサイズ
-    UINT sizeINB = static_cast<UINT>(sizeof(ConstBufferData) * lightNum);
     Update();
 }
 

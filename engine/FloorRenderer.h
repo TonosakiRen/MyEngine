@@ -16,6 +16,9 @@
 #include "Cellular.h"
 #include "Renderer.h"
 
+#include "WaveIndexData.h"
+#include "WaveData.h"
+
 
 class DirectXCommon;
 
@@ -48,6 +51,8 @@ public:
 		kUniqueVertexIndices,
 		kPrimitiveIndices,
 		kCullData,
+		kWaveData,
+		kWaveIndexData,
 		kDirectionalLights,
 		kPointLights,
 		kAreaLights,
@@ -69,6 +74,7 @@ public:
 		kMeshletInfo,
 		kFrustum,
 		kTileNum,
+		kWaveParam,
 
 		parameterNum
 	};
@@ -77,7 +83,7 @@ public:
 	void Finalize();
 	void PreDraw(PipelineType pipelineType, CommandContext& commandContext, const ViewProjection& viewProjection, const ViewProjection& cullingViewProjection,const TileBasedRendering& tileBasedRendering);
 
-	void Draw(CommandContext& commandContext, uint32_t modelHandle,const WorldTransform& worldTransform);
+	void Draw(CommandContext& commandContext, uint32_t modelHandle,const WorldTransform& worldTransform, const WaveData& waveData, const WaveIndexData& waveIndexData);
 
 private: 
 	void CreatePipeline();
@@ -92,5 +98,10 @@ private:
 	std::unique_ptr < Cellular> cellular_;
 
 	Vector4 HSVA_ = { 0.0f,0.2f,0.45f,0.4f };
+
+	float hz_ = 0.2f;
+	float period_ = 2.0f;
+	float amplitude_ = 0.06f;
+	float radius_ = 6.0f;
 };
 

@@ -3,7 +3,7 @@
 #include "ColorBuffer.h"
 #include "CubeColorBuffer.h"
 #include "UploadBuffer.h"
-#include "StructuredBuffer.h"
+#include "DefaultStructuredBuffer.h"
 #include "PipelineState.h"
 #include "RootSignature.h"
 #include <Windows.h>
@@ -32,7 +32,7 @@ public:
 		uint32_t index;
 	};
 
-	void Initialize(uint32_t pointNum);
+	void Initialize(uint32_t pointNum, CommandContext& commandContext);
 	void Render(CommandContext& commandContext);
 
 	ColorBuffer& GetResult() { return voronoiTexture_; }
@@ -42,7 +42,7 @@ private:
 	std::unique_ptr<RootSignature> sRootSignature;
 	std::unique_ptr<PipelineState> sPipelineState;
 
-	StructuredBuffer point_;
+	DefaultStructuredBuffer point_;
 
 	Voronoi(const Voronoi&) = delete;
 	Voronoi& operator=(const Voronoi&) = delete;

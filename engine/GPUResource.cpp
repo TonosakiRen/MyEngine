@@ -1,8 +1,14 @@
 #include "GPUResource.h"
-
-#include "DirectXCommon.h"
+#include "BufferManager.h"
 #include <assert.h>
 
+GPUResource::~GPUResource()
+{
+    if (resource_) {
+         BufferManager::GetInstance()->ReleaseResource(index_);
+         resource_ = nullptr;
+    }
+}
 
 void GPUResource::CreateResource(
     const std::wstring& name,
@@ -11,17 +17,14 @@ void GPUResource::CreateResource(
     D3D12_RESOURCE_STATES initState,
     const D3D12_CLEAR_VALUE* optimizedClearValue) {
 
-    auto graphics = DirectXCommon::GetInstance();
-    auto device = graphics->GetDevice();
-    auto hr = device->CreateCommittedResource(
+    
+    resource_ = BufferManager::GetInstance()->CreateResource(
+        index_,
         &heapProperties,
         D3D12_HEAP_FLAG_NONE,
         &desc,
-        initState,
-        optimizedClearValue,
-        IID_PPV_ARGS(resource_.ReleaseAndGetAddressOf()));
+        initState);
 
-    assert(SUCCEEDED(hr));
     state_ = initState;
 
 #ifdef _DEBUG

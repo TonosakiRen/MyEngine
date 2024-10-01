@@ -2,6 +2,7 @@
 #include "EnemyBulletManager.h"
 #include "Player.h"
 #include "ModelManager.h"
+#include "Floor.h"
 
 uint32_t Enemy::deadEnemyNum = 0;
 Vector3 Enemy::modelSize;
@@ -30,8 +31,8 @@ void Enemy::Update()
 	}
 	fireFrame_--;
 
-	if (worldTransform_.translation_.x > 25.0f + modelSize.x / 2.0f  || worldTransform_.translation_.x < -25.0f - modelSize.x / 2.0f ||
-		worldTransform_.translation_.z > 25.0f + modelSize.z / 2.0f || worldTransform_.translation_.z < -25.0f - modelSize.z / 2.0f
+	if (worldTransform_.translation_.x > Floor::kFloorHalfSize + modelSize.x / 2.0f  || worldTransform_.translation_.x < -Floor::kFloorHalfSize - modelSize.x / 2.0f ||
+		worldTransform_.translation_.z > Floor::kFloorHalfSize + modelSize.z / 2.0f || worldTransform_.translation_.z < -Floor::kFloorHalfSize - modelSize.z / 2.0f
 		) {
 		isDead_ = true;
 	}

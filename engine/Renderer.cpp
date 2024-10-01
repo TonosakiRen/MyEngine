@@ -13,9 +13,9 @@
 #include "Sky.h"
 #include "DrawManager.h"
 #include "LightManager.h"
+#include "BufferManager.h"
 
 Renderer::RenderingMode Renderer::renderingMode = Renderer::kForward;
-uint32_t Renderer::time = 0;
 
 Renderer* Renderer::GetInstance() {
     static Renderer instance;
@@ -30,6 +30,8 @@ void Renderer::Initialize() {
     // コマンドリストを初期化   
     commandContext_.Create();
     commandContext_.SetDescriptorHeap();
+
+    bufferManager_ = BufferManager::GetInstance();
 
     // シェーダー関連を初期化
     ShaderManager::GetInstance()->Initialize();
@@ -125,6 +127,8 @@ void Renderer::Initialize() {
 
 void Renderer::BeginFrame()
 {
+
+    commandContext_.Start();
     auto imguiManager = ImGuiManager::GetInstance();
     imguiManager->Begin();
 }
@@ -297,20 +301,35 @@ void Renderer::EndRender()
 
     commandContext_.TransitionResource(swapChain_->GetColorBuffer(), D3D12_RESOURCE_STATE_PRESENT);
     commandContext_.Close();
+
+    //commandList実行
     CommandQueue& commandQueue = graphics_->GetCommandQueue();
 
+    if (!isBeginFrame_) {
+        commandQueue.Signal();
+        commandQueue.WaitForGPU();
+        commandQueue.UpdateFixFPS();
+
+        swapChain_->Present();
+
+        commandContext_.Reset();
+        bufferManager_->ReleaseAllResource();
+    }
+    else {
+        isBeginFrame_ = false;
+    }
+
     commandQueue.Excute(commandContext_);
-    swapChain_->Present();
-
-    commandQueue.Signal();
-    commandQueue.WaitForGPU();
-    commandQueue.UpdateFixFPS();
-
-    commandContext_.Reset();
-    time++;
+    swapChain_->SwapBackBuffer();
+    
 }
 
 void Renderer::Shutdown() {
+
+
+    CommandQueue& commandQueue = graphics_->GetCommandQueue();
+    commandQueue.Signal();
+    commandQueue.WaitForGPU();
 
     switch (renderingMode)
     {
@@ -351,6 +370,8 @@ void Renderer::Shutdown() {
 
     graphics_->Shutdown();
     ImGuiManager_->Finalize();
+
+    bufferManager_->Finalize();
 }
 
 

@@ -43,8 +43,8 @@ void EdgeRenderer::Render(CommandContext& commandContext, ColorBuffer& tmpBuffer
 #ifdef _DEBUG
 	if (ImGui::BeginMenu("Edge")) {
 		ImGui::DragFloat3("EdgeColor", &edgeColor_.x,0.01f,0.0f,1.0f);
-		ImGui::DragFloat("normalThreshold", &normalThreshold_, 0.0001f, 0.0f);
-		ImGui::DragFloat("depthThreshold", &depthThreshold_, 0.0001f, 0.0f);
+		ImGui::DragFloat("normalThreshold", &normalThreshold_, 0.00001f, 0.0f);
+		ImGui::DragFloat("depthThreshold", &depthThreshold_, 0.00001f, 0.0f);
 		ImGui::EndMenu();
 	}
 #endif

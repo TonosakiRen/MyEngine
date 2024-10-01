@@ -5,7 +5,7 @@
 
 #include "PipelineState.h"
 #include "RootSignature.h"
-#include "UploadBuffer.h"
+#include "DefaultBuffer.h"
 #include "CommandContext.h"
 
 #include "ViewProjection.h"
@@ -43,18 +43,15 @@ public:
 	const Vector4& GetBottomColor() { return bottomHSVA_; }
 private: 
 	void CreatePipeline();
-	void CreateMesh();
+	void CreateMesh(CommandContext& commnadContext);
 private:
 	std::unique_ptr<RootSignature> rootSignature_;
 	std::unique_ptr<PipelineState> pipelineState_;
 
-	UploadBuffer vertexBuffer_;
+	DefaultBuffer vertexBuffer_;
 	std::vector<Vector4> vertices_;
 	D3D12_VERTEX_BUFFER_VIEW vbView_{};
 
-	UploadBuffer indexBuffer_;
-	D3D12_INDEX_BUFFER_VIEW ibView_{};
-	std::vector<uint32_t> indices_;
 
 	std::unique_ptr<Voronoi> voronoi_;
 

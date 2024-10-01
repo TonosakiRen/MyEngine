@@ -2,31 +2,12 @@
 #include "Lighting.hlsli"
 #define MY_TEXTURE2D_SPACE space1
 Texture2D<float4> Texture2DTable[]  : register(t0, MY_TEXTURE2D_SPACE);
-Texture2D<float> tex : register(t0);
-SamplerState smp : register(s0);
-
-RWStructuredBuffer<uint32_t> gTBRPointLightIndex  : register(u1);
-RWStructuredBuffer<uint32_t> gTBRSpotLightIndex  : register(u2);
-RWStructuredBuffer<uint32_t> gTBRShadowSpotLightIndex  : register(u3);
-
-ConstantBuffer<ViewProjection> gViewProjection  : register(b1);
-StructuredBuffer<DirectionalLight> gDirectionLights  : register(t6);
-StructuredBuffer<PointLight> gPointLights  : register(t7);
-StructuredBuffer<AreaLight> gAreaLights  : register(t8);
-StructuredBuffer<SpotLight> gSpotLights  : register(t9);
-StructuredBuffer<ShadowSpotLight> gShadowSpotLights  : register(t10);
-ConstantBuffer<TileNum> tileNum : register(b6);
 struct Param {
 	float32_t4 color;
 };
-ConstantBuffer<Param> gColor  : register(b2);
-
 struct Time {
 	uint32_t t;
 };
-ConstantBuffer<Time> time  : register(b3);
-RWStructuredBuffer<TBRInformation> gTBRInformation  : register(u0);
-
 struct MSOutput {
 	float32_t4 pos : SV_POSITION;
 	float32_t3 normal : NORMAL;
@@ -40,6 +21,26 @@ struct PixelShaderOutput {
 	float32_t4 color : SV_TARGET0;
 	float32_t4 normal : SV_TARGET1;
 };
+Texture2D<float> tex : register(t0);
+SamplerState smp : register(s0);
+ConstantBuffer<WorldTransform> worldTransform  : register(b0);
+ConstantBuffer<ViewProjection> gViewProjection  : register(b1);
+ConstantBuffer<Param> gColor  : register(b2);
+ConstantBuffer<Time> time  : register(b3);
+ConstantBuffer<TileNum> tileNum : register(b6);
+
+RWStructuredBuffer<uint32_t> gTBRPointLightIndex  : register(u1);
+RWStructuredBuffer<uint32_t> gTBRSpotLightIndex  : register(u2);
+RWStructuredBuffer<uint32_t> gTBRShadowSpotLightIndex  : register(u3);
+
+StructuredBuffer<DirectionalLight> gDirectionLights  : register(t8);
+StructuredBuffer<PointLight> gPointLights  : register(t9);
+StructuredBuffer<AreaLight> gAreaLights  : register(t10);
+StructuredBuffer<SpotLight> gSpotLights  : register(t11);
+StructuredBuffer<ShadowSpotLight> gShadowSpotLights  : register(t12);
+
+RWStructuredBuffer<TBRInformation> gTBRInformation  : register(u0);
+
 
 float32_t RandomRange(float32_t2 num, float32_t minValue, float32_t maxValue) {
 
@@ -54,13 +55,14 @@ PixelShaderOutput main(MSOutput input) {
 
 	float32_t3 normal = normalize(input.normal);
 
-	float32_t2 uv = input.uv;
+	float32_t2 a = (input.worldPosition.xz + worldTransform.scale / 2.0f) / worldTransform.scale;
+
+	float32_t2 uv = a;
 	uv.y += time.t / 1000.0f;
 
 	float32_t4 color = gColor.color;
 
 	float32_t textureColor = tex.Sample(smp, uv);
-	color.xyz -= textureColor;
 
 	
 
@@ -163,6 +165,8 @@ PixelShaderOutput main(MSOutput input) {
 	lighting += ambient;
 
 	color.xyz *= lighting;
+
+	color.xyz -= textureColor ;
 
 	output.color = color;
 

@@ -21,10 +21,10 @@ class CommandContext
 public:
     void Create();
     void SetDescriptorHeap();
-    void ShutDown();
 
-    void ReleaseResource(GPUResource& resource);
-    void ReleaseAllResource();
+    void Start();
+
+    void ShutDown();
 
     void Close();
     void Reset();
@@ -100,16 +100,19 @@ public:
 
     void ExecuteIndirect(ID3D12CommandSignature* commandSignature, UINT maxCommandCount, ID3D12Resource* argumentBuffer, UINT64 argumentBufferOffset, ID3D12Resource* countBuffer, UINT64 countBufferOffset);
 
-    operator ID3D12GraphicsCommandList6* () const { return commandList_.Get(); }
+    operator ID3D12GraphicsCommandList6* () const { return currentCommandList_; }
     
 private:
     static const uint32_t kMaxNumResourceBarriers = 16;
 
-    Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator_;
-    Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList6> commandList_;
+    Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator_[2];
+    Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList6> commandList_[2];
+    ID3D12CommandAllocator* currentCommandAllocator_ = nullptr;
+    ID3D12GraphicsCommandList6* currentCommandList_ = nullptr;
+    ID3D12CommandAllocator* executeCommandAllocator_ = nullptr;
+    ID3D12GraphicsCommandList6* executeCommandList_ = nullptr;
 
     D3D12_RESOURCE_BARRIER resourceBarriers_[kMaxNumResourceBarriers]{};
-    std::vector<GPUResource*> releaseResources_;
     uint32_t numResourceBarriers_;
 
     ID3D12RootSignature* rootSignature_;
@@ -139,7 +142,7 @@ inline void CommandContext::TransitionResource(GPUResource& resource, D3D12_RESO
 
 inline void CommandContext::FlushResourceBarriers() {
     if (numResourceBarriers_ > 0) {
-        commandList_->ResourceBarrier(numResourceBarriers_, resourceBarriers_);
+        currentCommandList_->ResourceBarrier(numResourceBarriers_, resourceBarriers_);
         numResourceBarriers_ = 0;
     }
 }
@@ -148,21 +151,21 @@ inline void CommandContext::CopyBuffer(GPUResource& dest, GPUResource& src) {
     TransitionResource(dest, D3D12_RESOURCE_STATE_COPY_DEST);
     TransitionResource(src, D3D12_RESOURCE_STATE_COPY_SOURCE);
     FlushResourceBarriers();
-    commandList_->CopyResource(dest, src);
+    currentCommandList_->CopyResource(dest, src);
 }
 
 inline void CommandContext::CopyBufferRegion(GPUResource& dest, size_t destOffset, GPUResource& src, size_t srcOffset, size_t numBytes) {
     TransitionResource(dest, D3D12_RESOURCE_STATE_COPY_DEST);
     TransitionResource(src, D3D12_RESOURCE_STATE_COPY_SOURCE);
     FlushResourceBarriers();
-    commandList_->CopyBufferRegion(dest, destOffset, src, srcOffset, numBytes);
+    currentCommandList_->CopyBufferRegion(dest, destOffset, src, srcOffset, numBytes);
 }
 
 inline void CommandContext::SetPipelineState(const PipelineState& pipelineState) {
     ID3D12PipelineState* ps = pipelineState;
     if (pipelineState_ != ps) {
         pipelineState_ = ps;
-        commandList_->SetPipelineState(pipelineState_);
+        currentCommandList_->SetPipelineState(pipelineState_);
     }
 }
 
@@ -170,7 +173,7 @@ inline void CommandContext::SetGraphicsRootSignature(const RootSignature& rootSi
     ID3D12RootSignature* rs = rootSignature;
     if (rootSignature_ != rs) {
         rootSignature_ = rs;
-        commandList_->SetGraphicsRootSignature(rootSignature_);
+        currentCommandList_->SetGraphicsRootSignature(rootSignature_);
     }
 }
 
@@ -178,31 +181,31 @@ inline void CommandContext::SetComputeRootSignature(const RootSignature& rootSig
     ID3D12RootSignature* rs = rootSignature;
     if (rootSignature_ != rs) {
         rootSignature_ = rs;
-        commandList_->SetComputeRootSignature(rootSignature_);
+        currentCommandList_->SetComputeRootSignature(rootSignature_);
     }
 }
 
 inline void CommandContext::ClearColor(ColorBuffer& target) {
     FlushResourceBarriers();
-    commandList_->ClearRenderTargetView(target.GetRTV(), target.GetClearColor(), 0, nullptr);
+    currentCommandList_->ClearRenderTargetView(target.GetRTV(), target.GetClearColor(), 0, nullptr);
 }
 
 inline void CommandContext::ClearColor(ColorBuffer& target, float clearColor[4]) {
     FlushResourceBarriers();
-    commandList_->ClearRenderTargetView(target.GetRTV(), clearColor, 0, nullptr);
+    currentCommandList_->ClearRenderTargetView(target.GetRTV(), clearColor, 0, nullptr);
 }
 
 inline void CommandContext::ClearColor(CubeColorBuffer& target) {
     FlushResourceBarriers();
     for (uint32_t i = 0; i < 6; i++) {
-        commandList_->ClearRenderTargetView(target.GetRTV(i), target.GetClearColor(), 0, nullptr);
+        currentCommandList_->ClearRenderTargetView(target.GetRTV(i), target.GetClearColor(), 0, nullptr);
     }
 }
 
 inline void CommandContext::ClearColor(CubeColorBuffer& target, float clearColor[4]) {
     FlushResourceBarriers();
     for (uint32_t i = 0; i < 6; i++) {
-        commandList_->ClearRenderTargetView(target.GetRTV(i), clearColor, 0, nullptr);
+        currentCommandList_->ClearRenderTargetView(target.GetRTV(i), clearColor, 0, nullptr);
     }
 }
 
@@ -221,7 +224,7 @@ inline void CommandContext::CopyCubeBuffer(CubeColorBuffer& dest, CubeColorBuffe
         srcLocation.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
         srcLocation.SubresourceIndex = D3D12CalcSubresource(0, srcIndex, 0, 1, 1);
 
-        commandList_->CopyTextureRegion(&dstLocation, 0, 0, 0, &srcLocation, nullptr);
+        currentCommandList_->CopyTextureRegion(&dstLocation, 0, 0, 0, &srcLocation, nullptr);
     }
 }
 
@@ -241,36 +244,36 @@ inline void CommandContext::CopyCubeBuffer(CubeColorBuffer& dest, ColorBuffer& s
         dstLocation.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
         dstLocation.SubresourceIndex = D3D12CalcSubresource(0, i, 0, 1, 1);
 
-        commandList_->CopyTextureRegion(&dstLocation, 0, 0, 0, &srcLocation, nullptr);
+        currentCommandList_->CopyTextureRegion(&dstLocation, 0, 0, 0, &srcLocation, nullptr);
     }
 }
 
 inline void CommandContext::ClearDepth(DepthBuffer& target) {
     FlushResourceBarriers();
-    commandList_->ClearDepthStencilView(target.GetDSV(), D3D12_CLEAR_FLAG_DEPTH, target.GetClearValue(), 0, 0, nullptr);
+    currentCommandList_->ClearDepthStencilView(target.GetDSV(), D3D12_CLEAR_FLAG_DEPTH, target.GetClearValue(), 0, 0, nullptr);
 }
 
 inline void CommandContext::ClearDepth(DepthBuffer& target, float clearValue) {
     FlushResourceBarriers();
-    commandList_->ClearDepthStencilView(target.GetDSV(), D3D12_CLEAR_FLAG_DEPTH, clearValue, 0, 0, nullptr);
+    currentCommandList_->ClearDepthStencilView(target.GetDSV(), D3D12_CLEAR_FLAG_DEPTH, clearValue, 0, 0, nullptr);
 }
 
 inline void CommandContext::SetRenderTargets(UINT numRTVs, const D3D12_CPU_DESCRIPTOR_HANDLE rtvs[]) {
-    commandList_->OMSetRenderTargets(numRTVs, rtvs, FALSE, nullptr);
+    currentCommandList_->OMSetRenderTargets(numRTVs, rtvs, FALSE, nullptr);
 }
 
 inline void CommandContext::SetRenderTargets(UINT numRTVs, const D3D12_CPU_DESCRIPTOR_HANDLE rtvs[], D3D12_CPU_DESCRIPTOR_HANDLE dsv) {
-    commandList_->OMSetRenderTargets(numRTVs, rtvs, FALSE, &dsv);
+    currentCommandList_->OMSetRenderTargets(numRTVs, rtvs, FALSE, &dsv);
 }
 
 
 inline void CommandContext::SetDepthStencil(D3D12_CPU_DESCRIPTOR_HANDLE dsv)
 {
-    commandList_->OMSetRenderTargets(0, nullptr, FALSE, &dsv);
+    currentCommandList_->OMSetRenderTargets(0, nullptr, FALSE, &dsv);
 }
 
 inline void CommandContext::SetViewport(const D3D12_VIEWPORT& viewport) {
-    commandList_->RSSetViewports(1, &viewport);
+    currentCommandList_->RSSetViewports(1, &viewport);
 }
 
 inline void CommandContext::SetViewport(FLOAT x, FLOAT y, FLOAT w, FLOAT h, FLOAT minDepth, FLOAT maxDepth) {
@@ -286,7 +289,7 @@ inline void CommandContext::SetViewport(FLOAT x, FLOAT y, FLOAT w, FLOAT h, FLOA
 
 inline void CommandContext::SetScissorRect(const D3D12_RECT& rect) {
     assert(rect.left < rect.right && rect.top < rect.bottom);
-    commandList_->RSSetScissorRects(1, &rect);
+    currentCommandList_->RSSetScissorRects(1, &rect);
 }
 
 inline void CommandContext::SetScissorRect(UINT left, UINT top, UINT right, UINT bottom) {
@@ -309,112 +312,112 @@ inline void CommandContext::SetViewportAndScissorRect(UINT x, UINT y, UINT w, UI
 }
 
 inline void CommandContext::SetPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY topology) {
-    commandList_->IASetPrimitiveTopology(topology);
+    currentCommandList_->IASetPrimitiveTopology(topology);
 }
 
 inline void CommandContext::SetConstantArray(UINT rootIndex, UINT numConstants, const void* constants) {
-    commandList_->SetGraphicsRoot32BitConstants(rootIndex, numConstants, constants, 0);
+    currentCommandList_->SetGraphicsRoot32BitConstants(rootIndex, numConstants, constants, 0);
 }
 
 inline void CommandContext::SetConstant(UINT rootIndex, UINT offset, DWParam value) {
-    commandList_->SetGraphicsRoot32BitConstant(rootIndex, value.v.u, offset);
+    currentCommandList_->SetGraphicsRoot32BitConstant(rootIndex, value.v.u, offset);
 }
 
 inline void CommandContext::SetConstants(UINT rootIndex, DWParam x) {
-    commandList_->SetGraphicsRoot32BitConstant(rootIndex, x.v.u, 0);
+    currentCommandList_->SetGraphicsRoot32BitConstant(rootIndex, x.v.u, 0);
 }
 
 inline void CommandContext::SetConstants(UINT rootIndex, DWParam x, DWParam y) {
-    commandList_->SetGraphicsRoot32BitConstant(rootIndex, x.v.u, 0);
-    commandList_->SetGraphicsRoot32BitConstant(rootIndex, y.v.u, 1);
+    currentCommandList_->SetGraphicsRoot32BitConstant(rootIndex, x.v.u, 0);
+    currentCommandList_->SetGraphicsRoot32BitConstant(rootIndex, y.v.u, 1);
 }
 
 inline void CommandContext::SetConstants(UINT rootIndex, DWParam x, DWParam y, DWParam z) {
-    commandList_->SetGraphicsRoot32BitConstant(rootIndex, x.v.u, 0);
-    commandList_->SetGraphicsRoot32BitConstant(rootIndex, y.v.u, 1);
-    commandList_->SetGraphicsRoot32BitConstant(rootIndex, z.v.u, 2);
+    currentCommandList_->SetGraphicsRoot32BitConstant(rootIndex, x.v.u, 0);
+    currentCommandList_->SetGraphicsRoot32BitConstant(rootIndex, y.v.u, 1);
+    currentCommandList_->SetGraphicsRoot32BitConstant(rootIndex, z.v.u, 2);
 }
 
 inline void CommandContext::SetConstants(UINT rootIndex, DWParam x, DWParam y, DWParam z, DWParam w) {
-    commandList_->SetGraphicsRoot32BitConstant(rootIndex, x.v.u, 0);
-    commandList_->SetGraphicsRoot32BitConstant(rootIndex, y.v.u, 1);
-    commandList_->SetGraphicsRoot32BitConstant(rootIndex, z.v.u, 2);
-    commandList_->SetGraphicsRoot32BitConstant(rootIndex, w.v.u, 3);
+    currentCommandList_->SetGraphicsRoot32BitConstant(rootIndex, x.v.u, 0);
+    currentCommandList_->SetGraphicsRoot32BitConstant(rootIndex, y.v.u, 1);
+    currentCommandList_->SetGraphicsRoot32BitConstant(rootIndex, z.v.u, 2);
+    currentCommandList_->SetGraphicsRoot32BitConstant(rootIndex, w.v.u, 3);
 }
 
 inline void CommandContext::SetComputeConstantArray(UINT rootIndex, UINT numConstants, const void* constants) {
-    commandList_->SetComputeRoot32BitConstants(rootIndex, numConstants, constants, 0);
+    currentCommandList_->SetComputeRoot32BitConstants(rootIndex, numConstants, constants, 0);
 }
 
 inline void CommandContext::SetComputeConstant(UINT rootIndex, UINT offset, DWParam value) {
-    commandList_->SetComputeRoot32BitConstant(rootIndex, value.v.u, offset);
+    currentCommandList_->SetComputeRoot32BitConstant(rootIndex, value.v.u, offset);
 }
 
 inline void CommandContext::SetComputeConstants(UINT rootIndex, DWParam x) {
-    commandList_->SetComputeRoot32BitConstant(rootIndex, x.v.u, 0);
+    currentCommandList_->SetComputeRoot32BitConstant(rootIndex, x.v.u, 0);
 }
 
 inline void CommandContext::SetComputeConstants(UINT rootIndex, DWParam x, DWParam y) {
-    commandList_->SetComputeRoot32BitConstant(rootIndex, x.v.u, 0);
-    commandList_->SetComputeRoot32BitConstant(rootIndex, y.v.u, 1);
+    currentCommandList_->SetComputeRoot32BitConstant(rootIndex, x.v.u, 0);
+    currentCommandList_->SetComputeRoot32BitConstant(rootIndex, y.v.u, 1);
 }
 
 inline void CommandContext::SetComputeConstants(UINT rootIndex, DWParam x, DWParam y, DWParam z) {
-    commandList_->SetComputeRoot32BitConstant(rootIndex, x.v.u, 0);
-    commandList_->SetComputeRoot32BitConstant(rootIndex, y.v.u, 1);
-    commandList_->SetComputeRoot32BitConstant(rootIndex, z.v.u, 2);
+    currentCommandList_->SetComputeRoot32BitConstant(rootIndex, x.v.u, 0);
+    currentCommandList_->SetComputeRoot32BitConstant(rootIndex, y.v.u, 1);
+    currentCommandList_->SetComputeRoot32BitConstant(rootIndex, z.v.u, 2);
 }
 
 inline void CommandContext::SetComputeConstants(UINT rootIndex, DWParam x, DWParam y, DWParam z, DWParam w) {
-    commandList_->SetComputeRoot32BitConstant(rootIndex, x.v.u, 0);
-    commandList_->SetComputeRoot32BitConstant(rootIndex, y.v.u, 1);
-    commandList_->SetComputeRoot32BitConstant(rootIndex, z.v.u, 2);
-    commandList_->SetComputeRoot32BitConstant(rootIndex, w.v.u, 3);
+    currentCommandList_->SetComputeRoot32BitConstant(rootIndex, x.v.u, 0);
+    currentCommandList_->SetComputeRoot32BitConstant(rootIndex, y.v.u, 1);
+    currentCommandList_->SetComputeRoot32BitConstant(rootIndex, z.v.u, 2);
+    currentCommandList_->SetComputeRoot32BitConstant(rootIndex, w.v.u, 3);
 }
 
 inline void CommandContext::SetConstantBuffer(UINT rootIndex, D3D12_GPU_VIRTUAL_ADDRESS address) {
-    commandList_->SetGraphicsRootConstantBufferView(rootIndex, address);
+    currentCommandList_->SetGraphicsRootConstantBufferView(rootIndex, address);
 }
 
 inline void CommandContext::SetComputeConstantBuffer(UINT rootIndex, D3D12_GPU_VIRTUAL_ADDRESS address) {
-    commandList_->SetComputeRootConstantBufferView(rootIndex, address);
+    currentCommandList_->SetComputeRootConstantBufferView(rootIndex, address);
 }
 
 inline void CommandContext::SetComputeUAVBuffer(UINT rootIndex, D3D12_GPU_VIRTUAL_ADDRESS address)
 {
-    commandList_->SetComputeRootUnorderedAccessView(rootIndex, address);
+    currentCommandList_->SetComputeRootUnorderedAccessView(rootIndex, address);
 }
 
 inline void CommandContext::SetDescriptorTable(UINT rootIndex, D3D12_GPU_DESCRIPTOR_HANDLE baseDescriptor) {
-    commandList_->SetGraphicsRootDescriptorTable(rootIndex, baseDescriptor);
+    currentCommandList_->SetGraphicsRootDescriptorTable(rootIndex, baseDescriptor);
 }
 
 inline void CommandContext::SetComputeDescriptorTable(UINT rootIndex, D3D12_GPU_DESCRIPTOR_HANDLE baseDescriptor) {
-    commandList_->SetComputeRootDescriptorTable(rootIndex, baseDescriptor);
+    currentCommandList_->SetComputeRootDescriptorTable(rootIndex, baseDescriptor);
 }
 
 inline void CommandContext::SetVertexBuffer(UINT slot, const D3D12_VERTEX_BUFFER_VIEW& vbv) {
-    commandList_->IASetVertexBuffers(slot, 1, &vbv);
+    currentCommandList_->IASetVertexBuffers(slot, 1, &vbv);
 }
 
 inline void CommandContext::SetVertexBuffer(UINT slot, UINT numViews, const D3D12_VERTEX_BUFFER_VIEW vbvs[]) {
-    commandList_->IASetVertexBuffers(slot, numViews, vbvs);
+    currentCommandList_->IASetVertexBuffers(slot, numViews, vbvs);
 }
 
 inline void CommandContext::SetIndexBuffer(const D3D12_INDEX_BUFFER_VIEW& ibv) {
-    commandList_->IASetIndexBuffer(&ibv);
+    currentCommandList_->IASetIndexBuffer(&ibv);
 }
 
 inline void CommandContext::Dispatch(uint32_t x, uint32_t y, uint32_t z)
 {
     FlushResourceBarriers();
-    commandList_->Dispatch(x,y,z);
+    currentCommandList_->Dispatch(x,y,z);
 }
 
 inline void CommandContext::DispatchMesh(uint32_t x, uint32_t y, uint32_t z)
 {
     FlushResourceBarriers();
-    commandList_->DispatchMesh(x, y, z);
+    currentCommandList_->DispatchMesh(x, y, z);
 }
 
 inline void CommandContext::UAVBarrier(GPUResource& resource) {
@@ -436,19 +439,15 @@ inline void CommandContext::DrawIndexed(UINT indexCount, UINT startIndexLocation
 
 inline void CommandContext::DrawInstanced(UINT vertexCountPerInstance, UINT instanceCount, UINT startVertexLocation, UINT startInstanceLocation) {
     FlushResourceBarriers();
-    commandList_->DrawInstanced(vertexCountPerInstance, instanceCount, startVertexLocation, startInstanceLocation);
+    currentCommandList_->DrawInstanced(vertexCountPerInstance, instanceCount, startVertexLocation, startInstanceLocation);
 }
 
 inline void CommandContext::DrawIndexedInstanced(UINT indexCountPerInstance, UINT instanceCount, UINT startIndexLocation, INT baseVertexLocation, UINT startInstanceLocation) {
     FlushResourceBarriers();
-    commandList_->DrawIndexedInstanced(indexCountPerInstance, instanceCount, startIndexLocation, baseVertexLocation, startInstanceLocation);
-}
-
-inline void CommandContext::ReleaseResource(GPUResource& resource) {
-    releaseResources_.push_back(&resource);
+    currentCommandList_->DrawIndexedInstanced(indexCountPerInstance, instanceCount, startIndexLocation, baseVertexLocation, startInstanceLocation);
 }
 
 inline void CommandContext::ExecuteIndirect(ID3D12CommandSignature* commandSignature, UINT maxCommandCount, ID3D12Resource* argumentBuffer, UINT64 argumentBufferOffset, ID3D12Resource* countBuffer, UINT64 countBufferOffset) {
     FlushResourceBarriers();
-    commandList_->ExecuteIndirect(commandSignature, maxCommandCount, argumentBuffer, argumentBufferOffset, countBuffer, countBufferOffset);
+    currentCommandList_->ExecuteIndirect(commandSignature, maxCommandCount, argumentBuffer, argumentBufferOffset, countBuffer, countBufferOffset);
 }

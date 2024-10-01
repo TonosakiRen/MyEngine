@@ -137,7 +137,7 @@ void Sprite::Draw(CommandContext& commandContext,SpriteData& spriteData) {
 
 	spriteData.constBuffer_.Copy(mapData);
 
-	commandContext.SetVertexBuffer(0, 1, &spriteData.vbView_);
+	commandContext.SetVertexBuffer(0, 1, &spriteData.vbView_[1]);
 
 	commandContext.SetConstantBuffer(0, spriteData.constBuffer_.GetGPUVirtualAddress());
 

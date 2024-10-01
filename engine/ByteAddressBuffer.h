@@ -1,12 +1,11 @@
 #pragma once
-#include "UploadBuffer.h"
+#include "CopyBuffer.h"
 #include "DescriptorHandle.h"
 #include "CommandContext.h"
 class ByteAddressBuffer
 	: public GPUResource
 {
 public:
-    ~ByteAddressBuffer();
 
 	void Create(const std::wstring& name, size_t bufferSize, UINT numElements);
 	const DescriptorHandle& GetSRV() const { return srvHandle_; }
@@ -21,11 +20,13 @@ public:
 
     void SetZero();
 
+    void DestroyCopyBuffer();
+
 protected:
-    void Destroy();
 
     size_t bufferSize_ = 0;
     void* cpuData_ = nullptr;
+    bool isCopy_ = false;
 	DescriptorHandle srvHandle_;
-    UploadBuffer copyBuffer_;
+    CopyBuffer copyBuffer_;
 };

@@ -24,6 +24,7 @@ class ShadowSpotLights;
 class DrawManager;
 class LightManager;
 class ImGuiManager;
+class BufferManager;
 
 class Renderer
 {
@@ -51,7 +52,6 @@ public:
     static Renderer* GetInstance();
 
 
-    static uint32_t time;
 
     void Initialize();
     void BeginFrame();
@@ -98,8 +98,10 @@ private:
     DrawManager* drawManager_ = nullptr;
     LightManager* lightManager_ = nullptr;
     ImGuiManager* ImGuiManager_ = nullptr;
+    BufferManager* bufferManager_ = nullptr;
     std::unique_ptr<SwapChain> swapChain_;
     CommandContext commandContext_;
+    bool isBeginFrame_ = true;
 
     std::unique_ptr<ColorBuffer> colorBuffers_[static_cast<int>(RenderTargetType::kRenderTargetNum)];
     std::unique_ptr<DepthBuffer> mainDepthBuffer_;

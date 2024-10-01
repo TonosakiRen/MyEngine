@@ -8,17 +8,24 @@ class WavePoints
 {
 public:
 	static const uint32_t kWavePointNum = 50;
+
+	struct Point {
+		Vector3 position_ = { 0.0f,3.0f,0.0f };
+		float t_ = 0.0f;
+	};
+
 	WavePoints();
 	void Initialize();
 	void Update();
 	void Draw();
 
 	const WaveData* GetWaveData() const { return waveData_.get(); }
+
+	const Point* GetPoints() const { return points; }
+
+	uint32_t EmitPoint(const Vector3& pos);
 	
-	struct Point {
-		Vector3 position_ = {0.0f,3.0f,0.0f};
-		float t_ = 0.0f;
-	};
+	
 private:
 	Point points[kWavePointNum];
 	std::unique_ptr<WaveData> waveData_;

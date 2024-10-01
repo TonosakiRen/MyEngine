@@ -39,6 +39,7 @@ void DrawManager::Initialize(CommandContext& CommandContext)
 	commandContext_ = &CommandContext;
 	defaultMaterial_ = std::make_unique<Material>();
 	defaultMaterial_->Initialize();
+	defaultMaterial_->Update();
 	modelPipeline_ = std::make_unique<Model>();
 	modelPipeline_->Initialize();
 	meshletModelPipeline_ = std::make_unique<MeshletModel>();
@@ -126,6 +127,12 @@ void DrawManager::AllDraw(PipelineType pipelineType,const ViewProjection& viewPr
 	}
 
 	//透明
+
+	particleModelPipeline_->PreDraw(pipelineType, *commandContext_, viewProjection, tileBasedRendering);
+	for (auto& call : calls[kPostParticleModel]) {
+		call();
+	}
+
 	floorPipeline_->PreDraw(pipelineType ,*commandContext_, viewProjection, *calling_->currentViewProjection, tileBasedRendering);
 	for (auto& call : calls[kFloor]) {
 		call();
@@ -230,6 +237,12 @@ void DrawManager::DrawParticleModel(ParticleModelData& bufferData, const uint32_
 	calls[kParticleModel].push_back([&, modelHandle]() {particleModelPipeline_->Draw(*commandContext_, bufferData, material, modelHandle); });
 }
 
+void DrawManager::DrawPostParticleModel(ParticleModelData& bufferData, const uint32_t modelHandle, const Material& material)
+{
+	drawCallNum_++;
+	calls[kPostParticleModel].push_back([&, modelHandle]() {particleModelPipeline_->Draw(*commandContext_, bufferData, material, modelHandle); });
+}
+
 void DrawManager::DrawPreSprite(SpriteData& spriteData)
 {
 	drawCallNum_++;
@@ -277,9 +290,9 @@ void DrawManager::DrawWaveModel(const WorldTransform& worldTransform, const Wave
 	}
 }
 
-void DrawManager::DrawFloor(const WorldTransform& worldTransform, const uint32_t modelHandle)
+void DrawManager::DrawFloor(const WorldTransform& worldTransform, const WaveData& waveData, const WaveIndexData& waveIndexData, const uint32_t modelHandle)
 {
 	drawCallNum_++;
-	calls[kFloor].push_back([&, modelHandle]() {floorPipeline_->Draw(*commandContext_, modelHandle, worldTransform); });
+	calls[kFloor].push_back([&, modelHandle]() {floorPipeline_->Draw(*commandContext_, modelHandle, worldTransform, waveData, waveIndexData); });
 }
 

@@ -1,8 +1,9 @@
 #include "EnemyBulletManager.h"
 #include "ModelManager.h"
 
-void EnemyBulletManager::Initialize()
+void EnemyBulletManager::Initialize(ExplodeParticle* explodeParticle)
 {
+	explodeParticle_ = explodeParticle;
 	enemyBullets_.clear();
 	modelHandle_ = ModelManager::Load("sphere.obj");
 }
@@ -16,8 +17,11 @@ void EnemyBulletManager::Update()
 	}
 
 	// デスフラグの立った敵を削除
-	enemyBullets_.remove_if([](std::unique_ptr<EnemyBullet>& enemyBullet) {
+	enemyBullets_.remove_if([&](std::unique_ptr<EnemyBullet>& enemyBullet) {
 		if (enemyBullet->IsDead()) {
+			if (enemyBullet->GetWorldTransform()->translation_.y >= 0.0f) {
+				explodeParticle_->SetIsEmit(true, MakeTranslation(enemyBullet->GetWorldTransform()->matWorld_));
+			}
 			return true;
 		}
 		return false;

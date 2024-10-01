@@ -2,44 +2,44 @@
 
 #include <cassert>
 #include "DirectXCommon.h"
+#include "BufferManager.h"
 
-DefaultBuffer::~DefaultBuffer() {
-    Destroy();
-}
 
 void DefaultBuffer::Create(const std::wstring& name, size_t bufferSize) {
     HRESULT result = S_FALSE;
-    auto device = DirectXCommon::GetInstance()->GetDevice();
-
-    Destroy();
 
     auto desc = CD3DX12_RESOURCE_DESC::Buffer(UINT64(bufferSize));
     auto heapProps = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
 
-    result = device->CreateCommittedResource(
+    resource_ = BufferManager::GetInstance()->CreateResource(
+        index_,
         &heapProps,
         D3D12_HEAP_FLAG_NONE,
         &desc,
-        D3D12_RESOURCE_STATE_COMMON,
-        nullptr,
-        IID_PPV_ARGS(resource_.GetAddressOf()));
-
-    assert(SUCCEEDED(result));
+        D3D12_RESOURCE_STATE_COMMON);
 
 #ifdef _DEBUG
     resource_->SetName(name.c_str());
+    name_ = name;
 #endif // _DEBUG
 
     state_ = D3D12_RESOURCE_STATE_COMMON;
     bufferSize_ = bufferSize;
+
+    copyBuffer_.Create(name, bufferSize_);
 }
 
 void DefaultBuffer::Create(const std::wstring& name, size_t numElements, size_t elementSize) {
     Create(name, numElements * elementSize);
 }
 
-void DefaultBuffer::Destroy() {
-    if (resource_) {
-        resource_.Reset();
-    }
+void DefaultBuffer::Copy(const void* srcData, size_t copySize, CommandContext& commandContext)
+{
+    copyBuffer_.Copy(srcData, copySize);
+    commandContext.CopyBuffer(*this, copyBuffer_);
+}
+
+void DefaultBuffer::DestroyCopyBuffer()
+{
+    BufferManager::GetInstance()->ReleaseResource(copyBuffer_.GetIndex());
 }

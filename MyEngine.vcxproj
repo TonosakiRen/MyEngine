@@ -181,11 +181,14 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   <ItemGroup>
     <ClCompile Include="application\BaseScene.cpp" />
     <ClCompile Include="application\GamePlayScene.cpp" />
+    <ClCompile Include="application\LineAttack.cpp" />
     <ClCompile Include="application\MyGame.cpp" />
     <ClCompile Include="application\SceneManager.cpp" />
     <ClCompile Include="application\Skybox.cpp" />
     <ClCompile Include="application\SphereLights.cpp" />
     <ClCompile Include="application\TitleScene.cpp" />
+    <ClCompile Include="application\Tree.cpp" />
+    <ClCompile Include="application\Trees.cpp" />
     <ClCompile Include="application\WavePoints.cpp" />
     <ClCompile Include="audio\Audio.cpp" />
     <ClCompile Include="engine\AnimationManager.cpp" />
@@ -202,6 +205,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\CommandQueue.cpp" />
     <ClCompile Include="application\Compute.cpp" />
     <ClCompile Include="engine\CommandSignature.cpp" />
+    <ClCompile Include="engine\CopyBuffer.cpp" />
     <ClCompile Include="engine\CubeColorBuffer.cpp" />
     <ClCompile Include="engine\DebugCamera.cpp" />
     <ClCompile Include="engine\DefaultBuffer.cpp" />
@@ -222,6 +226,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\LightManager.cpp" />
     <ClCompile Include="engine\GameObjectManager.cpp" />
     <ClCompile Include="engine\LightNumBuffer.cpp" />
+    <ClCompile Include="engine\Loader.cpp" />
     <ClCompile Include="engine\MeshletEnvironmentMapModel.cpp" />
     <ClCompile Include="engine\MeshletModel.cpp" />
     <ClCompile Include="engine\ParticleData.cpp" />
@@ -238,6 +243,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\SpriteData.cpp" />
     <ClCompile Include="engine\Transition.cpp" />
     <ClCompile Include="engine\UAVBuffer.cpp" />
+    <ClCompile Include="engine\BufferManager.cpp" />
     <ClCompile Include="engine\Vignette.cpp" />
     <ClCompile Include="engine\Voronoi.cpp" />
     <ClCompile Include="engine\WaveData.cpp" />
@@ -299,11 +305,14 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   <ItemGroup>
     <ClInclude Include="application\BaseScene.h" />
     <ClInclude Include="application\GamePlayScene.h" />
+    <ClInclude Include="application\LineAttack.h" />
     <ClInclude Include="application\MyGame.h" />
     <ClInclude Include="application\SceneManager.h" />
     <ClInclude Include="application\Skybox.h" />
     <ClInclude Include="application\SphereLights.h" />
     <ClInclude Include="application\TitleScene.h" />
+    <ClInclude Include="application\Tree.h" />
+    <ClInclude Include="application\Trees.h" />
     <ClInclude Include="application\WavePoints.h" />
     <ClInclude Include="audio\Audio.h" />
     <ClInclude Include="engine\AnimationManager.h" />
@@ -320,6 +329,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\CommandQueue.h" />
     <ClInclude Include="application\Compute.h" />
     <ClInclude Include="engine\CommandSignature.h" />
+    <ClInclude Include="engine\CopyBuffer.h" />
     <ClInclude Include="engine\CubeColorBuffer.h" />
     <ClInclude Include="engine\DebugCamera.h" />
     <ClInclude Include="engine\DefaultBuffer.h" />
@@ -340,6 +350,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\LightManager.h" />
     <ClInclude Include="engine\GameObjectManager.h" />
     <ClInclude Include="engine\LightNumBuffer.h" />
+    <ClInclude Include="engine\Loader.h" />
     <ClInclude Include="engine\MeshletEnvironmentMapModel.h" />
     <ClInclude Include="engine\MeshletModel.h" />
     <ClInclude Include="engine\ParticleData.h" />
@@ -356,6 +367,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\SpriteData.h" />
     <ClInclude Include="engine\Transition.h" />
     <ClInclude Include="engine\UAVBuffer.h" />
+    <ClInclude Include="engine\BufferManager.h" />
     <ClInclude Include="engine\Vignette.h" />
     <ClInclude Include="engine\Voronoi.h" />
     <ClInclude Include="engine\WaveData.h" />

@@ -1,7 +1,7 @@
 #pragma once
 #include <d3d12.h>
 #include "Mymath.h"
-#include "UploadBuffer.h"
+#include "StructuredBuffer.h"
 #include "DepthBuffer.h"
 #include <vector>
 
@@ -18,7 +18,7 @@ public:
 		Vector4 color = { 1.0f, 1.0f, 1.0f,1.0f };
 		Vector3 direction = { 0.0f, -1.0f, 0.0f };
 		Vector3 position = { 0.0f,150.0f,0.0f };
-		float intensity = 1.0f;
+		float intensity = 0.0f;
 		Vector3 lockUp = { 1.0f,0.0f,0.0f };
 		DepthBuffer shadowMap_;
 		UploadBuffer constBuffer_;
@@ -28,7 +28,7 @@ public:
 	struct ConstBufferData {
 		Vector4 color = { 1.0f, 1.0f, 1.0f,1.0f };
 		Vector3 direction = { 0.0f, -1.0f, 0.0f };
-		float intensity = 1.0f;
+		float intensity = 0.0f;
 		Matrix4x4 viewProjection;
 		uint32_t descriptorHeapIndex;
 	};
@@ -44,8 +44,6 @@ public:
 
 public:
 	std::vector<DirectionalLight> lights_;
-	UploadBuffer structureBuffer_;
-	DescriptorHandle srvHandle_;
-private:
+	StructuredBuffer structureBuffer_;
 
 };

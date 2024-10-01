@@ -8,6 +8,9 @@ class Framework
 {
 public:
 
+	static uint32_t kFrame;
+	static uint32_t kFrameRemainder;
+
 	void Run();
 
 	virtual void Initialize();

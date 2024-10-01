@@ -32,7 +32,7 @@ public:
 
 	void Create(const Node& rootNode);
 	Joint GetJoint(std::string name) {
-		int32_t index;
+		int32_t index = 0;
 		if (jointMap.find(name) != jointMap.end()) {
 			index = jointMap[name];
 		}

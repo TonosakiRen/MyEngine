@@ -1,23 +1,18 @@
-#define WaveRadius 6.0f
 #include "Common.hlsli"
-ConstantBuffer<WorldTransform> worldTransform  : register(b0);
-ConstantBuffer<Frustum> frustum  : register(b4);
-ConstantBuffer<MeshletInfo> meshletInfo  : register(b3);
-StructuredBuffer<CullData> cullData : register(t5);
-
 struct Payload {
 	uint32_t meshletIndices[32];
 	uint32_t hitWaveIndices[32];
 	uint32_t visibleCount;
 };
-
 groupshared Payload payload;
+ConstantBuffer<WorldTransform> worldTransform  : register(b0);
+ConstantBuffer<MeshletInfo> meshletInfo  : register(b3);
+ConstantBuffer<Frustum> frustum  : register(b4);
+ConstantBuffer<WaveParam> waveParam: register(b7);
 
-ConstantBuffer<WaveIndexData> waveIndexData: register(b6);
-
+StructuredBuffer<CullData> cullData : register(t5);
 StructuredBuffer<WaveData> waveData :register(t6);
-
-ConstantBuffer<WaveParam> waveParam: register(b8);
+StructuredBuffer<uint32_t> waveIndexData: register(t7);
 
 bool IsVisible(CullData cullData, WorldTransform worldTransform) {
 	float32_t3 center = Multiply(worldTransform.world, cullData.sphere.position);
@@ -53,8 +48,10 @@ void main(uint32_t dtid : SV_DispatchThreadID)
 		
 		uint32_t index;
 
-		for (int i = 0; i < waveIndexData.waveDataNum;i++) {
-			WaveData wave = waveData[waveIndexData.waveIndex[i]];
+		isHitWave = true;
+
+		for (int i = 0; i < waveIndexData[0];i++) {
+			WaveData wave = waveData[waveIndexData[i + 1]];
 			if (IsHit(cullData[dtid].sphere, wave.position, waveParam.radius)) {
 				isHitWave = true;
 			}

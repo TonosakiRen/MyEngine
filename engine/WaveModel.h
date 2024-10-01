@@ -41,6 +41,7 @@ public:
 		kFrustum,
 		kTime,
 		kWaveIndexData,
+		kWaveIndexDataNum,
 		kWaveParam,
 
 		parameterNum
@@ -54,6 +55,7 @@ public:
 		kPrimitiveIndices,
 		kCullData,
 		kWaveData,
+		kWaveIndexData,
 
 		kDirectionalLights,
 		kPointLights,
@@ -73,7 +75,6 @@ public:
 		kMeshletInfo,
 		kFrustum,
 		kTime,
-		kWaveIndexData,
 		kTileNum,
 		kWaveParam,
 

@@ -26,15 +26,22 @@ void SpriteData::Initialize(uint32_t textureHandle, Vector2 position, Vector4 co
 
 	resourceDesc_ = TextureManager::GetInstance()->GetResoureDesc(textureHandle_);
 
-	vertexBuffer_.Create(L"spriteVertexBuffer", sizeof(VertexData) * 4);
+	UINT bufferSize = sizeof(VertexData) * 4;
+
+	vertexBuffer_.Create(L"spriteVertexBuffer", bufferSize);
 
 	// 頂点バッファへのデータ転送
 	TransferVertices();
 
 	// 頂点バッファビューの作成
-	vbView_.BufferLocation = vertexBuffer_->GetGPUVirtualAddress();
-	vbView_.SizeInBytes = sizeof(VertexData) * 4;
-	vbView_.StrideInBytes = sizeof(VertexData);
+	vbView_[0].BufferLocation = vertexBuffer_->GetGPUVirtualAddress();
+	vbView_[0].SizeInBytes = bufferSize;
+	vbView_[0].StrideInBytes = sizeof(VertexData);
+
+	size_t offset = Helper::AlignUp(bufferSize, 256);
+	vbView_[1].BufferLocation = vertexBuffer_->GetGPUVirtualAddress() + static_cast<D3D12_GPU_VIRTUAL_ADDRESS>(offset);
+	vbView_[1].SizeInBytes = bufferSize;
+	vbView_[1].StrideInBytes = sizeof(VertexData);
 
 	constBuffer_.Create(L"spriteConstBuffer", (sizeof(ConstBufferData) + 0xff) & ~0xff);
 }

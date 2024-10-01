@@ -10,9 +10,9 @@ using namespace Microsoft::WRL;
 
 void Sky::Initialize(CommandContext& commnadContext) {
     CreatePipeline();
-    CreateMesh();
+    CreateMesh(commnadContext);
     voronoi_ = std::make_unique<Voronoi>();
-    voronoi_->Initialize(pointNum_);
+    voronoi_->Initialize(pointNum_, commnadContext);
     voronoi_->Render(commnadContext);
 
     reducation_ = std::make_unique<Reducation>();
@@ -178,7 +178,7 @@ void Sky::CreatePipeline() {
     }
 }
 
-void Sky::CreateMesh()
+void Sky::CreateMesh(CommandContext& commnadContext)
 {
     vertices_.resize(36);
     vertices_ = {
@@ -233,8 +233,10 @@ void Sky::CreateMesh()
     UINT sizeVB = static_cast<UINT>(sizeof(Vector4) * vertices_.size());
 
     vertexBuffer_.Create(L"skyBoxVertexBuffer", sizeVB);
+    vertexBuffer_.Copy(vertices_.data(), sizeVB, commnadContext);
+    vertexBuffer_.DestroyCopyBuffer();
+    commnadContext.TransitionResource(vertexBuffer_,D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
 
-    vertexBuffer_.Copy(vertices_.data(), sizeVB);
 
     // 頂点バッファビューの作成
     vbView_.BufferLocation = vertexBuffer_->GetGPUVirtualAddress();

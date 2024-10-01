@@ -45,6 +45,7 @@ public:
 		kMeshletEnvironmentMap,
 		kParticle,
 		kParticleModel,
+		kPostParticleModel,
 		kPreSprite,
 		kPostSprite,
 		kShadow,
@@ -68,6 +69,7 @@ public:
 	void DrawEnvironmentMapMeshletModel(const WorldTransform& worldTransform, const uint32_t modelHandle, SkinCluster& skinCluster, const uint32_t textureHandle = 0, const Material& material = *defaultMaterial_.get());
 	void DrawParticle(ParticleData& bufferData, const uint32_t textureHandle = 0, const Material& material = *defaultMaterial_.get());
 	void DrawParticleModel(ParticleModelData& bufferData, const uint32_t modelHandle = 0, const Material& material = *defaultMaterial_.get());
+	void DrawPostParticleModel(ParticleModelData& bufferData, const uint32_t modelHandle = 0, const Material& material = *defaultMaterial_.get());
 	void DrawPreSprite(SpriteData& spriteData);
 	void DrawPostSprite(SpriteData& spriteData);
 	void DrawShadow(const WorldTransform& worldTransform, const uint32_t modelHandle = 0);
@@ -75,7 +77,7 @@ public:
 	void DrawSky(const WorldTransform& worldTransform);
 	void DrawWaveModel(const WorldTransform& worldTransform, const WaveData& waveData, const WaveIndexData& waveIndexData, const uint32_t modelHandle = 0, const uint32_t textureHandle = 0, const Material& material = *defaultMaterial_.get());
 	void DrawWaveModel(const WorldTransform& worldTransform, const WaveData& waveData, const WaveIndexData& waveIndexData, const uint32_t modelHandle, SkinCluster& skinCluster, const uint32_t textureHandle = 0, const Material& material = *defaultMaterial_.get());
-	void DrawFloor(const WorldTransform& worldTransform, const uint32_t modelHandle = 0);
+	void DrawFloor(const WorldTransform& worldTransform, const WaveData& waveData, const WaveIndexData& waveIndexData, const uint32_t modelHandle = 0);
 
 	void SetCallingViewProjection(const ViewProjection& viewProjection) { calling_->SetViewProjection(&viewProjection); }
 private:

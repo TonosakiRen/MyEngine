@@ -2,23 +2,6 @@
 #include "Lighting.hlsli"
 #define MY_TEXTURE2D_SPACE space1
 Texture2D<float4> Texture2DTable[]  : register(t0, MY_TEXTURE2D_SPACE);
-
-Texture2D<float4> tex : register(t0);
-SamplerState smp : register(s0);
-
-RWStructuredBuffer<uint32_t> gTBRPointLightIndex  : register(u1);
-RWStructuredBuffer<uint32_t> gTBRSpotLightIndex  : register(u2);
-RWStructuredBuffer<uint32_t> gTBRShadowSpotLightIndex  : register(u3);
-ConstantBuffer<ViewProjection> gViewProjection  : register(b1);
-StructuredBuffer<DirectionalLight> gDirectionLights  : register(t7);
-StructuredBuffer<PointLight> gPointLights  : register(t8);
-StructuredBuffer<AreaLight> gAreaLights  : register(t9);
-StructuredBuffer<SpotLight> gSpotLights  : register(t10);
-StructuredBuffer<ShadowSpotLight> gShadowSpotLights  : register(t11);
-ConstantBuffer<TileNum> tileNum : register(b7);
-ConstantBuffer<Material> gMaterial  : register(b2);
-RWStructuredBuffer<TBRInformation> gTBRInformation  : register(u0);
-
 struct MSOutput {
 	float32_t4 pos : SV_POSITION;
 	float32_t3 normal : NORMAL;
@@ -32,6 +15,24 @@ struct PixelShaderOutput {
 	float32_t4 color : SV_TARGET0;
 	float32_t4 normal : SV_TARGET1;
 };
+Texture2D<float4> tex : register(t0);
+SamplerState smp : register(s0);
+
+RWStructuredBuffer<TBRInformation> gTBRInformation  : register(u0);
+RWStructuredBuffer<uint32_t> gTBRPointLightIndex  : register(u1);
+RWStructuredBuffer<uint32_t> gTBRSpotLightIndex  : register(u2);
+RWStructuredBuffer<uint32_t> gTBRShadowSpotLightIndex  : register(u3);
+
+
+StructuredBuffer<DirectionalLight> gDirectionLights  : register(t7);
+StructuredBuffer<PointLight> gPointLights  : register(t8);
+StructuredBuffer<AreaLight> gAreaLights  : register(t9);
+StructuredBuffer<SpotLight> gSpotLights  : register(t10);
+StructuredBuffer<ShadowSpotLight> gShadowSpotLights  : register(t11);
+
+ConstantBuffer<ViewProjection> gViewProjection  : register(b1);
+ConstantBuffer<Material> gMaterial  : register(b2);
+ConstantBuffer<TileNum> tileNum : register(b7);
 
 PixelShaderOutput main(MSOutput input) {
 

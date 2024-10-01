@@ -13,9 +13,10 @@
 
 class SwapChain {
 public:
-    static const uint32_t kNumBuffers = 3;
+    static const uint32_t kNumBuffers = 2;
 
     void Create(HWND hWnd);
+    void SwapBackBuffer();
     void Present();
 
     ColorBuffer& GetColorBuffer() { return *buffers_[currentBufferIndex_]; }

@@ -18,7 +18,7 @@ void ParticleData::Initialize()
 
 void ParticleData::PushBackData(const Data& data)
 {
-
+	data_ = static_cast<Data*>(structuredBuffer_->GetCPUData());
 	data_[dataNum_] = data;
 	dataNum_++;
 }

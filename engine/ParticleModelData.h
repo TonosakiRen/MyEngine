@@ -12,8 +12,9 @@ public:
 	const uint32_t kParticleNum;
 
 	struct Data {
-		Matrix4x4 matWorld;
-		Matrix4x4 worldInverseTranspose;
+		Matrix4x4 matWorld{};
+		Matrix4x4 worldInverseTranspose{};
+		Vector4 color = {1.0f,1.0,1.0f,1.0f};
 	};
 
 	ParticleModelData(uint32_t particleNum);

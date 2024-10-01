@@ -154,6 +154,12 @@ inline Vector4 HSVA(float h, float s, float v, float a) {
 	return { r, g, b, a };
 }
 
+inline Vector3 ColorCodeToVector3(uint32_t colorCode) {
+	float r = ((colorCode >> 16) & 0xFF) / 255.0f;
+	float g = ((colorCode >> 8) & 0xFF) / 255.0f;
+	float b = (colorCode & 0xFF) / 255.0f;
+	return Vector3(r, g, b);
+}
 
 #pragma endregion
 

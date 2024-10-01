@@ -13,10 +13,12 @@ void ParticleModelData::Initialize()
 	structuredBuffer_ = std::make_unique<StructuredBuffer>();
 	structuredBuffer_->Create(L"particleModelDataBuffer", sizeof(Data), kParticleNum);
 	data_ = static_cast<Data*>(structuredBuffer_->GetCPUData());
+	
 }
 
 void ParticleModelData::PushBackData(const Data& data)
 {
+	data_ = static_cast<Data*>(structuredBuffer_->GetCPUData());
 	data_[dataNum_] = data;
 	dataNum_++;
 }

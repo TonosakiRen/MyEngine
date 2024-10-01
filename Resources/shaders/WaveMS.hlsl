@@ -1,14 +1,7 @@
 #include "Common.hlsli"
-ConstantBuffer<WorldTransform> gWorldTransform  : register(b0);
-ConstantBuffer<ViewProjection> gViewProjection  : register(b1);
-ConstantBuffer<MeshletInfo> meshletInfo  : register(b3);
-
 struct Time {
 	uint32_t t;
 };
-ConstantBuffer<Time> time  : register(b5);
-ConstantBuffer<WaveIndexData> waveIndexData: register(b6);
-
 struct Vertex {
 	float32_t3 pos;
 	float32_t3 normal;
@@ -22,23 +15,29 @@ struct MSOutput {
 	float32_t3 worldPosition : POSITION0;
 	float32_t depth : TEXCOORD1;
 };
-StructuredBuffer<Vertex> input : register(t1);
-StructuredBuffer<Meshlet> meshlets :register(t2);
-ByteAddressBuffer uniqueVertexIndices : register(t3);
-StructuredBuffer<uint32_t> primitiveIndices :register(t4);
-StructuredBuffer<WaveData> waveData :register(t6);
-
 struct MSOutput3 {
 	MSOutput x;
 	MSOutput y;
 	MSOutput z;
 };
-ConstantBuffer<WaveParam> waveParam: register(b8);
+
+ConstantBuffer<WorldTransform> gWorldTransform  : register(b0);
+ConstantBuffer<ViewProjection> gViewProjection  : register(b1);
+ConstantBuffer<MeshletInfo> meshletInfo  : register(b3);
+ConstantBuffer<Time> time  : register(b5);
+ConstantBuffer<WaveParam> waveParam: register(b7);
+
+StructuredBuffer<Vertex> input : register(t1);
+StructuredBuffer<Meshlet> meshlets :register(t2);
+ByteAddressBuffer uniqueVertexIndices : register(t3);
+StructuredBuffer<uint32_t> primitiveIndices :register(t4);
+StructuredBuffer<WaveData> waveData :register(t6);
+StructuredBuffer<uint32_t> waveIndexData: register(t7);
 
 float32_t3 WaveVertex(float32_t3 worldPos) {
 
-	for (int i = 0; i < waveIndexData.waveDataNum; i++) {
-		WaveData data = waveData[waveIndexData.waveIndex[i]];
+	for (int i = 0; i < waveIndexData[0];i++) {
+		WaveData data = waveData[waveIndexData[i + 1]];
 
 		float32_t3 diff = data.position - worldPos;
 

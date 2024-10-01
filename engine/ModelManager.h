@@ -66,7 +66,7 @@ public:
 
 	Node& GetRootNode(const uint32_t modelHandle);
 
-	const ModelData& GetModelData(const uint32_t modelHandle);
+	ModelData& GetModelData(const uint32_t modelHandle);
 
 	const std::vector<CullData>& GetCullDataData(const uint32_t modelHandle);
 

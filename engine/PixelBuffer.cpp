@@ -6,18 +6,19 @@
 #include "Helper.h"
 #include <assert.h>
 
-#include "DirectXCommon.h"
+#include "BufferManager.h"
 
 void PixelBuffer::CreateTextureResource(const std::wstring& name, const D3D12_RESOURCE_DESC& desc, D3D12_CLEAR_VALUE clearValue) {
-    resource_.Reset();
-
-    auto device = DirectXCommon::GetInstance()->GetDevice();
 
     CD3DX12_HEAP_PROPERTIES heapProps(D3D12_HEAP_TYPE_DEFAULT);
-    Helper::AssertIfFailed(device->CreateCommittedResource(
-        &heapProps, D3D12_HEAP_FLAG_NONE,
-        &desc, D3D12_RESOURCE_STATE_COMMON,
-        &clearValue, IID_PPV_ARGS(resource_.GetAddressOf())));
+
+    resource_ = BufferManager::GetInstance()->CreateResource(
+        index_,
+        &heapProps,
+        D3D12_HEAP_FLAG_NONE,
+        &desc,
+        D3D12_RESOURCE_STATE_COMMON,
+        &clearValue);
 
     state_ = D3D12_RESOURCE_STATE_COMMON;
 
@@ -31,7 +32,8 @@ void PixelBuffer::AssociateWithResource(const std::wstring& name, ID3D12Resource
     assert(resource);
     auto desc = resource->GetDesc();
 
-    resource_.Attach(resource);
+
+    resource_ = resource;
     state_ = state;
 
     width_ = uint32_t(desc.Width);

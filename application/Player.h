@@ -61,5 +61,4 @@ private:
 
     WorldTransform rightHandWorldTransform_;
 
-    WaveIndexData waveIndexData_;
 };

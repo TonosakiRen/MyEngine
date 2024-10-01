@@ -4,6 +4,7 @@
 #include "ShaderManager.h"
 #include "ImGuiManager.h"
 #include "LightManager.h"
+#include "Framework.h"
 
 using namespace Microsoft::WRL;
 
@@ -47,6 +48,10 @@ void FloorRenderer::PreDraw(PipelineType pipelineType, CommandContext& commandCo
     ImGui::Begin("Engine");
     if (ImGui::BeginMenu("Floor")) {
         ImGui::DragFloat4("HSVA COLOR", &HSVA_.x, 0.01f, 0.0f, 1.0f);
+        ImGui::DragFloat("hz", &hz_, 0.01f, 0.0f);
+        ImGui::DragFloat("period", &period_, 0.01f, 0.0f);
+        ImGui::DragFloat("amplitude", &amplitude_, 0.01f, 0.0f);
+        ImGui::DragFloat("radius", &radius_, 0.01f, 0.0f);
         ImGui::EndMenu();
     }
     ImGui::End();
@@ -64,7 +69,7 @@ void FloorRenderer::PreDraw(PipelineType pipelineType, CommandContext& commandCo
 
 
 
-        commandContext.SetDescriptorTable(static_cast<UINT>(ForwardRootParameter::kDirectionalLights), lightManager->directionalLights_->srvHandle_);
+        commandContext.SetDescriptorTable(static_cast<UINT>(ForwardRootParameter::kDirectionalLights), lightManager->directionalLights_->structureBuffer_.GetSRV());
         commandContext.SetDescriptorTable(static_cast<UINT>(ForwardRootParameter::kPointLights), lightManager->pointLights_->structureBuffer_.GetSRV());
         commandContext.SetDescriptorTable(static_cast<UINT>(ForwardRootParameter::kAreaLights), lightManager->areaLights_->structureBuffer_.GetSRV());
         commandContext.SetDescriptorTable(static_cast<UINT>(ForwardRootParameter::kSpotLights), lightManager->spotLights_->structureBuffer_.GetSRV());
@@ -81,7 +86,7 @@ void FloorRenderer::PreDraw(PipelineType pipelineType, CommandContext& commandCo
 
         commandContext.SetConstants(static_cast<UINT>(ForwardRootParameter::kColor), HSVA_.x, HSVA_.y, HSVA_.z, HSVA_.w);
 
-        commandContext.SetConstants(static_cast<UINT>(ForwardRootParameter::kTime), Renderer::time);
+        commandContext.SetConstants(static_cast<UINT>(ForwardRootParameter::kTime), Framework::kFrame);
 
         commandContext.SetDescriptorTable(static_cast<UINT>(ForwardRootParameter::kTileInformation), tileBasedRendering.GetTileInformationGPUHandle());
 
@@ -95,6 +100,8 @@ void FloorRenderer::PreDraw(PipelineType pipelineType, CommandContext& commandCo
 
         commandContext.SetConstants(static_cast<UINT>(ForwardRootParameter::kTileNum), TileBasedRendering::kTileWidthNum, TileBasedRendering::kTileHeightNum);
 
+        commandContext.SetConstants(static_cast<UINT>(ForwardRootParameter::kWaveParam), hz_, period_, amplitude_, radius_);
+
         break;
     case Renderer::kDeferred:
 
@@ -106,7 +113,7 @@ void FloorRenderer::PreDraw(PipelineType pipelineType, CommandContext& commandCo
 
         commandContext.SetConstants(static_cast<UINT>(RootParameter::kColor), HSVA_.x, HSVA_.y, HSVA_.z, HSVA_.w);
 
-        commandContext.SetConstants(static_cast<UINT>(RootParameter::kTime), Renderer::time);
+        commandContext.SetConstants(static_cast<UINT>(RootParameter::kTime), Framework::kFrame);
 
         commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kFrustum), cullingViewProjection.GetFrustumGPUVirtualAddress());
         break;
@@ -280,11 +287,13 @@ void FloorRenderer::CreateForwardPipeline()
         descRangeSRV[int(ForwardRootParameter::kUniqueVertexIndices)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 3);
         descRangeSRV[int(ForwardRootParameter::kPrimitiveIndices)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 4);
         descRangeSRV[int(ForwardRootParameter::kCullData)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 5);
-        descRangeSRV[int(ForwardRootParameter::kDirectionalLights)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 6);
-        descRangeSRV[int(ForwardRootParameter::kPointLights)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 7);
-        descRangeSRV[int(ForwardRootParameter::kAreaLights)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 8);
-        descRangeSRV[int(ForwardRootParameter::kSpotLights)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 9);
-        descRangeSRV[int(ForwardRootParameter::kShadowSpotLights)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 10);
+        descRangeSRV[int(ForwardRootParameter::kWaveData)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 6);
+        descRangeSRV[int(ForwardRootParameter::kWaveIndexData)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 7);
+        descRangeSRV[int(ForwardRootParameter::kDirectionalLights)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 8);
+        descRangeSRV[int(ForwardRootParameter::kPointLights)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 9);
+        descRangeSRV[int(ForwardRootParameter::kAreaLights)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 10);
+        descRangeSRV[int(ForwardRootParameter::kSpotLights)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 11);
+        descRangeSRV[int(ForwardRootParameter::kShadowSpotLights)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 12);
         descRangeSRV[int(ForwardRootParameter::kTileInformation)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 0);
         descRangeSRV[int(ForwardRootParameter::kTBRPointLightIndex)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 1);
         descRangeSRV[int(ForwardRootParameter::kTBRSpotLightIndex)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 2);
@@ -299,6 +308,8 @@ void FloorRenderer::CreateForwardPipeline()
         rootparams[int(ForwardRootParameter::kUniqueVertexIndices)].InitAsDescriptorTable(1, &descRangeSRV[int(ForwardRootParameter::kUniqueVertexIndices)]);
         rootparams[int(ForwardRootParameter::kPrimitiveIndices)].InitAsDescriptorTable(1, &descRangeSRV[int(ForwardRootParameter::kPrimitiveIndices)]);
         rootparams[int(ForwardRootParameter::kCullData)].InitAsDescriptorTable(1, &descRangeSRV[int(ForwardRootParameter::kCullData)]);
+        rootparams[int(ForwardRootParameter::kWaveData)].InitAsDescriptorTable(1, &descRangeSRV[int(ForwardRootParameter::kWaveData)]);
+        rootparams[int(ForwardRootParameter::kWaveIndexData)].InitAsDescriptorTable(1, &descRangeSRV[int(ForwardRootParameter::kWaveIndexData)]);
         rootparams[(int)ForwardRootParameter::kDirectionalLights].InitAsDescriptorTable(1, &descRangeSRV[(int)ForwardRootParameter::kDirectionalLights]);
         rootparams[(int)ForwardRootParameter::kPointLights].InitAsDescriptorTable(1, &descRangeSRV[(int)ForwardRootParameter::kPointLights]);
         rootparams[(int)ForwardRootParameter::kAreaLights].InitAsDescriptorTable(1, &descRangeSRV[(int)ForwardRootParameter::kAreaLights]);
@@ -317,6 +328,7 @@ void FloorRenderer::CreateForwardPipeline()
         rootparams[int(ForwardRootParameter::kMeshletInfo)].InitAsConstantBufferView(4, 0, D3D12_SHADER_VISIBILITY_ALL);
         rootparams[int(ForwardRootParameter::kFrustum)].InitAsConstantBufferView(5, 0, D3D12_SHADER_VISIBILITY_ALL);
         rootparams[(int)ForwardRootParameter::kTileNum].InitAsConstants(2, 6);
+        rootparams[(int)ForwardRootParameter::kWaveParam].InitAsConstants(4, 7);
 
         // スタティックサンプラー
         CD3DX12_STATIC_SAMPLER_DESC samplerDesc = CD3DX12_STATIC_SAMPLER_DESC(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR);
@@ -401,7 +413,7 @@ void FloorRenderer::CreateForwardPipeline()
     }
 }
 
-void FloorRenderer::Draw(CommandContext& commandContext, uint32_t modelHandle, const WorldTransform& worldTransform) {
+void FloorRenderer::Draw(CommandContext& commandContext, uint32_t modelHandle, const WorldTransform& worldTransform, const WaveData& waveData, const WaveIndexData& waveIndexData) {
 
 
     const ModelData& modelItem = ModelManager::GetInstance()->ModelManager::GetModelData(modelHandle);
@@ -411,6 +423,10 @@ void FloorRenderer::Draw(CommandContext& commandContext, uint32_t modelHandle, c
     {
     case Renderer::kForward:
         commandContext.SetConstantBuffer(static_cast<UINT>(ForwardRootParameter::kWorldTransform), worldTransform.GetGPUVirtualAddress());
+
+        commandContext.SetDescriptorTable(static_cast<UINT>(ForwardRootParameter::kWaveData), waveData.GetGPUHandle());
+
+        commandContext.SetDescriptorTable(UINT(ForwardRootParameter::kWaveIndexData), waveIndexData.GetGPUHandle());
 
         for (const auto& mesh : modelItem.meshes) {
  

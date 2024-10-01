@@ -137,6 +137,9 @@
     <Filter Include="shaders\Hlsli">
       <UniqueIdentifier>{fde0058d-1793-4232-9456-820ca1c074b4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine\ReleaseManager">
+      <UniqueIdentifier>{a98319b5-cf56-4c45-8153-a45e4e5683b1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="externals\imgui\imgui.cpp">
@@ -294,9 +297,6 @@
     </ClCompile>
     <ClCompile Include="application\EnemyBulletManager.cpp">
       <Filter>Game\Enemy</Filter>
-    </ClCompile>
-    <ClCompile Include="application\ExplodeParticle.cpp">
-      <Filter>Engine\Light</Filter>
     </ClCompile>
     <ClCompile Include="engine\StructuredBuffer.cpp">
       <Filter>Engine\GPUResource</Filter>
@@ -487,6 +487,27 @@
     <ClCompile Include="engine\ByteAddressBuffer.cpp">
       <Filter>Engine\GPUResource</Filter>
     </ClCompile>
+    <ClCompile Include="engine\CopyBuffer.cpp">
+      <Filter>Engine\GPUResource</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\Loader.cpp">
+      <Filter>Engine\Loader</Filter>
+    </ClCompile>
+    <ClCompile Include="application\Tree.cpp">
+      <Filter>Game\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="application\Trees.cpp">
+      <Filter>Game\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\BufferManager.cpp">
+      <Filter>Engine\GPUResource</Filter>
+    </ClCompile>
+    <ClCompile Include="application\ExplodeParticle.cpp">
+      <Filter>Game\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="application\LineAttack.cpp">
+      <Filter>Game\Enemy</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -650,9 +671,6 @@
     </ClInclude>
     <ClInclude Include="application\EnemyBulletManager.h">
       <Filter>Game\Enemy</Filter>
-    </ClInclude>
-    <ClInclude Include="application\ExplodeParticle.h">
-      <Filter>Engine\Light</Filter>
     </ClInclude>
     <ClInclude Include="engine\StructuredBuffer.h">
       <Filter>Engine\GPUResource</Filter>
@@ -842,6 +860,27 @@
     </ClInclude>
     <ClInclude Include="engine\ByteAddressBuffer.h">
       <Filter>Engine\GPUResource</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\CopyBuffer.h">
+      <Filter>Engine\GPUResource</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Loader.h">
+      <Filter>Engine\Loader</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Tree.h">
+      <Filter>Game\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Trees.h">
+      <Filter>Game\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\BufferManager.h">
+      <Filter>Engine\GPUResource</Filter>
+    </ClInclude>
+    <ClInclude Include="application\ExplodeParticle.h">
+      <Filter>Game\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="application\LineAttack.h">
+      <Filter>Game\Enemy</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

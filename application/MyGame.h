@@ -7,6 +7,7 @@ class ModelManager;
 class SceneManager;
 class GameObjectManager;
 class LightManager;
+class BufferManager;
 
 
 class MyGame : public Framework
@@ -20,6 +21,7 @@ public:
 	
 	GameScene* gameScene = nullptr;
 	Renderer* renderer = nullptr;
+	BufferManager* bufferManager = nullptr;
 	TextureManager* textureManager = nullptr;
 	ModelManager* modelManager = nullptr;
 	SceneManager* sceneManager = nullptr;

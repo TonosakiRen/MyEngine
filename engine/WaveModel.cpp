@@ -4,6 +4,7 @@
 #include "ShaderManager.h"
 #include "LightManager.h"
 #include "ImGuiManager.h"
+#include "Framework.h"
 
 using namespace Microsoft::WRL;
 
@@ -51,14 +52,14 @@ void WaveModel::PreDraw(PipelineType pipelineType,CommandContext& commandContext
     {
     case Renderer::kForward:
 
-        commandContext.SetDescriptorTable(static_cast<UINT>(ForwardRootParameter::kDirectionalLights), lightManager->directionalLights_->srvHandle_);
+        commandContext.SetDescriptorTable(static_cast<UINT>(ForwardRootParameter::kDirectionalLights), lightManager->directionalLights_->structureBuffer_.GetSRV());
         commandContext.SetDescriptorTable(static_cast<UINT>(ForwardRootParameter::kPointLights), lightManager->pointLights_->structureBuffer_.GetSRV());
         commandContext.SetDescriptorTable(static_cast<UINT>(ForwardRootParameter::kAreaLights), lightManager->areaLights_->structureBuffer_.GetSRV());
         commandContext.SetDescriptorTable(static_cast<UINT>(ForwardRootParameter::kSpotLights), lightManager->spotLights_->structureBuffer_.GetSRV());
         commandContext.SetDescriptorTable(static_cast<UINT>(ForwardRootParameter::kShadowSpotLights), lightManager->shadowSpotLights_->structureBuffer_.GetSRV());
         commandContext.SetConstantBuffer(static_cast<UINT>(ForwardRootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
         commandContext.SetConstantBuffer(static_cast<UINT>(ForwardRootParameter::kFrustum), cullingViewProjection.GetFrustumGPUVirtualAddress());
-        commandContext.SetConstants(static_cast<UINT>(ForwardRootParameter::kTime), Renderer::time);
+        commandContext.SetConstants(static_cast<UINT>(ForwardRootParameter::kTime), Framework::kFrame);
         commandContext.SetDescriptorTable(static_cast<UINT>(ForwardRootParameter::kTileInformation), tileBasedRendering.GetTileInformationGPUHandle());
         commandContext.SetDescriptorTable(static_cast<UINT>(ForwardRootParameter::kTBRPointLightIndex), tileBasedRendering.GetPointLightIndexGPUHandle());
         commandContext.SetDescriptorTable(static_cast<UINT>(ForwardRootParameter::kTBRSpotLightIndex), tileBasedRendering.GetSpotLightIndexGPUHandle());
@@ -71,7 +72,7 @@ void WaveModel::PreDraw(PipelineType pipelineType,CommandContext& commandContext
     case Renderer::kDeferred:
         commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
         commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kFrustum), cullingViewProjection.GetFrustumGPUVirtualAddress());
-        commandContext.SetConstants(static_cast<UINT>(RootParameter::kTime), Renderer::time);
+        commandContext.SetConstants(static_cast<UINT>(RootParameter::kTime), Framework::kFrame);
         break;
     default:
         break;
@@ -130,7 +131,8 @@ void WaveModel::CreatePipeline() {
         rootparams[int(RootParameter::kFrustum)].InitAsConstantBufferView(4, 0, D3D12_SHADER_VISIBILITY_ALL);
         rootparams[int(RootParameter::kTime)].InitAsConstants(1, 5, 0, D3D12_SHADER_VISIBILITY_ALL);
         rootparams[int(RootParameter::kWaveIndexData)].InitAsConstantBufferView(6, 0, D3D12_SHADER_VISIBILITY_ALL);
-        rootparams[int(RootParameter::kWaveParam)].InitAsConstants(4,7);
+        rootparams[int(RootParameter::kWaveIndexDataNum)].InitAsConstantBufferView(7, 0, D3D12_SHADER_VISIBILITY_ALL);
+        rootparams[int(RootParameter::kWaveParam)].InitAsConstants(4,8);
 
         // スタティックサンプラー
         CD3DX12_STATIC_SAMPLER_DESC samplerDesc =
@@ -247,11 +249,12 @@ void WaveModel::CreateForwardPipeline()
         descRangeSRV[int(ForwardRootParameter::kPrimitiveIndices)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 4);
         descRangeSRV[int(ForwardRootParameter::kCullData)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 5);
         descRangeSRV[int(ForwardRootParameter::kWaveData)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 6);
-        descRangeSRV[int(ForwardRootParameter::kDirectionalLights)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 7);
-        descRangeSRV[int(ForwardRootParameter::kPointLights)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 8);
-        descRangeSRV[int(ForwardRootParameter::kAreaLights)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 9);
-        descRangeSRV[int(ForwardRootParameter::kSpotLights)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 10);
-        descRangeSRV[int(ForwardRootParameter::kShadowSpotLights)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 11);
+        descRangeSRV[int(ForwardRootParameter::kWaveIndexData)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 7);
+        descRangeSRV[int(ForwardRootParameter::kDirectionalLights)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 8);
+        descRangeSRV[int(ForwardRootParameter::kPointLights)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 9);
+        descRangeSRV[int(ForwardRootParameter::kAreaLights)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 10);
+        descRangeSRV[int(ForwardRootParameter::kSpotLights)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 11);
+        descRangeSRV[int(ForwardRootParameter::kShadowSpotLights)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 12);
         descRangeSRV[int(ForwardRootParameter::kTileInformation)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 0);
         descRangeSRV[int(ForwardRootParameter::kTBRPointLightIndex)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 1);
         descRangeSRV[int(ForwardRootParameter::kTBRSpotLightIndex)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 2);
@@ -267,6 +270,7 @@ void WaveModel::CreateForwardPipeline()
         rootparams[int(ForwardRootParameter::kPrimitiveIndices)].InitAsDescriptorTable(1, &descRangeSRV[int(ForwardRootParameter::kPrimitiveIndices)], D3D12_SHADER_VISIBILITY_ALL);
         rootparams[int(ForwardRootParameter::kCullData)].InitAsDescriptorTable(1, &descRangeSRV[int(ForwardRootParameter::kCullData)], D3D12_SHADER_VISIBILITY_ALL);
         rootparams[int(ForwardRootParameter::kWaveData)].InitAsDescriptorTable(1, &descRangeSRV[int(ForwardRootParameter::kWaveData)], D3D12_SHADER_VISIBILITY_ALL);
+        rootparams[int(ForwardRootParameter::kWaveIndexData)].InitAsDescriptorTable(1, &descRangeSRV[int(ForwardRootParameter::kWaveIndexData)], D3D12_SHADER_VISIBILITY_ALL);
         rootparams[(int)ForwardRootParameter::kDirectionalLights].InitAsDescriptorTable(1, &descRangeSRV[(int)ForwardRootParameter::kDirectionalLights]);
         rootparams[(int)ForwardRootParameter::kPointLights].InitAsDescriptorTable(1, &descRangeSRV[(int)ForwardRootParameter::kPointLights]);
         rootparams[(int)ForwardRootParameter::kAreaLights].InitAsDescriptorTable(1, &descRangeSRV[(int)ForwardRootParameter::kAreaLights]);
@@ -284,9 +288,8 @@ void WaveModel::CreateForwardPipeline()
         rootparams[int(ForwardRootParameter::kMeshletInfo)].InitAsConstantBufferView(3, 0, D3D12_SHADER_VISIBILITY_ALL);
         rootparams[int(ForwardRootParameter::kFrustum)].InitAsConstantBufferView(4, 0, D3D12_SHADER_VISIBILITY_ALL);
         rootparams[int(ForwardRootParameter::kTime)].InitAsConstants(1, 5, 0, D3D12_SHADER_VISIBILITY_ALL);
-        rootparams[int(ForwardRootParameter::kWaveIndexData)].InitAsConstantBufferView(6, 0, D3D12_SHADER_VISIBILITY_ALL);
-        rootparams[(int)ForwardRootParameter::kTileNum].InitAsConstants(2, 7);
-        rootparams[(int)ForwardRootParameter::kWaveParam].InitAsConstants(4, 8);
+        rootparams[(int)ForwardRootParameter::kTileNum].InitAsConstants(2, 6);
+        rootparams[(int)ForwardRootParameter::kWaveParam].InitAsConstants(4, 7);
 
         // スタティックサンプラー
         CD3DX12_STATIC_SAMPLER_DESC samplerDesc =
@@ -387,7 +390,7 @@ void WaveModel::Draw(CommandContext& commandContext, uint32_t modelHandle, const
 
         commandContext.SetDescriptorTable(static_cast<UINT>(ForwardRootParameter::kWaveData), waveData.GetGPUHandle());
 
-        commandContext.SetConstantBuffer(static_cast<UINT>(ForwardRootParameter::kWaveIndexData), waveIndexData.GetGPUVirtualAddress());
+        commandContext.SetDescriptorTable(UINT(ForwardRootParameter::kWaveIndexData), waveIndexData.GetGPUHandle());
 
         for (const auto& mesh : modelItem.meshes) {
             // srvセット
@@ -420,8 +423,7 @@ void WaveModel::Draw(CommandContext& commandContext, uint32_t modelHandle, const
 
         commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kWaveData), waveData.GetGPUHandle());
 
-        commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kWaveIndexData), waveIndexData.GetGPUVirtualAddress());
-
+        commandContext.SetDescriptorTable(UINT(ForwardRootParameter::kWaveIndexData), waveIndexData.GetGPUHandle());
 
         for (const auto& mesh : modelItem.meshes) {
             // srvセット
@@ -467,8 +469,7 @@ void WaveModel::Draw(CommandContext& commandContext, uint32_t modelHandle, const
 
         commandContext.SetDescriptorTable(static_cast<UINT>(ForwardRootParameter::kWaveData), waveData.GetGPUHandle());
 
-        commandContext.SetConstantBuffer(static_cast<UINT>(ForwardRootParameter::kWaveIndexData), waveIndexData.GetGPUVirtualAddress());
-
+        commandContext.SetDescriptorTable(UINT(ForwardRootParameter::kWaveIndexData), waveIndexData.GetGPUHandle());
 
         for (const auto& mesh : modelItem.meshes) {
             // srvセット
@@ -502,7 +503,7 @@ void WaveModel::Draw(CommandContext& commandContext, uint32_t modelHandle, const
 
         commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kWaveData), waveData.GetGPUHandle());
 
-        commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kWaveIndexData), waveIndexData.GetGPUVirtualAddress());
+        commandContext.SetDescriptorTable(UINT(ForwardRootParameter::kWaveIndexData), waveIndexData.GetGPUHandle());
 
         for (const auto& mesh : modelItem.meshes) {
             // srvセット

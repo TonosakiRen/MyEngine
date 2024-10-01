@@ -4,7 +4,8 @@
 #include "WinApp.h"
 #include "SceneManager.h"
 bool Framework::endRequest_ = false;
-
+uint32_t Framework::kFrame = 0;
+uint32_t Framework::kFrameRemainder = 0;
 void Framework::Run()
 {
 	Framework::Initialize();
@@ -20,6 +21,8 @@ void Framework::Run()
 		}
 
 		Draw();
+		kFrame++;
+		kFrameRemainder = kFrame % 2;
 	}
 
 	Framework::Finalize();

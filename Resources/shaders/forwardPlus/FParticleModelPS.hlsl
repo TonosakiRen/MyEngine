@@ -24,12 +24,20 @@ struct VSOutput {
 	float32_t2 uv : TEXCOORD;
 	float32_t3 worldPosition : POSITION0;
 	float32_t depth : TEXCOORD1;
+	uint32_t instanceId : TEXCOORD2;
 };
 
 struct PixelShaderOutput {
 	float32_t4 color : SV_TARGET0;
 	float32_t4 normal : SV_TARGET1;
 };
+
+struct ParticleData {
+	float32_t4x4 world;
+	float32_t4x4 worldInverseTranspose;
+	float32_t4 color;
+};
+StructuredBuffer<ParticleData> gParticleData  : register(t1);
 
 PixelShaderOutput main(VSOutput input) {
 
@@ -42,6 +50,8 @@ PixelShaderOutput main(VSOutput input) {
 	float32_t4 tranformedUV = mul(float32_t4(input.uv, 0.0f, 1.0f), gMaterial.uvTransfrom);
 	float32_t4 texColor = tex.Sample(smp, tranformedUV.xy);
 	float32_t4 color = gMaterial.materialColor * texColor;	
+	color = color * gParticleData[input.instanceId].color;
+
 
 	if (gMaterial.enableLighting) {
 

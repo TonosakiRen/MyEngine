@@ -8,7 +8,6 @@ class CommandContext;
 
 class RwStructuredBuffer : public UAVBuffer {
 public:
-    ~RwStructuredBuffer();
 
     void Create(const std::wstring& name, size_t bufferSize, UINT numElements);
 
@@ -19,7 +18,6 @@ public:
     }
 
 protected:
-    void Destroy();
 
     DescriptorHandle uavHandle_;
 };

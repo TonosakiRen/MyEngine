@@ -1,5 +1,6 @@
 #include "EnemyBullet.h"
 #include "ModelManager.h"
+#include "Floor.h"
 
 Vector3 EnemyBullet::modelSize;
 void EnemyBullet::Initialize(Vector3 position, Vector3 direction,uint32_t modelHandle)
@@ -10,6 +11,7 @@ void EnemyBullet::Initialize(Vector3 position, Vector3 direction,uint32_t modelH
 	collider_.Initialize(&worldTransform_, "enemyBullet", modelHandle);
 	direction_ = direction;
 	modelSize = ModelManager::GetInstance()->GetModelSize(modelHandle_);
+	isDead_ = false;
 }
 
 void EnemyBullet::Update()
@@ -18,9 +20,8 @@ void EnemyBullet::Update()
 	worldTransform_.Update();
 	collider_.AdjustmentScale();
 
-	if (worldTransform_.translation_.x > 25.0f + modelSize.x / 2.0f || worldTransform_.translation_.x < -25.0f - modelSize.x / 2.0f ||
-		worldTransform_.translation_.z > 25.0f + modelSize.z / 2.0f || worldTransform_.translation_.z < -25.0f - modelSize.z / 2.0f
-		) {
+	if (worldTransform_.translation_.x > Floor::kFloorHalfSize + modelSize.x / 2.0f || worldTransform_.translation_.x < -Floor::kFloorHalfSize - modelSize.x / 2.0f ||
+		worldTransform_.translation_.z > Floor::kFloorHalfSize + modelSize.z / 2.0f || worldTransform_.translation_.z < -Floor::kFloorHalfSize - modelSize.z / 2.0f ) {
 		isDead_ = true;
 	}
 }
