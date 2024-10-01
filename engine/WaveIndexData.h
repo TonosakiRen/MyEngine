@@ -8,7 +8,7 @@
 class WaveIndexData {
 public:
 
-	static const uint32_t kMaxInfluenceWaveNum = 127;
+	static const uint32_t kMaxInfluenceWaveNum = 255;
 
 	void Initialize();
 	void Update();
