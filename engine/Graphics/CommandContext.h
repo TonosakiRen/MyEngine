@@ -89,6 +89,7 @@ public:
     void SetIndexBuffer(const D3D12_INDEX_BUFFER_VIEW& ibv);
 
     void UAVBarrier(GPUResource& resource);
+    void UAVBarrier(ID3D12Resource& resource);
 
     void Dispatch(uint32_t x,uint32_t y,uint32_t z);
     void DispatchMesh(uint32_t x, uint32_t y, uint32_t z);
@@ -99,6 +100,8 @@ public:
     void DrawIndexedInstanced(UINT indexCountPerInstance, UINT instanceCount, UINT startIndexLocation = 0, INT baseVertexLocation = 0, UINT startInstanceLocation = 0);
 
     void ExecuteIndirect(ID3D12CommandSignature* commandSignature, UINT maxCommandCount, ID3D12Resource* argumentBuffer, UINT64 argumentBufferOffset, ID3D12Resource* countBuffer, UINT64 countBufferOffset);
+
+    void BuildRaytracingAccelerationStructure(const D3D12_BUILD_RAYTRACING_ACCELERATION_STRUCTURE_DESC& asDesc);
 
     operator ID3D12GraphicsCommandList6* () const { return currentCommandList_; }
     
@@ -429,6 +432,16 @@ inline void CommandContext::UAVBarrier(GPUResource& resource) {
     }
 }
 
+inline void CommandContext::UAVBarrier(ID3D12Resource& resource) {
+    D3D12_RESOURCE_BARRIER& barrierDesc = resourceBarriers_[numResourceBarriers_++];
+    barrierDesc.Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
+    barrierDesc.UAV.pResource = &resource;
+    if (numResourceBarriers_ >= kMaxNumResourceBarriers) {
+        FlushResourceBarriers();
+    }
+}
+
+
 inline void CommandContext::Draw(UINT vertexCount, UINT vertexStartOffset) {
     DrawInstanced(vertexCount, 1, vertexStartOffset, 0);
 }
@@ -450,4 +463,10 @@ inline void CommandContext::DrawIndexedInstanced(UINT indexCountPerInstance, UIN
 inline void CommandContext::ExecuteIndirect(ID3D12CommandSignature* commandSignature, UINT maxCommandCount, ID3D12Resource* argumentBuffer, UINT64 argumentBufferOffset, ID3D12Resource* countBuffer, UINT64 countBufferOffset) {
     FlushResourceBarriers();
     currentCommandList_->ExecuteIndirect(commandSignature, maxCommandCount, argumentBuffer, argumentBufferOffset, countBuffer, countBufferOffset);
+}
+
+
+inline void CommandContext::BuildRaytracingAccelerationStructure(const D3D12_BUILD_RAYTRACING_ACCELERATION_STRUCTURE_DESC& asDesc) {
+    FlushResourceBarriers();
+    currentCommandList_->BuildRaytracingAccelerationStructure(&asDesc, 0, nullptr);
 }

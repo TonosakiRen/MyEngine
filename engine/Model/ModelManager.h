@@ -88,7 +88,8 @@ private:
 
 	std::unique_ptr<std::array<ModelData, kNumModels>> models_;
 	uint32_t useModelCount_ = 0;
-	CommandContext* commandContext_;
+	CommandContext* commandContext_ = nullptr;
+	DirectXCommon* directXCommon_ = nullptr;
 
 	uint32_t LoadInternal(const std::string& fileName);
 

@@ -29,8 +29,15 @@ void ModelManager::CreateMeshes(ModelData& modelData)
 
 	std::string directoryPath = "Resources/models/" + n + "/";
 
+	//debug
+	//directoryPath = "Resources/models/box1x1/";
+
 	Assimp::Importer importer;
 	std::string filePath = directoryPath + modelData.name;
+
+	//debug
+	//filePath = directoryPath + "box1x1.obj";
+
 	const aiScene* scene = importer.ReadFile(filePath.c_str(), aiProcess_FlipWindingOrder | aiProcess_FlipUVs);
 	assert(scene->HasMeshes());
 	modelData.meshes.resize(scene->mNumMeshes);
@@ -203,6 +210,29 @@ void ModelManager::CreateMeshes(ModelData& modelData)
 
 	//node
 	modelData.rootNode = ReadNode(scene->mRootNode);
+
+	//blasの生成
+	for (auto& mesh : modelData.meshes) {
+
+		commandContext_->TransitionResource(mesh.indexBuffer_, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+		commandContext_->TransitionResource(mesh.vertexBuffer_, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+
+		D3D12_RAYTRACING_GEOMETRY_DESC geomDesc{};
+		geomDesc.Type = D3D12_RAYTRACING_GEOMETRY_TYPE_TRIANGLES;
+		geomDesc.Triangles.VertexBuffer.StartAddress = mesh.vertexBuffer_.GetGPUVirtualAddress();
+		geomDesc.Triangles.VertexBuffer.StrideInBytes = sizeof(Mesh::VertexData);
+		geomDesc.Triangles.VertexCount = UINT(mesh.vertices_.size());
+
+		geomDesc.Triangles.VertexFormat = DXGI_FORMAT_R32G32B32_FLOAT;
+
+		geomDesc.Triangles.IndexBuffer = mesh.indexBuffer_->GetGPUVirtualAddress();
+		geomDesc.Triangles.IndexFormat = DXGI_FORMAT_R32_UINT;  // インデックスのフォーマット
+		geomDesc.Triangles.IndexCount = static_cast<UINT>(mesh.indices_.size());
+
+		geomDesc.Flags = D3D12_RAYTRACING_GEOMETRY_FLAG_OPAQUE; //不透明
+
+		mesh.blasBuffer_.Create(L"BlasBuffer", geomDesc,*commandContext_);
+	}
 	
 }
 
@@ -223,6 +253,7 @@ ModelManager* ModelManager::GetInstance() {
 void ModelManager::Initialize(CommandContext& commandContext)
 {
 	commandContext_ = &commandContext;
+	directXCommon_ = DirectXCommon::GetInstance();
 }
 
 void ModelManager::DrawInstanced(CommandContext& commandContext, const  uint32_t modelHandle)

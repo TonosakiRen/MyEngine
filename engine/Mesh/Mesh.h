@@ -4,6 +4,7 @@
 #include "UploadBuffer.h"
 #include "DefaultStructuredBuffer.h"
 #include "ByteAddressBuffer.h"
+#include "BLAS.h"
 #include <vector>
 #include <memory>
 #include <DirectXMesh.h>
@@ -64,6 +65,10 @@ public:
 
 	DefaultStructuredBuffer cullDataBuffer_;
 	std::vector<DirectX::CullData> cullData_;
+
+	// raytarceing用
+	BLAS blasBuffer_;
+
 
 	std::string name_;
 	uint32_t uvHandle_ = 0;
