@@ -1,6 +1,6 @@
-#include "WavePoints.h"
+#include "WavePoints/WavePoints.h"
 #include "ImGuiManager.h"
-#include "DrawManager.h"
+#include "Draw/DrawManager.h"
 
 WavePoints::WavePoints()
 {

@@ -1,6 +1,6 @@
-#include "SceneManager.h"
-#include "BaseScene.h"
-#include "Renderer.h"
+#include "Scene/SceneManager.h"
+#include "Scene/BaseScene.h"
+#include "Render/Renderer.h"
 SceneManager* SceneManager::GetInstance() {
 	static SceneManager instance;
 	return &instance;

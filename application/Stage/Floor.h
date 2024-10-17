@@ -1,7 +1,7 @@
 #pragma once
-#include "GameObject.h"
-#include "WaveIndexData.h"
-#include "WavePoints.h"
+#include "GameComponent/GameObject.h"
+#include "Wave/WaveIndexData.h"
+#include "WavePoints/WavePoints.h"
 class Floor :
     public GameObject
 {

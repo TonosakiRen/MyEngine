@@ -1,10 +1,10 @@
-#include "LineAttack.h"
-#include "EnemyBulletManager.h"
-#include "Player.h"
-#include "ModelManager.h"
-#include "Floor.h"
-#include "LightManager.h"
-#include "DrawManager.h"
+#include "Enemy/LineAttack.h"
+#include "Enemy/EnemyBulletManager.h"
+#include "Player/Player.h"
+#include "Model/ModelManager.h"
+#include "Stage/Floor.h"
+#include "Light/LightManager.h"
+#include "Draw/DrawManager.h"
 
 
 void LineAttack::Initialize()

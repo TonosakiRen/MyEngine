@@ -81,7 +81,7 @@
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(ProjectDir)application;$(ProjectDir)application\WavePoints;$(ProjectDir)application\Stage;$(ProjectDir)application\Scene;$(ProjectDir)application\Player;$(ProjectDir)application\Particle;$(ProjectDir)application\Enemy;$(ProjectDir)application\Compute;$(ProjectDir)application\Camera;$(ProjectDir)audio;$(ProjectDir)engine;$(ProjectDir)engine\Animation;$(ProjectDir)engine\Framework;$(ProjectDir)engine\Input;$(ProjectDir)engine\Render;$(ProjectDir)engine\Texture;$(ProjectDir)engine\Draw;$(ProjectDir)engine\Model;$(ProjectDir)engine\Sky;$(ProjectDir)engine\Wave;$(ProjectDir)engine\RayTracing;$(ProjectDir)engine\PostEffect;$(ProjectDir)engine\Particle;$(ProjectDir)engine\Mesh;$(ProjectDir)engine\Light;$(ProjectDir)engine\Graphics;$(ProjectDir)engine\GPUResource;$(ProjectDir)engine\GameComponent;$(ProjectDir)ImGui;$(ProjectDir)math;$(ProjectDir)externals\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)application;$(ProjectDir)audio;$(ProjectDir)engine;$(ProjectDir)engine\Input;$(ProjectDir)ImGui;$(ProjectDir)math;$(ProjectDir)external\assimp\include;$(ProjectDir)audio;$(ProjectDir)engine;$(ProjectDir)engine\Input;$(ProjectDir)ImGui;$(ProjectDir)math;$(ProjectDir)externals\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -115,7 +115,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(ProjectDir)application;$(ProjectDir)application\WavePoints;$(ProjectDir)application\Stage;$(ProjectDir)application\Scene;$(ProjectDir)application\Player;$(ProjectDir)application\Particle;$(ProjectDir)application\Enemy;$(ProjectDir)application\Compute;$(ProjectDir)application\Camera;$(ProjectDir)audio;$(ProjectDir)engine;$(ProjectDir)engine\Animation;$(ProjectDir)engine\Framework;$(ProjectDir)engine\Input;$(ProjectDir)engine\Render;$(ProjectDir)engine\Texture;$(ProjectDir)engine\Draw;$(ProjectDir)engine\Model;$(ProjectDir)engine\Sky;$(ProjectDir)engine\Wave;$(ProjectDir)engine\RayTracing;$(ProjectDir)engine\PostEffect;$(ProjectDir)engine\Particle;$(ProjectDir)engine\Mesh;$(ProjectDir)engine\Light;$(ProjectDir)engine\Graphics;$(ProjectDir)engine\GPUResource;$(ProjectDir)engine\GameComponent;$(ProjectDir)ImGui;$(ProjectDir)math;$(ProjectDir)externals\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)application;$(ProjectDir)audio;$(ProjectDir)engine;$(ProjectDir)engine\Input;$(ProjectDir)ImGui;$(ProjectDir)math;$(ProjectDir)external\assimp\include;$(ProjectDir)application\WavePoints;$(ProjectDir)application\Stage;$(ProjectDir)application\Scene;$(ProjectDir)application\Player;$(ProjectDir)application\Particle;$(ProjectDir)application\Enemy;$(ProjectDir)application\Compute;$(ProjectDir)application\Camera;$(ProjectDir)audio;$(ProjectDir)engine;$(ProjectDir)engine\Animation;$(ProjectDir)engine\Framework;$(ProjectDir)engine\Input;$(ProjectDir)engine\Render;$(ProjectDir)engine\Texture;$(ProjectDir)engine\Draw;$(ProjectDir)engine\Model;$(ProjectDir)engine\Sky;$(ProjectDir)engine\Wave;$(ProjectDir)engine\RayTracing;$(ProjectDir)engine\PostEffect;$(ProjectDir)engine\Particle;$(ProjectDir)engine\Mesh;$(ProjectDir)engine\Light;$(ProjectDir)engine\Graphics;$(ProjectDir)engine\GPUResource;$(ProjectDir)engine\GameComponent;$(ProjectDir)ImGui;$(ProjectDir)math;$(ProjectDir)externals\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>MinSpace</Optimization>
       <TreatWarningAsError>true</TreatWarningAsError>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -152,7 +152,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(ProjectDir)application;$(ProjectDir)application\WavePoints;$(ProjectDir)application\Stage;$(ProjectDir)application\Scene;$(ProjectDir)application\Player;$(ProjectDir)application\Particle;$(ProjectDir)application\Enemy;$(ProjectDir)application\Compute;$(ProjectDir)application\Camera;$(ProjectDir)audio;$(ProjectDir)engine;$(ProjectDir)engine\Animation;$(ProjectDir)engine\Framework;$(ProjectDir)engine\Input;$(ProjectDir)engine\Render;$(ProjectDir)engine\Texture;$(ProjectDir)engine\Draw;$(ProjectDir)engine\Model;$(ProjectDir)engine\Sky;$(ProjectDir)engine\Wave;$(ProjectDir)engine\RayTracing;$(ProjectDir)engine\PostEffect;$(ProjectDir)engine\Particle;$(ProjectDir)engine\Mesh;$(ProjectDir)engine\Light;$(ProjectDir)engine\Graphics;$(ProjectDir)engine\GPUResource;$(ProjectDir)engine\GameComponent;$(ProjectDir)ImGui;$(ProjectDir)math;$(ProjectDir)externals\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)application;$(ProjectDir)audio;$(ProjectDir)engine;$(ProjectDir)engine\Input;$(ProjectDir)ImGui;$(ProjectDir)math;$(ProjectDir)external\assimp\include;$(ProjectDir)application\WavePoints;$(ProjectDir)application\Stage;$(ProjectDir)application\Scene;$(ProjectDir)application\Player;$(ProjectDir)application\Particle;$(ProjectDir)application\Enemy;$(ProjectDir)application\Compute;$(ProjectDir)application\Camera;$(ProjectDir)audio;$(ProjectDir)engine;$(ProjectDir)engine\Animation;$(ProjectDir)engine\Framework;$(ProjectDir)engine\Input;$(ProjectDir)engine\Render;$(ProjectDir)engine\Texture;$(ProjectDir)engine\Draw;$(ProjectDir)engine\Model;$(ProjectDir)engine\Sky;$(ProjectDir)engine\Wave;$(ProjectDir)engine\RayTracing;$(ProjectDir)engine\PostEffect;$(ProjectDir)engine\Particle;$(ProjectDir)engine\Mesh;$(ProjectDir)engine\Light;$(ProjectDir)engine\Graphics;$(ProjectDir)engine\GPUResource;$(ProjectDir)engine\GameComponent;$(ProjectDir)ImGui;$(ProjectDir)math;$(ProjectDir)externals\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>MinSpace</Optimization>
       <TreatWarningAsError>true</TreatWarningAsError>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -179,6 +179,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="application\Boss\Boss.cpp" />
     <ClCompile Include="application\Camera\Camera.cpp" />
     <ClCompile Include="application\Compute\Compute.cpp" />
     <ClCompile Include="application\Enemy\Enemy.cpp" />
@@ -279,7 +280,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\PostEffect\Smooth.cpp" />
     <ClCompile Include="engine\PostEffect\Vignette.cpp" />
     <ClCompile Include="engine\RayTracing\BLAS.cpp" />
-    <ClCompile Include="engine\RayTracing\RayTracing.cpp" />
+    <ClCompile Include="engine\RayTracing\Raytracing.cpp" />
+    <ClCompile Include="engine\RayTracing\RaytracingInstanceDescs.cpp" />
     <ClCompile Include="engine\RayTracing\TRAS.cpp" />
     <ClCompile Include="engine\Render\Renderer.cpp" />
     <ClCompile Include="engine\Render\Transition.cpp" />
@@ -306,6 +308,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="application\Boss\Boss.h" />
     <ClInclude Include="application\Camera\Camera.h" />
     <ClInclude Include="application\Compute\Compute.h" />
     <ClInclude Include="application\Enemy\Enemy.h" />
@@ -407,7 +410,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\PostEffect\Smooth.h" />
     <ClInclude Include="engine\PostEffect\Vignette.h" />
     <ClInclude Include="engine\RayTracing\BLAS.h" />
-    <ClInclude Include="engine\RayTracing\RayTracing.h" />
+    <ClInclude Include="engine\RayTracing\Raytracing.h" />
+    <ClInclude Include="engine\RayTracing\RaytracingInstanceDescs.h" />
     <ClInclude Include="engine\RayTracing\TRAS.h" />
     <ClInclude Include="engine\Render\Renderer.h" />
     <ClInclude Include="engine\Render\Transition.h" />

@@ -1,14 +1,14 @@
 #pragma once
 
 #include <array>
-#include "CommandContext.h"
+#include "Graphics/CommandContext.h"
 #include <string>
 #include <unordered_map>
 #include <wrl.h>
-#include "GPUResource.h"
-#include "DescriptorHandle.h"
+#include "GPUResource/GPUResource.h"
+#include "Graphics/DescriptorHandle.h"
 #include <memory>
-#include "CopyBuffer.h"
+#include "GPUResource/CopyBuffer.h"
 
 class TextureManager
 {

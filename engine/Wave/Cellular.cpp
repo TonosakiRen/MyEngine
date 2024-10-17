@@ -1,9 +1,9 @@
-#include "Cellular.h"
-#include "ShaderManager.h"
-#include "CommandContext.h"
+#include "Wave/Cellular.h"
+#include "Light/ShaderManager.h"
+#include "Graphics/CommandContext.h"
 #include <vector>
 
-#include "Helper.h"
+#include "Graphics/Helper.h"
 
 using namespace Microsoft::WRL;
 

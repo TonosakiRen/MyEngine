@@ -1,5 +1,5 @@
 #include "Input.h"
-#include "Helper.h"
+#include "Graphics/Helper.h"
 
 #pragma comment(lib,"dinput8.lib")
 #pragma comment(lib,"dxguid.lib")

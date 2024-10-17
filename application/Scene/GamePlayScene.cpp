@@ -1,9 +1,9 @@
-#include "GamePlayScene.h"
-#include "GameScene.h"
+#include "Scene/GamePlayScene.h"
+#include "Scene/GameScene.h"
 
-#include "ModelManager.h"
+#include "Model/ModelManager.h"
 #include "ImGuiManager.h"
-#include "GameObjectManager.h"
+#include "GameComponent/GameObjectManager.h"
 
 const Player* GamePlayScene::player = nullptr;
 
@@ -44,6 +44,10 @@ void GamePlayScene::Initialize()
 	player_->Initialize("walk.gltf", playerBulletManager_.get());
 	player = player_.get();
 
+	boss_ = std::make_unique<Boss>();
+	boss_->Initialize("box1x1.obj");
+	boss_->SetPlayer(*player_.get());
+
 	sphereLights_ = std::make_unique<SphereLights>();
 	sphereLights_->Initialize();
 
@@ -76,6 +80,8 @@ void GamePlayScene::Update()
 	trees_->Update();
 
 	player_->Update(*GameScene::currentViewProjection);
+
+	boss_->Update();
 
 	floor_->Update();
 
@@ -138,6 +144,9 @@ void GamePlayScene::Update()
 void GamePlayScene::Draw()
 {
 	player_->Draw();
+
+	boss_->Draw();
+
 	lineAttack_->Draw();
 	//sphere_->Draw();
 	explodeParticle_->Draw();

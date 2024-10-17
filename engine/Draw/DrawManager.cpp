@@ -1,7 +1,9 @@
-#include "DrawManager.h"
+#include "Draw/DrawManager.h"
+
 #include <DirectXTex.h>
 #include <cassert>
-#include "Renderer.h"
+
+#include "Render/Renderer.h"
 
 using namespace DirectX;
 

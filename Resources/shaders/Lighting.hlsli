@@ -1,6 +1,6 @@
 #define RTWidth 1280
 #define RTHeight 720
-#define ambient 0.1f
+#define ambient 0.03f
 
 struct TBRInformation {
 	uint32_t pointLightNum;

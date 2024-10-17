@@ -8,8 +8,8 @@
 #include <memory>
 #include <chrono>
 
-#include "DescriptorHandle.h"
-#include "ColorBuffer.h"
+#include "Graphics/DescriptorHandle.h"
+#include "GPUResource/ColorBuffer.h"
 
 class SwapChain {
 public:

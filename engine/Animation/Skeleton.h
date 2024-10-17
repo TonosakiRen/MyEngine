@@ -7,7 +7,7 @@
 #include <string>
 
 #include "Mymath.h"
-#include "WorldTransform.h"
+#include "GameComponent/WorldTransform.h"
 
 struct Node {
 	WorldTransform transform;

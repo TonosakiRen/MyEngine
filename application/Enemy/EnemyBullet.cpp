@@ -1,6 +1,6 @@
-#include "EnemyBullet.h"
-#include "ModelManager.h"
-#include "Floor.h"
+#include "Enemy/EnemyBullet.h"
+#include "Model/ModelManager.h"
+#include "Stage/Floor.h"
 
 Vector3 EnemyBullet::modelSize;
 void EnemyBullet::Initialize(Vector3 position, Vector3 direction,uint32_t modelHandle)

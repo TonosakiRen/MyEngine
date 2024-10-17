@@ -1,5 +1,5 @@
-#include "AreaLights.h"
-#include "DirectXCommon.h"
+#include "Light/AreaLights.h"
+#include "Graphics/DirectXCommon.h"
 
 void AreaLights::Initialize() {
     

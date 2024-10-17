@@ -3,17 +3,17 @@
 #include <memory>
 #include <d3d12.h>
 
-#include "PipelineState.h"
-#include "RootSignature.h"
-#include "DefaultBuffer.h"
-#include "CommandContext.h"
+#include "Graphics/PipelineState.h"
+#include "Graphics/RootSignature.h"
+#include "GPUResource/DefaultBuffer.h"
+#include "Graphics/CommandContext.h"
 
-#include "ViewProjection.h"
-#include "WorldTransform.h"
-#include "Mesh.h"
+#include "GameComponent/ViewProjection.h"
+#include "GameComponent/WorldTransform.h"
+#include "Mesh/Mesh.h"
 
-#include "Voronoi.h"
-#include "Reducation.h"
+#include "Sky/Voronoi.h"
+#include "PostEffect/Reducation.h"
 
 class DirectXCommon;
 
@@ -59,7 +59,7 @@ private:
 
 	CubeColorBuffer starTexture_;
 
-	Vector4 topHSVA_ = { 0.650f,1.0f,0.07f,1.0f };;
-	Vector4 bottomHSVA_ = { 0.550f,1.0f,0.15f,1.0f };
+	Vector4 topHSVA_ = { 0.650f,1.0f,0.03f,1.0f };;
+	Vector4 bottomHSVA_ = { 0.550f,1.0f,0.0f,1.0f };
 };
 

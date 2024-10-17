@@ -52,7 +52,7 @@ public:
 protected:
     Microsoft::WRL::ComPtr<ID3D12Resource> resource_ = nullptr;
     D3D12_RESOURCE_STATES state_ = D3D12_RESOURCE_STATE_COMMON;
-    uint32_t index_;
+    uint32_t index_ = 0;
 
 #ifdef _DEBUG
     std::wstring name_;

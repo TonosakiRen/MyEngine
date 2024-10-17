@@ -1,5 +1,5 @@
 #pragma once
-#include "GPUResource.h"
+#include "GPUResource/GPUResource.h"
 
 
 class UAVBuffer : public GPUResource {

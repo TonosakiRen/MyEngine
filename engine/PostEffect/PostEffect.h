@@ -4,16 +4,16 @@
 #include <vector>
 #include <d3d12.h>
 
-#include "PipelineState.h"
-#include "RootSignature.h"
-#include "DescriptorHandle.h"
-#include "UploadBuffer.h"
+#include "Graphics/PipelineState.h"
+#include "Graphics/RootSignature.h"
+#include "Graphics/DescriptorHandle.h"
+#include "GPUResource/UploadBuffer.h"
 
-#include "ViewProjection.h"
-#include "WorldTransform.h"
-#include "DirectionalLights.h"
-#include "Material.h"
-#include "Mesh.h"
+#include "GameComponent/ViewProjection.h"
+#include "GameComponent/WorldTransform.h"
+#include "Light/DirectionalLights.h"
+#include "GameComponent/Material.h"
+#include "Mesh/Mesh.h"
 
 class DirectXCommon;
 

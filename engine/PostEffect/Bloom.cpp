@@ -1,8 +1,8 @@
-#include "Bloom.h"
+#include "PostEffect/Bloom.h"
 
-#include "ShaderManager.h"
-#include "CommandContext.h"
-#include "Helper.h"
+#include "Light/ShaderManager.h"
+#include "Graphics/CommandContext.h"
+#include "Graphics/Helper.h"
 
 #include <d3dx12.h>
 

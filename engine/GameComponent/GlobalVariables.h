@@ -2,6 +2,7 @@
 #include <variant>
 #include <map>
 #include <string>
+
 #include "Mymath.h"
 class GlobalVariables {
 public:

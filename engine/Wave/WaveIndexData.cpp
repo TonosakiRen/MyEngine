@@ -1,4 +1,4 @@
-#include "WaveIndexData.h"
+#include "Wave/WaveIndexData.h"
 #include "ImGuiManager.h"
 
 void WaveIndexData::Initialize() {

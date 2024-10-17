@@ -1,6 +1,6 @@
 #pragma once
-#include "GaussianBlur.h"
-#include "UploadBuffer.h"
+#include "PostEffect/GaussianBlur.h"
+#include "GPUResource/UploadBuffer.h"
 
 class CommandContext;
 

@@ -1,6 +1,8 @@
 #pragma once
-#include "GameObject.h"
 #include <string>
+
+#include "GameComponent/GameObject.h"
+
 class Collider
 {
 public:

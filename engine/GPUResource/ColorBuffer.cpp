@@ -1,7 +1,7 @@
-#include "ColorBuffer.h"
+#include "GPUResource/ColorBuffer.h"
 
-#include "DirectXCommon.h"
-#include "BufferManager.h"
+#include "Graphics/DirectXCommon.h"
+#include "GPUResource/BufferManager.h"
 
 void ColorBuffer::CreateFromSwapChain(const std::wstring& name, ID3D12Resource* resource,uint32_t index) {
     AssociateWithResource(name,resource, D3D12_RESOURCE_STATE_PRESENT);

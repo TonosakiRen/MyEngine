@@ -5,7 +5,7 @@
 
 #include <cstdint>
 
-#include "DescriptorHandle.h"
+#include "Graphics/DescriptorHandle.h"
 #include <d3dx12.h>
 
 class DescriptorHeap {

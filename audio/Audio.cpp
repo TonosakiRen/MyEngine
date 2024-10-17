@@ -4,8 +4,6 @@
 #include <filesystem>
 
 #pragma comment(lib,"xaudio2.lib")
-
-
 #pragma comment(lib,"Mf.lib")
 #pragma comment(lib,"mfplat.lib")
 #pragma comment(lib,"Mfreadwrite.lib")

@@ -357,6 +357,7 @@ inline Vector3 CubicBezierCurve(float t, const Vector3& p0, const Vector3& p1, c
 		t * t * t * p3;
 }
 
+inline Vector3 LoseY(Vector3 loseY) { return Vector3{ loseY.x, 0.0f, loseY.z }; }
 
 #pragma endregion
 #pragma region	Vector4
@@ -1206,6 +1207,13 @@ inline Vector3 operator *(const Vector3& v, const Quaternion& q) {
 	Vector3 result = { resultQ.x,resultQ.y,resultQ.z };
 	return result;
 }
+
+inline bool IsClose(const Vector3& v1, const Vector3& v2, float epsilon = 1e-6f) {
+	return (std::fabs(v1.x - v2.x) < epsilon &&
+		std::fabs(v1.y - v2.y) < epsilon &&
+		std::fabs(v1.z - v2.z) < epsilon);
+}
+
 #pragma endregion
 #pragma region ファクトリ関数
 inline Quaternion IdentityQuaternion() {
@@ -1473,6 +1481,17 @@ inline Quaternion Slerp(float t, const Quaternion& start, const Quaternion& end)
 	// 球面線形補間の計算
 	float theta = std::acos(dot);
 	return (std::sin((1.0f - t) * theta) * s + std::sin(t * theta) * end) * (1.0f / std::sin(theta));
+}
+
+inline bool IsClose(const Quaternion& q1, const Quaternion& q2, float epsilon = 0.0001f) {
+	// クォータニオンの各成分の差の2乗の合計を計算する（ユークリッド距離の平方）
+	float diff = (q1.w - q2.w) * (q1.w - q2.w)
+		+ (q1.x - q2.x) * (q1.x - q2.x)
+		+ (q1.y - q2.y) * (q1.y - q2.y)
+		+ (q1.z - q2.z) * (q1.z - q2.z);
+
+	// 差が閾値以下であればtrueを返す
+	return diff < epsilon * epsilon;
 }
 #pragma endregion
 #pragma region	OBB

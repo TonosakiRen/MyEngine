@@ -1,5 +1,5 @@
-#include "MyGame.h"
-#include "Framework.h"
+#include "Framework/MyGame.h"
+#include "Framework/Framework.h"
 
 #include <wrl/client.h>
 #include <d3d12.h>

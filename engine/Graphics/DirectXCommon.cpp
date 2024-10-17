@@ -1,12 +1,12 @@
-#include "DirectXCommon.h"
-#include "BufferManager.h"
+#include "Graphics/DirectXCommon.h"
+#include "GPUResource/BufferManager.h"
 
 #include <dxgi1_6.h>
 
 #include <cassert>
 #include <format>
 
-#include "Helper.h"
+#include "Graphics/Helper.h"
 
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
@@ -53,14 +53,14 @@ void DirectXCommon::CreateDevice() {
 
 #ifdef _DEBUG
 
-	ComPtr<ID3D12Debug1> debugController = nullptr;
-	if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)))) {
-		//デバックレイヤーを有効化する	
-		debugController->EnableDebugLayer();
-		//さらにGPU側でもチェックを行えるようにする
-		debugController->SetEnableGPUBasedValidation(TRUE);
+	//ComPtr<ID3D12Debug1> debugController = nullptr;
+	//if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)))) {
+	//	//デバックレイヤーを有効化する	
+	//	debugController->EnableDebugLayer();
+	//	//さらにGPU側でもチェックを行えるようにする
+	//	debugController->SetEnableGPUBasedValidation(TRUE);
 
-	}
+	//}
 
 #endif
 

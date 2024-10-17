@@ -1,8 +1,8 @@
-#include "GaussianBlur.h"
-#include "ShaderManager.h"
-#include "CommandContext.h"
+#include "PostEffect/GaussianBlur.h"
+#include "Light/ShaderManager.h"
+#include "Graphics/CommandContext.h"
 
-#include "Helper.h"
+#include "Graphics/Helper.h"
 
 using namespace Microsoft::WRL;
 

@@ -1,6 +1,7 @@
-#include "Collider.h"
+#include "GameComponent/Collider.h"
+
 #include "ImGuiManager.h"
-#include "ModelManager.h"
+#include "Model/ModelManager.h"
 #include "Input.h"
 
 bool Collider::isDrawCollider = false;

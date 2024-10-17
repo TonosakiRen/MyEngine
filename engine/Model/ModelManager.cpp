@@ -1,17 +1,17 @@
-#include "ModelManager.h"
+#include "Model/ModelManager.h"
 #include <DirectXTex.h>
 #include <cassert>
-#include "DirectXCommon.h"
-#include "TextureManager.h"
+#include "Graphics/DirectXCommon.h"
+#include "Texture/TextureManager.h"
 #include <fstream>
 #include <sstream>
 #include <filesystem>
 #include <DirectXMesh.h>
-#include "Helper.h"
-#include "ByteAddressBuffer.h"
+#include "Graphics/Helper.h"
+#include "GPUResource/ByteAddressBuffer.h"
 
 
-#include "MeshletModel.h"
+#include "Mesh/MeshletModel.h"
 
 using namespace DirectX;
 

@@ -1,18 +1,18 @@
 #pragma once
-
 #include <array>
-#include "CommandContext.h"
 #include <string>
 #include <unordered_map>
 #include <wrl.h>
 #include <vector>
-#include "Mesh.h"
-#include "DescriptorHandle.h"
-#include "UploadBuffer.h"
 #include <memory>
 #include <map>
-#include "ModelManager.h"
-#include "Skeleton.h"
+
+#include "Mesh/Mesh.h"
+#include "Graphics/CommandContext.h"
+#include "Graphics/DescriptorHandle.h"
+#include "GPUResource/UploadBuffer.h"
+#include "Model/ModelManager.h"
+#include "Animation/Skeleton.h"
 
 template <typename tValue>
 struct Keyframe {

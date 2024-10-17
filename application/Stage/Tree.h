@@ -1,8 +1,8 @@
 #pragma once
 #include <memory>
 #include <vector>
-#include "GameObject.h"
-#include "ParticleModelData.h"
+#include "GameComponent/GameObject.h"
+#include "Particle/ParticleModelData.h"
 class Tree :
     public GameObject
 {

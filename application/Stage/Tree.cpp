@@ -1,6 +1,6 @@
-#include "Tree.h"
-#include "DrawManager.h"
-#include "Loader.h"
+#include "Stage/Tree.h"
+#include "Draw/DrawManager.h"
+#include "GameComponent/Loader.h"
 
 void Tree::Initialize()
 {

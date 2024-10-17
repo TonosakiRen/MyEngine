@@ -1,11 +1,11 @@
-#include "ShaderManager.h"
+#include "Light/ShaderManager.h"
 
 #include <cassert>
 #include <format>
 #include <filesystem>
 #include <fstream>
 
-#include "Helper.h"
+#include "Graphics/Helper.h"
 
 #pragma comment(lib,"dxcompiler.lib")
 

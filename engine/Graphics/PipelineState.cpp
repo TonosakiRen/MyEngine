@@ -1,6 +1,6 @@
-#include "PipelineState.h"
+#include "Graphics/PipelineState.h"
 
-#include "DirectXCommon.h"
+#include "Graphics/DirectXCommon.h"
 #include <assert.h>
 void PipelineState::Create(const std::wstring& name, const D3D12_GRAPHICS_PIPELINE_STATE_DESC& desc) {
     HRESULT hr = S_FALSE;

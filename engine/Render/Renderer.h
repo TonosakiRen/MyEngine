@@ -1,22 +1,22 @@
 #pragma once
 
-#include "DirectXCommon.h"
-#include "SwapChain.h"
-#include "CommandContext.h"
-#include "ColorBuffer.h"
-#include "DepthBuffer.h"
-#include "Bloom.h"
-#include "PostEffect.h"
+#include "Graphics/DirectXCommon.h"
+#include "Graphics/SwapChain.h"
+#include "Graphics/CommandContext.h"
+#include "GPUResource/ColorBuffer.h"
+#include "GPUResource/DepthBuffer.h"
+#include "PostEffect/Bloom.h"
+#include "PostEffect/PostEffect.h"
 
-#include "DeferredRenderer.h"
-#include "EdgeRenderer.h"
-#include "TileBasedRendering.h"
-#include "Transition.h"
-#include "GrayScale.h"
-#include "Vignette.h"
-#include "Wire.h"
-#include "Smooth.h"
-#include "HSVFilter.h"
+#include "Light/DeferredRenderer.h"
+#include "PostEffect/EdgeRenderer.h"
+#include "Light/TileBasedRendering.h"
+#include "Render/Transition.h"
+#include "PostEffect/GrayScale.h"
+#include "PostEffect/Vignette.h"
+#include "Render/Wire.h"
+#include "PostEffect/Smooth.h"
+#include "PostEffect/HSVFilter.h"
 
 class ViewProjection;
 class DirectionalLights;

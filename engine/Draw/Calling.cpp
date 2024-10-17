@@ -1,11 +1,13 @@
-#include "DrawManager.h"
-#include <DirectXTex.h>
-#include <cassert>
-#include "Calling.h"
-#include "DirectXCommon.h"
-#include "ShaderManager.h"
+#include "Draw/DrawManager.h"
 
 #include <Windows.h>
+#include <DirectXTex.h>
+#include <cassert>
+
+#include "Draw/Calling.h"
+#include "Graphics/DirectXCommon.h"
+#include "Light/ShaderManager.h"
+
 using namespace Microsoft::WRL;
 
 void Calling::Initialize()

@@ -1,13 +1,14 @@
-#include "UAVBuffer.h"
+#include "GPUResource/UAVBuffer.h"
 
 #include <cassert>
-#include "BufferManager.h"
+#include "GPUResource/BufferManager.h"
 #include <d3dx12.h>
+#include "Graphics/Helper.h"
 
 void UAVBuffer::Create(const std::wstring& name, size_t bufferSize) {
     HRESULT result = S_FALSE;
 
-
+    bufferSize = Helper::AlignUp(bufferSize, 256);
     auto desc = CD3DX12_RESOURCE_DESC::Buffer(UINT64(bufferSize), D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
     auto heapProps = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
 

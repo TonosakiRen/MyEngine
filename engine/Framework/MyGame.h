@@ -1,5 +1,6 @@
 #pragma once
-#include "Framework.h"
+#include "Framework/Framework.h"
+
 class Renderer;
 class GameScene;
 class TextureManager;

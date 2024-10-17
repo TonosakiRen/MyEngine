@@ -1,9 +1,9 @@
-#include "RootSignature.h"
+#include "Graphics/RootSignature.h"
 
-#include "Helper.h"
+#include "Graphics/Helper.h"
 #include <assert.h>
 
-#include "DirectXCommon.h"
+#include "Graphics/DirectXCommon.h"
 
 void RootSignature::Create(const std::wstring& name, const D3D12_ROOT_SIGNATURE_DESC& desc) {
 

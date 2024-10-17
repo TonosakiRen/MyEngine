@@ -6,9 +6,9 @@
 #include <cstdint>
 #include <memory>
 
-#include "DescriptorHandle.h"
-#include "DescriptorHeap.h"
-#include "CommandQueue.h"
+#include "Graphics/DescriptorHandle.h"
+#include "Graphics/DescriptorHeap.h"
+#include "Graphics/CommandQueue.h"
 
 class BufferManager;
 

@@ -1,12 +1,15 @@
 #pragma once
-#include "GPUResource.h"
-#include "CopyBuffer.h"
-#include "CommandContext.h"
+#include "GPUResource/GPUResource.h"
+#include "GPUResource/UploadBuffer.h"
+#include "Graphics/CommandContext.h"
+#include "Mymath.h"
+#include "Raytracing/RaytracingInstanceDescs.h"
 
-class TRAS : public GPUResource {
+class TRAS : public UploadBuffer {
 public:
 
-    void Create(const std::wstring& name, const D3D12_RAYTRACING_GEOMETRY_DESC& geomDesc, CommandContext& commandContext);
+    void Create(const std::wstring& name);
+    void Build(CommandContext& commandContext, const RaytracingInstanceDescs& descs);
     size_t GetBufferSize() const { return bufferSize_; }
 
 protected:

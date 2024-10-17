@@ -163,10 +163,10 @@ PixelShaderOutput main(MSOutput input) {
 	lighting *= shading;
 
 	lighting += ambient;
+	color.xyz += textureColor * 1.0f;
 
 	color.xyz *= lighting;
 
-	color.xyz -= textureColor ;
 
 	output.color = color;
 

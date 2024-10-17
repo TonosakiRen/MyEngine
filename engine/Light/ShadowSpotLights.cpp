@@ -1,5 +1,5 @@
-#include "ShadowSpotLights.h"
-#include "DirectXCommon.h"
+#include "Light/ShadowSpotLights.h"
+#include "Graphics/DirectXCommon.h"
 void ShadowSpotLights::Initialize() {
     
     structureBuffer_.Create(L"ShadowSpotLightBuffer", sizeof(ConstBufferData), lightNum);

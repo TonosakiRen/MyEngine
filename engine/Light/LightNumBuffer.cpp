@@ -1,10 +1,10 @@
-#include "LightNumBuffer.h"
-#include "DirectionalLights.h"
-#include "PointLights.h"
-#include "SpotLights.h"
-#include "ShadowSpotLights.h"
-#include "AreaLights.h"
-#include "TileBasedRendering.h"
+#include "Light/LightNumBuffer.h"
+#include "Light/DirectionalLights.h"
+#include "Light/PointLights.h"
+#include "Light/SpotLights.h"
+#include "Light/ShadowSpotLights.h"
+#include "Light/AreaLights.h"
+#include "Light/TileBasedRendering.h"
 
 void LightNumBuffer::Initialize()
 {

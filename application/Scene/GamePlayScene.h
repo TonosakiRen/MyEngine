@@ -1,25 +1,26 @@
 #pragma once
 #include <memory>
 #include <list>
-#include "BaseScene.h"
+#include "Scene/BaseScene.h"
 #include "MyMath.h"
 #include "Input.h"
 
-#include  "Skydome.h"
-#include  "Skybox.h"
-#include  "BoxArea.h"
-#include  "Floor.h"
-#include  "Player.h"
-#include  "GameObject.h"
-#include  "PlayerBulletManager.h"
-#include  "ExplodeParticle.h"
-#include  "WhiteParticle.h"
-#include  "Enemy.h"
-#include  "EnemyBulletManager.h"
-#include  "SphereLights.h"
-#include "GameObjectManager.h"
-#include "Trees.h"
-#include "LineAttack.h"
+#include  "Stage/Skydome.h"
+#include  "Stage/Skybox.h"
+#include  "Stage/BoxArea.h"
+#include  "Stage/Floor.h"
+#include  "Player/Player.h"
+#include  "GameComponent/GameObject.h"
+#include  "Player/PlayerBulletManager.h"
+#include  "Particle/ExplodeParticle.h"
+#include  "Particle/WhiteParticle.h"
+#include  "Enemy/Enemy.h"
+#include  "Enemy/EnemyBulletManager.h"
+#include  "Particle/SphereLights.h"
+#include "GameComponent/GameObjectManager.h"
+#include "Stage/Trees.h"
+#include "Enemy/LineAttack.h"
+#include "Boss/Boss.h"
 
 
 class GamePlayScene :
@@ -59,6 +60,8 @@ private:
 	std::unique_ptr<SphereLights> sphereLights_;
 
 	std::unique_ptr<LineAttack> lineAttack_;
+
+	std::unique_ptr<Boss> boss_;
 
 	//Enemy
 	std::list<std::unique_ptr<Enemy>> enemies_;

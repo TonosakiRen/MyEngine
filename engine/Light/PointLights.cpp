@@ -1,5 +1,5 @@
-#include "PointLights.h"
-#include "DirectXCommon.h"
+#include "Light/PointLights.h"
+#include "Graphics/DirectXCommon.h"
 
 void PointLights::Initialize() {
     

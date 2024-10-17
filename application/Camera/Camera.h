@@ -1,5 +1,5 @@
 #pragma once
-#include "ViewProjection.h"
+#include "GameComponent/ViewProjection.h"
 #include <memory>
 class Camera :
 	public ViewProjection

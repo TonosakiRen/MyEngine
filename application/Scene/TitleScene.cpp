@@ -1,13 +1,13 @@
-#include "TitleScene.h"
-#include "TextureManager.h"
-#include "GameObject.h"
-#include "Sprite.h"
-#include "WinApp.h"
+#include "Scene/TitleScene.h"
+#include "Texture/TextureManager.h"
+#include "GameComponent/GameObject.h"
+#include "Texture/Sprite.h"
+#include "Graphics/WinApp.h"
 #include "Input.h"
-#include "GamePlayScene.h"
-#include "SceneManager.h"
-#include "GameScene.h"
-#include "DrawManager.h"
+#include "Scene/GamePlayScene.h"
+#include "Scene/SceneManager.h"
+#include "Scene/GameScene.h"
+#include "Draw/DrawManager.h"
 void TitleScene::Initialize()
 {
 	input_ = Input::GetInstance();

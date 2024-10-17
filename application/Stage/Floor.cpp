@@ -1,8 +1,8 @@
-#include "Floor.h"
-#include "TextureManager.h"
+#include "Stage/Floor.h"
+#include "Texture/TextureManager.h"
 #include "ImGuiManager.h"
-#include "DrawManager.h"
-#include "GameScene.h"
+#include "Draw/DrawManager.h"
+#include "Scene/GameScene.h"
 
 const float Floor::kFloorSize = 50.0f;
 const float  Floor::kFloorHalfSize = Floor::kFloorSize / 2.0f;

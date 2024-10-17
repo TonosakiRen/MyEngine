@@ -1,9 +1,9 @@
-#include "WinApp.h"
+#include "Graphics/WinApp.h"
 #include <string>
 #include <imgui.h>
 #include <imgui_impl_dx12.h>
 #include <imgui_impl_win32.h>
-#include "Helper.h"
+#include "Graphics/Helper.h"
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 const wchar_t WinApp::kWindowClassName[] = L"DirectXGame";

@@ -1,7 +1,7 @@
 #pragma once
-#include "GPUResource.h"
-#include "CopyBuffer.h"
-#include "CommandContext.h"
+#include "GPUResource/GPUResource.h"
+#include "GPUResource/CopyBuffer.h"
+#include "Graphics/CommandContext.h"
 
 class DefaultBuffer : public GPUResource {
 public:

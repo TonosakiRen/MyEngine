@@ -1,9 +1,9 @@
-#include "Smooth.h"
+#include "PostEffect/Smooth.h"
 #include <DirectXTex.h>
 #include <d3dcompiler.h>
 #pragma comment(lib, "d3dcompiler.lib")
-#include "ShaderManager.h"
-#include "Renderer.h"
+#include "Light/ShaderManager.h"
+#include "Render/Renderer.h"
 #include "ImGuiManager.h"
 
 using namespace DirectX;

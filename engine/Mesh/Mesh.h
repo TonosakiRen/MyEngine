@@ -1,10 +1,10 @@
 #pragma once
 #include <string>
 #include "Mymath.h"
-#include "UploadBuffer.h"
-#include "DefaultStructuredBuffer.h"
-#include "ByteAddressBuffer.h"
-#include "BLAS.h"
+#include "GPUResource/UploadBuffer.h"
+#include "GPUResource/DefaultStructuredBuffer.h"
+#include "GPUResource/ByteAddressBuffer.h"
+#include "Raytracing/BLAS.h"
 #include <vector>
 #include <memory>
 #include <DirectXMesh.h>

@@ -1,10 +1,10 @@
-#include "Sky.h"
-#include "TextureManager.h"
-#include "ModelManager.h"
-#include "ShaderManager.h"
+#include "Sky/Sky.h"
+#include "Texture/TextureManager.h"
+#include "Model/ModelManager.h"
+#include "Light/ShaderManager.h"
 #include "ImGuiManager.h"
-#include "Renderer.h"
-#include "Helper.h"
+#include "Render/Renderer.h"
+#include "Graphics/Helper.h"
 
 using namespace Microsoft::WRL;
 

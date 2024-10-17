@@ -1,9 +1,9 @@
 #pragma once
 #include <memory>
-#include "WaveData.h"
-#include "WorldTransform.h"
-#include "Material.h"
-#include "ParticleModelData.h"
+#include "Wave/WaveData.h"
+#include "GameComponent/WorldTransform.h"
+#include "GameComponent/Material.h"
+#include "Particle/ParticleModelData.h"
 class WavePoints
 {
 public:

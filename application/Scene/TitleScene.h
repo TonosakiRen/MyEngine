@@ -1,8 +1,8 @@
 #pragma once
-#include "BaseScene.h"
+#include "Scene/BaseScene.h"
 #include <memory>
 
-#include "SpriteData.h"
+#include "Texture/SpriteData.h"
 class Input;
 class GameObject;
 class TitleScene :

@@ -1,9 +1,9 @@
-#include "CommandSignature.h"
+#include "Graphics/CommandSignature.h"
 
-#include "Helper.h"
+#include "Graphics/Helper.h"
 #include <assert.h>
 
-#include "DirectXCommon.h"
+#include "Graphics/DirectXCommon.h"
 
 void CommandSignature::Create(const std::wstring& name, const D3D12_COMMAND_SIGNATURE_DESC& desc,ID3D12RootSignature& rootSignature) {
 

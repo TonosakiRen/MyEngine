@@ -1,12 +1,13 @@
-#include "DefaultStructuredBuffer.h"
+#include "GPUResource/DefaultStructuredBuffer.h"
 
 #include <cassert>
-#include "DirectXCommon.h"
+#include "Graphics/DirectXCommon.h"
+#include "Graphics/Helper.h"
 
 void DefaultStructuredBuffer::Create(const std::wstring& name, size_t bufferSize, UINT numElements) {
     // インスタンシングデータのサイズ
     UINT sizeINB = static_cast<UINT>(bufferSize * numElements);
-
+    sizeINB = Helper::AlignUp(sizeINB, 256);
     DefaultBuffer::Create(name,sizeINB);
 
     D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};

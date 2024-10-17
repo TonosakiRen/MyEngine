@@ -2,8 +2,8 @@
 #include <d3d12.h>
 #include "Mymath.h"
 #include <numbers>
-#include "UploadBuffer.h"
-#include "StructuredBuffer.h"
+#include "GPUResource/UploadBuffer.h"
+#include "GPUResource/StructuredBuffer.h"
 
 class WaveIndexData {
 public:

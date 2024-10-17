@@ -1,7 +1,7 @@
 #pragma once
-#include "PixelBuffer.h"
+#include "GPUResource/PixelBuffer.h"
 
-#include "DescriptorHandle.h"
+#include "Graphics/DescriptorHandle.h"
 
 class ColorBuffer : public PixelBuffer {
 public:

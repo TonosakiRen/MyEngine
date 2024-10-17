@@ -1,8 +1,8 @@
 #pragma once
 #include "Mymath.h"
-#include "WorldTransform.h"
-#include "Collider.h"
-#include "GameObject.h"
+#include "GameComponent/WorldTransform.h"
+#include "GameComponent/Collider.h"
+#include "GameComponent/GameObject.h"
 
 class EnemyBullet:
 	public GameObject

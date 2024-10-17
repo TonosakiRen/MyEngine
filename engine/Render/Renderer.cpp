@@ -1,19 +1,19 @@
-#include "Renderer.h"
+#include "Render/Renderer.h"
 
-#include "ShaderManager.h"
+#include "Light/ShaderManager.h"
 #include "ImGuiManager.h"
-#include "Helper.h"
-#include "WinApp.h"
+#include "Graphics/Helper.h"
+#include "Graphics/WinApp.h"
 
-#include "ViewProjection.h"
-#include "DirectionalLights.h"
-#include "ShadowSpotLights.h"
-#include "TileBasedRendering.h"
-#include "TextureManager.h"
-#include "Sky.h"
-#include "DrawManager.h"
-#include "LightManager.h"
-#include "BufferManager.h"
+#include "GameComponent/ViewProjection.h"
+#include "Light/DirectionalLights.h"
+#include "Light/ShadowSpotLights.h"
+#include "Light/TileBasedRendering.h"
+#include "Texture/TextureManager.h"
+#include "Sky/Sky.h"
+#include "Draw/DrawManager.h"
+#include "Light/LightManager.h"
+#include "GPUResource/BufferManager.h"
 
 Renderer::RenderingMode Renderer::renderingMode = Renderer::kForward;
 

@@ -1,8 +1,8 @@
-#include "DescriptorHeap.h"
+#include "Graphics/DescriptorHeap.h"
 
 #include <cassert>
 
-#include "DirectXCommon.h"
+#include "Graphics/DirectXCommon.h"
 
 void DescriptorHeap::Create(D3D12_DESCRIPTOR_HEAP_TYPE type, uint32_t numDescriptors) {
     assert(type != D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES);

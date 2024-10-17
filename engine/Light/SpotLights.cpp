@@ -1,5 +1,5 @@
-#include "SpotLights.h"
-#include "DirectXCommon.h"
+#include "Light/SpotLights.h"
+#include "Graphics/DirectXCommon.h"
 
 void SpotLights::Initialize() {
    

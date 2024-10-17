@@ -1,8 +1,8 @@
-#include "SkinCluster.h"
-#include "Helper.h"
+#include "Animation/SkinCluster.h"
 
-#include "DirectXCommon.h"
-#include "ModelManager.h"
+#include "Graphics/Helper.h"
+#include "Graphics/DirectXCommon.h"
+#include "Model/ModelManager.h"
 
 void SkinCluster::Create(const Skeleton& skeleton, const uint32_t modelHandle) {
 

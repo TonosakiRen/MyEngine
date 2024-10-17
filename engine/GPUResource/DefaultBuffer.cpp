@@ -1,13 +1,15 @@
-#include "DefaultBuffer.h"
+#include "GPUResource/DefaultBuffer.h"
 
 #include <cassert>
-#include "DirectXCommon.h"
-#include "BufferManager.h"
+#include "Graphics/DirectXCommon.h"
+#include "GPUResource/BufferManager.h"
+#include "Graphics/Helper.h"
 
 
 void DefaultBuffer::Create(const std::wstring& name, size_t bufferSize) {
     HRESULT result = S_FALSE;
 
+    bufferSize = Helper::AlignUp(bufferSize, 256);
     auto desc = CD3DX12_RESOURCE_DESC::Buffer(UINT64(bufferSize));
     auto heapProps = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
 

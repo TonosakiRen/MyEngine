@@ -1,9 +1,9 @@
-#include "TextureManager.h"
+#include "Texture/TextureManager.h"
 #include <DirectXTex.h>
 #include <cassert>
-#include "DirectXCommon.h"
-#include "UploadBuffer.h"
-#include "BufferManager.h"
+#include "Graphics/DirectXCommon.h"
+#include "GPUResource/UploadBuffer.h"
+#include "GPUResource/BufferManager.h"
 using namespace DirectX;
 
 uint32_t TextureManager::Load(const std::string& fileName) {

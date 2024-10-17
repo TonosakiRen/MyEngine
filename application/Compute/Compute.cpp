@@ -1,8 +1,8 @@
-#include "Compute.h"
+#include "Compute/Compute.h"
 #include <Windows.h>
-#include "DirectXCommon.h"
-#include "ShaderManager.h"
-#include "Helper.h"
+#include "Graphics/DirectXCommon.h"
+#include "Light/ShaderManager.h"
+#include "Graphics/Helper.h"
 #include <assert.h>
 
 using namespace Microsoft::WRL;

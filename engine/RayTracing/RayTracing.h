@@ -3,18 +3,20 @@
 #include <memory>
 #include <d3d12.h>
 
-#include "PipelineState.h"
-#include "RootSignature.h"
-#include "CommandContext.h"
+#include "Graphics/PipelineState.h"
+#include "Graphics/RootSignature.h"
+#include "Graphics/CommandContext.h"
 
-#include "ViewProjection.h"
-#include "WorldTransform.h"
+#include "GameComponent/ViewProjection.h"
+#include "GameComponent/WorldTransform.h"
+#include "Raytracing/TRAS.h"
 
-#include "Renderer.h"
+#include "Render/Renderer.h"
+#include "Raytracing/RaytracingInstanceDescs.h"
 
 class DirectXCommon;
 
-class RayTracing
+class Raytracing
 {
 public:
 
@@ -25,11 +27,14 @@ public:
 		parameterNum
 	};
 	void Initialize();
+	void AddInstanceDesc(const D3D12_RAYTRACING_INSTANCE_DESC& desc);
 	void Finalize();
 
 private:
 	void CreatePipeline();
 private:
+	std::unique_ptr<TRAS> tras_;
+	std::unique_ptr<RaytracingInstanceDescs> instanceDescs_;
 	std::unique_ptr<RootSignature> rootSignature_;
 	std::unique_ptr<PipelineState> pipelineState_;
 };

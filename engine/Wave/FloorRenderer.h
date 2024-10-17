@@ -3,21 +3,21 @@
 #include <memory>
 #include <d3d12.h>
 
-#include "PipelineState.h"
-#include "RootSignature.h"
-#include "UploadBuffer.h"
-#include "StructuredBuffer.h"
-#include "CommandContext.h"
+#include "Graphics/PipelineState.h"
+#include "Graphics/RootSignature.h"
+#include "GPUResource/UploadBuffer.h"
+#include "GPUResource/StructuredBuffer.h"
+#include "Graphics/CommandContext.h"
 
-#include "ViewProjection.h"
-#include "WorldTransform.h"
-#include "DefaultBuffer.h"
+#include "GameComponent/ViewProjection.h"
+#include "GameComponent/WorldTransform.h"
+#include "GPUResource/DefaultBuffer.h"
 
-#include "Cellular.h"
-#include "Renderer.h"
+#include "Wave/Cellular.h"
+#include "Render/Renderer.h"
 
-#include "WaveIndexData.h"
-#include "WaveData.h"
+#include "Wave/WaveIndexData.h"
+#include "Wave/WaveData.h"
 
 
 class DirectXCommon;

@@ -1,7 +1,7 @@
 #pragma once
-#include "UploadBuffer.h"
-#include "DescriptorHandle.h"
-#include "Framework.h"
+#include "GPUResource/UploadBuffer.h"
+#include "Graphics/DescriptorHandle.h"
+#include "Framework/Framework.h"
 class StructuredBuffer
 	:public UploadBuffer
 {

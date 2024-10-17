@@ -1,6 +1,6 @@
-#include "WhiteParticle.h"
+#include "Particle/WhiteParticle.h"
 #include "ImGuiManager.h"
-#include "DrawManager.h"
+#include "Draw/DrawManager.h"
 
 WhiteParticle::WhiteParticle()
 {

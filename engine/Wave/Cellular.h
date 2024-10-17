@@ -1,11 +1,11 @@
 #pragma once
 #include <stdint.h>
-#include "ColorBuffer.h"
-#include "CubeColorBuffer.h"
-#include "UploadBuffer.h"
-#include "StructuredBuffer.h"
-#include "PipelineState.h"
-#include "RootSignature.h"
+#include "GPUResource/ColorBuffer.h"
+#include "GPUResource/CubeColorBuffer.h"
+#include "GPUResource/UploadBuffer.h"
+#include "GPUResource/StructuredBuffer.h"
+#include "Graphics/PipelineState.h"
+#include "Graphics/RootSignature.h"
 #include <Windows.h>
 #include <d3d12.h>
 

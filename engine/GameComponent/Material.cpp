@@ -1,4 +1,4 @@
-#include "Material.h"
+#include "GameComponent/Material.h"
 #include <d3dx12.h>
 
 void Material::Initialize() {

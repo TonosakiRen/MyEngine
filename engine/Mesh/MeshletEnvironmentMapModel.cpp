@@ -1,8 +1,8 @@
-#include "MeshletEnvironmentMapModel.h"
-#include "TextureManager.h"
-#include "ModelManager.h"
-#include "ShaderManager.h"
-#include "LightManager.h"
+#include "Mesh/MeshletEnvironmentMapModel.h"
+#include "Texture/TextureManager.h"
+#include "Model/ModelManager.h"
+#include "Light/ShaderManager.h"
+#include "Light/LightManager.h"
 
 using namespace Microsoft::WRL;
 

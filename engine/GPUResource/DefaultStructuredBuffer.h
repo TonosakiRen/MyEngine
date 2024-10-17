@@ -1,7 +1,7 @@
 #pragma once
-#include "GPUResource.h"
-#include "DefaultBuffer.h"
-#include "DescriptorHandle.h"
+#include "GPUResource/GPUResource.h"
+#include "GPUResource/DefaultBuffer.h"
+#include "Graphics/DescriptorHandle.h"
 
 class DefaultStructuredBuffer : public DefaultBuffer {
 public:

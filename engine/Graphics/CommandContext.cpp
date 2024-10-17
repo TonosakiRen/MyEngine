@@ -1,10 +1,10 @@
-#include "CommandContext.h"
+#include "Graphics/CommandContext.h"
 
-#include "DirectXCommon.h"
-#include "DescriptorHeap.h"
-#include "Framework.h"
+#include "Graphics/DirectXCommon.h"
+#include "Graphics/DescriptorHeap.h"
+#include "Framework/Framework.h"
 
-#include "Helper.h"
+#include "Graphics/Helper.h"
 
 void CommandContext::Create() {
 

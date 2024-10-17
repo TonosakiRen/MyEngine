@@ -1,7 +1,7 @@
 #pragma once
 #include <d3d12.h>
 #include "Mymath.h"
-#include "UploadBuffer.h"
+#include "GPUResource/UploadBuffer.h"
 
 class WorldTransform
 {

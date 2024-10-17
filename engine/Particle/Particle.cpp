@@ -1,7 +1,7 @@
-#include "Particle.h"
-#include "ShaderManager.h"
-#include "TextureManager.h"
-#include "LightManager.h"
+#include "Particle/Particle.h"
+#include "Light/ShaderManager.h"
+#include "Texture/TextureManager.h"
+#include "Light/LightManager.h"
 
 using namespace Microsoft::WRL;
 

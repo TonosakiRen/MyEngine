@@ -1,7 +1,7 @@
-#include "BoxArea.h"
-#include "TextureManager.h"
+#include "Stage/BoxArea.h"
+#include "Texture/TextureManager.h"
 #include "ImGuiManager.h"
-#include "DrawManager.h"
+#include "Draw/DrawManager.h"
 
 void BoxArea::Initialize(const std::string name)
 {

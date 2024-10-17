@@ -2,11 +2,11 @@
 #include <Windows.h>
 #include <memory>
 
-#include "PipelineState.h"
-#include "RootSignature.h"
-#include "CommandContext.h"
+#include "Graphics/PipelineState.h"
+#include "Graphics/RootSignature.h"
+#include "Graphics/CommandContext.h"
 
-#include "WorldTransform.h"
+#include "GameComponent/WorldTransform.h"
 
 class DirectXCommon;
 class LightNumBuffer;

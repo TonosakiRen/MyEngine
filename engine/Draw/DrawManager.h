@@ -1,35 +1,31 @@
 #pragma once
-
 #include <vector>
 #include <memory>
 #include <functional>
 
-#include "CommandContext.h"
-#include "Material.h"
-#include "WorldTransform.h"
-#include "SkinCluster.h"
-#include "ParticleModelData.h"
-#include "ParticleData.h"
-#include "SpriteData.h"
-
-#include "Model.h"
-#include "MeshletModel.h"
-#include "MeshletEnvironmentMapModel.h"
-#include "Skinning.h"
-#include "Particle.h"
-#include "ParticleModel.h"
-#include "Sprite.h"
-#include "ShadowMap.h"
-#include "SpotLightShadowMap.h"
-#include "Sky.h"
-#include "FloorRenderer.h"
-#include "WaveModel.h"
-
-#include "ViewProjection.h"
-#include "TileBasedRendering.h"
-
-#include "LightManager.h"
-#include "Calling.h"
+#include "Graphics/CommandContext.h"
+#include "GameComponent/Material.h"
+#include "GameComponent/WorldTransform.h"
+#include "Animation/SkinCluster.h"
+#include "Particle/ParticleModelData.h"
+#include "Particle/ParticleData.h"
+#include "Texture/SpriteData.h"
+#include "Model/Model.h"
+#include "Mesh/MeshletModel.h"
+#include "Mesh/MeshletEnvironmentMapModel.h"
+#include "Animation/Skinning.h"
+#include "Particle/Particle.h"
+#include "Particle/ParticleModel.h"
+#include "Texture/Sprite.h"
+#include "Light/ShadowMap.h"
+#include "Light/SpotLightShadowMap.h"
+#include "Sky/Sky.h"
+#include "Wave/FloorRenderer.h"
+#include "Wave/WaveModel.h"
+#include "GameComponent/ViewProjection.h"
+#include "Light/TileBasedRendering.h"
+#include "Light/LightManager.h"
+#include "Draw/Calling.h"
 
 class DrawManager
 {

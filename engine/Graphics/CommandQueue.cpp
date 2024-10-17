@@ -1,10 +1,10 @@
-#include "CommandQueue.h"
+#include "Graphics/CommandQueue.h"
 
 #include <Windows.h>
 #pragma comment(lib, "winmm.lib")
-#include "Helper.h"
+#include "Graphics/Helper.h"
 #include <assert.h>
-#include "DirectXCommon.h"
+#include "Graphics/DirectXCommon.h"
 #include <thread>
 
 CommandQueue::~CommandQueue() {

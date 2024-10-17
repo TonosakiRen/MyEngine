@@ -1,5 +1,5 @@
-#include "DirectionalLights.h"
-#include "DirectXCommon.h"
+#include "Light/DirectionalLights.h"
+#include "Graphics/DirectXCommon.h"
 
 void DirectionalLights::Initialize() {
     if (lightNum != 0) {

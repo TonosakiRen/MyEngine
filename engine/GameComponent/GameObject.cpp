@@ -1,7 +1,8 @@
-#include "GameObject.h"
-#include "ModelManager.h"
-#include "DrawManager.h"
-#include "GameScene.h"
+#include "GameComponent/GameObject.h"
+
+#include "Model/ModelManager.h"
+#include "Draw/DrawManager.h"
+#include "Scene/GameScene.h"
 
 ModelManager* GameObject::modelManager = ModelManager::GetInstance();
 AnimationManager* GameObject::animationManager = AnimationManager::GetInstance();

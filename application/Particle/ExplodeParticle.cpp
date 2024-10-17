@@ -1,7 +1,7 @@
-#include "ExplodeParticle.h"
+#include "Particle/ExplodeParticle.h"
 #include "ImGuiManager.h"
-#include "DrawManager.h"
-#include "LightManager.h"
+#include "Draw/DrawManager.h"
+#include "Light/LightManager.h"
 
 ExplodeParticle::ExplodeParticle()
 {

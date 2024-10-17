@@ -1,5 +1,5 @@
-#include "Skydome.h"
-#include "DrawManager.h"
+#include "Stage/Skydome.h"
+#include "Draw/DrawManager.h"
 
 void Skydome::Initialize(const std::string name)
 {

@@ -3,19 +3,19 @@
 #include <memory>
 #include <d3d12.h>
 
-#include "PipelineState.h"
-#include "RootSignature.h"
-#include "UploadBuffer.h"
-#include "CommandContext.h"
+#include "Graphics/PipelineState.h"
+#include "Graphics/RootSignature.h"
+#include "GPUResource/UploadBuffer.h"
+#include "Graphics/CommandContext.h"
 
-#include "ViewProjection.h"
-#include "WorldTransform.h"
-#include "DirectionalLights.h"
-#include "Material.h"
-#include "SkinCluster.h"
-#include "Mesh.h"
+#include "GameComponent/ViewProjection.h"
+#include "GameComponent/WorldTransform.h"
+#include "Light/DirectionalLights.h"
+#include "GameComponent/Material.h"
+#include "Animation/SkinCluster.h"
+#include "Mesh/Mesh.h"
 
-#include "Renderer.h"
+#include "Render/Renderer.h"
 
 class DirectXCommon;
 

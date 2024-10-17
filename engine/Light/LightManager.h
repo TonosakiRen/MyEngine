@@ -2,12 +2,12 @@
 #include "Mymath.h"
 #include <vector>
 #include <memory>
-#include "AreaLights.h"
-#include "DirectionalLights.h"
-#include "LightNumBuffer.h"
-#include "PointLights.h"
-#include "ShadowSpotLights.h"
-#include "SpotLights.h"
+#include "Light/AreaLights.h"
+#include "Light/DirectionalLights.h"
+#include "Light/LightNumBuffer.h"
+#include "Light/PointLights.h"
+#include "Light/ShadowSpotLights.h"
+#include "Light/SpotLights.h"
 class LightManager
 {
 public:

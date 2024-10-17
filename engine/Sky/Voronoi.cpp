@@ -1,9 +1,9 @@
-#include "Voronoi.h"
-#include "ShaderManager.h"
-#include "CommandContext.h"
+#include "Sky/Voronoi.h"
+#include "Light/ShaderManager.h"
+#include "Graphics/CommandContext.h"
 #include <vector>
 
-#include "Helper.h"
+#include "Graphics/Helper.h"
 
 using namespace Microsoft::WRL;
 

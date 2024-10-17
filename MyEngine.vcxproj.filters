@@ -65,9 +65,6 @@
     <Filter Include="Engine\Animation">
       <UniqueIdentifier>{49f097c0-c68c-4793-a54b-3b5dc154bdc0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\DrawManager">
-      <UniqueIdentifier>{4117657c-d136-48f4-b988-5c1b47d35590}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Game\Particle">
       <UniqueIdentifier>{1820220b-483d-485b-968f-ded23a5732e3}</UniqueIdentifier>
     </Filter>
@@ -112,6 +109,12 @@
     </Filter>
     <Filter Include="Game\Compute">
       <UniqueIdentifier>{fafbb1c1-6999-4efa-8cff-36af6ee36859}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Boss">
+      <UniqueIdentifier>{0214d10a-425b-41e4-b3f4-d1be7618f2bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Draw">
+      <UniqueIdentifier>{4117657c-d136-48f4-b988-5c1b47d35590}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -352,7 +355,7 @@
     <ClCompile Include="engine\RayTracing\BLAS.cpp">
       <Filter>Engine\RayTracing</Filter>
     </ClCompile>
-    <ClCompile Include="engine\RayTracing\RayTracing.cpp">
+    <ClCompile Include="engine\RayTracing\Raytracing.cpp">
       <Filter>Engine\RayTracing</Filter>
     </ClCompile>
     <ClCompile Include="engine\RayTracing\TRAS.cpp">
@@ -398,10 +401,10 @@
       <Filter>Engine\Wave</Filter>
     </ClCompile>
     <ClCompile Include="engine\Draw\Calling.cpp">
-      <Filter>Engine\DrawManager</Filter>
+      <Filter>Engine\Draw</Filter>
     </ClCompile>
     <ClCompile Include="engine\Draw\DrawManager.cpp">
-      <Filter>Engine\DrawManager</Filter>
+      <Filter>Engine\Draw</Filter>
     </ClCompile>
     <ClCompile Include="engine\GameComponent\GameObject.cpp">
       <Filter>Engine\GameComponent</Filter>
@@ -489,6 +492,12 @@
     </ClCompile>
     <ClCompile Include="application\WavePoints\WavePoints.cpp">
       <Filter>Game\WavePoints</Filter>
+    </ClCompile>
+    <ClCompile Include="application\Boss\Boss.cpp">
+      <Filter>Game\Boss</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\RayTracing\RaytracingInstanceDescs.cpp">
+      <Filter>Engine\RayTracing</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -735,7 +744,7 @@
     <ClInclude Include="engine\RayTracing\BLAS.h">
       <Filter>Engine\RayTracing</Filter>
     </ClInclude>
-    <ClInclude Include="engine\RayTracing\RayTracing.h">
+    <ClInclude Include="engine\RayTracing\Raytracing.h">
       <Filter>Engine\RayTracing</Filter>
     </ClInclude>
     <ClInclude Include="engine\RayTracing\TRAS.h">
@@ -781,10 +790,10 @@
       <Filter>Engine\Wave</Filter>
     </ClInclude>
     <ClInclude Include="engine\Draw\Calling.h">
-      <Filter>Engine\DrawManager</Filter>
+      <Filter>Engine\Draw</Filter>
     </ClInclude>
     <ClInclude Include="engine\Draw\DrawManager.h">
-      <Filter>Engine\DrawManager</Filter>
+      <Filter>Engine\Draw</Filter>
     </ClInclude>
     <ClInclude Include="engine\GameComponent\GameObject.h">
       <Filter>Engine\GameComponent</Filter>
@@ -872,6 +881,12 @@
     </ClInclude>
     <ClInclude Include="application\WavePoints\WavePoints.h">
       <Filter>Game\WavePoints</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Boss\Boss.h">
+      <Filter>Game\Boss</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\RayTracing\RaytracingInstanceDescs.h">
+      <Filter>Engine\RayTracing</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

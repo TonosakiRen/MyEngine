@@ -1,8 +1,8 @@
-#include "WaveData.h"
-#include "Particle.h"
-#include "ShaderManager.h"
-#include "Renderer.h"
-#include "TextureManager.h"
+#include "Wave/WaveData.h"
+#include "Particle/Particle.h"
+#include "Light/ShaderManager.h"
+#include "Render/Renderer.h"
+#include "Texture/TextureManager.h"
 
 using namespace Microsoft::WRL;
 

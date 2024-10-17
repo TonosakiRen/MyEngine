@@ -1,8 +1,9 @@
-#include "Framework.h"
+#include "Framework/Framework.h"
+
 #include "Input.h"
 #include "Audio.h"
-#include "WinApp.h"
-#include "SceneManager.h"
+#include "Graphics/WinApp.h"
+#include "Scene/SceneManager.h"
 bool Framework::endRequest_ = false;
 uint32_t Framework::kFrame = 0;
 uint32_t Framework::kFrameRemainder = 0;

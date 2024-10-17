@@ -1,13 +1,15 @@
 #pragma once
-#include "ViewProjection.h"
-#include "Material.h"
-#include "WorldTransform.h"
-#include "DirectionalLights.h"
-#include "AnimationManager.h"
-#include "ModelManager.h"
-#include "SkinCluster.h"
 #include <string>
-#include "WaveIndexData.h"
+
+#include "GameComponent/ViewProjection.h"
+#include "GameComponent/Material.h"
+#include "GameComponent/WorldTransform.h"
+#include "Light/DirectionalLights.h"
+#include "Animation/AnimationManager.h"
+#include "Model/ModelManager.h"
+#include "Animation/SkinCluster.h"
+#include "Wave/WaveIndexData.h"
+
 class GameObject
 {
 public:

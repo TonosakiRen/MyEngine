@@ -1,5 +1,6 @@
+#include "GameComponent/Loader.h"
+
 #include <iostream>
-#include "Loader.h"
 
 namespace Load {
 	void Positions(const std::string& fileName, std::vector<Vector3>& positions)

@@ -1,12 +1,12 @@
-#include "PixelBuffer.h"
+#include "GPUResource/PixelBuffer.h"
 
 #include <d3dx12.h>
 
 
-#include "Helper.h"
+#include "Graphics/Helper.h"
 #include <assert.h>
 
-#include "BufferManager.h"
+#include "GPUResource/BufferManager.h"
 
 void PixelBuffer::CreateTextureResource(const std::wstring& name, const D3D12_RESOURCE_DESC& desc, D3D12_CLEAR_VALUE clearValue) {
 

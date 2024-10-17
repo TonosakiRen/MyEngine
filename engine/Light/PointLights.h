@@ -1,9 +1,9 @@
 #pragma once
 #include <d3d12.h>
 #include "Mymath.h"
-#include "StructuredBuffer.h"
+#include "GPUResource/StructuredBuffer.h"
 #include <vector>
-#include "WorldTransform.h"
+#include "GameComponent/WorldTransform.h"
 
 class PointLights
 {

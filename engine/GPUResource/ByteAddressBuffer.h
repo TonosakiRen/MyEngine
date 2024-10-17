@@ -1,7 +1,7 @@
 #pragma once
-#include "CopyBuffer.h"
-#include "DescriptorHandle.h"
-#include "CommandContext.h"
+#include "GPUResource/CopyBuffer.h"
+#include "Graphics/DescriptorHandle.h"
+#include "Graphics/CommandContext.h"
 class ByteAddressBuffer
 	: public GPUResource
 {

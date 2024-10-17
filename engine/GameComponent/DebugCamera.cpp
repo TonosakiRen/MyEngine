@@ -1,4 +1,5 @@
-#include "DebugCamera.h"
+#include "GameComponent/DebugCamera.h"
+
 #include "Input.h"
 #include "ImGuiManager.h"
 

@@ -1,7 +1,7 @@
-#include "Trees.h"
-#include "DrawManager.h"
-#include "Loader.h"
-#include "Floor.h"
+#include "Stage/Trees.h"
+#include "Draw/DrawManager.h"
+#include "GameComponent/Loader.h"
+#include "Stage/Floor.h"
 
 void Trees::Initialize()
 {

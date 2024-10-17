@@ -1,15 +1,16 @@
-#include "AnimationManager.h"
+#include "Animation/AnimationManager.h"
+
 #include <DirectXTex.h>
 #include <cassert>
-#include "DirectXCommon.h"
-#include "TextureManager.h"
 #include <fstream>
 #include <sstream>
 #include <filesystem>
-
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+
+#include "Graphics/DirectXCommon.h"
+#include "Texture/TextureManager.h"
 
 using namespace DirectX;
 

@@ -1,5 +1,5 @@
-#include "WorldTransform.h"
-#include "ModelManager.h"
+#include "GameComponent/WorldTransform.h"
+#include "Model/ModelManager.h"
 ModelManager* modelManager_ = ModelManager::GetInstance();
 
 void WorldTransform::Initialize(bool srtChange) {

@@ -1,5 +1,5 @@
-#include "LightManager.h"
-#include "DirectXCommon.h"
+#include "Light/LightManager.h"
+#include "Graphics/DirectXCommon.h"
 
 LightManager* LightManager::GetInstance()
 {

@@ -1,5 +1,6 @@
-#include "Skeleton.h"
-#include "Helper.h"
+#include "Animation/Skeleton.h"
+
+#include "Graphics/Helper.h"
 
 
 void Skeleton::Create(const Node& rootNode)

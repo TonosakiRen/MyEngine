@@ -1,8 +1,8 @@
-#include "SphereLights.h"
+#include "Particle/SphereLights.h"
 #include "ImGuiManager.h"
-#include "LightManager.h"
-#include "DrawManager.h"
-#include "ModelManager.h"
+#include "Light/LightManager.h"
+#include "Draw/DrawManager.h"
+#include "Model/ModelManager.h"
 #include <string>
 
 

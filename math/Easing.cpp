@@ -1,5 +1,5 @@
 #include "Easing.h"
-
+#include <algorithm>
 
 Easing::Easing()
 {
@@ -81,6 +81,36 @@ Vector2 Easing::Bezier(const Vector2& p0, const Vector2& p1, const Vector2& p2, 
 	Vector2 tmp4 = easing(t, tmp1, tmp2, 0.0f, easingMode, false);
 
 	Vector2 tmp = easing(t, tmp3, tmp4, 0.0f, easingMode, false);
+
+	return tmp;
+}
+
+Vector3 Easing::Bezier(const Vector3& p0, const Vector3& p1, const Vector3& p2, float& t, float speed, EasingMode easingMode, bool isAdd)
+{
+	if (isAdd == true) {
+		t += speed;
+	}
+	t = std::clamp(t, 0.0f, 1.0f);
+	Vector3 tmp0 = easing(t, p0, p1, 0.0f, easingMode, false);
+	Vector3 tmp1 = easing(t, p1, p2, 0.0f, easingMode, false);
+	Vector3 tmp = easing(t, tmp0, tmp1, 0.0f, easingMode, false);
+	return { tmp };
+}
+
+Vector3 Easing::Bezier(const Vector3& p0, const Vector3& p1, const Vector3& p2, const Vector3& p3, float& t, float speed, EasingMode easingMode, bool isAdd)
+{
+	if (isAdd) {
+		t += speed;
+	}
+	t = std::clamp(t, 0.0f, 1.0f);
+	Vector3 tmp0 = easing(t, p0, p1, 0.0f, easingMode, false);
+	Vector3 tmp1 = easing(t, p1, p2, 0.0f, easingMode, false);
+	Vector3 tmp2 = easing(t, p2, p3, 0.0f, easingMode, false);
+
+	Vector3 tmp3 = easing(t, tmp0, tmp1, 0.0f, easingMode, false);
+	Vector3 tmp4 = easing(t, tmp1, tmp2, 0.0f, easingMode, false);
+
+	Vector3 tmp = easing(t, tmp3, tmp4, 0.0f, easingMode, false);
 
 	return tmp;
 }

@@ -1,7 +1,7 @@
 #pragma once
 #include "MyMath.h"
-#include "Collider.h"
-#include "GameObject.h"
+#include "GameComponent/Collider.h"
+#include "GameComponent/GameObject.h"
 
 class EnemyBulletManager;
 class Player;

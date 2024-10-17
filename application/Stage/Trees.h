@@ -1,9 +1,9 @@
 #pragma once
 #include <memory>
 #include <vector>
-#include "GameObject.h"
-#include "ParticleModelData.h"
-#include "Tree.h"
+#include "GameComponent/GameObject.h"
+#include "Particle/ParticleModelData.h"
+#include "Stage/Tree.h"
 class Trees
 {
 private:

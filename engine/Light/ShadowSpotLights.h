@@ -1,10 +1,10 @@
 #pragma once
 #include <d3d12.h>
 #include "Mymath.h"
-#include "StructuredBuffer.h"
-#include "DepthBuffer.h"
+#include "GPUResource/StructuredBuffer.h"
+#include "GPUResource/DepthBuffer.h"
 #include <vector>
-#include "WorldTransform.h"
+#include "GameComponent/WorldTransform.h"
 
 class ShadowSpotLights
 {

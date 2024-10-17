@@ -1,16 +1,16 @@
 #pragma once
 
 #include <array>
-#include "CommandContext.h"
+#include "Graphics/CommandContext.h"
 #include <string>
 #include <unordered_map>
 #include <optional>
 #include <wrl.h>
 #include <vector>
-#include "Mesh.h"
-#include "DescriptorHandle.h"
-#include "UploadBuffer.h"
-#include "WorldTransform.h"
+#include "Mesh/Mesh.h"
+#include "Graphics/DescriptorHandle.h"
+#include "GPUResource/UploadBuffer.h"
+#include "GameComponent/WorldTransform.h"
 #include <memory>
 #include <string>
 #include <map>
@@ -19,8 +19,8 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
-#include "Skeleton.h"
-#include "SkinCluster.h"
+#include "Animation/Skeleton.h"
+#include "Animation/SkinCluster.h"
 
 struct VertexWeightData {
 	float weight;

@@ -7,14 +7,14 @@
 #include <cassert>
 #include <vector>
 
-#include "GPUResource.h"
-#include "PipelineState.h"
-#include "RootSignature.h"
-#include "ColorBuffer.h"
-#include "CubeColorBuffer.h"
-#include "DepthBuffer.h"
+#include "GPUResource/GPUResource.h"
+#include "Graphics/PipelineState.h"
+#include "Graphics/RootSignature.h"
+#include "GPUResource/ColorBuffer.h"
+#include "GPUResource/CubeColorBuffer.h"
+#include "GPUResource/DepthBuffer.h"
 
-#include "DWParam.h"
+#include "Graphics/DWParam.h"
 
 class CommandContext
 {

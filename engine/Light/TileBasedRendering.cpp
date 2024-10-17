@@ -1,13 +1,13 @@
-#include "TileBasedRendering.h"
-#include "WinApp.h"
-#include "DirectXCommon.h"
+#include "Light/TileBasedRendering.h"
+#include "Graphics/WinApp.h"
+#include "Graphics/DirectXCommon.h"
 #include <Windows.h>
-#include "ShaderManager.h"
-#include "Helper.h"
-#include "CommandContext.h"
-#include "LightNumBuffer.h"
-#include "LightManager.h"
-#include "Wire.h"
+#include "Light/ShaderManager.h"
+#include "Graphics/Helper.h"
+#include "Graphics/CommandContext.h"
+#include "Light/LightNumBuffer.h"
+#include "Light/LightManager.h"
+#include "Render/Wire.h"
 using namespace Microsoft::WRL;
 void TileBasedRendering::Initialize()
 {

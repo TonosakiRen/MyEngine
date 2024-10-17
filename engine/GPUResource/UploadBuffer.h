@@ -1,7 +1,7 @@
 #pragma once
-#include "GPUResource.h"
-#include "Helper.h"
-#include "Framework.h"
+#include "GPUResource/GPUResource.h"
+#include "Graphics/Helper.h"
+#include "Framework/Framework.h"
 
 class UploadBuffer : public GPUResource {
 public:

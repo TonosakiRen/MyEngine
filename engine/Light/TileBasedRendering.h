@@ -1,14 +1,14 @@
 #pragma once
 #include <vector>
-#include "PipelineState.h"
-#include "RootSignature.h"
-#include "UploadBuffer.h"
-#include "DescriptorHandle.h"
-#include "StructuredBuffer.h"
-#include "DefaultStructuredBuffer.h"
-#include "RwStructuredBuffer.h"
-#include "WinApp.h"
-#include "ViewProjection.h"
+#include "Graphics/PipelineState.h"
+#include "Graphics/RootSignature.h"
+#include "GPUResource/UploadBuffer.h"
+#include "Graphics/DescriptorHandle.h"
+#include "GPUResource/StructuredBuffer.h"
+#include "GPUResource/DefaultStructuredBuffer.h"
+#include "GPUResource/RwStructuredBuffer.h"
+#include "Graphics/WinApp.h"
+#include "GameComponent/ViewProjection.h"
 class LightNumBuffer;
 class TileBasedRendering
 {

@@ -1,10 +1,10 @@
-#include "SwapChain.h"
+#include "Graphics/SwapChain.h"
 
-#include "Helper.h"
+#include "Graphics/Helper.h"
 #include <assert.h>
 
-#include "DirectXCommon.h"
-#include "BufferManager.h"
+#include "Graphics/DirectXCommon.h"
+#include "GPUResource/BufferManager.h"
 
 using namespace Microsoft::WRL;
 

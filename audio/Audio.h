@@ -1,14 +1,12 @@
 #pragma once
-
 #include <xaudio2.h>
 #include <wrl.h>
-
 #include <fstream>
 #include <vector>
-
 #include <mfapi.h>
 #include <mfidl.h>
 #include <mfreadwrite.h>
+
 class Audio {
 public:
     static const size_t kMaxNumPlayHandles = 128;

@@ -1,12 +1,12 @@
-#include "EdgeRenderer.h"
+#include "PostEffect/EdgeRenderer.h"
 #include <Windows.h>
-#include "DirectXCommon.h"
-#include "ShaderManager.h"
-#include "Helper.h"
+#include "Graphics/DirectXCommon.h"
+#include "Light/ShaderManager.h"
+#include "Graphics/Helper.h"
 #include <assert.h>
-#include "Renderer.h"
-#include "ViewProjection.h"
-#include "DirectionalLights.h"
+#include "Render/Renderer.h"
+#include "GameComponent/ViewProjection.h"
+#include "Light/DirectionalLights.h"
 #include "ImGuiManager.h"
 
 using namespace Microsoft::WRL;

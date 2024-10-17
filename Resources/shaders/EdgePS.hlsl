@@ -65,7 +65,18 @@ float4 main(VSOutput input) : SV_TARGET
 
 	//法線の計算結果、あるいは深度値の計算結果が一定以上ならエッジとみなす。
 	if (length(Normal) >= edgeParam.normalThreshold || abs(depth) > edgeParam.depthThreshold) {
-		float32_t3 color = colorTex.Sample(smp, input.texCenter).xyz;
+		float32_t3 color = float32_t3(0.0f,0.0f,0.0f);
+		color += colorTex.Sample(smp, input.texCenter).xyz;
+		color += colorTex.Sample(smp, input.texLT).xyz;
+		color += colorTex.Sample(smp, input.texMT).xyz;
+		color += colorTex.Sample(smp, input.texRT).xyz;
+		color += colorTex.Sample(smp, input.texLM).xyz;
+		color += colorTex.Sample(smp, input.texRM).xyz;
+		color += colorTex.Sample(smp, input.texLB).xyz;
+		color += colorTex.Sample(smp, input.texMB).xyz;
+		color += colorTex.Sample(smp, input.texRB).xyz;
+		color *= 0.125f;
+		output.color.xyz = color;
 		output.color.xyz = pow(color, 0.333f);
 		output.color.w = 1.0f;
 	}

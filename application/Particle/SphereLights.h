@@ -1,6 +1,6 @@
 #pragma once
-#include "ParticleModelData.h"
-#include "WorldTransform.h"
+#include "Particle/ParticleModelData.h"
+#include "GameComponent/WorldTransform.h"
 #include <vector>
 #include <memory>
 class PointLights;

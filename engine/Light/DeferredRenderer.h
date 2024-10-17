@@ -1,13 +1,13 @@
 #pragma once
-#include "PipelineState.h"
-#include "RootSignature.h"
-#include "GPUResource.h"
-#include "CommandContext.h"
-#include "DescriptorHandle.h"
-#include "ColorBuffer.h"
-#include "DepthBuffer.h"
+#include "Graphics/PipelineState.h"
+#include "Graphics/RootSignature.h"
+#include "GPUResource/GPUResource.h"
+#include "Graphics/CommandContext.h"
+#include "Graphics/DescriptorHandle.h"
+#include "GPUResource/ColorBuffer.h"
+#include "GPUResource/DepthBuffer.h"
 #include "Mymath.h"
-#include "UploadBuffer.h"
+#include "GPUResource/UploadBuffer.h"
 
 class ViewProjection;
 class TileBasedRendering;

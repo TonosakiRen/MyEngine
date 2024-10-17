@@ -1,5 +1,5 @@
-#include "GPUResource.h"
-#include "BufferManager.h"
+#include "GPUResource/GPUResource.h"
+#include "GPUResource/BufferManager.h"
 #include <assert.h>
 
 GPUResource::~GPUResource()

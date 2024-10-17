@@ -1,9 +1,9 @@
 #pragma once
-#include "PipelineState.h"
-#include "RootSignature.h"
-#include "GPUResource.h"
-#include "CommandContext.h"
-#include "DescriptorHandle.h"
+#include "Graphics/PipelineState.h"
+#include "Graphics/RootSignature.h"
+#include "GPUResource/GPUResource.h"
+#include "Graphics/CommandContext.h"
+#include "Graphics/DescriptorHandle.h"
 class Compute
 {
 public:

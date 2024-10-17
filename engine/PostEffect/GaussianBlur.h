@@ -1,9 +1,9 @@
 #pragma once
 #include <stdint.h>
-#include "ColorBuffer.h"
-#include "UploadBuffer.h"
-#include "PipelineState.h"
-#include "RootSignature.h"
+#include "GPUResource/ColorBuffer.h"
+#include "GPUResource/UploadBuffer.h"
+#include "Graphics/PipelineState.h"
+#include "Graphics/RootSignature.h"
 #include <Windows.h>
 #include <d3d12.h>
 

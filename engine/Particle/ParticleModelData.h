@@ -1,8 +1,8 @@
 #pragma once
 #include <Windows.h>
 
-#include "StructuredBuffer.h"
-#include "CommandContext.h"
+#include "GPUResource/StructuredBuffer.h"
+#include "Graphics/CommandContext.h"
 #include "Mymath.h"
 
 class ParticleModelData

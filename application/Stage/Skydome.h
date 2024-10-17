@@ -1,5 +1,5 @@
 #pragma once
-#include "GameObject.h"
+#include "GameComponent/GameObject.h"
 class Skydome :
     public GameObject
 {

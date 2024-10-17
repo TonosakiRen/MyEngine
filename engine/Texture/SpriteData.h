@@ -6,12 +6,12 @@
 #include <memory>
 #include "Mymath.h"
 
-#include "CommandContext.h"
-#include "PipelineState.h"
-#include "GPUResource.h"
-#include "PipelineState.h"
-#include "RootSignature.h"
-#include "UploadBuffer.h"
+#include "Graphics/CommandContext.h"
+#include "Graphics/PipelineState.h"
+#include "GPUResource/GPUResource.h"
+#include "Graphics/PipelineState.h"
+#include "Graphics/RootSignature.h"
+#include "GPUResource/UploadBuffer.h"
 
 class SpriteData {
 public:

@@ -1,8 +1,8 @@
-#include "ViewProjection.h"
-#include "WinApp.h"
+#include "GameComponent/ViewProjection.h"
+#include "Graphics/WinApp.h"
 #include "Input.h"
 #include "ImGuiManager.h"
-#include "Wire.h"
+#include "Render/Wire.h"
 
 
 bool ViewProjection::isUseDebugCamera = false;

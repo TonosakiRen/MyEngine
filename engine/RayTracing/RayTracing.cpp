@@ -1,24 +1,27 @@
-#include "RayTracing.h"
-#include "TextureManager.h"
-#include "ModelManager.h"
-#include "ShaderManager.h"
-#include "LightManager.h"
+#include "Raytracing/Raytracing.h"
+#include "Texture/TextureManager.h"
+#include "Model/ModelManager.h"
+#include "Light/ShaderManager.h"
+#include "Light/LightManager.h"
 
 using namespace Microsoft::WRL;
 
-void RayTracing::Initialize() {
-    
+void Raytracing::Initialize() {
+    tras_ = std::make_unique<TRAS>();
+    tras_->Create(L"tras");
 }
 
-void RayTracing::Finalize()
+void Raytracing::AddInstanceDesc(const D3D12_RAYTRACING_INSTANCE_DESC& desc)
 {
-   
-   rootSignature_.reset();
-   pipelineState_.reset();
-    
 }
 
-void RayTracing::CreatePipeline() {
+void Raytracing::Finalize()
+{
+   rootSignature_.reset();
+   pipelineState_.reset();   
+}
+
+void Raytracing::CreatePipeline() {
     HRESULT result = S_FALSE;
     ComPtr<IDxcBlob> msBlob;
     ComPtr<IDxcBlob> psBlob;

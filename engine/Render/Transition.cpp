@@ -1,12 +1,12 @@
-#include "Transition.h"
+#include "Render/Transition.h"
 #include <DirectXTex.h>
 #include <d3dcompiler.h>
 #include <fstream>
 #include <sstream>
-#include "TextureManager.h"
-#include "DWParam.h"
-#include "ShaderManager.h"
-#include "Renderer.h"
+#include "Texture/TextureManager.h"
+#include "Graphics/DWParam.h"
+#include "Light/ShaderManager.h"
+#include "Render/Renderer.h"
 
 using namespace DirectX;
 using namespace Microsoft::WRL;

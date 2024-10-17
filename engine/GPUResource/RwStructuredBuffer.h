@@ -1,8 +1,8 @@
 #pragma once
-#include "GPUResource.h"
-#include "DefaultBuffer.h"
-#include "UAVBuffer.h"
-#include "DescriptorHandle.h"
+#include "GPUResource/GPUResource.h"
+#include "GPUResource/DefaultBuffer.h"
+#include "GPUResource/UAVBuffer.h"
+#include "Graphics/DescriptorHandle.h"
 
 class CommandContext;
 

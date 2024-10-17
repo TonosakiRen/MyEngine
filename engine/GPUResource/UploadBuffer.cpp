@@ -1,7 +1,7 @@
-#include "UploadBuffer.h"
+#include "GPUResource/UploadBuffer.h"
 
 #include <cassert>
-#include "BufferManager.h"
+#include "GPUResource/BufferManager.h"
 
 UploadBuffer::~UploadBuffer()
 {

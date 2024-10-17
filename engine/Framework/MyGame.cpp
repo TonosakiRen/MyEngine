@@ -1,14 +1,14 @@
-#include "MyGame.h"
+#include "Framework/MyGame.h"
 
-#include "TextureManager.h"
-#include "ModelManager.h"
+#include "Texture/TextureManager.h"
+#include "Model/ModelManager.h"
 #include <Windows.h>
-#include "GameScene.h"
-#include "ShaderManager.h"
-#include "Renderer.h"
-#include "GameObjectManager.h"
-#include "LightManager.h"
-#include "BufferManager.h"
+#include "Scene/GameScene.h"
+#include "Light/ShaderManager.h"
+#include "Render/Renderer.h"
+#include "GameComponent/GameObjectManager.h"
+#include "Light/LightManager.h"
+#include "GPUResource/BufferManager.h"
 
 
 void MyGame::Initialize()

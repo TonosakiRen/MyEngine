@@ -1,9 +1,9 @@
-#include "ShadowMap.h"
-#include "TextureManager.h"
-#include "ModelManager.h"
-#include "ShaderManager.h"
-#include "Renderer.h"
-#include "DirectionalLights.h"
+#include "Light/ShadowMap.h"
+#include "Texture/TextureManager.h"
+#include "Model/ModelManager.h"
+#include "Light/ShaderManager.h"
+#include "Render/Renderer.h"
+#include "Light/DirectionalLights.h"
 
 using namespace Microsoft::WRL;
 

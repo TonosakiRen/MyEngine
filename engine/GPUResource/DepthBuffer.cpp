@@ -1,6 +1,6 @@
-#include "DepthBuffer.h"
+#include "GPUResource/DepthBuffer.h"
 
-#include "DirectXCommon.h"
+#include "Graphics/DirectXCommon.h"
 
 DXGI_FORMAT GetDSVFormat(DXGI_FORMAT format) {
     switch (format) {

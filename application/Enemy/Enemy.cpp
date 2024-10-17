@@ -1,8 +1,8 @@
-#include "Enemy.h"
-#include "EnemyBulletManager.h"
-#include "Player.h"
-#include "ModelManager.h"
-#include "Floor.h"
+#include "Enemy/Enemy.h"
+#include "Enemy/EnemyBulletManager.h"
+#include "Player/Player.h"
+#include "Model/ModelManager.h"
+#include "Stage/Floor.h"
 
 uint32_t Enemy::deadEnemyNum = 0;
 Vector3 Enemy::modelSize;

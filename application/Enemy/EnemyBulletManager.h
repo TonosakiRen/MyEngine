@@ -2,8 +2,8 @@
 #include <list>
 #include <memory>
 #include "Mymath.h"
-#include "EnemyBullet.h"
-#include "ExplodeParticle.h"
+#include "Enemy/EnemyBullet.h"
+#include "Particle/ExplodeParticle.h"
 
 class EnemyBulletManager
 {

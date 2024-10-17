@@ -1,8 +1,8 @@
 #pragma once
 #include <memory>
-#include "ParticleData.h"
-#include "WorldTransform.h"
-#include "Material.h"
+#include "Particle/ParticleData.h"
+#include "GameComponent/WorldTransform.h"
+#include "GameComponent/Material.h"
 class WhiteParticle
 {
 public:

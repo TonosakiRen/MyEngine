@@ -1,8 +1,8 @@
 #pragma once
 #include <memory>
-#include "ParticleModelData.h"
-#include "WorldTransform.h"
-#include "Material.h"
+#include "Particle/ParticleModelData.h"
+#include "GameComponent/WorldTransform.h"
+#include "GameComponent/Material.h"
 class DustParticle
 {
 public:

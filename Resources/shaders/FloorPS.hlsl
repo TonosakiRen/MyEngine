@@ -44,7 +44,7 @@ PixelShaderOutput main(VSOutput input) {
 	uv.y += time.t / 1000.0f;
 
 	float32_t textureColor = tex.Sample(smp, uv);
-	output.color.xyz -= textureColor;
+	output.color.xyz += textureColor * 1.0f;
 
 	output.normal.xyz = (normal.xyz + 1.0f) * 0.5f;
 	output.normal.w = 1.0f;

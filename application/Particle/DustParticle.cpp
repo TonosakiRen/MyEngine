@@ -1,5 +1,5 @@
-#include "DustParticle.h"
-#include "DrawManager.h"
+#include "Particle/DustParticle.h"
+#include "Draw/DrawManager.h"
 #include "ImGuiManager.h"
 
 DustParticle::DustParticle()

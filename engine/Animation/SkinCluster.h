@@ -4,11 +4,11 @@
 #include <array>
 
 #include "Mymath.h"
-#include "GPUResource.h"
-#include "DescriptorHandle.h"
-#include "StructuredBuffer.h"
-#include "Skeleton.h"
-#include "RwStructuredBuffer.h"
+#include "GPUResource/GPUResource.h"
+#include "Graphics/DescriptorHandle.h"
+#include "GPUResource/StructuredBuffer.h"
+#include "Animation/Skeleton.h"
+#include "GPUResource/RwStructuredBuffer.h"
 
 const uint32_t kNumMaxInfluence = 4;
 struct VertexInfluence {
@@ -37,7 +37,7 @@ public:
     const D3D12_VERTEX_BUFFER_VIEW& GetSkinnedVertexBufferView() const { return skinnedBufferView_; }
     const D3D12_GPU_VIRTUAL_ADDRESS GetSkinningInformationGPUAddress() const { return skinningInformation_.GetGPUVirtualAddress(); }
 
-public:
+private:
 
     std::vector<Matrix4x4> inverseBindPoseMatrices_;
     UploadBuffer influenceResource_;

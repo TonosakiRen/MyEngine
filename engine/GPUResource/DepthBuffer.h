@@ -1,8 +1,8 @@
 #pragma once
 
-#include "PixelBuffer.h"
+#include "GPUResource/PixelBuffer.h"
 
-#include "DescriptorHandle.h"
+#include "Graphics/DescriptorHandle.h"
 
 class DepthBuffer : public PixelBuffer {
 public:

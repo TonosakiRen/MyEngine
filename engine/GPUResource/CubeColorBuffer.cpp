@@ -1,6 +1,6 @@
-#include "CubeColorBuffer.h"
+#include "GPUResource/CubeColorBuffer.h"
 
-#include "DirectXCommon.h"
+#include "Graphics/DirectXCommon.h"
 
 void CubeColorBuffer::Create(const std::wstring& name, uint32_t width, uint32_t height, DXGI_FORMAT format) {
     auto flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;

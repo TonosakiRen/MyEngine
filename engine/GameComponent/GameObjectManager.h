@@ -1,8 +1,9 @@
 #pragma once
 #include <string>
 #include <vector>
+
 #include "Mymath.h"
-#include "GameObject.h"
+#include "GameComponent/GameObject.h"
 
 class GameObjectManager
 {

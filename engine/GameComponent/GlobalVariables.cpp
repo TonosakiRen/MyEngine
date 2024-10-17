@@ -1,9 +1,11 @@
-#include "GlobalVariables.h"
-#include "ImGuiManager.h"
+#include "GameComponent/GlobalVariables.h"
+
 #include <json.hpp>
 #include <iostream>
 #include <fstream>
 #include <assert.h>
+
+#include "ImGuiManager.h"
 
 using namespace nlohmann;
 GlobalVariables* GlobalVariables::GetInstance() {

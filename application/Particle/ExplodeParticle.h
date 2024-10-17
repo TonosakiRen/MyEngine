@@ -1,9 +1,9 @@
 #pragma once
 #include <memory>
-#include "ParticleModelData.h"
-#include "WorldTransform.h"
-#include "Floor.h"
-#include "WavePoints.h"
+#include "Particle/ParticleModelData.h"
+#include "GameComponent/WorldTransform.h"
+#include "Stage/Floor.h"
+#include "WavePoints/WavePoints.h"
 class PointLights;
 class ExplodeParticle
 {

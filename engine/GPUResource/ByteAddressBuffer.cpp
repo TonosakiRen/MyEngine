@@ -1,7 +1,8 @@
-#include "ByteAddressBuffer.h"
+#include "GPUResource/ByteAddressBuffer.h"
 #include <assert.h>
-#include "DirectXCommon.h"
-#include "BufferManager.h"
+#include "Graphics/DirectXCommon.h"
+#include "GPUResource/BufferManager.h"
+#include "Graphics/Helper.h"
 
 void ByteAddressBuffer::Create(const std::wstring& name, size_t bufferSize , UINT numElements)
 {
@@ -10,6 +11,7 @@ void ByteAddressBuffer::Create(const std::wstring& name, size_t bufferSize , UIN
 
     //インスタンシングデータのサイズ
     UINT sizeBAB = static_cast<UINT>(bufferSize * numElements);
+    sizeBAB = Helper::AlignUp(sizeBAB, 256);
 
     copyBuffer_.Create(name,sizeBAB,&cpuData_);
 

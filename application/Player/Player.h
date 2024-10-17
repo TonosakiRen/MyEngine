@@ -1,20 +1,22 @@
 #pragma once
 #include <memory>
-#include "GameObject.h"
+#include "GameComponent/GameObject.h"
 #include "Input.h"
-#include "Collider.h"
-#include "SpriteData.h"
+#include "GameComponent/Collider.h"
+#include "Texture/SpriteData.h"
 #include "Mymath.h"
-#include "AnimationManager.h"
-#include "ModelManager.h"
-#include "SkinCluster.h"
-#include "DustParticle.h"
+#include "Animation/AnimationManager.h"
+#include "Model/ModelManager.h"
+#include "Animation/SkinCluster.h"
+#include "Particle/DustParticle.h"
 
 class PlayerBulletManager;
 class Player :
     public GameObject
 {
 public:
+
+    bool a = false;
 
     static const int fireNum_ = 40;
 

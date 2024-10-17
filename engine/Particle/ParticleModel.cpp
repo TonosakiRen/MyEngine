@@ -1,9 +1,9 @@
-#include "ParticleModel.h"
-#include "ShaderManager.h"
-#include "DirectXCommon.h"
-#include "TextureManager.h"
-#include "ModelManager.h"
-#include "LightManager.h"
+#include "Particle/ParticleModel.h"
+#include "Light/ShaderManager.h"
+#include "Graphics/DirectXCommon.h"
+#include "Texture/TextureManager.h"
+#include "Model/ModelManager.h"
+#include "Light/LightManager.h"
 
 using namespace Microsoft::WRL;
 

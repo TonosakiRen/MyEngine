@@ -1,10 +1,10 @@
-#include "FloorRenderer.h"
-#include "TextureManager.h"
-#include "ModelManager.h"
-#include "ShaderManager.h"
+#include "Wave/FloorRenderer.h"
+#include "Texture/TextureManager.h"
+#include "Model/ModelManager.h"
+#include "Light/ShaderManager.h"
 #include "ImGuiManager.h"
-#include "LightManager.h"
-#include "Framework.h"
+#include "Light/LightManager.h"
+#include "Framework/Framework.h"
 
 using namespace Microsoft::WRL;
 

@@ -1,12 +1,14 @@
-#include "RwStructuredBuffer.h"
+#include "GPUResource/RwStructuredBuffer.h"
 
 #include <cassert>
-#include "DirectXCommon.h"
-#include "CommandContext.h"
+#include "Graphics/DirectXCommon.h"
+#include "Graphics/CommandContext.h"
+#include "Graphics/Helper.h"
 
 void RwStructuredBuffer::Create(const std::wstring& name, size_t bufferSize, UINT numElements) {
     // インスタンシングデータのサイズ
     UINT sizeINB = static_cast<UINT>(bufferSize * numElements);
+    sizeINB = Helper::AlignUp(sizeINB, 256);
 
     UAVBuffer::Create(name, sizeINB);
 

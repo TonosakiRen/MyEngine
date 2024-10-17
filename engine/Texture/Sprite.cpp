@@ -1,9 +1,9 @@
-#include "Sprite.h"
-#include "TextureManager.h"
+#include "Texture/Sprite.h"
+#include "Texture/TextureManager.h"
 #include <cassert>
-#include "WinApp.h"
-#include "ShaderManager.h"
-#include "Renderer.h"
+#include "Graphics/WinApp.h"
+#include "Light/ShaderManager.h"
+#include "Render/Renderer.h"
 
 using namespace Microsoft::WRL;
 

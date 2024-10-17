@@ -1,5 +1,5 @@
 #pragma once
-#include "UploadBuffer.h"
+#include "GPUResource/UploadBuffer.h"
 #include <stdint.h>
 class LightNumBuffer
 {

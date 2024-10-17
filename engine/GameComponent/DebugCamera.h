@@ -1,6 +1,7 @@
 #pragma once
-#include "ViewProjection.h"
 #include <memory>
+
+#include "GameComponent/ViewProjection.h"
 class DebugCamera :
 	public ViewProjection
 {

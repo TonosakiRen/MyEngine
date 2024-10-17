@@ -1,11 +1,11 @@
 #include <json.hpp>
 #include <iostream>
-#include "GameObjectManager.h"
 #include <fstream>
 #include <assert.h>
-#include "ModelManager.h"
 
-#include "LightManager.h"
+#include "GameComponent/GameObjectManager.h"
+#include "Model/ModelManager.h"
+#include "Light/LightManager.h"
 
 using namespace nlohmann;
 

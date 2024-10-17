@@ -1,5 +1,5 @@
-#include "EnemyBulletManager.h"
-#include "ModelManager.h"
+#include "Enemy/EnemyBulletManager.h"
+#include "Model/ModelManager.h"
 
 void EnemyBulletManager::Initialize(ExplodeParticle* explodeParticle)
 {

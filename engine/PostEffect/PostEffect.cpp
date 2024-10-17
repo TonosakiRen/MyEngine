@@ -1,13 +1,13 @@
-#include "PostEffect.h"
+#include "PostEffect/PostEffect.h"
 #include <DirectXTex.h>
 #include <d3dcompiler.h>
 #include <fstream>
 #include <sstream>
 #pragma comment(lib, "d3dcompiler.lib")
-#include "TextureManager.h"
-#include "DWParam.h"
-#include "ShaderManager.h"
-#include "Renderer.h"
+#include "Texture/TextureManager.h"
+#include "Graphics/DWParam.h"
+#include "Light/ShaderManager.h"
+#include "Render/Renderer.h"
 
 using namespace DirectX;
 using namespace Microsoft::WRL;
