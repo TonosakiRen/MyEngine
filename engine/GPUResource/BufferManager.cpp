@@ -1,6 +1,8 @@
 #include "GPUResource/BufferManager.h"
+
 #include <algorithm>
 #include <assert.h>
+
 #include "Graphics/DirectXCommon.h"
 
 BufferManager* BufferManager::GetInstance()

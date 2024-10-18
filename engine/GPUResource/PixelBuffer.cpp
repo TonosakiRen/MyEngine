@@ -46,9 +46,7 @@ void PixelBuffer::AssociateWithResource(const std::wstring& name, ID3D12Resource
 #endif // _DEBUG
 }
 
-D3D12_RESOURCE_DESC PixelBuffer::DescribeTex2D(
-    uint32_t width, uint32_t height, uint32_t arraySize,
-    DXGI_FORMAT format, D3D12_RESOURCE_FLAGS flags) {
+D3D12_RESOURCE_DESC PixelBuffer::DescribeTex2D(uint32_t width, uint32_t height, uint32_t arraySize,DXGI_FORMAT format, D3D12_RESOURCE_FLAGS flags) {
     width_ = width;
     height_ = height;
     arraySize_ = arraySize;

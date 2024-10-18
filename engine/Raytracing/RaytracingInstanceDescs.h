@@ -10,7 +10,7 @@ public:
     static const uint32_t kMaxDescNum_ = 128;
 
     void Create();
-    void AddDesc(const D3D12_RAYTRACING_INSTANCE_DESC& desc);
+    void AddDesc(D3D12_RAYTRACING_INSTANCE_DESC& desc);
     void Update();
 
     uint32_t GetInstanceNum() const { return instanceNum_; }

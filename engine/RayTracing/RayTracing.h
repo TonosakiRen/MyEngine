@@ -13,6 +13,7 @@
 
 #include "Render/Renderer.h"
 #include "Raytracing/RaytracingInstanceDescs.h"
+#include "Raytracing/BLAS.h"
 
 class DirectXCommon;
 
@@ -27,7 +28,8 @@ public:
 		parameterNum
 	};
 	void Initialize();
-	void AddInstanceDesc(const D3D12_RAYTRACING_INSTANCE_DESC& desc);
+	void Update(CommandContext& commandContext);
+	void AddInstanceDesc(const BLAS& blas, const WorldTransform& worldTranform);
 	void Finalize();
 
 private:

@@ -92,9 +92,6 @@
     <Filter Include="shaders\Hlsli">
       <UniqueIdentifier>{fde0058d-1793-4232-9456-820ca1c074b4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\RayTracing">
-      <UniqueIdentifier>{e890c993-2deb-40e4-979d-0ab673734618}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Engine\Input">
       <UniqueIdentifier>{c810670b-d476-48ee-b6ec-575de27a7707}</UniqueIdentifier>
     </Filter>
@@ -115,6 +112,9 @@
     </Filter>
     <Filter Include="Engine\Draw">
       <UniqueIdentifier>{4117657c-d136-48f4-b988-5c1b47d35590}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Raytracing">
+      <UniqueIdentifier>{e890c993-2deb-40e4-979d-0ab673734618}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -353,13 +353,13 @@
       <Filter>Engine\PostEffect</Filter>
     </ClCompile>
     <ClCompile Include="engine\RayTracing\BLAS.cpp">
-      <Filter>Engine\RayTracing</Filter>
+      <Filter>Engine\Raytracing</Filter>
     </ClCompile>
     <ClCompile Include="engine\RayTracing\Raytracing.cpp">
-      <Filter>Engine\RayTracing</Filter>
+      <Filter>Engine\Raytracing</Filter>
     </ClCompile>
     <ClCompile Include="engine\RayTracing\TRAS.cpp">
-      <Filter>Engine\RayTracing</Filter>
+      <Filter>Engine\Raytracing</Filter>
     </ClCompile>
     <ClCompile Include="engine\Render\Renderer.cpp">
       <Filter>Engine\Rederer</Filter>
@@ -497,7 +497,7 @@
       <Filter>Game\Boss</Filter>
     </ClCompile>
     <ClCompile Include="engine\RayTracing\RaytracingInstanceDescs.cpp">
-      <Filter>Engine\RayTracing</Filter>
+      <Filter>Engine\Raytracing</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -742,13 +742,13 @@
       <Filter>Engine\PostEffect</Filter>
     </ClInclude>
     <ClInclude Include="engine\RayTracing\BLAS.h">
-      <Filter>Engine\RayTracing</Filter>
+      <Filter>Engine\Raytracing</Filter>
     </ClInclude>
     <ClInclude Include="engine\RayTracing\Raytracing.h">
-      <Filter>Engine\RayTracing</Filter>
+      <Filter>Engine\Raytracing</Filter>
     </ClInclude>
     <ClInclude Include="engine\RayTracing\TRAS.h">
-      <Filter>Engine\RayTracing</Filter>
+      <Filter>Engine\Raytracing</Filter>
     </ClInclude>
     <ClInclude Include="engine\Render\Renderer.h">
       <Filter>Engine\Rederer</Filter>
@@ -886,7 +886,7 @@
       <Filter>Game\Boss</Filter>
     </ClInclude>
     <ClInclude Include="engine\RayTracing\RaytracingInstanceDescs.h">
-      <Filter>Engine\RayTracing</Filter>
+      <Filter>Engine\Raytracing</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
