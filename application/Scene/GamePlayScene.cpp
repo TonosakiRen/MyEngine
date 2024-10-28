@@ -186,6 +186,16 @@ void GamePlayScene::CheckAllCollision()
 		}
 	}
 
+	//boss当たり判定
+	for (const std::unique_ptr<PlayerBullet>& playerBullet : playerBulletManager_->GetPlayerBullets()) {
+		bool isHit = boss_->collider_.Collision(playerBullet->GetCollider());
+		if (isHit) {
+			playerBullet->OnCollision();
+			explodeParticle_->SetIsEmit(true, MakeTranslation(playerBullet->GetWorldTransform()->matWorld_));
+		}
+	}
+	
+
 	//自機当たり判定
 	for (const std::unique_ptr<EnemyBullet>& enemyBullet : enemyBulletManager_->GetEnemyBullets()) {
 		bool isHit = player_->collider_.Collision(enemyBullet->GetCollider());

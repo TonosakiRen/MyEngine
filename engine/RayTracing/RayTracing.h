@@ -9,7 +9,7 @@
 
 #include "GameComponent/ViewProjection.h"
 #include "GameComponent/WorldTransform.h"
-#include "Raytracing/TRAS.h"
+#include "Raytracing/TLAS.h"
 
 #include "Render/Renderer.h"
 #include "Raytracing/RaytracingInstanceDescs.h"
@@ -22,20 +22,23 @@ class Raytracing
 public:
 
 	enum class RootParameter {
-		kTexture,
+		kResult,
+		kTras,
 		kDescriptorRangeNum,
-		kWorldTransform = kDescriptorRangeNum,
-		parameterNum
+
+		parameterNum = kDescriptorRangeNum
 	};
+
 	void Initialize();
 	void Update(CommandContext& commandContext);
-	void AddInstanceDesc(const BLAS& blas, const WorldTransform& worldTranform);
+	void AddInstanceDesc(const BLAS& blas, const WorldTransform& worldTransform);
+	void AddInstanceDesc(const BLAS& blas, const Matrix4x4& matrix);
 	void Finalize();
 
 private:
 	void CreatePipeline();
 private:
-	std::unique_ptr<TRAS> tras_;
+	std::unique_ptr<TLAS> tras_;
 	std::unique_ptr<RaytracingInstanceDescs> instanceDescs_;
 	std::unique_ptr<RootSignature> rootSignature_;
 	std::unique_ptr<PipelineState> pipelineState_;

@@ -89,7 +89,7 @@ void MeshletEnvironmentMapModel::CreatePipeline() {
     msBlob = shaderManager->Compile(L"MeshTestMS.hlsl",ShaderManager::kMesh);
     assert(msBlob != nullptr);
 
-    psBlob = shaderManager->Compile(L"FMeshEnvironmentMapPS.hlsl", ShaderManager::kPixel);
+    psBlob = shaderManager->Compile(L"MeshEnvironmentMapPS.hlsl", ShaderManager::kPixel);
     assert(psBlob != nullptr);
 
     rootSignature_[kDeferred] = std::make_unique<RootSignature>();
@@ -221,7 +221,7 @@ void MeshletEnvironmentMapModel::CreateForwardPipeline()
     msBlob = shaderManager->Compile(L"MeshTestMS.hlsl", ShaderManager::kMesh);
     assert(msBlob != nullptr);
 
-    psBlob = shaderManager->Compile(L"forwardPlus/FMeshEnvironmentMapPS.hlsl", ShaderManager::kPixel);
+    psBlob = shaderManager->Compile(L"forwardPlus/MeshEnvironmentMapPS.hlsl", ShaderManager::kPixel);
     assert(psBlob != nullptr);
 
     rootSignature_[kForward] = std::make_unique<RootSignature>();

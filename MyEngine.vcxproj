@@ -210,6 +210,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\Animation\Skeleton.cpp" />
     <ClCompile Include="engine\Animation\SkinCluster.cpp" />
     <ClCompile Include="engine\Animation\Skinning.cpp" />
+    <ClCompile Include="engine\Curve\LissajousCurve.cpp" />
     <ClCompile Include="engine\Draw\Calling.cpp" />
     <ClCompile Include="engine\Draw\DrawManager.cpp" />
     <ClCompile Include="engine\Framework\Framework.cpp" />
@@ -282,7 +283,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\RayTracing\BLAS.cpp" />
     <ClCompile Include="engine\RayTracing\Raytracing.cpp" />
     <ClCompile Include="engine\RayTracing\RaytracingInstanceDescs.cpp" />
-    <ClCompile Include="engine\RayTracing\TRAS.cpp" />
+    <ClCompile Include="engine\RayTracing\TLAS.cpp" />
     <ClCompile Include="engine\Render\Renderer.cpp" />
     <ClCompile Include="engine\Render\Transition.cpp" />
     <ClCompile Include="engine\Render\Wire.cpp" />
@@ -339,6 +340,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\Animation\Skeleton.h" />
     <ClInclude Include="engine\Animation\SkinCluster.h" />
     <ClInclude Include="engine\Animation\Skinning.h" />
+    <ClInclude Include="engine\Curve\LissajousCurve.h" />
     <ClInclude Include="engine\Draw\Calling.h" />
     <ClInclude Include="engine\Draw\DrawManager.h" />
     <ClInclude Include="engine\Framework\Framework.h" />
@@ -412,7 +414,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\RayTracing\BLAS.h" />
     <ClInclude Include="engine\RayTracing\Raytracing.h" />
     <ClInclude Include="engine\RayTracing\RaytracingInstanceDescs.h" />
-    <ClInclude Include="engine\RayTracing\TRAS.h" />
+    <ClInclude Include="engine\RayTracing\TLAS.h" />
     <ClInclude Include="engine\Render\Renderer.h" />
     <ClInclude Include="engine\Render\Transition.h" />
     <ClInclude Include="engine\Render\Wire.h" />
@@ -454,37 +456,37 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Demo|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="Resources\shaders\forwardPlus\FFloorPS.hlsl">
+    <FxCompile Include="Resources\shaders\forwardPlus\FloorPS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Demo|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="Resources\shaders\forwardPlus\FMeshEnvironmentMapPS.hlsl">
+    <FxCompile Include="Resources\shaders\forwardPlus\MeshEnvironmentMapPS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Demo|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="Resources\shaders\forwardPlus\FMeshTestPS.hlsl">
+    <FxCompile Include="Resources\shaders\forwardPlus\MeshTestPS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Demo|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="Resources\shaders\forwardPlus\FModelPS.hlsl">
+    <FxCompile Include="Resources\shaders\forwardPlus\ModelPS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Demo|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="Resources\shaders\forwardPlus\FParticleModelPS.hlsl">
+    <FxCompile Include="Resources\shaders\forwardPlus\ParticleModelPS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Demo|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="Resources\shaders\forwardPlus\FParticlePS.hlsl">
+    <FxCompile Include="Resources\shaders\forwardPlus\ParticlePS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Demo|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="Resources\shaders\forwardPlus\FWavePS.hlsl">
+    <FxCompile Include="Resources\shaders\forwardPlus\WavePS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Demo|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>

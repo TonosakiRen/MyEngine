@@ -1,3 +1,7 @@
+/**
+ * @file AnimationManager.cpp
+ * @brief Animationに必要な関数などをラップしたもの
+ */
 #include "Animation/AnimationManager.h"
 
 #include <DirectXTex.h>

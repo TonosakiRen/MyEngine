@@ -42,7 +42,7 @@ void FloorRenderer::Finalize()
     }
 }
 
-void FloorRenderer::PreDraw(PipelineType pipelineType, CommandContext& commandContext, const ViewProjection& viewProjection, const ViewProjection& cullingViewProjection,const TileBasedRendering& tileBasedRendering) {
+void FloorRenderer::PreDraw(PipelineType pipelineType, CommandContext& commandContext, const ViewProjection& viewProjection, const ViewProjection& cullingViewProjection,const TileBasedRendering& tileBasedRendering, const LissajousCurve& lissajousCurve) {
 
 #ifdef USE_IMGUI
     ImGui::Begin("Engine");
@@ -93,6 +93,8 @@ void FloorRenderer::PreDraw(PipelineType pipelineType, CommandContext& commandCo
         commandContext.SetDescriptorTable(static_cast<UINT>(ForwardRootParameter::kTBRPointLightIndex), tileBasedRendering.GetPointLightIndexGPUHandle());
         commandContext.SetDescriptorTable(static_cast<UINT>(ForwardRootParameter::kTBRSpotLightIndex), tileBasedRendering.GetSpotLightIndexGPUHandle());
         commandContext.SetDescriptorTable(static_cast<UINT>(ForwardRootParameter::kTBRShadowSpotLightIndex), tileBasedRendering.GetShadowSpotLightIndexGPUHandle());
+
+        commandContext.SetDescriptorTable(static_cast<UINT>(ForwardRootParameter::kCurvePoints), lissajousCurve.GetGPUHandle());
 
         commandContext.SetConstantBuffer(static_cast<UINT>(ForwardRootParameter::kFrustum), cullingViewProjection.GetFrustumGPUVirtualAddress());
 
@@ -272,7 +274,7 @@ void FloorRenderer::CreateForwardPipeline()
     msBlob = shaderManager->Compile(L"FloorMS.hlsl", ShaderManager::kMesh);
     assert(msBlob != nullptr);
 
-    psBlob = shaderManager->Compile(L"forwardPlus/FFloorPS.hlsl", ShaderManager::kPixel);
+    psBlob = shaderManager->Compile(L"forwardPlus/FloorPS.hlsl", ShaderManager::kPixel);
     assert(psBlob != nullptr);
 
     rootSignature_[kForward] = std::make_unique<RootSignature>();
@@ -294,6 +296,8 @@ void FloorRenderer::CreateForwardPipeline()
         descRangeSRV[int(ForwardRootParameter::kAreaLights)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 10);
         descRangeSRV[int(ForwardRootParameter::kSpotLights)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 11);
         descRangeSRV[int(ForwardRootParameter::kShadowSpotLights)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 12);
+        descRangeSRV[int(ForwardRootParameter::kCurvePoints)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 13);
+
         descRangeSRV[int(ForwardRootParameter::kTileInformation)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 0);
         descRangeSRV[int(ForwardRootParameter::kTBRPointLightIndex)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 1);
         descRangeSRV[int(ForwardRootParameter::kTBRSpotLightIndex)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 2);
@@ -315,6 +319,8 @@ void FloorRenderer::CreateForwardPipeline()
         rootparams[(int)ForwardRootParameter::kAreaLights].InitAsDescriptorTable(1, &descRangeSRV[(int)ForwardRootParameter::kAreaLights]);
         rootparams[(int)ForwardRootParameter::kSpotLights].InitAsDescriptorTable(1, &descRangeSRV[(int)ForwardRootParameter::kSpotLights]);
         rootparams[(int)ForwardRootParameter::kShadowSpotLights].InitAsDescriptorTable(1, &descRangeSRV[(int)ForwardRootParameter::kShadowSpotLights]);
+        rootparams[(int)ForwardRootParameter::kCurvePoints].InitAsDescriptorTable(1, &descRangeSRV[(int)ForwardRootParameter::kCurvePoints]);
+
         rootparams[int(ForwardRootParameter::kTileInformation)].InitAsDescriptorTable(1, &descRangeSRV[int(ForwardRootParameter::kTileInformation)]);
         rootparams[(int)ForwardRootParameter::kTBRPointLightIndex].InitAsDescriptorTable(1, &descRangeSRV[(int)ForwardRootParameter::kTBRPointLightIndex]);
         rootparams[(int)ForwardRootParameter::kTBRSpotLightIndex].InitAsDescriptorTable(1, &descRangeSRV[(int)ForwardRootParameter::kTBRSpotLightIndex]);

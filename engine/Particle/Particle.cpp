@@ -205,7 +205,7 @@ void Particle::CreateForwardPipeline()
     vsBlob = shaderManager->Compile(L"ParticleVS.hlsl", ShaderManager::kVertex);
     assert(vsBlob != nullptr);
 
-    psBlob = shaderManager->Compile(L"forwardPlus/FParticlePS.hlsl", ShaderManager::kPixel);
+    psBlob = shaderManager->Compile(L"forwardPlus/ParticlePS.hlsl", ShaderManager::kPixel);
     assert(psBlob != nullptr);
 
     rootSignature_[kForward] = std::make_unique<RootSignature>();

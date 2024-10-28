@@ -19,6 +19,8 @@
 #include "Wave/WaveIndexData.h"
 #include "Wave/WaveData.h"
 
+#include "Curve/LissajousCurve.h"
+
 
 class DirectXCommon;
 
@@ -58,6 +60,7 @@ public:
 		kAreaLights,
 		kSpotLights,
 		kShadowSpotLights,
+		kCurvePoints,
 
 		kTileInformation,
 		kTBRPointLightIndex,
@@ -81,7 +84,7 @@ public:
 
 	void Initialize(CommandContext& commnadContext);
 	void Finalize();
-	void PreDraw(PipelineType pipelineType, CommandContext& commandContext, const ViewProjection& viewProjection, const ViewProjection& cullingViewProjection,const TileBasedRendering& tileBasedRendering);
+	void PreDraw(PipelineType pipelineType, CommandContext& commandContext, const ViewProjection& viewProjection, const ViewProjection& cullingViewProjection,const TileBasedRendering& tileBasedRendering,const LissajousCurve& lissajousCurve);
 
 	void Draw(CommandContext& commandContext, uint32_t modelHandle,const WorldTransform& worldTransform, const WaveData& waveData, const WaveIndexData& waveIndexData);
 

@@ -13,6 +13,8 @@
 void Boss::Initialize(const std::string name) {
 	GameObject::Initialize(name);
 
+	collider_.Initialize(&worldTransform_,name,modelHandle_);
+
 	stateFunctions_[kNormal] = std::bind(&Boss::Normal, this);
 	stateFunctions_[kAttack] = std::bind(&Boss::Attack, this);
 	stateFunctions_[kAssault] = std::bind(&Boss::Assault, this);
@@ -25,7 +27,7 @@ void Boss::Initialize(const std::string name) {
 	modelWorldTransform_[static_cast<int>(Boss::Parts::Right)].SetParent(&worldTransform_);
 	modelWorldTransform_[static_cast<int>(Boss::Parts::Left)].SetParent(&worldTransform_);
 	modelWorldTransform_[static_cast<int>(Boss::Parts::Body)].scale_ = { 3.0f, 3.0f, 3.0f };
-	worldTransform_.translation_ = { 0.0f, 3.0f, 3.0f };
+	worldTransform_.translation_ = { 0.0f, 1.5f, 3.0f };
 	worldTransform_.quaternion_ = MakeForYAxis(Radian(180.0f));
 	
 
@@ -48,6 +50,7 @@ void Boss::Update() {
 	worldTransform_.translation_.x = std::clamp(worldTransform_.translation_.x, -limit, limit);
 	worldTransform_.translation_.z = std::clamp(worldTransform_.translation_.z, -limit, limit);
 	worldTransform_.Update();
+	collider_.MatrixUpdate();
 	modelWorldTransform_[static_cast<int>(Boss::Parts::Body)].Update();
 	modelWorldTransform_[static_cast<int>(Boss::Parts::Right)].Update();
 	modelWorldTransform_[static_cast<int>(Boss::Parts::Left)].Update();

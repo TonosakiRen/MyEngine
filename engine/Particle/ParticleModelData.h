@@ -24,6 +24,7 @@ public:
 
 	const DescriptorHandle& GetGPUHandle() const { return structuredBuffer_->GetSRV(); }
 	const uint32_t GetDataNum() const { return dataNum_; }
+	const Data* GetData() const { return data_; }
 private:
 	std::unique_ptr<StructuredBuffer> structuredBuffer_;
 	Data* data_ = nullptr;

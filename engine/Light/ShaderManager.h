@@ -20,6 +20,7 @@ public:
         kCompute,
         kMesh,
         kAmplification,
+        kRaytracing,
 
         kNumTypes
     };

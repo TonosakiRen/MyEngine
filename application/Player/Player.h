@@ -63,4 +63,7 @@ private:
 
     WorldTransform rightHandWorldTransform_;
 
+    SpriteData spriteData_;
+
+
 };

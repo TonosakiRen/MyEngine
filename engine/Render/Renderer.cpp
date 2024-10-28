@@ -194,9 +194,7 @@ void Renderer::MainRender(ViewProjection& viewProjection) {
     default:
         break;
     }
-    drawManager_->PostSpriteDraw();
-    drawManager_->ResetCalls();
-
+  
 }
 
 void Renderer::DeferredRender(ViewProjection& viewProjection)
@@ -245,6 +243,13 @@ void Renderer::DeferredRender(ViewProjection& viewProjection)
         hsvFilter_->Draw(*resultBuffer_.get(), *tmpBuffer_.get(), commandContext_);
     }
     ImGui::End();
+
+    commandContext_.TransitionResource(*resultBuffer_, D3D12_RESOURCE_STATE_RENDER_TARGET);
+    commandContext_.SetViewportAndScissorRect(0, 0, resultBuffer_->GetWidth(), resultBuffer_->GetHeight());
+    commandContext_.SetRenderTarget(resultBuffer_->GetRTV());
+
+    drawManager_->PostSpriteDraw();
+    drawManager_->ResetCalls();
 
 }
 

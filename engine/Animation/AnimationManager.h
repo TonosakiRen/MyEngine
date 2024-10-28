@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file AnimationManager.h
+ * @brief Animationに必要な関数などをラップしたもの
+ */
 #include <array>
 #include <string>
 #include <unordered_map>

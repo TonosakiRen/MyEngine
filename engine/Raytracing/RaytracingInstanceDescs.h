@@ -7,7 +7,7 @@
 class RaytracingInstanceDescs {
 public:
 
-    static const uint32_t kMaxDescNum_ = 128;
+    static const uint32_t kMaxDescNum_ = 8192;
 
     void Create();
     void AddDesc(D3D12_RAYTRACING_INSTANCE_DESC& desc);

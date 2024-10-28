@@ -26,6 +26,8 @@
 #include "Light/TileBasedRendering.h"
 #include "Light/LightManager.h"
 #include "Draw/Calling.h"
+#include "Raytracing/Raytracing.h"
+#include "Curve/LissajousCurve.h"
 
 class DrawManager
 {
@@ -100,12 +102,16 @@ private:
 	std::unique_ptr<FloorRenderer> floorPipeline_;
 	std::unique_ptr<WaveModel> waveModelPipeline_;
 
+	std::unique_ptr<Raytracing> raytracing_;
+
 	static std::unique_ptr<Material> defaultMaterial_;
+	std::unique_ptr<LissajousCurve> lissajousCurve_;
 
 	std::unique_ptr<Calling> calling_;
 	CommandContext* commandContext_;
 
 	LightManager* lightManager_;
+	ModelManager* modelManager_;
 
 	std::vector<std::function<void()>> calls[kCallNum];
 private:

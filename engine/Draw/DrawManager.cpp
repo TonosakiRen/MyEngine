@@ -24,6 +24,8 @@ void DrawManager::Finalize()
 	defaultMaterial_.reset();
 	floorPipeline_.reset();
 	waveModelPipeline_.reset();
+	raytracing_.reset();
+	lissajousCurve_.reset();
 
 	calls->clear();
 }
@@ -37,6 +39,7 @@ DrawManager* DrawManager::GetInstance() {
 void DrawManager::Initialize(CommandContext& CommandContext)
 {
 	lightManager_ = LightManager::GetInstance();
+	modelManager_ = ModelManager::GetInstance();
 
 	commandContext_ = &CommandContext;
 	defaultMaterial_ = std::make_unique<Material>();
@@ -66,6 +69,11 @@ void DrawManager::Initialize(CommandContext& CommandContext)
 	floorPipeline_->Initialize(CommandContext);
 	waveModelPipeline_ = std::make_unique<WaveModel>();
 	waveModelPipeline_->Initialize();
+	raytracing_ = std::make_unique<Raytracing>();
+	raytracing_->Initialize();
+
+	lissajousCurve_ = std::make_unique<LissajousCurve>();
+	lissajousCurve_->Initialize();
 
 	calling_ = std::make_unique<Calling>();
 	calling_->Initialize();
@@ -73,7 +81,7 @@ void DrawManager::Initialize(CommandContext& CommandContext)
 
 void DrawManager::AllDraw(PipelineType pipelineType,const ViewProjection& viewProjection,const TileBasedRendering& tileBasedRendering)
 {
-
+	lissajousCurve_->Update();
 
 	//不透明
 	
@@ -135,10 +143,12 @@ void DrawManager::AllDraw(PipelineType pipelineType,const ViewProjection& viewPr
 		call();
 	}
 
-	floorPipeline_->PreDraw(pipelineType ,*commandContext_, viewProjection, *calling_->currentViewProjection, tileBasedRendering);
+	floorPipeline_->PreDraw(pipelineType ,*commandContext_, viewProjection, *calling_->currentViewProjection, tileBasedRendering, *lissajousCurve_.get());
 	for (auto& call : calls[kFloor]) {
 		call();
 	}
+
+	raytracing_->Update(*commandContext_);
 
 }
 
@@ -178,6 +188,9 @@ void DrawManager::DrawModel(const WorldTransform& worldTransform, const uint32_t
 {
 	drawCallNum_++;
 	if (calling_->isDraw(modelHandle,worldTransform)) {
+		for (Mesh& mesh : modelManager_->GetModelData(modelHandle).meshes) {
+			raytracing_->AddInstanceDesc(mesh.blasBuffer_, worldTransform);
+		}
 		calls[kModel].push_back([&, modelHandle , textureHandle]() {modelPipeline_->Draw(*commandContext_, modelHandle, worldTransform, material, textureHandle); });
 	}
 }
@@ -195,6 +208,9 @@ void DrawManager::DrawMeshletModel(const WorldTransform& worldTransform, const u
 {
 	drawCallNum_++;
 	if (calling_->isDraw(modelHandle, worldTransform)) {
+		for (Mesh& mesh : modelManager_->GetModelData(modelHandle).meshes) {
+			raytracing_->AddInstanceDesc(mesh.blasBuffer_, worldTransform);
+		}
 		calls[kMeshletModel].push_back([&, modelHandle, textureHandle]() {meshletModelPipeline_->Draw(*commandContext_, modelHandle, worldTransform, material, textureHandle); });
 	}
 }
@@ -214,6 +230,9 @@ void DrawManager::DrawEnvironmentMapMeshletModel(const WorldTransform& worldTran
 {
 	drawCallNum_++;
 	if (calling_->isDraw(modelHandle, worldTransform)) {
+		for (Mesh& mesh : modelManager_->GetModelData(modelHandle).meshes) {
+			raytracing_->AddInstanceDesc(mesh.blasBuffer_, worldTransform);
+		}
 		calls[kMeshletEnvironmentMap].push_back([&, modelHandle, textureHandle]() {meshletEnvironmentMapPipeline_->Draw(*commandContext_, modelHandle, worldTransform, material); });
 	}
 }
@@ -236,6 +255,11 @@ void DrawManager::DrawParticle(ParticleData& bufferData, const uint32_t textureH
 void DrawManager::DrawParticleModel(ParticleModelData& bufferData, const uint32_t modelHandle, const Material& material)
 {
 	drawCallNum_++;
+	for (Mesh& mesh : modelManager_->GetModelData(modelHandle).meshes) {
+		for (uint32_t i = 0; i < bufferData.GetDataNum();i++) {
+			//raytracing_->AddInstanceDesc(mesh.blasBuffer_, bufferData.GetData()[i].matWorld);
+		}
+	}
 	calls[kParticleModel].push_back([&, modelHandle]() {particleModelPipeline_->Draw(*commandContext_, bufferData, material, modelHandle); });
 }
 
@@ -279,6 +303,9 @@ void DrawManager::DrawWaveModel(const WorldTransform& worldTransform, const Wave
 {
 	drawCallNum_++;
 	if (calling_->isDraw(modelHandle, worldTransform)) {
+		for (Mesh& mesh : modelManager_->GetModelData(modelHandle).meshes) {
+			raytracing_->AddInstanceDesc(mesh.blasBuffer_, worldTransform);
+		}
 		calls[kWave].push_back([&, modelHandle, textureHandle]() {waveModelPipeline_->Draw(*commandContext_, modelHandle, worldTransform, waveData, waveIndexData, material, textureHandle); });
 	}
 }
@@ -295,6 +322,9 @@ void DrawManager::DrawWaveModel(const WorldTransform& worldTransform, const Wave
 void DrawManager::DrawFloor(const WorldTransform& worldTransform, const WaveData& waveData, const WaveIndexData& waveIndexData, const uint32_t modelHandle)
 {
 	drawCallNum_++;
+	for (Mesh& mesh : modelManager_->GetModelData(modelHandle).meshes) {
+		raytracing_->AddInstanceDesc(mesh.blasBuffer_, worldTransform);
+	}
 	calls[kFloor].push_back([&, modelHandle]() {floorPipeline_->Draw(*commandContext_, modelHandle, worldTransform, waveData, waveIndexData); });
 }
 

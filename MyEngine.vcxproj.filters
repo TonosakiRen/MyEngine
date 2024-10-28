@@ -77,12 +77,6 @@
     <Filter Include="shaders\Transition">
       <UniqueIdentifier>{8bcd18f6-0501-49d4-92ef-603e62fa05c1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="shaders\Compute">
-      <UniqueIdentifier>{4c86af85-f1e3-4f9b-8085-7aec3f9fd0dc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Engine\Wave">
-      <UniqueIdentifier>{f835e169-236a-42e5-9a7d-56d2028452e5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Engine\GameComponent">
       <UniqueIdentifier>{0d50efd7-9491-40ef-915b-37715d373269}</UniqueIdentifier>
     </Filter>
@@ -115,6 +109,15 @@
     </Filter>
     <Filter Include="Engine\Raytracing">
       <UniqueIdentifier>{e890c993-2deb-40e4-979d-0ab673734618}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Wave">
+      <UniqueIdentifier>{f835e169-236a-42e5-9a7d-56d2028452e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Curve">
+      <UniqueIdentifier>{73e0be86-3752-4605-a8e9-e0917b422807}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shaders\Compute">
+      <UniqueIdentifier>{4c86af85-f1e3-4f9b-8085-7aec3f9fd0dc}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -358,7 +361,7 @@
     <ClCompile Include="engine\RayTracing\Raytracing.cpp">
       <Filter>Engine\Raytracing</Filter>
     </ClCompile>
-    <ClCompile Include="engine\RayTracing\TRAS.cpp">
+    <ClCompile Include="engine\RayTracing\TLAS.cpp">
       <Filter>Engine\Raytracing</Filter>
     </ClCompile>
     <ClCompile Include="engine\Render\Renderer.cpp">
@@ -498,6 +501,9 @@
     </ClCompile>
     <ClCompile Include="engine\RayTracing\RaytracingInstanceDescs.cpp">
       <Filter>Engine\Raytracing</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\Curve\LissajousCurve.cpp">
+      <Filter>Engine\Curve</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -747,7 +753,7 @@
     <ClInclude Include="engine\RayTracing\Raytracing.h">
       <Filter>Engine\Raytracing</Filter>
     </ClInclude>
-    <ClInclude Include="engine\RayTracing\TRAS.h">
+    <ClInclude Include="engine\RayTracing\TLAS.h">
       <Filter>Engine\Raytracing</Filter>
     </ClInclude>
     <ClInclude Include="engine\Render\Renderer.h">
@@ -887,6 +893,9 @@
     </ClInclude>
     <ClInclude Include="engine\RayTracing\RaytracingInstanceDescs.h">
       <Filter>Engine\Raytracing</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Curve\LissajousCurve.h">
+      <Filter>Engine\Curve</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1037,25 +1046,25 @@
     <FxCompile Include="Resources\shaders\HSVFilterPS.hlsl">
       <Filter>shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Resources\shaders\forwardPlus\FFloorPS.hlsl">
+    <FxCompile Include="Resources\shaders\forwardPlus\FloorPS.hlsl">
       <Filter>shaders\FPlus</Filter>
     </FxCompile>
-    <FxCompile Include="Resources\shaders\forwardPlus\FMeshTestPS.hlsl">
+    <FxCompile Include="Resources\shaders\forwardPlus\MeshEnvironmentMapPS.hlsl">
       <Filter>shaders\FPlus</Filter>
     </FxCompile>
-    <FxCompile Include="Resources\shaders\forwardPlus\FModelPS.hlsl">
+    <FxCompile Include="Resources\shaders\forwardPlus\MeshTestPS.hlsl">
       <Filter>shaders\FPlus</Filter>
     </FxCompile>
-    <FxCompile Include="Resources\shaders\forwardPlus\FParticleModelPS.hlsl">
+    <FxCompile Include="Resources\shaders\forwardPlus\ModelPS.hlsl">
       <Filter>shaders\FPlus</Filter>
     </FxCompile>
-    <FxCompile Include="Resources\shaders\forwardPlus\FParticlePS.hlsl">
+    <FxCompile Include="Resources\shaders\forwardPlus\ParticleModelPS.hlsl">
       <Filter>shaders\FPlus</Filter>
     </FxCompile>
-    <FxCompile Include="Resources\shaders\forwardPlus\FWavePS.hlsl">
+    <FxCompile Include="Resources\shaders\forwardPlus\ParticlePS.hlsl">
       <Filter>shaders\FPlus</Filter>
     </FxCompile>
-    <FxCompile Include="Resources\shaders\forwardPlus\FMeshEnvironmentMapPS.hlsl">
+    <FxCompile Include="Resources\shaders\forwardPlus\WavePS.hlsl">
       <Filter>shaders\FPlus</Filter>
     </FxCompile>
   </ItemGroup>

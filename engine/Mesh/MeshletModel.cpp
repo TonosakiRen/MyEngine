@@ -210,7 +210,7 @@ void MeshletModel::CreateForwardPipeline()
     msBlob = shaderManager->Compile(L"MeshTestMS.hlsl", ShaderManager::kMesh);
     assert(msBlob != nullptr);
 
-    psBlob = shaderManager->Compile(L"forwardPlus/FMeshTestPS.hlsl", ShaderManager::kPixel);
+    psBlob = shaderManager->Compile(L"forwardPlus/MeshTestPS.hlsl", ShaderManager::kPixel);
     assert(psBlob != nullptr);
 
     rootSignature_[kForward] = std::make_unique<RootSignature>();

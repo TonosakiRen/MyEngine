@@ -1,3 +1,7 @@
+/**
+ * @file 
+ * @brief 
+ */
 #include "Animation/Skeleton.h"
 
 #include "Graphics/Helper.h"

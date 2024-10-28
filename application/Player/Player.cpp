@@ -61,6 +61,14 @@ void Player::Initialize(const std::string name, PlayerBulletManager* playerBulle
 	fireParticle_->emitterWorldTransform_.scale_ = { 0.5f,0.5f,0.5f };
 	fireParticle_->material_.color_ = {1.0f,0.0f,0.0f,1.0f};
 	fireParticle_->material_.Update();
+
+	spriteData_.Initialize(TextureManager::Load("hansya2.dds"));
+	spriteData_.size_.x = 400.0f;
+	spriteData_.size_.y = 300.0f;
+	spriteData_.position_ = {400.0f,300.0f};
+
+
+	
 }
 
 void Player::Update(const ViewProjection& viewProjection)
@@ -119,6 +127,8 @@ void Player::Draw() {
 
 	rightHandWorldTransform_.Update(skeleton_.GetJoint("mixamorig:RightHand").skeletonSpaceMatrix);
 	DrawManager::GetInstance()->DrawManager::DrawModel(leftHandModelWorldTransform_,ModelManager::GetInstance()->Load("box1x1.obj"));
+	DrawManager::GetInstance()->DrawPostSprite(spriteData_);
+
 }
 
 void Player::Fire()
@@ -185,7 +195,7 @@ void Player::Move(const ViewProjection& viewProjection)
 	}
 
 	if (input_->TriggerKey(DIK_SPACE) || input_->TriggerButton(XINPUT_GAMEPAD_A)) {
-		velocity_.y = 0.3f;
+		//velocity_.y = 0.3f;
 	}
 
 	velocity_.y = clamp(velocity_.y, -0.5f, 200.0f);
