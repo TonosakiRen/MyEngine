@@ -1,12 +1,12 @@
-## プロジェクト名
+## MyEngine 作品
 
-React、DRF、Terraform のテンプレートリポジトリ
+幻想的な世界観のレンダリングを目指し制作中
 
 <!-- プロジェクトについて -->
 
 ## プロジェクトについて
 
-React、DRF、Terraform を勉強する際に使用できるテンプレート
+DirectXTex,DirectXMesh,assimp を使用
 
 <!-- プロジェクトの概要を記載 -->
 
