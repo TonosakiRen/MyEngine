@@ -21,6 +21,12 @@ MeshShaderによるテッセレーションでパーティクルが床に落ち�
 
   ![image](https://github.com/user-attachments/assets/59f0ae74-204f-4c64-b958-475d2b576c16)
 
+  ## 使用ライブラリ
+* DirectXTex
+* DirectXMesh
+* asiimp
+* ImGUI
+
 
 
 
