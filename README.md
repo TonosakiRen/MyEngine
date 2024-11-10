@@ -46,6 +46,8 @@ MeshShaderによるテッセレーションでパーティクルが床に落ち�
 
 波が起こるMeshletのみテッセレーションを行い波を起こしています。
 
+波はsin波で行っていて法線を偏微分で求めています。
+
 ![wkwkw](https://github.com/user-attachments/assets/100acb2e-1c32-46fb-b0cc-5a68fe19d439)
 
   
