@@ -7,8 +7,6 @@
 
 
 void BLAS::Create(const std::wstring& name, const D3D12_RAYTRACING_GEOMETRY_DESC& geomDesc,CommandContext& commandContext) {
-    HRESULT result = S_FALSE;
-
     D3D12_BUILD_RAYTRACING_ACCELERATION_STRUCTURE_INPUTS inputs{};
     inputs.DescsLayout = D3D12_ELEMENTS_LAYOUT_ARRAY;
     inputs.Flags = D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAG_NONE;
@@ -36,10 +34,9 @@ void BLAS::Create(const std::wstring& name, const D3D12_RAYTRACING_GEOMETRY_DESC
     asDesc.ScratchAccelerationStructureData = scrach_->GetGPUVirtualAddress();
     asDesc.DestAccelerationStructureData = resource_->GetGPUVirtualAddress();
 
-#ifdef _DEBUG
+
     resource_->SetName(name.c_str());
     name_ = name;
-#endif // _DEBUG
 
     state_ = D3D12_RESOURCE_STATE_RAYTRACING_ACCELERATION_STRUCTURE;
     bufferSize_ = Helper::AlignUp(info.ResultDataMaxSizeInBytes, 255);

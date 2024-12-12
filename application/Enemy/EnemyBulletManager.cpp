@@ -20,7 +20,7 @@ void EnemyBulletManager::Update()
 	enemyBullets_.remove_if([&](std::unique_ptr<EnemyBullet>& enemyBullet) {
 		if (enemyBullet->IsDead()) {
 			if (enemyBullet->GetWorldTransform()->translation_.y >= 0.0f) {
-				explodeParticle_->SetIsEmit(true, MakeTranslation(enemyBullet->GetWorldTransform()->matWorld_));
+				//explodeParticle_->SetIsEmit(true, MakeTranslation(enemyBullet->GetWorldTransform()->matWorld_));
 			}
 			return true;
 		}

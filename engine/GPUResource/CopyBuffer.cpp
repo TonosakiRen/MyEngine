@@ -19,6 +19,9 @@ void CopyBuffer::Create(const std::wstring& name, size_t bufferSize,void** cpuDa
         &desc,
         D3D12_RESOURCE_STATE_GENERIC_READ);
 
+    resource_->SetName(name.c_str());
+    name_ = name;
+
     assert(SUCCEEDED(result));
 
     state_ = D3D12_RESOURCE_STATE_GENERIC_READ;
@@ -41,10 +44,9 @@ void CopyBuffer::Create(const std::wstring& name, size_t bufferSize) {
         &desc,
         D3D12_RESOURCE_STATE_GENERIC_READ);
 
-#ifdef _DEBUG
+   
     resource_->SetName(name.c_str());
     name_ = name;
-#endif // _DEBUG
 
 
     state_ = D3D12_RESOURCE_STATE_GENERIC_READ;
@@ -57,7 +59,6 @@ void CopyBuffer::Create(const std::wstring& name, size_t bufferSize) {
 void CopyBuffer::Copy(const void* srcData, size_t copySize) const
 {
     memcpy(cpuData_, srcData, copySize);
-    uint32_t* a = static_cast<uint32_t*>(cpuData_);
 }
 
 void CopyBuffer::SetZero()

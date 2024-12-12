@@ -18,6 +18,7 @@ void ExplodeParticle::Initialize(Floor* floor, WavePoints* wavePoints)
 	emitterWorldTransform_.SetIsScaleParent(false);
 	emitterWorldTransform_.scale_ = { 0.8f,0.8f,0.8f };
 	emitterWorldTransform_.Update();
+	modelHandle_ = ModelManager::GetInstance()->Load("dodecahedron.obj");
 }
 
 void ExplodeParticle::Update() {
@@ -27,26 +28,27 @@ void ExplodeParticle::Update() {
 
 	if (isEmit_) {
 		for (size_t i = 0; i < EmitNum_; i++) {
-			for (size_t i = 0; i < kParticleNum; i++) {
-				if (particles[i].isActive_ == false) {
-					particles[i].isActive_ = true;
-					particles[i].velocity_ = { Rand(-directionScalar_,directionScalar_),Rand(initVelocity_.x,initVelocity_.y), Rand(-directionScalar_,directionScalar_) };
-					particles[i].worldTransform_.translation_ = MakeTranslation(emitterWorldTransform_.matWorld_);
-					particles[i].worldTransform_.quaternion_ = IdentityQuaternion();
-					particles[i].worldTransform_.scale_ = emitterWorldTransform_.scale_;
-					particles[i].worldTransform_.Update();
-					particles[i].firstDrop_ = false;
+			for (size_t k = 0; k < kParticleNum; k++) {
+				if (particles[k].isActive_ == false) {
+					particles[k].isActive_ = true;
+					particles[k].velocity_ = { Rand(-directionScalar_,directionScalar_),Rand(initVelocity_.x,initVelocity_.y), Rand(-directionScalar_,directionScalar_) };
+					particles[k].worldTransform_.translation_ = MakeTranslation(emitterWorldTransform_.matWorld_);
+					particles[k].worldTransform_.quaternion_ = IdentityQuaternion();
+					particles[k].worldTransform_.scale_ = emitterWorldTransform_.scale_;
+					particles[k].worldTransform_.Update();
+					particles[k].firstDrop_ = false;
 					for (size_t j = 0; j < PointLights::lightNum; j++) {
 						if (pointLights_->lights_[j].isActive == false) {
+							pointLights_->lights_[j].worldTransform.Reset();
 							pointLights_->lights_[j].worldTransform.translation_ = {0.0f,0.0f,0.0f};
-							pointLights_->lights_[j].worldTransform.SetParent(&particles[i].worldTransform_);
+							pointLights_->lights_[j].worldTransform.SetParent(&particles[k].worldTransform_,false);
 							pointLights_->lights_[j].isActive = true;
-							pointLights_->lights_[j].color = HSVA(Rand(0.0f, 1.0f),1.0f,1.0f,1.0f);
+							pointLights_->lights_[j].color = emitColor_;
 							pointLights_->lights_[j].radius = pointLightRadius_;
 							pointLights_->lights_[j].intensity = 3.0f;
 							pointLights_->lights_[j].decay = 1.0f;
-							particles[i].pointLightIndex_ = static_cast<uint32_t>(j);
-							particles[i].color_ = pointLights_->lights_[j].color;
+							particles[k].pointLight_ = &pointLights_->lights_[j];
+							particles[k].color_ = emitColor_;
 							break;
 						}
 					}
@@ -76,11 +78,10 @@ void ExplodeParticle::Update() {
 			}
 			particles[i].worldTransform_.scale_ = particles[i].worldTransform_.scale_ - scaleSpeed_;
 			particles[i].worldTransform_.Update();
-			pointLights_->lights_[particles[i].pointLightIndex_].intensity = 3.0f * (particles[i].worldTransform_.scale_.x / emitterWorldTransform_.scale_.x);
-			pointLights_->lights_[particles[i].pointLightIndex_].worldTransform.Update();
-			if (particles[i].worldTransform_.scale_.x <= 0.05f) {
+			particles[i].pointLight_->intensity = 3.0f * (particles[i].worldTransform_.scale_.x / emitterWorldTransform_.scale_.x);
+			if (particles[i].worldTransform_.scale_.x <= 0.005f) {
 				particles[i].isActive_ = false;
-				pointLights_->lights_[particles[i].pointLightIndex_].isActive = false;
+				particles[i].pointLight_->isActive = false;
 			}
 		}
 
@@ -88,7 +89,7 @@ void ExplodeParticle::Update() {
 
 }
 
-void ExplodeParticle::Draw(Vector4 color)
+void ExplodeParticle::Draw()
 {
 
 	emitterWorldTransform_.Update();
@@ -104,5 +105,5 @@ void ExplodeParticle::Draw(Vector4 color)
 		}
 	}
 
-	DrawManager::GetInstance()->DrawParticleModel(*particle_);
+	DrawManager::GetInstance()->DrawParticleModel(*particle_, modelHandle_);
 }

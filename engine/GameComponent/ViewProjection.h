@@ -91,7 +91,7 @@ protected:
 	float fovAngleY_ = 45.0f * std::numbers::pi_v <float> / 180.0f;
 	float aspectRatio_ = (float)16 / (float)9;
 	float nearZ_ = 0.1f;
-	float farZ_ = 100.0f;
+	float farZ_ = 200.0f;
 
 
 	Matrix4x4 worldMatrix_;

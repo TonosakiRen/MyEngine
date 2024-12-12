@@ -77,7 +77,6 @@ void LineAttack::Update()
 					lastLength_ = box->worldTransform_.translation_.x;
 					return true;
 				}
-				return false;
 			}
 		),
 		boxs_.end()

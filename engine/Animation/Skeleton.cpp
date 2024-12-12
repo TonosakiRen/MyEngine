@@ -10,11 +10,11 @@
 void Skeleton::Create(const Node& rootNode)
 {
 	
-	root = CreateJoint(rootNode, {}, joints);
+	root_ = CreateJoint(rootNode, {}, joints_);
 
 	// 名前とindexのマッピングを行いアクセスしやすくする
-	for (const Joint& joint : joints) {
-		jointMap.emplace(joint.name, joint.index);
+	for (const Joint& joint : joints_) {
+		jointMap_.emplace(joint.name, joint.index);
 	}
 	
 }
@@ -22,10 +22,10 @@ void Skeleton::Create(const Node& rootNode)
 void Skeleton::Update()
 {
 	//すべてのJOintを更新。親が若いので通常ループで処理可能になっている
-	for (Joint& joint : joints) {
+	for (Joint& joint : joints_) {
 		joint.localMatrix = MakeAffineMatrix(joint.transform.scale_, joint.transform.quaternion_, joint.transform.translation_);
 		if (joint.parent) {
-			joint.skeletonSpaceMatrix = joint.localMatrix * joints[*joint.parent].skeletonSpaceMatrix;
+			joint.skeletonSpaceMatrix = joint.localMatrix * joints_[*joint.parent].skeletonSpaceMatrix;
 		}
 		else {
 			joint.skeletonSpaceMatrix = joint.localMatrix;

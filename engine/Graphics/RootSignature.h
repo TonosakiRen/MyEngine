@@ -14,7 +14,6 @@ public:
 
 private:
     Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_;
-#ifdef _DEBUG
     std::wstring name_;
-#endif // _DEBUG
+
 };

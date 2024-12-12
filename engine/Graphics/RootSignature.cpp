@@ -26,8 +26,8 @@ void RootSignature::Create(const std::wstring& name, const D3D12_ROOT_SIGNATURE_
         blob->GetBufferSize(),
         IID_PPV_ARGS(rootSignature_.ReleaseAndGetAddressOf())));
 
-#ifdef _DEBUG
+
     rootSignature_->SetName(name.c_str());
     name_ = name;
-#endif // _DEBUG
+
 }

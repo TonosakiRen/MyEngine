@@ -21,8 +21,6 @@ uint32_t ModelManager::Load(const std::string& fileName) {
 
 void ModelManager::CreateMeshes(ModelData& modelData)
 {
-	HRESULT result = S_FALSE;
-
 	//拡張子がない名前を取得
 	std::size_t dotPos = modelData.name.find_last_of('.');
 	std::string n = modelData.name.substr(0, dotPos);

@@ -107,9 +107,6 @@
     <Filter Include="Engine\Draw">
       <UniqueIdentifier>{4117657c-d136-48f4-b988-5c1b47d35590}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\Raytracing">
-      <UniqueIdentifier>{e890c993-2deb-40e4-979d-0ab673734618}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Engine\Wave">
       <UniqueIdentifier>{f835e169-236a-42e5-9a7d-56d2028452e5}</UniqueIdentifier>
     </Filter>
@@ -118,6 +115,12 @@
     </Filter>
     <Filter Include="shaders\Compute">
       <UniqueIdentifier>{4c86af85-f1e3-4f9b-8085-7aec3f9fd0dc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Rain">
+      <UniqueIdentifier>{6dbc01d7-cc5a-4ff1-ae4a-c5485916a263}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Raytracing">
+      <UniqueIdentifier>{e890c993-2deb-40e4-979d-0ab673734618}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -436,9 +439,6 @@
     <ClCompile Include="application\Camera\Camera.cpp">
       <Filter>Game\Camera</Filter>
     </ClCompile>
-    <ClCompile Include="application\Compute\Compute.cpp">
-      <Filter>Game\Compute</Filter>
-    </ClCompile>
     <ClCompile Include="application\Particle\DustParticle.cpp">
       <Filter>Game\Particle</Filter>
     </ClCompile>
@@ -504,6 +504,30 @@
     </ClCompile>
     <ClCompile Include="engine\Curve\LissajousCurve.cpp">
       <Filter>Engine\Curve</Filter>
+    </ClCompile>
+    <ClCompile Include="application\Stage\LightObject.cpp">
+      <Filter>Game\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="application\Stage\LightObjects.cpp">
+      <Filter>Game\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="application\Player\PlayerModel.cpp">
+      <Filter>Game\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="application\Rain\RainDrop.cpp">
+      <Filter>Game\Rain</Filter>
+    </ClCompile>
+    <ClCompile Include="application\Rain\RainManager.cpp">
+      <Filter>Game\Rain</Filter>
+    </ClCompile>
+    <ClCompile Include="application\Stage\Cave.cpp">
+      <Filter>Game\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="application\Stage\Mushroom.cpp">
+      <Filter>Game\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="application\Stage\Mushrooms.cpp">
+      <Filter>Game\Stage</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -828,9 +852,6 @@
     <ClInclude Include="application\Camera\Camera.h">
       <Filter>Game\Camera</Filter>
     </ClInclude>
-    <ClInclude Include="application\Compute\Compute.h">
-      <Filter>Game\Compute</Filter>
-    </ClInclude>
     <ClInclude Include="application\Particle\DustParticle.h">
       <Filter>Game\Particle</Filter>
     </ClInclude>
@@ -896,6 +917,30 @@
     </ClInclude>
     <ClInclude Include="engine\Curve\LissajousCurve.h">
       <Filter>Engine\Curve</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Stage\LightObject.h">
+      <Filter>Game\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Stage\LightObjects.h">
+      <Filter>Game\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Player\PlayerModel.h">
+      <Filter>Game\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Rain\RainDrop.h">
+      <Filter>Game\Rain</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Rain\RainManager.h">
+      <Filter>Game\Rain</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Stage\Cave.h">
+      <Filter>Game\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Stage\Mushroom.h">
+      <Filter>Game\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Stage\Mushrooms.h">
+      <Filter>Game\Stage</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

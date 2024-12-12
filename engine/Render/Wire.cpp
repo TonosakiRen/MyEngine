@@ -54,7 +54,6 @@ void Wire::AllDraw(CommandContext& commandContext, const ViewProjection& viewPro
 }
 
 void Wire::CreatePipeline() {
-    HRESULT result = S_FALSE;
     ComPtr<IDxcBlob> vsBlob;    
     ComPtr<IDxcBlob> psBlob;    
 
@@ -177,11 +176,11 @@ void Wire::Draw(const Vector3& start,const Vector3& end)
 
 void Wire::Draw(const Skeleton& skeleton,const WorldTransform& worldTransform)
 {
-    for (const Joint& joint : skeleton.joints) {
+    for (const Joint& joint : skeleton.joints_) {
         Vector3 point = MakeTranslation(joint.skeletonSpaceMatrix) * worldTransform.matWorld_;
         vertices_.push_back(point);
         if (joint.parent) {
-            vertices_.push_back(MakeTranslation(skeleton.joints.at(joint.parent.value()).skeletonSpaceMatrix) * worldTransform.matWorld_);
+            vertices_.push_back(MakeTranslation(skeleton.joints_.at(joint.parent.value()).skeletonSpaceMatrix) * worldTransform.matWorld_);
         }
         else {
             vertices_.push_back(point);

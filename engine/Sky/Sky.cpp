@@ -58,7 +58,6 @@ void Sky::PreDraw(CommandContext& commandContext, const ViewProjection& viewProj
 
 
 void Sky::CreatePipeline() {
-    HRESULT result = S_FALSE;
     ComPtr<IDxcBlob> vsBlob;    
     ComPtr<IDxcBlob> psBlob;    
 

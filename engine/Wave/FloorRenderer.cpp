@@ -128,7 +128,6 @@ void FloorRenderer::PreDraw(PipelineType pipelineType, CommandContext& commandCo
 
 
 void FloorRenderer::CreatePipeline() {
-    HRESULT result = S_FALSE;
     ComPtr<IDxcBlob> msBlob;
     ComPtr<IDxcBlob> psBlob;
     ComPtr<IDxcBlob> asBlob;
@@ -149,7 +148,7 @@ void FloorRenderer::CreatePipeline() {
 
     {
         // デスクリプタレンジ
-        CD3DX12_DESCRIPTOR_RANGE descRangeSRV[int(RootParameter::kDescriptorRangeNum)];
+        CD3DX12_DESCRIPTOR_RANGE descRangeSRV[int(RootParameter::kDescriptorRangeNum)]{};
         descRangeSRV[int(RootParameter::kCellular)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
         descRangeSRV[int(RootParameter::kVertices)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1);
         descRangeSRV[int(RootParameter::kMeshlets)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 2);
@@ -261,7 +260,6 @@ void FloorRenderer::CreatePipeline() {
 
 void FloorRenderer::CreateForwardPipeline()
 {
-    HRESULT result = S_FALSE;
     ComPtr<IDxcBlob> msBlob;
     ComPtr<IDxcBlob> psBlob;
     ComPtr<IDxcBlob> asBlob;
@@ -282,7 +280,7 @@ void FloorRenderer::CreateForwardPipeline()
 
     {
         // デスクリプタレンジ
-        CD3DX12_DESCRIPTOR_RANGE descRangeSRV[int(ForwardRootParameter::kDescriptorRangeNum)];
+        CD3DX12_DESCRIPTOR_RANGE descRangeSRV[int(ForwardRootParameter::kDescriptorRangeNum)]{};
         descRangeSRV[int(ForwardRootParameter::kCellular)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
         descRangeSRV[int(ForwardRootParameter::kVertices)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1);
         descRangeSRV[int(ForwardRootParameter::kMeshlets)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 2);

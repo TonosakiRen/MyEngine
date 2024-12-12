@@ -93,7 +93,9 @@ public:
 
 	static AnimationManager* GetInstance();
 
-	static void ApplyAnimation(Skeleton& skeleton, const Animation& animation, float animationTime);
+	static void ApplyAnimation(Skeleton& skeleton, Animation& animation, float animationTime);
+
+	static void LerpSkeleton(float t, Skeleton& skeleton, const Animation& fromAnimation, float fromAnimationTime, const Animation& toAnimation, float toAnimationTime);
 
 	void Finalize();
 private:
@@ -107,7 +109,7 @@ private:
 
 	const Animation& LoadInternal(const std::string& fileName, const std::string& animationName);
 
-	void CreateAnimations(const std::string& fileName, AnimationData& modelIndex);
+	void CreateAnimations(const std::string& fileName, AnimationData& modelIndex,const std::string& animationName);
 
 };
 

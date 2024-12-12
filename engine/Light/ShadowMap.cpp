@@ -33,7 +33,6 @@ void ShadowMap::PreDraw(CommandContext& commandContext, DirectionalLights& direc
 }
 
 void ShadowMap::CreatePipeline() {
-    HRESULT result = S_FALSE;
     ComPtr<IDxcBlob> vsBlob;
 
     auto shaderManager = ShaderManager::GetInstance();

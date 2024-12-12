@@ -18,9 +18,10 @@ public:
 	bool Collision(Collider& colliderB, Vector3& minAxis, float& minOverlap);
 	bool Collision(Collider& colliderB, Vector3& pushBuckVector);
 	bool SphereCollision(Vector3 position1,Vector3 size1, Vector3 position2, Vector3 size2);
+	bool SphereCollision(Collider& colliderB);
 	void AdjustmentScale();
 	void MatrixUpdate();
-	void Draw(Vector4 color = { 1.0f,1.0f,1.0f,1.0f });
+	void Draw();
 
 	bool ObbCollision(const OBB& obb1, const OBB& obb2);
 	bool ObbCollision(const OBB& obb1, const OBB& obb2, Vector3& minAxis, float& minOverlap);
@@ -28,7 +29,6 @@ public:
 public:
 	WorldTransform worldTransform_;
 private:
-	GameObject cube_;
 	std::string name_;
 
 };

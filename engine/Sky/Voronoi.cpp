@@ -29,11 +29,12 @@ void Voronoi::Initialize(uint32_t pointNum,CommandContext& commandContext)
         Point tmp;
         tmp.point = Vector2{ x,y };
 
-        //tmp.color = HSVA(Rand(0.0f,1.0f),1.0f,1.0f,1.0f);
+        //tmp.color = HSVAtoRGBA(Rand(0.0f,1.0f),1.0f,1.0f,1.0f);
 
         tmp.index = i;
         if (i % 350 == 0) {
-            tmp.color = HSVA(Rand(0.0f, 1.0f), 0.5f, 1.0f, 1.0f);
+            //tmp.color = HSVAtoRGBA(Rand(0.0f, 1.0f), 0.5f, 1.0f, 1.0f);
+            tmp.color = {1.0f,1.0f,1.0f,1.0f};
         }
         else {
             tmp.color = { 0.0f,0.0f,0.0f,0.0f };

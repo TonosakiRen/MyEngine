@@ -10,7 +10,6 @@ void SkinCluster::Create(const Skeleton& skeleton, const uint32_t modelHandle) {
     const ModelData& modelData = ModelManager::GetInstance()->GetModelData(modelHandle);
 
     paletteResource_.Create(L"paletteResource", sizeof(WellForGPU), UINT(modelData.meshes[0].GetVerticies().size()));
-    auto device = DirectXCommon::GetInstance()->GetDevice();
 
     paletteResource_.SetZero();
 
@@ -21,12 +20,12 @@ void SkinCluster::Create(const Skeleton& skeleton, const uint32_t modelHandle) {
     influenceBufferView_.SizeInBytes = UINT(sizeof(VertexInfluence) * modelData.meshes[0].GetVerticies().size());
     influenceBufferView_.StrideInBytes = sizeof(VertexInfluence);
 
-    inverseBindPoseMatrices_.resize(skeleton.joints.size());
+    inverseBindPoseMatrices_.resize(skeleton.joints_.size());
     std::generate(inverseBindPoseMatrices_.begin(), inverseBindPoseMatrices_.end(), MakeIdentity4x4);
 
     for (const auto& jointWeight : modelData.skinClusterData) {
-        auto it = skeleton.jointMap.find(jointWeight.first);
-        if (it == skeleton.jointMap.end()) {
+        auto it = skeleton.jointMap_.find(jointWeight.first);
+        if (it == skeleton.jointMap_.end()) {
             continue;
         }
 
@@ -61,11 +60,10 @@ void SkinCluster::Update()
 {
     WellForGPU* mappedPalette = static_cast<WellForGPU*>(paletteResource_.GetCPUData());
 
-    for (size_t jointIndex = 0; jointIndex < skeleton_->joints.size(); ++jointIndex) {
+    for (size_t jointIndex = 0; jointIndex < skeleton_->joints_.size(); ++jointIndex) {
         assert(jointIndex < inverseBindPoseMatrices_.size());
-        mappedPalette[jointIndex].skeletonSpaceMatrix = inverseBindPoseMatrices_[jointIndex] * skeleton_->joints[jointIndex].skeletonSpaceMatrix;
+        mappedPalette[jointIndex].skeletonSpaceMatrix = inverseBindPoseMatrices_[jointIndex] * skeleton_->joints_[jointIndex].skeletonSpaceMatrix;
         mappedPalette[jointIndex].skeletonSpaceInverseTransposeMatrix = Transpose(Inverse(mappedPalette[jointIndex].skeletonSpaceMatrix));
         mappedPalette[jointIndex].skeletonSpaceMatrix = mappedPalette[jointIndex].skeletonSpaceMatrix;
     }
-    WellForGPU* palette = static_cast<WellForGPU*>(paletteResource_.GetCPUData());
 }

@@ -9,7 +9,6 @@
 #include "Input.h"
 #include "Audio.h"
 #include "Texture/Sprite.h"
-#include "Compute/Compute.h"
 #include "GameComponent/GameObject.h"
 #include "Scene/SceneManager.h"
 #include "Light/LightManager.h"
@@ -24,7 +23,7 @@ public:
 	~GameScene();
 
 	void Initialize();
-	void Update(CommandContext& commandContext);
+	void Update();
 	void Draw();
 
 	ViewProjection& GetViewProjection() {
@@ -49,7 +48,5 @@ private:
 	std::unique_ptr<WavePoints> wavePoints_;
 	
 	std::unique_ptr<Camera> camera_;
-	std::unique_ptr<Compute> compute_;
-
 };
 

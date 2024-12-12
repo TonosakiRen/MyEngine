@@ -2,16 +2,16 @@
 #include "Graphics/DirectXCommon.h"
 
 void DirectionalLights::Initialize() {
-    if (lightNum != 0) {
-        lights_.resize(lightNum);
-        for (int i = 0; i < lightNum; i++) {
-            lights_[i].shadowMap_.Create(L"shadowTexture", shadowWidth, shadowHeight, DXGI_FORMAT_D32_FLOAT);
-            lights_[i].constBuffer_.Create(L"directionalLightBuffer", (sizeof(ConstBufferData) + 0xff) & ~0xff);
-            lights_[i].descriptorHeapIndex = lights_[i].shadowMap_.GetSRV().GetIndex();
-        }
-        structureBuffer_.Create(L"directionalLightBuffer", sizeof(ConstBufferData), lightNum);
-        Update();
+  
+    lights_.resize(lightNum);
+    for (int i = 0; i < lightNum; i++) {
+        lights_[i].shadowMap_.Create(L"shadowTexture", shadowWidth, shadowHeight, DXGI_FORMAT_D32_FLOAT);
+        lights_[i].constBuffer_.Create(L"directionalLightBuffer", (sizeof(ConstBufferData) + 0xff) & ~0xff);
+        lights_[i].descriptorHeapIndex = lights_[i].shadowMap_.GetSRV().GetIndex();
     }
+    structureBuffer_.Create(L"directionalLightBuffer", sizeof(ConstBufferData), lightNum);
+    Update();
+  
 }
 
 void DirectionalLights::Update() {

@@ -10,6 +10,7 @@ public:
 	struct ConstBufferData {
 		Vector4 color;
 		Matrix4x4 uvTransform;
+		float intensity;
 		uint32_t enableLighting;
 	};
 
@@ -24,6 +25,7 @@ public:
 	Vector3 scale_ = { 1.0f,1.0f,1.0f };
 	Vector3 rotation_ = { 0.0f,0.0f,0.0f };
 	Vector3 translation_ = { 0.0f,0.0f,0.0f };
+	float intensity_ = 1.0f;
 	bool enableLighting_ = true;
 private:
 	Matrix4x4 uvTransform_;

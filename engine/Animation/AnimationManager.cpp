@@ -22,9 +22,8 @@ const Animation& AnimationManager::Load(const std::string& fileName, const std::
 	return AnimationManager::GetInstance()->LoadInternal(fileName, animationName);
 }
 
-void AnimationManager::CreateAnimations(const std::string& fileName, AnimationData& animationData)
+void AnimationManager::CreateAnimations(const std::string& fileName, AnimationData& animationData, const std::string& animationName)
 {
-	HRESULT result = S_FALSE;
 
 	//拡張子がない名前を取得
 	std::size_t dotPos = fileName.find_last_of('.');
@@ -39,7 +38,7 @@ void AnimationManager::CreateAnimations(const std::string& fileName, AnimationDa
 	aiAnimation* animationAssimp = nullptr;
 	for (uint32_t animationIndex = 0; animationIndex < scene->mNumAnimations; animationIndex++){
 		aiString name = scene->mAnimations[animationIndex]->mName;
-		if (name.C_Str() == animationData.name) {
+		if (name.C_Str() == animationName) {
 			animationAssimp = scene->mAnimations[animationIndex];//名前が一致したら代入
 			break;
 		}
@@ -89,9 +88,9 @@ AnimationManager* AnimationManager::GetInstance() {
 	return &instance;
 }
 
-void AnimationManager::ApplyAnimation(Skeleton& skeleton, const Animation& animation, float animationTime)
+void AnimationManager::ApplyAnimation(Skeleton& skeleton, Animation& animation, float animationTime)
 {
-	for (Joint& joint : skeleton.joints) {
+	for (Joint& joint : skeleton.joints_) {
 		// 対称のJointのAnimationがあれば、値の適用を行う。下記のif文はC+;17から可能になった初期化付きif文。
 		if (auto it = animation.nodeAnimations.find(joint.name); it != animation.nodeAnimations.end()) {
 			const NodeAnimation& rootNodeAnimation = (*it).second;
@@ -102,13 +101,28 @@ void AnimationManager::ApplyAnimation(Skeleton& skeleton, const Animation& anima
 	}
 }
 
+void AnimationManager::LerpSkeleton(float t,Skeleton& skeleton, const Animation& fromAnimation, float fromAnimationTime, const Animation& toAnimation, float toAnimationTime)
+{
+	for (Joint& joint : skeleton.joints_) {
+		auto fromIt = fromAnimation.nodeAnimations.find(joint.name);
+		auto toIt = toAnimation.nodeAnimations.find(joint.name);
+		if (fromIt != fromAnimation.nodeAnimations.end() && toIt != toAnimation.nodeAnimations.end()) {
+			const NodeAnimation& fromNodeAnimation = (*fromIt).second;
+			const NodeAnimation& toNodeAnimation = (*toIt).second;
+			joint.transform.translation_ = Lerp(t,CalculateValue(fromNodeAnimation.translate.keyframes, fromAnimationTime), CalculateValue(toNodeAnimation.translate.keyframes, toAnimationTime));
+			joint.transform.quaternion_ = Slerp(t,CalculateValue(fromNodeAnimation.rotate.keyframes, fromAnimationTime), CalculateValue(toNodeAnimation.rotate.keyframes, toAnimationTime));
+			joint.transform.scale_ = Lerp(t,CalculateValue(fromNodeAnimation.scale.keyframes, fromAnimationTime), CalculateValue(toNodeAnimation.scale.keyframes, toAnimationTime));
+		}
+	}
+}
+
 const Animation& AnimationManager::LoadInternal(const std::string& fileName, const std::string& animationName) {
 
 	assert(useAnimationCount_ < kNumAnimations);
 	uint32_t handle = useAnimationCount_;
 
 	// 読み込み済みanimationを検索
-	const auto& it = std::find_if(animations_->begin(), animations_->end(), [&](const auto& animation) {return animation.name == animationName; });
+	const auto& it = std::find_if(animations_->begin(), animations_->end(), [&](const auto& animation) {return animation.name == fileName; });
 
 	if (it != animations_->end()) {
 		// 読み込み済みanimationの要素番号を取得
@@ -120,9 +134,9 @@ const Animation& AnimationManager::LoadInternal(const std::string& fileName, con
 	// 書き込むAnimationの参照
 	auto& animationData = (animations_->at(handle));
 
-	animationData.name = animationName;
+	animationData.name = fileName;
 
-	CreateAnimations(fileName, animationData);
+	CreateAnimations(fileName, animationData, animationName);
 
 	useAnimationCount_++;
 	return animationData.animation;

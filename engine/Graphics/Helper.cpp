@@ -389,6 +389,7 @@ namespace Helper {
 
     void AssertIfFailed(HRESULT hr)
     {
+        hr;
         assert(SUCCEEDED(hr));
     }
 

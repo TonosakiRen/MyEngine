@@ -6,8 +6,6 @@
 #include "Graphics/Helper.h"
 
 void UAVBuffer::Create(const std::wstring& name, size_t bufferSize) {
-    HRESULT result = S_FALSE;
-
     bufferSize = Helper::AlignUp(bufferSize, 256);
     auto desc = CD3DX12_RESOURCE_DESC::Buffer(UINT64(bufferSize), D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
     auto heapProps = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
@@ -19,10 +17,10 @@ void UAVBuffer::Create(const std::wstring& name, size_t bufferSize) {
         &desc,
         D3D12_RESOURCE_STATE_COMMON);
 
-#ifdef _DEBUG
+
     resource_->SetName(name.c_str());
     name_ = name;
-#endif // _DEBUG
+
 
     state_ = D3D12_RESOURCE_STATE_COMMON;
     bufferSize_ = bufferSize;

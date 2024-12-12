@@ -10,7 +10,7 @@ public:
 	WhiteParticle();
 	void Initialize(Vector3 minDirection, Vector3 maxDirection);
 	void Update();
-	void Draw(uint32_t textureHandle = 0);
+	void Draw();
 	void SetDirection(Vector3 minDirection, Vector3 maxDirection) {
 		minDirection_ = minDirection;
 		maxDirection_ = maxDirection;
@@ -24,16 +24,16 @@ public:
 	void SetScaleSpeed(float scaleSpeed) {
 		scaleSpeed_ = scaleSpeed;
 	}
-	struct deadLineParticle {
-		WorldTransform worldTransform_;
-		Vector3 direction_;
-		Vector3 velocity_;
-		bool isActive_;
+	struct DeadLineParticle {
+		WorldTransform worldTransform;
+		Vector3 direction;
+		Vector3 velocity;
+		bool isActive;
 	};
 public:
 	WorldTransform emitterWorldTransform_;
 	OBB emitBox_;
-	deadLineParticle particles[kParticleNum];
+	DeadLineParticle particles[kParticleNum];
 	int EmitNum_ = 1;
 private:
 	float speed_ = 0.05f;

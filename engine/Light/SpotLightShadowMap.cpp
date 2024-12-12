@@ -33,7 +33,6 @@ void SpotLightShadowMap::PreDraw(CommandContext& commandContext, ShadowSpotLight
 }
 
 void SpotLightShadowMap::CreatePipeline() {
-    HRESULT result = S_FALSE;
     ComPtr<IDxcBlob> vsBlob;
 
     auto shaderManager = ShaderManager::GetInstance();

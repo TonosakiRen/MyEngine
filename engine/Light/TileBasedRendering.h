@@ -19,7 +19,7 @@ public:
 	static const uint32_t kTileHeight = WinApp::kWindowHeight / kTileHeightNum;
 	static const uint32_t kTileNum = kTileWidthNum * kTileHeightNum;
 
-	static const uint32_t kMaxInTilePointLight = 64;
+	static const uint32_t kMaxInTilePointLight = 128;
 
 	void Initialize();
 	void ComputeUpdate(CommandContext& commandContext, const ViewProjection& viewProjection);

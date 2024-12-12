@@ -3,8 +3,9 @@
 #include <cmath>
 #include <assert.h>
 #include <numbers>
-#include<cstdlib>
-#include<ctime>
+#include <cstdlib>
+#include <ctime>
+#include <algorithm>
 #include <DirectXMath.h>
 using namespace DirectX;
 
@@ -64,6 +65,11 @@ struct Frustum {
 	Plane plane[6]{};
 	Vector3 vertex[8]{};
 };
+struct Transform {
+	Vector3 scale;
+	Vector3 rotate;
+	Vector3 translate;
+};
 #pragma endregion
 
 
@@ -113,10 +119,14 @@ inline float Rand(float min, float max) {
 }
 inline bool Rand() { return bool(0 + (int)(rand() * (1 - 0 + 1.0) / (1.0 + RAND_MAX))); }
 
+inline Vector3 Rand(const Vector3& min, const Vector3& max) {
+	return Vector3{ Rand(min.x,max.x),Rand(min.y,max.y) ,Rand(min.z,max.z) };
+}
+
 inline void SRAND() {
 	srand((unsigned)time(NULL));
 }
-inline Vector4 HSVA(float h, float s, float v, float a) {
+inline Vector4 HSVAtoRGBA(float h, float s, float v, float a) {
 	float r = v, g = v, b = v;
 	if (s > 0.0f) {
 		h = std::fmod(h, 1.0f);
@@ -154,6 +164,35 @@ inline Vector4 HSVA(float h, float s, float v, float a) {
 	return { r, g, b, a };
 }
 
+inline Vector4 HSVAtoRGBA(const Vector4& rgba) {
+	return HSVAtoRGBA(rgba.x, rgba.y, rgba.z, rgba.w);
+};
+
+inline Vector4 RGBAtoHSVA(const Vector4& rgba) {
+	float max = (std::max)({ rgba.x, rgba.y, rgba.z });
+	float min = (std::min)({ rgba.x, rgba.y, rgba.z });
+	float delta = max - min;
+
+	float h = 0.0f, s = 0.0f, v = max;
+
+	if (delta > 0.0f) {
+		s = delta / max;
+
+		if (rgba.x == max) {
+			h = (rgba.y - rgba.z) / delta + (rgba.y < rgba.z ? 6.0f : 0.0f);
+		}
+		else if (rgba.y == max) {
+			h = (rgba.z - rgba.x) / delta + 2.0f;
+		}
+		else {
+			h = (rgba.x - rgba.y) / delta + 4.0f;
+		}
+
+		h /= 6.0f;  // 正規化
+	}
+
+	return { h, s, v, rgba.w };
+}
 inline Vector3 ColorCodeToVector3(uint32_t colorCode) {
 	float r = ((colorCode >> 16) & 0xFF) / 255.0f;
 	float g = ((colorCode >> 8) & 0xFF) / 255.0f;
@@ -361,6 +400,84 @@ inline Vector3 LoseY(Vector3 loseY) { return Vector3{ loseY.x, 0.0f, loseY.z }; 
 
 #pragma endregion
 #pragma region	Vector4
+#pragma region 演算子のオーバーロード
+inline Vector4 Add(const Vector4& v1, const Vector4& v2) {
+	Vector4 tmp;
+	tmp.x = v1.x + v2.x;
+	tmp.y = v1.y + v2.y;
+	tmp.z = v1.z + v2.z;
+	tmp.w = v1.w + v2.w;
+	return tmp;
+}
+inline Vector4 operator +(const Vector4& v1, const Vector4& v2) {
+	return{ v1.x + v2.x,v1.y + v2.y,v1.z + v2.z ,v1.w + v2.w };
+}
+inline Vector4 operator +(const Vector4& v1, const float& scalar) {
+	return{ v1.x + scalar,v1.y + scalar,v1.z + scalar,v1.w + scalar };
+}
+//減算
+inline Vector4 Subtract(const Vector4& v1, const Vector4& v2) {
+	Vector4 tmp;
+	tmp.x = v1.x - v2.x;
+	tmp.y = v1.y - v2.y;
+	tmp.z = v1.z - v2.z;
+	tmp.w = v1.z - v2.w;
+	return tmp;
+}
+inline Vector4 operator -(const Vector4& v1, const Vector4& v2) {
+	return{ v1.x - v2.x,v1.y - v2.y,v1.z - v2.z,v1.w - v2.w };
+}
+inline Vector4 operator -(const Vector4& v1, const float& scalar) {
+	return{ v1.x - scalar,v1.y - scalar,v1.z - scalar,v1.w - scalar };
+}
+
+//スカラー倍
+inline Vector4 Multiply(float scalar, const Vector4& v) {
+	Vector4 tmp;
+	tmp.x = v.x * scalar;
+	tmp.y = v.y * scalar;
+	tmp.z = v.z * scalar;
+	tmp.w = v.w * scalar;
+	return tmp;
+}
+inline Vector4 operator *(const Vector4& v, const float& scalar) {
+	return{ v.x * scalar,v.y * scalar,v.z * scalar,v.w * scalar };
+}
+inline Vector4 operator *(const float& scalar, const Vector4& v) {
+	return{ v.x * scalar,v.y * scalar,v.z * scalar,v.w * scalar };
+}
+//スカラー割り算
+inline Vector4 operator /(const Vector4& v, const float& scalar) {
+	return{ v.x / scalar,v.y / scalar,v.z / scalar,v.w / scalar };
+}
+inline Vector4 operator /(const float& scalar, const Vector4& v) {
+	return{ v.x / scalar,v.y / scalar,v.z / scalar,v.w / scalar };
+}
+inline Vector4& operator+=(Vector4& v1, const Vector4& v2) {
+	v1.x += v2.x;
+	v1.y += v2.y;
+	v1.z += v2.z;
+	v1.w += v2.w;
+	return v1;
+}
+inline Vector4& operator-=(Vector4& v1, const Vector4& v2) {
+	v1.x -= v2.x;
+	v1.y -= v2.y;
+	v1.z -= v2.z;
+	v1.w -= v2.w;
+	return v1;
+}
+
+inline Vector4 operator -(const Vector4& v1) {
+	return{ -v1.x,-v1.y,-v1.z,-v1.w };
+}
+#pragma endregion
+// 線形補間
+inline Vector4 Lerp(float t, const Vector4& v1, const Vector4& v2) {
+	Vector4 result = v1 + (v2 - v1) * t;
+	return result;
+}
+
 #pragma endregion
 #pragma region	Matrix4x4
 #pragma region 演算子のオーバーロード
@@ -770,7 +887,7 @@ inline Vector3 MakeEulerAngle(const Matrix4x4& matrix) {
 
 	return angles;
 }
-inline Vector3 Transform(const Vector3& vector, const Matrix4x4& matrix) {
+inline Vector3 TransformVector(const Vector3& vector, const Matrix4x4& matrix) {
 	Vector3 result;
 	result.x = vector.x * matrix.m[0][0] + vector.y * matrix.m[1][0] + vector.z * matrix.m[2][0] + 1.0f * matrix.m[3][0];
 	result.y = vector.x * matrix.m[0][1] + vector.y * matrix.m[1][1] + vector.z * matrix.m[2][1] + 1.0f * matrix.m[3][1];

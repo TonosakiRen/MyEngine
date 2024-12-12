@@ -54,21 +54,14 @@ PixelShaderOutput main(MSOutput input) {
 
 	PixelShaderOutput output;
 
+	float32_t specularPower = 200.0f;
+
 	float32_t3 normal = normalize(input.normal);
 
 	float32_t2 a = (input.worldPosition.xz + worldTransform.scale / 2.0f) / worldTransform.scale;
 
 	float32_t2 uv = a;
 	uv.y += time.t / 1000.0f;
-
-	float curveDistance = 10000.0f;
-
-	for(int n = 0; n < 30; n++){
-		float dis = distance(gLissajousCurve[n] * worldTransform.scale,input.worldPosition.xz);
-		if(dis < curveDistance){
-			curveDistance = dis;
-		}
-	}
 
 	float32_t4 color = gColor.color;
 
@@ -95,7 +88,7 @@ PixelShaderOutput main(MSOutput input) {
 
 		int index = gTBRPointLightIndex[tileInformation.pointLightOffset + i];
 
-		lighting += PointLightLighting(gPointLights[index],worldPos,viewDirection,normal);
+		lighting += PointLightLighting(gPointLights[index],worldPos,viewDirection,normal , specularPower);
 	}
 
 	//spotLight
@@ -104,7 +97,7 @@ PixelShaderOutput main(MSOutput input) {
 
 		int index = gTBRSpotLightIndex[tileInformation.spotLightOffset + j];
 
-		lighting += SpotLightLighting(gSpotLights[index],worldPos,viewDirection,normal);
+		lighting += SpotLightLighting(gSpotLights[index],worldPos,viewDirection,normal,specularPower);
 
 	}
 
@@ -114,7 +107,7 @@ PixelShaderOutput main(MSOutput input) {
 
 		int index = gTBRShadowSpotLightIndex[tileInformation.shadowSpotLightOffset + l];
 
-		lighting += ShadowSpotLightLighting(gShadowSpotLights[index],worldPos,viewDirection,normal);
+		lighting += ShadowSpotLightLighting(gShadowSpotLights[index],worldPos,viewDirection,normal,specularPower);
 
 		//影
 		float32_t4 wp = float4(worldPos.xyz, 1.0f);
@@ -142,7 +135,7 @@ PixelShaderOutput main(MSOutput input) {
 
 	for (int k = 0; k < 1; k++) {
 
-		lighting += DirectionalLightLighting(gDirectionLights[k],worldPos,viewDirection,normal);
+		lighting += DirectionalLightLighting(gDirectionLights[k],worldPos,viewDirection,normal,specularPower);
 
 		//影
 		/*float32_t4 wp = float4(worldPos.xyz, 1.0f);
@@ -165,7 +158,7 @@ PixelShaderOutput main(MSOutput input) {
 	}
 
 	for (int m = 0; m < 1; m++) {
-		lighting += AreaLightLighting(gAreaLights[m],worldPos,viewDirection,normal);
+		lighting += AreaLightLighting(gAreaLights[m],worldPos,viewDirection,normal,specularPower);
 	}
 
 
@@ -173,15 +166,11 @@ PixelShaderOutput main(MSOutput input) {
 	lighting *= shading;
 
 	lighting += ambient;
-	color.xyz += textureColor * 1.0f;
 
 
+	color.rgb -= (1.0f - textureColor);
 	color.xyz *= lighting;
 
-	if(curveDistance < 1.0f){
-		color = 1.0f;
-	}
-	
 	output.color = color;
 
 	output.normal.xyz = (normal.xyz + 1.0f) * 0.5f;

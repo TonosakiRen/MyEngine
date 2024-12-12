@@ -1,24 +1,29 @@
 #pragma once
 #include "Particle/ParticleModelData.h"
 #include "GameComponent/WorldTransform.h"
-#include <vector>
+#include "GameComponent/Material.h"
+#include <array>
 #include <memory>
 class PointLights;
 class SphereLights
 {
 public:
-	static const uint32_t kSphereNum = 64 * 2;
+	static const uint32_t kSphereNum = 64;
 	void Initialize();
+	void Emit(const Vector3& position, const Vector4& color);
 	void Update();
-	void Draw(Vector4 color = { 1.0f,1.0f,1.0f,1.0f });
+	void Draw();
 	struct Sphere {
 		WorldTransform worldTransform_{};
+		Vector4 color_;
 		uint32_t pointLightIndex_;
+		float intensity;
 		bool isActive_;
 	};
 public:
-	std::vector<Sphere> spheres_;
+	std::array<Sphere, kSphereNum> spheres_;
 	std::unique_ptr<ParticleModelData> particle_;
+	std::unique_ptr<Material> material_;
 	PointLights* pointLights_;
 	uint32_t activeNum_ = 0;
 private:

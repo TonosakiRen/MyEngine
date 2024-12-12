@@ -23,18 +23,18 @@ void DustParticle::Update() {
 
 	if (isEmit_) {
 		for (size_t i = 0; i < EmitNum_; i++) {
-			for (size_t i = 0; i < kParticleNum; i++) {
-				if (particles[i].isActive_ == false) {
-					particles[i].isActive_ = true;
+			for (size_t j = 0; j < kParticleNum; j++) {
+				if (particles[j].isActive_ == false) {
+					particles[j].isActive_ = true;
 					if (emitterWorldTransform_.GetParent()) {
-						particles[i].direction_ = Normalize(Vector3{ Rand(minDirection_.x, maxDirection_.x) ,Rand(minDirection_.y,maxDirection_.y) ,Rand(minDirection_.z,maxDirection_.z) } *NormalizeMakeRotateMatrix(emitterWorldTransform_.GetParent()->matWorld_));
+						particles[j].direction_ = Normalize(Vector3{ Rand(minDirection_.x, maxDirection_.x) ,Rand(minDirection_.y,maxDirection_.y) ,Rand(minDirection_.z,maxDirection_.z) } *NormalizeMakeRotateMatrix(emitterWorldTransform_.GetParent()->matWorld_));
 					}
 					else {
-						particles[i].direction_ = Normalize(Vector3{ Rand(minDirection_.x, maxDirection_.x) ,Rand(minDirection_.y,maxDirection_.y) ,Rand(minDirection_.z,maxDirection_.z) });
+						particles[j].direction_ = Normalize(Vector3{ Rand(minDirection_.x, maxDirection_.x) ,Rand(minDirection_.y,maxDirection_.y) ,Rand(minDirection_.z,maxDirection_.z) });
 					}
-					particles[i].worldTransform_.translation_ = MakeTranslation(emitterWorldTransform_.matWorld_);
-					particles[i].worldTransform_.quaternion_ = IdentityQuaternion();
-					particles[i].worldTransform_.scale_ = emitterWorldTransform_.scale_;
+					particles[j].worldTransform_.translation_ = MakeTranslation(emitterWorldTransform_.matWorld_);
+					particles[j].worldTransform_.quaternion_ = IdentityQuaternion();
+					particles[j].worldTransform_.scale_ = emitterWorldTransform_.scale_;
 					break;
 				}
 			}

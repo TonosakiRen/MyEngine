@@ -33,6 +33,7 @@ Microsoft::WRL::ComPtr<ID3D12Resource> BufferManager::CreateResource(uint32_t& i
 		optimizedClearValue,
 		IID_PPV_ARGS(&comPtrResource));
 
+	result;
 	assert(SUCCEEDED(result));
 
 	uint32_t index_ = 0;

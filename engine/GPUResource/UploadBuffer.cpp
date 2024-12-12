@@ -25,10 +25,10 @@ void UploadBuffer::Create(const std::wstring& name, size_t bufferSize) {
         D3D12_RESOURCE_STATE_GENERIC_READ
         );
 
-#ifdef _DEBUG
+
     resource_->SetName(name.c_str());
     name_ = name;
-#endif // _DEBUG
+
 
 
     state_ = D3D12_RESOURCE_STATE_GENERIC_READ;
@@ -37,37 +37,6 @@ void UploadBuffer::Create(const std::wstring& name, size_t bufferSize) {
     result =  resource_->Map(0, nullptr, &cpuData_);
     assert(SUCCEEDED(result));
 }
-
-void UploadBuffer::Create(const std::wstring& name, size_t bufferSize, bool a)
-{
-    HRESULT result = S_FALSE;
-
-
-    auto desc = CD3DX12_RESOURCE_DESC::Buffer(bufferSize * 2);
-    auto heapProps = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
-
-    resource_ = BufferManager::GetInstance()->CreateResource(
-        index_,
-        &heapProps,
-        D3D12_HEAP_FLAG_NONE,
-        &desc,
-        D3D12_RESOURCE_STATE_GENERIC_READ
-    );
-
-#ifdef _DEBUG
-    resource_->SetName(name.c_str());
-    name_ = name;
-#endif // _DEBUG
-
-
-    state_ = D3D12_RESOURCE_STATE_GENERIC_READ;
-    bufferSize_ = bufferSize;
-
-    result = resource_->Map(0, nullptr, &cpuData_);
-    assert(SUCCEEDED(result));
-}
-
-
 
 void UploadBuffer::Copy(const void* srcData, size_t copySize) {
     assert(copySize <= bufferSize_);

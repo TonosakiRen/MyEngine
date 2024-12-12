@@ -114,10 +114,6 @@ void DirectXCommon::CreateDevice() {
 	assert(device_ != nullptr);
 	Helper::Log("Complete create D3D12Device!!!\n");//初期化完了のログを出す
 
-	const uint32_t desriptorSizeSRV = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-	const uint32_t desriptorSizeRTV = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-	const uint32_t desriptorSizeDSV = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
-
 
 #ifdef _DEBUG
 

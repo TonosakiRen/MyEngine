@@ -89,7 +89,7 @@ void Particle::CreatePipeline() {
 
     {
 
-        CD3DX12_DESCRIPTOR_RANGE descRangeSRV[int(RootParameter::kDescriptorRangeNum)];
+        CD3DX12_DESCRIPTOR_RANGE descRangeSRV[int(RootParameter::kDescriptorRangeNum)] = {};
         descRangeSRV[int(RootParameter::kTexture)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0); // t0
         descRangeSRV[int(RootParameter::kParticleData)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1); // t1
 
@@ -213,7 +213,7 @@ void Particle::CreateForwardPipeline()
 
     {
 
-        CD3DX12_DESCRIPTOR_RANGE descRangeSRV[int(ForwardRootParameter::kDescriptorRangeNum)];
+        CD3DX12_DESCRIPTOR_RANGE descRangeSRV[int(ForwardRootParameter::kDescriptorRangeNum)] = {};
         descRangeSRV[int(ForwardRootParameter::kTexture)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0); // t0
         descRangeSRV[int(ForwardRootParameter::kParticleData)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1); // t1
         descRangeSRV[int(ForwardRootParameter::kDirectionalLights)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 2);
@@ -340,7 +340,6 @@ void Particle::CreateForwardPipeline()
 }
 
 void Particle::CreateMesh() {
-    HRESULT result = S_FALSE;
 
     vertices_.resize(4);
 

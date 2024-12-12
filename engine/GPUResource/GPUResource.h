@@ -25,15 +25,11 @@ public:
         const std::wstring& name,
         const D3D12_HEAP_PROPERTIES& heapProperties,
         const D3D12_RESOURCE_DESC& desc,
-
-        D3D12_RESOURCE_STATES initState = D3D12_RESOURCE_STATE_COMMON,
-        const D3D12_CLEAR_VALUE* optimizedClearValue = nullptr);
+        D3D12_RESOURCE_STATES initState = D3D12_RESOURCE_STATE_COMMON);
 
     void SetName(const std::wstring& name) {
-        #ifdef _DEBUG
         resource_->SetName(name.c_str());
         name_ = name;
-        #endif // _DEBUG
     }
     void SetState(const D3D12_RESOURCE_STATES state) {
         state_ = state;
@@ -53,8 +49,5 @@ protected:
     Microsoft::WRL::ComPtr<ID3D12Resource> resource_ = nullptr;
     D3D12_RESOURCE_STATES state_ = D3D12_RESOURCE_STATE_COMMON;
     uint32_t index_ = 0;
-
-#ifdef _DEBUG
     std::wstring name_;
-#endif // _DEBUG
 };

@@ -56,7 +56,6 @@ void Raytracing::Finalize()
 }
 
 void Raytracing::CreatePipeline() {
-    HRESULT result = S_FALSE;
     ComPtr<IDxcBlob> raytracingBlob;
 
     auto shaderManager = ShaderManager::GetInstance();
@@ -69,7 +68,7 @@ void Raytracing::CreatePipeline() {
     pipelineState_ = std::make_unique<PipelineState>();
 
     // デスクリプタレンジ
-    CD3DX12_DESCRIPTOR_RANGE descRangeSRV[int(RootParameter::kDescriptorRangeNum)];
+    CD3DX12_DESCRIPTOR_RANGE descRangeSRV[int(RootParameter::kDescriptorRangeNum)] = {};
     descRangeSRV[int(RootParameter::kResult)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 0); 
     descRangeSRV[int(RootParameter::kTras)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1);
 
@@ -116,6 +115,6 @@ void Raytracing::CreatePipeline() {
     shaderConfigSubobject->Config(payloadSize, attributeSize);
 
     auto localRootSignature = stateObjectDesc.CreateSubobject<CD3DX12_LOCAL_ROOT_SIGNATURE_SUBOBJECT>();
-    //localRootSignature->SetRootSignature(rayGenLo)
+    localRootSignature;
 
 }

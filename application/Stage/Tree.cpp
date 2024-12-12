@@ -29,9 +29,9 @@ void Tree::Initialize()
 	material_.Update();
 
 	grassMaterial_ = std::make_unique<Material>();
-	color = ColorCodeToVector3(0x40BA8D);
+	//color = ColorCodeToVector3(0x40BA8D);
 	grassMaterial_->Initialize();
-	grassMaterial_->color_ = { color.x,color.y,color.z,0.5f };
+	grassMaterial_->color_ = { 1.0f,1.0f,1.0f,1.0f };
 	grassMaterial_->Update();
 }
 
@@ -57,6 +57,6 @@ void Tree::Draw()
 		
 	}
 
-	DrawManager::GetInstance()->DrawPostParticleModel(*grassesData_, ModelManager::GetInstance()->Load("box1x1.obj"), *grassMaterial_);
+	DrawManager::GetInstance()->DrawParticleModel(*grassesData_, ModelManager::GetInstance()->Load("box1x1.obj"), *grassMaterial_);
 	DrawManager::GetInstance()->DrawModel(worldTransform_,modelHandle_,0,material_);
 }

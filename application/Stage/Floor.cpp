@@ -18,7 +18,6 @@ void Floor::Initialize(const std::string name,WavePoints* wavePoints)
 
 	waveIndexData_.Initialize();
 	wavePoints_ = wavePoints;
-	
 }
 
 void Floor::Update()

@@ -76,7 +76,6 @@ void MeshletEnvironmentMapModel::PreDraw(PipelineType pipelineType,CommandContex
 }
 
 void MeshletEnvironmentMapModel::CreatePipeline() {
-    HRESULT result = S_FALSE;
     ComPtr<IDxcBlob> msBlob;    
     ComPtr<IDxcBlob> psBlob;   
     ComPtr<IDxcBlob> asBlob;
@@ -98,7 +97,7 @@ void MeshletEnvironmentMapModel::CreatePipeline() {
     {
 
         // デスクリプタレンジ
-        CD3DX12_DESCRIPTOR_RANGE descRangeSRV[int(RootParameter::kDescriptorRangeNum)];
+        CD3DX12_DESCRIPTOR_RANGE descRangeSRV[int(RootParameter::kDescriptorRangeNum)] = {};
         descRangeSRV[int(RootParameter::kTexture)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
         descRangeSRV[int(RootParameter::kVertices)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1);
         descRangeSRV[int(RootParameter::kMeshlets)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 2);
@@ -208,7 +207,6 @@ void MeshletEnvironmentMapModel::CreatePipeline() {
 
 void MeshletEnvironmentMapModel::CreateForwardPipeline()
 {
-    HRESULT result = S_FALSE;
     ComPtr<IDxcBlob> msBlob;
     ComPtr<IDxcBlob> psBlob;
     ComPtr<IDxcBlob> asBlob;
@@ -230,7 +228,7 @@ void MeshletEnvironmentMapModel::CreateForwardPipeline()
     {
 
         // デスクリプタレンジ
-        CD3DX12_DESCRIPTOR_RANGE descRangeSRV[int(ForwardRootParameter::kDescriptorRangeNum)];
+        CD3DX12_DESCRIPTOR_RANGE descRangeSRV[int(ForwardRootParameter::kDescriptorRangeNum)] = {};
         descRangeSRV[int(ForwardRootParameter::kTexture)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
         descRangeSRV[int(ForwardRootParameter::kVertices)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1);
         descRangeSRV[int(ForwardRootParameter::kMeshlets)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 2);

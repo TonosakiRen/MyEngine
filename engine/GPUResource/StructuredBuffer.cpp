@@ -24,10 +24,10 @@ void StructuredBuffer::Create(const std::wstring& name, size_t bufferSize , UINT
         &desc,
         D3D12_RESOURCE_STATE_GENERIC_READ);
 
-#ifdef _DEBUG
+
     resource_->SetName(name.c_str());
     name_ = name;
-#endif // _DEBUG
+
 
 
     state_ = D3D12_RESOURCE_STATE_GENERIC_READ;

@@ -7,7 +7,6 @@ class UploadBuffer : public GPUResource {
 public:
     ~UploadBuffer();
     void Create(const std::wstring& name, size_t bufferSize);
-    void Create(const std::wstring& name, size_t bufferSize,bool a);
 
     void Create(const std::wstring& name, size_t numElements, size_t elementSize) {
         Create(name, numElements * elementSize);

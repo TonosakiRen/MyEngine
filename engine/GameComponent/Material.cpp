@@ -30,5 +30,6 @@ void Material::Update() {
     bufferData.color = color_;
     bufferData.uvTransform = uvTransform_;
     bufferData.enableLighting = static_cast<uint32_t>(enableLighting_);
+    bufferData.intensity = intensity_;
     constBuffer_.Copy(bufferData);
 }

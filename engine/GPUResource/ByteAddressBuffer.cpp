@@ -6,9 +6,6 @@
 
 void ByteAddressBuffer::Create(const std::wstring& name, size_t bufferSize , UINT numElements)
 {
-
-    HRESULT result = S_FALSE;
-
     //インスタンシングデータのサイズ
     UINT sizeBAB = static_cast<UINT>(bufferSize * numElements);
     sizeBAB = Helper::AlignUp(sizeBAB, 256);

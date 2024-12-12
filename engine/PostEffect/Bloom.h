@@ -32,8 +32,8 @@ private:
     ColorBuffer luminanceTexture_;
     GaussianBlur gaussianBlurs_[kMaxLevel];
 
-    float threshold_ = 0.8f;
-    float knee_ = 0.3f;
+    float threshold_ = 0.0001f;
+    float knee_ = 0.6f;
     float intensity_ = 1.0f;
 };
 

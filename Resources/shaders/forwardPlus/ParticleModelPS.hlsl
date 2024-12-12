@@ -1,22 +1,10 @@
 #include "Common.hlsli"
 #include "Lighting.hlsli"
 #define MY_TEXTURE2D_SPACE space1
+
 Texture2D<float4> Texture2DTable[]  : register(t0, MY_TEXTURE2D_SPACE);
 Texture2D<float4> tex : register(t0);
 SamplerState smp : register(s0);
-
-RWStructuredBuffer<uint32_t> gTBRPointLightIndex  : register(u1);
-RWStructuredBuffer<uint32_t> gTBRSpotLightIndex  : register(u2);
-RWStructuredBuffer<uint32_t> gTBRShadowSpotLightIndex  : register(u3);
-ConstantBuffer<ViewProjection> gViewProjection  : register(b0);
-StructuredBuffer<DirectionalLight> gDirectionLights  : register(t2);
-StructuredBuffer<PointLight> gPointLights  : register(t3);
-StructuredBuffer<AreaLight> gAreaLights  : register(t4);
-StructuredBuffer<SpotLight> gSpotLights  : register(t5);
-StructuredBuffer<ShadowSpotLight> gShadowSpotLights  : register(t6);
-ConstantBuffer<TileNum> tileNum : register(b2);
-ConstantBuffer<Material> gMaterial  : register(b1);
-RWStructuredBuffer<TBRInformation> gTBRInformation  : register(u0);
 
 struct VSOutput {
 	float32_t4 pos : SV_POSITION;
@@ -37,6 +25,19 @@ struct ParticleData {
 	float32_t4x4 worldInverseTranspose;
 	float32_t4 color;
 };
+
+RWStructuredBuffer<uint32_t> gTBRPointLightIndex  : register(u1);
+RWStructuredBuffer<uint32_t> gTBRSpotLightIndex  : register(u2);
+RWStructuredBuffer<uint32_t> gTBRShadowSpotLightIndex  : register(u3);
+ConstantBuffer<ViewProjection> gViewProjection  : register(b0);
+StructuredBuffer<DirectionalLight> gDirectionLights  : register(t2);
+StructuredBuffer<PointLight> gPointLights  : register(t3);
+StructuredBuffer<AreaLight> gAreaLights  : register(t4);
+StructuredBuffer<SpotLight> gSpotLights  : register(t5);
+StructuredBuffer<ShadowSpotLight> gShadowSpotLights  : register(t6);
+ConstantBuffer<TileNum> tileNum : register(b2);
+ConstantBuffer<Material> gMaterial  : register(b1);
+RWStructuredBuffer<TBRInformation> gTBRInformation  : register(u0);
 StructuredBuffer<ParticleData> gParticleData  : register(t1);
 
 PixelShaderOutput main(VSOutput input) {
@@ -152,6 +153,8 @@ PixelShaderOutput main(VSOutput input) {
 		lighting *= shading;
 
 		lighting += ambient;
+		lighting *= gMaterial.intensity;
+
 
 		color.xyz *= lighting;
 

@@ -277,12 +277,6 @@ void Renderer::SpotLightShadowMapRender()
 
 void Renderer::UIRender()
 {
-
-    //コピーできないよん
-    //commandContext_.CopyBuffer(swapChain_.GetColorBuffer(), *resultBuffer_);
-
-    //コピーしようとするとき消して
-    //commandContext_.TransitionResource(*resultBuffer_, D3D12_RESOURCE_STATE_RENDER_TARGET); // ??なんでこれで警告消える？
     commandContext_.SetViewportAndScissorRect(0, 0, resultBuffer_->GetWidth(), resultBuffer_->GetHeight());  
     commandContext_.SetRenderTarget(resultBuffer_->GetRTV());
 

@@ -3,6 +3,7 @@
 #include "ImGuiManager.h"
 #include "Model/ModelManager.h"
 #include "Input.h"
+#include "Draw/DrawManager.h"
 
 bool Collider::isDrawCollider = false;
 
@@ -28,21 +29,20 @@ void Collider::SwitchIsDrawCollider()
 void Collider::Initialize(WorldTransform* objectWorldTransform, const std::string name, Vector3 initialScale, Vector3 initialPos)
 {
 	worldTransform_.Initialize();
-	worldTransform_.SetParent(objectWorldTransform);
+	worldTransform_.SetParent(objectWorldTransform,false);
 	worldTransform_.scale_ = initialScale;
 	worldTransform_.translation_ = initialPos;
 	name_ = name;
-	cube_.Initialize("box1x1.obj");
+	
 }
 
 void Collider::Initialize(WorldTransform* objectWorldTransform, const std::string name,uint32_t modelHandle)
 {
 	worldTransform_.Initialize();
-	worldTransform_.SetParent(objectWorldTransform);
+	worldTransform_.SetParent(objectWorldTransform,false);
 	worldTransform_.scale_ = ModelManager::GetInstance()->GetModelSize(modelHandle);
 	worldTransform_.translation_ = ModelManager::GetInstance()->GetModelCenter(modelHandle);
 	name_ = name;
-	cube_.Initialize("box1x1.obj");
 }
 
 void Collider::AdjustmentScale()
@@ -63,8 +63,6 @@ void Collider::Initialize(const std::string name)
 {
 	worldTransform_.Initialize();
 	name_ = name;
-	cube_.Initialize("box1x1");
-	cube_.SetEnableLighting(false);
 }
 
 bool Collider::Collision(Collider& colliderB, Vector3& minAxis, float& minOverlap)
@@ -133,7 +131,6 @@ bool Collider::Collision(Collider& colliderB, Vector3& pushBuckVector)
 		pushBuckVector = { 0.0f,0.0f,0.0f };
 		return false;
 	}
-	return false;
 }
 
 bool Collider::SphereCollision(Vector3 position1, Vector3 size1, Vector3 position2, Vector3 size2)
@@ -141,6 +138,19 @@ bool Collider::SphereCollision(Vector3 position1, Vector3 size1, Vector3 positio
 	float radius1 = Length(size1) ;
 	float radius2 = Length(size2) ;
 	float distance = Length(position1 - position2);
+	if (distance < radius2 + radius1) {
+		return true;
+	}
+	return false;
+}
+
+bool Collider::SphereCollision(Collider& colliderB)
+{
+	MatrixUpdate();
+	colliderB.MatrixUpdate();
+	float radius1 = worldTransform_.maxScale_ / 2.0f;
+	float radius2 = colliderB.worldTransform_.maxScale_ / 2.0f;
+	float distance = Length(MakeTranslation(worldTransform_.matWorld_) - MakeTranslation(colliderB.worldTransform_.matWorld_));
 	if (distance < radius2 + radius1) {
 		return true;
 	}
@@ -203,16 +213,19 @@ void Collider::MatrixUpdate()
 
 	}
 
+	Vector3 scale = MakeScale(worldTransform_.matWorld_);
+	worldTransform_.maxScale_ = (std::max)({ scale.x,scale.y,scale.z });
+
 	// 定数バッファに書き込み
 	worldTransform_.ConstUpdate();
 }
 
-void Collider::Draw(Vector4 color)
+void Collider::Draw()
 {
 
 	if (isDrawCollider) {
 		MatrixUpdate();
-		cube_.Draw(color);
+		DrawManager::GetInstance()->DrawModel(worldTransform_);
 	}
 
 }

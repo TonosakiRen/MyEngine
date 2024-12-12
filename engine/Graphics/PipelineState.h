@@ -14,9 +14,7 @@ public:
 	operator bool() const { return pipelineState_; }
 private:
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState_;
-#ifdef _DEBUG
 	std::wstring name_;
-#endif // _DEBUG
 };
 
 enum PipelineType {

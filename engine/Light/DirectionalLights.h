@@ -18,7 +18,7 @@ public:
 		Vector4 color = { 1.0f, 1.0f, 1.0f,1.0f };
 		Vector3 direction = { 0.0f, -1.0f, 0.0f };
 		Vector3 position = { 0.0f,150.0f,0.0f };
-		float intensity = 0.0f;
+		float intensity = 0.075f;
 		Vector3 lockUp = { 1.0f,0.0f,0.0f };
 		DepthBuffer shadowMap_;
 		UploadBuffer constBuffer_;

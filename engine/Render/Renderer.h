@@ -121,7 +121,7 @@ private:
     std::unique_ptr<Vignette> vignette_;
     std::unique_ptr<Smooth> smooth_;
 
-    bool isEdge_ = true;
+    bool isEdge_ = false;
     bool isBloom_ = true;
     bool isHSVFilter = true;
     bool isGrayScale_ = false;

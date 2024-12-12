@@ -100,7 +100,7 @@ private:
 
 	std::unique_ptr < Cellular> cellular_;
 
-	Vector4 HSVA_ = { 0.0f,0.2f,0.45f,0.4f };
+	Vector4 HSVA_ = { 1.0f,1.0f,1.0f,0.61f };
 
 	float hz_ = 0.2f;
 	float period_ = 2.0f;

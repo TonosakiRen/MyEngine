@@ -6,7 +6,6 @@
 
 
 void TLAS::Create(const std::wstring& name) {
-    HRESULT result = S_FALSE;
 
     D3D12_BUILD_RAYTRACING_ACCELERATION_STRUCTURE_INPUTS inputs = {};
     inputs.DescsLayout = D3D12_ELEMENTS_LAYOUT_ARRAY;
@@ -29,10 +28,9 @@ void TLAS::Create(const std::wstring& name) {
         &desc,
         D3D12_RESOURCE_STATE_RAYTRACING_ACCELERATION_STRUCTURE);
 
-#ifdef _DEBUG
+
     resource_->SetName(name.c_str());
     name_ = name;
-#endif // _DEBUG
 
     state_ = D3D12_RESOURCE_STATE_RAYTRACING_ACCELERATION_STRUCTURE;
     bufferSize_ = info.ResultDataMaxSizeInBytes;
@@ -56,7 +54,9 @@ void TLAS::Build(CommandContext& commandContext, const RaytracingInstanceDescs& 
     asDesc.DestAccelerationStructureData = resource_->GetGPUVirtualAddress();
     asDesc.ScratchAccelerationStructureData = scrach_->GetGPUVirtualAddress();
 
-    commandContext.BuildRaytracingAccelerationStructure(asDesc);
-    commandContext.UAVBarrier(*resource_.Get());
+    /*commandContext.BuildRaytracingAccelerationStructure(asDesc);
+    commandContext.UAVBarrier(*resource_.Get());*/
+
+    commandContext;
 
 }

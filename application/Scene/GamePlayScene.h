@@ -9,6 +9,7 @@
 #include  "Stage/Skybox.h"
 #include  "Stage/BoxArea.h"
 #include  "Stage/Floor.h"
+#include  "Stage/Cave.h"
 #include  "Player/Player.h"
 #include  "GameComponent/GameObject.h"
 #include  "Player/PlayerBulletManager.h"
@@ -21,6 +22,8 @@
 #include "Stage/Trees.h"
 #include "Enemy/LineAttack.h"
 #include "Boss/Boss.h"
+#include "Stage/LightObjects.h"
+#include "Rain/RainManager.h"
 
 
 class GamePlayScene :
@@ -37,7 +40,6 @@ public:
 
 private:
 	void CheckAllCollision();
-	void EnemySpawn(const Vector3& position);
 
 private:
 	Input* input_;
@@ -57,21 +59,11 @@ private:
 
 	std::unique_ptr<WhiteParticle> whiteParticle_;
 	
-	std::unique_ptr<SphereLights> sphereLights_;
-
 	std::unique_ptr<LineAttack> lineAttack_;
+	
+	std::unique_ptr<RainManager> rainManager_;
 
-	std::unique_ptr<Boss> boss_;
-
-	//Enemy
-	std::list<std::unique_ptr<Enemy>> enemies_;
-	//EnemyBullets
-	std::unique_ptr<EnemyBulletManager> enemyBulletManager_;
-	//Enemyの数
-	uint32_t enemyNum_ = 0;
-	//Enemyが出現するフレーム
-	uint32_t enemySpawnFrame_ = 0;
-
+	std::unique_ptr<Cave> cave_;
 
 	std::vector<std::unique_ptr<GameObject>>* gameObjects_;
 	int i = 0;

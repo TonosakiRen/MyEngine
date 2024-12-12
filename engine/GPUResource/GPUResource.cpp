@@ -14,8 +14,7 @@ void GPUResource::CreateResource(
     const std::wstring& name,
     const D3D12_HEAP_PROPERTIES& heapProperties,
     const D3D12_RESOURCE_DESC& desc,
-    D3D12_RESOURCE_STATES initState,
-    const D3D12_CLEAR_VALUE* optimizedClearValue) {
+    D3D12_RESOURCE_STATES initState) {
 
     
     resource_ = BufferManager::GetInstance()->CreateResource(
@@ -27,8 +26,7 @@ void GPUResource::CreateResource(
 
     state_ = initState;
 
-#ifdef _DEBUG
+
     resource_->SetName(name.c_str());
     name_ = name;
-#endif // _DEBUG
 }

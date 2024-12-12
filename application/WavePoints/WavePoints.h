@@ -7,7 +7,7 @@
 class WavePoints
 {
 public:
-	static const uint32_t kWavePointNum = 50;
+	static const uint32_t kWavePointNum = 256;
 
 	struct Point {
 		Vector3 position_ = { 0.0f,3.0f,0.0f };

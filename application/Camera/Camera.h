@@ -13,4 +13,5 @@ public:
 private:
 	Vector3 savePlayerPos;
 	Vector3 interTarget_;
+	Vector3 rotate_;
 };

@@ -67,8 +67,7 @@ void MyGame::Update()
 	audio->Update();
 
 	// ゲームシーンの毎フレーム処理
-	gameScene->Update(renderer->GetCommandContext());
-	lightManager_->Update();
+	gameScene->Update();
 	if (sceneManager->GetNextScene()) {
 		renderer->StartTransition();
 	};

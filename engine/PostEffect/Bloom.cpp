@@ -3,6 +3,7 @@
 #include "Light/ShaderManager.h"
 #include "Graphics/CommandContext.h"
 #include "Graphics/Helper.h"
+#include "ImGuiManager.h"
 
 #include <d3dx12.h>
 
@@ -81,6 +82,16 @@ void Bloom::Initialize(ColorBuffer* originalTexture)
 void Bloom::Render(CommandContext& commandContext, ColorBuffer* originalTexture, uint32_t level)
 {
     assert(level <= kMaxLevel);
+
+#ifdef _DEBUG
+    if (ImGui::BeginMenu("Bloom")) {
+        ImGui::DragFloat("threshold", &threshold_, 0.00001f, 0.0f, 1.0f);
+        ImGui::DragFloat("knee", &knee_, 0.1f, 0.0f);
+        ImGui::DragFloat("intensity", &intensity_, 0.1f, 0.0f);
+        ImGui::EndMenu();
+    }
+#endif
+
     if (threshold_ == 0.0f) {
         threshold_ = 0.00001f;
     }

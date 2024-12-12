@@ -6,22 +6,22 @@
 #include <vector>
 #include "GameComponent/WorldTransform.h"
 
+struct SpotLight {
+	Vector4 color = { 1.0f, 1.0f, 1.0f,1.0f };
+	WorldTransform worldTransform;
+	float intensity = 5.0f;
+	Vector3 direction = { 0.0f,-1.0f,0.0f };
+	float distance = 18.0f;
+	float decay = 0.4f;
+	float cosAngle = Radian(45.0f);
+	bool isActive = false;
+};
+
 class SpotLights
 {
 public:
 
 	static const uint32_t  lightNum = 1;
-
-	struct SpotLight {
-		Vector4 color = { 1.0f, 1.0f, 1.0f,1.0f };
-		WorldTransform worldTransform;
-		float intensity = 5.0f;
-		Vector3 direction = { 0.0f,-1.0f,0.0f };
-		float distance = 18.0f;
-		float decay = 0.4f;
-		float cosAngle = Radian(45.0f);
-		bool isActive = false;
-	};
 
 	struct ConstBufferData {
 		Vector4 color = { 1.0f, 1.0f, 1.0f,1.0f };

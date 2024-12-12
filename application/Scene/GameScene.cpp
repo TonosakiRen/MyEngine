@@ -38,10 +38,6 @@ void GameScene::Initialize() {
 	camera_ = std::make_unique<Camera>();
 	camera_->Initialize(initializeCameraPos, MakeFromEulerAngle(initializeCameraRotate));
 
-	
-	compute_ = std::make_unique<Compute>();
-	compute_->Initialize();
-
 	sceneManager_ = SceneManager::GetInstance();
 	BaseScene* scene = new GamePlayScene();
 	sceneManager_->SetNextScene(scene);
@@ -55,7 +51,7 @@ void GameScene::Initialize() {
 	wavePoints = wavePoints_.get();
 }
 
-void GameScene::Update(CommandContext& commandContext){
+void GameScene::Update(){
 	Collider::SwitchIsDrawCollider();
 	ViewProjection::SwitchIsUseDebugCamera();
 	//fps表示

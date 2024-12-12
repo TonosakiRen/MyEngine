@@ -102,7 +102,7 @@ void GameObjectManager::Load()
 
 
 			if (object.contains("pointLight")) {
-				PointLights::PointLight pointLight;
+				PointLight pointLight;
 				//平行移動
 				pointLight.worldTransform.translation_.x = (float)transform["translation"][0];
 				pointLight.worldTransform.translation_.y = (float)transform["translation"][2];
@@ -113,7 +113,7 @@ void GameObjectManager::Load()
 				pointLight.color.x = color[0];
 				pointLight.color.y = color[1];
 				pointLight.color.z = color[2];
-				pointLight.isActive = true;
+				pointLight.isActive = false;
 				pointLight.decay = 1.0f;
 				pointLight.intensity = 3.0f;
 				pointLight.radius = 3.0f;

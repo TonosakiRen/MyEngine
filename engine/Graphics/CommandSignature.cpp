@@ -12,8 +12,8 @@ void CommandSignature::Create(const std::wstring& name, const D3D12_COMMAND_SIGN
         &rootSignature,
         IID_PPV_ARGS(&commandSignature_)
        ));
-#ifdef _DEBUG
+
     commandSignature_->SetName(name.c_str());
     name_ = name;
-#endif // _DEBUG
+
 }

@@ -137,7 +137,6 @@ void DrawManager::AllDraw(PipelineType pipelineType,const ViewProjection& viewPr
 	}
 
 	//透明
-
 	particleModelPipeline_->PreDraw(pipelineType, *commandContext_, viewProjection, tileBasedRendering);
 	for (auto& call : calls[kPostParticleModel]) {
 		call();
@@ -257,7 +256,7 @@ void DrawManager::DrawParticleModel(ParticleModelData& bufferData, const uint32_
 	drawCallNum_++;
 	for (Mesh& mesh : modelManager_->GetModelData(modelHandle).meshes) {
 		for (uint32_t i = 0; i < bufferData.GetDataNum();i++) {
-			//raytracing_->AddInstanceDesc(mesh.blasBuffer_, bufferData.GetData()[i].matWorld);
+			raytracing_->AddInstanceDesc(mesh.blasBuffer_, bufferData.GetData()[i].matWorld);
 		}
 	}
 	calls[kParticleModel].push_back([&, modelHandle]() {particleModelPipeline_->Draw(*commandContext_, bufferData, material, modelHandle); });

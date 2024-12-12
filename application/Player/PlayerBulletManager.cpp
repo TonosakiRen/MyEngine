@@ -20,7 +20,7 @@ void PlayerBulletManager::Update()
 	playerBullets_.remove_if([&](std::unique_ptr<PlayerBullet>& playerBullet) {
 		if (playerBullet->IsDead()) {
 			if (playerBullet->GetWorldTransform()->translation_.y >= 0.0f) {
-				explodeParticle_->SetIsEmit(true, MakeTranslation(playerBullet->GetWorldTransform()->matWorld_));
+				//explodeParticle_->SetIsEmit(true, MakeTranslation(playerBullet->GetWorldTransform()->matWorld_));
 			}
 			return true;
 		}

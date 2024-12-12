@@ -8,6 +8,7 @@
 #include "Scene/GameScene.h"
 #include "Stage/Floor.h"
 
+
 void Player::Initialize(const std::string name, PlayerBulletManager* playerBulletManager)
 {
 	GameObject::Initialize(name);
@@ -16,21 +17,7 @@ void Player::Initialize(const std::string name, PlayerBulletManager* playerBulle
 	input_ = Input::GetInstance();
 	modelSize_ = modelManager->GetModelSize(modelHandle_);
 	Vector3 modelCenter = modelManager->GetModelCenter(modelHandle_);
-	collider_.Initialize(&worldTransform_, name,modelSize_, modelCenter);
-	modelWorldTransform_.Initialize();
-	modelWorldTransform_.SetParent(&worldTransform_);
-	//modelの中心からmodelの高さの半分したにmodelWorldTransformを配置
-	modelWorldTransform_.translation_ = { 0.0f,0.0f,0.0f };
-	worldTransform_.scale_ = { 5.0f,5.0f,5.0f };
-
-	animation_ = animationManager->Load(name,"Armature|mixamo.com|Layer0");
-	animationTime_ = 0.0f;
-	skeleton_.Create(modelManager->GetRootNode(modelHandle_));
-	
-	rightHand_.Initialize(ModelManager::Load("rightHandPlayer.gltf"));
-	rightHand_.SetParent(&worldTransform_);
-
-	skinCluster_.Create(skeleton_, modelHandle_);
+	collider_.Initialize(&worldTransform_, name,modelHandle_);
 
 	velocity_ = { 0.0f,0.0f,0.0f };
 	acceleration_ = { 0.0f,-0.05f,0.0f };
@@ -39,46 +26,50 @@ void Player::Initialize(const std::string name, PlayerBulletManager* playerBulle
 	worldTransform3DReticle_.Initialize();
 	direction_ = { 0.0f,0.0f,1.0f };
 
-	size_t soundHandle = Audio::GetInstance()->SoundLoadWave("walk.mp3");
-	size_t playHandle = Audio::GetInstance()->SoundPlayLoopStart(soundHandle);
-
-	Animate();
-
-	leftHandWorldTransform_.Initialize();
-	leftHandWorldTransform_.SetParent(&worldTransform_);
-	leftHandModelWorldTransform_.Initialize();
-	leftHandModelWorldTransform_.SetParent(&leftHandWorldTransform_);
-	leftHandModelWorldTransform_.translation_ = { 2.0f,6.0f,1.0f };
-	leftHandModelWorldTransform_.scale_ = { 1.0f,20.0f,1.0f };
-	leftHandModelWorldTransform_.quaternion_ = MakeFromEulerAngle(Vector3{-0.61f,0.0f,-0.54f});
-
-	rightHandWorldTransform_.Initialize();
-	rightHandWorldTransform_.SetParent(&worldTransform_);
-
-	fireParticle_ = std::make_unique<DustParticle>();
-	fireParticle_->Initialize({ -0.5f,-0.5f,-0.5f }, {0.5f,-1.0f,0.5f});
-	fireParticle_->emitterWorldTransform_.SetParent(&rightHandWorldTransform_);
-	fireParticle_->emitterWorldTransform_.scale_ = { 0.5f,0.5f,0.5f };
-	fireParticle_->material_.color_ = {1.0f,0.0f,0.0f,1.0f};
-	fireParticle_->material_.Update();
-
-	spriteData_.Initialize(TextureManager::Load("hansya2.dds"));
-	spriteData_.size_.x = 400.0f;
-	spriteData_.size_.y = 300.0f;
-	spriteData_.position_ = {400.0f,300.0f};
-
-
+	playerModel_.Initialize(worldTransform_);
+	playerModel_.SetMoving(PlayerModel::kStand);
+	playerModel_.Update();
 	
+	color_ = { 1.0f,1.0f,1.0f,1.0f };
+	PointLights* pointLights = LightManager::GetInstance()->pointLights_.get();
+	for (int i = 0; i < PointLights::lightNum; i++) {
+		if (pointLights->lights_[i].isActive == false) {
+			pointLight_ = &pointLights->lights_[i];
+			pointLight_->isActive = true;
+			pointLight_->worldTransform.Reset();
+			pointLight_->worldTransform.translation_ = modelCenter;
+			pointLight_->worldTransform.SetParent(&worldTransform_, false);
+			pointLight_->decay = 1.0f;
+			pointLight_->intensity = 3.0f;
+			pointLight_->radius = 6.0f;
+			pointLight_->color = color_;
+			break;
+		}
+	}
+
+	lightCollider_.Initialize(&worldTransform_, name, modelHandle_);
 }
 
 void Player::Update(const ViewProjection& viewProjection)
 {
-
+	playerModel_.SetMoving(PlayerModel::kStand);
 	Move(viewProjection);
 	
 	ReticleUpdate(viewProjection);
-	isFire_ = false;
 	Fire();
+
+	if (isGrowSphere_) {
+		lightSphereT_ += growSpeed;
+		lightSphereT_ = clamp(lightSphereT_, 0.0f, 1.0f);
+		const float maxScale = 400.0f;
+		lightCollider_.worldTransform_.scale_ = { (maxScale * lightSphereT_),(maxScale * lightSphereT_), (maxScale * lightSphereT_) };
+		if (lightSphereT_ >= 1.0f) {
+			isGrowSphere_ = false;
+			lightSphereT_ = 0.0f;
+			lightCollider_.worldTransform_.scale_ = { 1.0f,1.0f,1.0f };
+		}
+	}
+
 
 #ifdef _DEBUG
 	ImGui::Begin("Game");
@@ -91,13 +82,14 @@ void Player::Update(const ViewProjection& viewProjection)
 	ImGui::End();
 #endif
 
-	fireParticle_->Update();
-	skeleton_.Update();
-	skinCluster_.Update();
+	colorT_ += 0.02f;
+	colorT_ = clamp(colorT_, 0.0f, 1.0f);
+	material_.color_ = Lerp(colorT_, material_.color_, color_);
+	pointLight_->color = material_.color_;
+	material_.Update();
 	worldTransform_.Update();
-	modelWorldTransform_.Update();
 	worldTransform3DReticle_.Update();
-	rightHand_.UpdateMatrix();
+	playerModel_.Update();
 }
 
 void Player::Extrusion(Collider& otherCollider)
@@ -106,7 +98,6 @@ void Player::Extrusion(Collider& otherCollider)
 	if (collider_.Collision(otherCollider, pushBackVector)) {
 		worldTransform_.translation_ += pushBackVector;
 		worldTransform_.Update();
-		modelWorldTransform_.Update();
 	}
 
 }
@@ -116,25 +107,24 @@ void Player::OnCollision()
 
 }
 
+void Player::SetColor(const Vector4& color)
+{
+	colorT_ = 0.0f;
+	color_ = color;
+}
+
 void Player::Draw() {
 	if (input_->PushRightTrigger()) {
 		DrawManager::GetInstance()->DrawPostSprite(sprite2DReticle_);
 	}
-
-	DrawManager::GetInstance()->DrawEnvironmentMapMeshletModel(worldTransform_, modelHandle_, skinCluster_);
-	leftHandWorldTransform_.Update(skeleton_.GetJoint("mixamorig:LeftHand").skeletonSpaceMatrix);
-	leftHandModelWorldTransform_.Update();
-
-	rightHandWorldTransform_.Update(skeleton_.GetJoint("mixamorig:RightHand").skeletonSpaceMatrix);
-	DrawManager::GetInstance()->DrawManager::DrawModel(leftHandModelWorldTransform_,ModelManager::GetInstance()->Load("box1x1.obj"));
-	DrawManager::GetInstance()->DrawPostSprite(spriteData_);
-
+	playerModel_.Draw();
+	collider_.Draw();
 }
 
 void Player::Fire()
 {
-	if (input_->TriggerButton(XINPUT_GAMEPAD_RIGHT_SHOULDER) || input_->TriggerKey(DIK_SPACE)) {
-		Vector3 position = MakeTranslation(worldTransform_.matWorld_);
+	if (input_->TriggerButton(XINPUT_GAMEPAD_RIGHT_SHOULDER) || input_->TriggerKey(DIK_SPACE) || input_->TriggerButton(XINPUT_GAMEPAD_B) || input_->TriggerButton(XINPUT_GAMEPAD_A)) {
+		/*Vector3 position = MakeTranslation(worldTransform_.matWorld_);
 		Vector3 direction;
 		if (input_->PushRightTrigger()) {
 			direction = Normalize(worldTransform3DReticle_.translation_ - MakeTranslation(worldTransform_.matWorld_));
@@ -142,16 +132,11 @@ void Player::Fire()
 		else {
 			direction = Normalize(direction_);
 		}
-		playerBulletManager_->PopPlayerBullet(position, direction);
+		playerBulletManager_->PopPlayerBullet(position, direction);*/
+		isGrowSphere_ = true;
 	}
 }
 
-void Player::Animate()
-{
-	animationTime_ += 1.0f / 60.0f;
-	animationTime_ = std::fmod(animationTime_, animation_.duration);
-	AnimationManager::ApplyAnimation(skeleton_, animation_, animationTime_);
-}
 
 void Player::Move(const ViewProjection& viewProjection)
 {
@@ -191,7 +176,7 @@ void Player::Move(const ViewProjection& viewProjection)
 		direction_ = Normalize(move);
 		inputQuaternion_ = MakeLookRotation(direction_);
 		worldTransform_.quaternion_ = Slerp(0.2f, worldTransform_.quaternion_, inputQuaternion_);
-		Animate();
+		playerModel_.SetMoving(PlayerModel::kWalk);
 	}
 
 	if (input_->TriggerKey(DIK_SPACE) || input_->TriggerButton(XINPUT_GAMEPAD_A)) {
@@ -204,8 +189,8 @@ void Player::Move(const ViewProjection& viewProjection)
 	
 	worldTransform_.translation_ += move;
 	worldTransform_.translation_.x = clamp(worldTransform_.translation_.x , -Floor::kFloorHalfSize + modelSize_.x / 2.0f , Floor::kFloorHalfSize - modelSize_.x / 2.0f);
-	worldTransform_.translation_.y = clamp(worldTransform_.translation_.y, 0.0f, FLT_MAX);
-	worldTransform_.translation_.z = clamp(worldTransform_.translation_.z, -Floor::kFloorHalfSize + modelSize_.z / 2.0f, Floor::kFloorHalfSize - modelSize_.z / 2.0f);
+	worldTransform_.translation_.y = clamp(worldTransform_.translation_.y,0.0f, FLT_MAX);
+	worldTransform_.translation_.z = clamp(worldTransform_.translation_.z, -Floor::kFloorHalfSize + modelSize_.z / 2.0f, FLT_MAX);
 }
 
 void Player::ReticleUpdate(const ViewProjection& viewProjection)
@@ -244,8 +229,8 @@ void Player::ReticleUpdate(const ViewProjection& viewProjection)
 			Vector3 posFar = Vector3(spritePosition.x, spritePosition.y, 1.0f);
 
 			// スクリーン座標系からワールド座標系
-			posNear = Transform(posNear, matInverseVPV);
-			posFar = Transform(posFar, matInverseVPV);
+			posNear = TransformVector(posNear, matInverseVPV);
+			posFar = TransformVector(posFar, matInverseVPV);
 
 			// マウスレイの方向
 			Vector3 mouseDirection = posFar - posNear;
@@ -268,8 +253,8 @@ void Player::ReticleUpdate(const ViewProjection& viewProjection)
 			Vector3 posFar = Vector3(mousePos.x, mousePos.y, 1.0f);
 
 			// スクリーン座標系からワールド座標系
-			posNear = Transform(posNear, matInverseVPV);
-			posFar = Transform(posFar, matInverseVPV);
+			posNear = TransformVector(posNear, matInverseVPV);
+			posFar = TransformVector(posFar, matInverseVPV);
 
 			// マウスレイの方向
 			Vector3 mouseDirection = posFar - posNear;
@@ -294,8 +279,8 @@ void Player::ReticleUpdate(const ViewProjection& viewProjection)
 		Vector3 posFar = Vector3(screenCenter.x, screenCenter.y, 1.0f);
 
 		// スクリーン座標系からワールド座標系
-		posNear = Transform(posNear, matInverseVPV);
-		posFar = Transform(posFar, matInverseVPV);
+		posNear = TransformVector(posNear, matInverseVPV);
+		posFar = TransformVector(posFar, matInverseVPV);
 
 		// マウスレイの方向
 		Vector3 mouseDirection = posFar - posNear;

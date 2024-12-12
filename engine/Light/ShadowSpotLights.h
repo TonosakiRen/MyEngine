@@ -6,6 +6,21 @@
 #include <vector>
 #include "GameComponent/WorldTransform.h"
 
+struct ShadowSpotLight {
+	Vector4 color = { 1.0f, 1.0f, 1.0f,1.0f };
+	WorldTransform worldTransform;
+	float intensity = 1.0f;
+	Vector3 direction = { 0.0f,-1.0f,0.0f };
+	float distance = 1.0f;
+	float decay = 1.0f;
+	float cosAngle = Radian(45.0f);
+	bool isActive = false;
+	Vector3 lockUp = { 1.0f,0.0f,0.0f };
+	DepthBuffer shadowMap_;
+	UploadBuffer constBuffer_;
+	uint32_t descriptorHeapIndex;
+};
+
 class ShadowSpotLights
 {
 public:
@@ -14,20 +29,6 @@ public:
 	static const uint32_t shadowWidth = 1024;
 	static const uint32_t shadowHeight = 1024;
 
-	struct SpotLight {
-		Vector4 color = { 1.0f, 1.0f, 1.0f,1.0f };
-		WorldTransform worldTransform;
-		float intensity = 1.0f;
-		Vector3 direction = { 0.0f,-1.0f,0.0f };
-		float distance = 1.0f;
-		float decay = 1.0f;
-		float cosAngle = Radian(45.0f);
-		bool isActive = false;
-		Vector3 lockUp = { 1.0f,0.0f,0.0f };
-		DepthBuffer shadowMap_;
-		UploadBuffer constBuffer_;
-		uint32_t descriptorHeapIndex;
-	};
 
 	struct ConstBufferData {
 		Vector4 color = { 1.0f, 1.0f, 1.0f,1.0f };
@@ -46,7 +47,7 @@ public:
 	void Update();
 
 public:
-	std::vector<SpotLight> lights_;
+	std::vector<ShadowSpotLight> lights_;
 	StructuredBuffer structureBuffer_;
 private:
 	//影用viewProjection

@@ -64,7 +64,6 @@ void Model::PreDraw(PipelineType pipelineType,CommandContext& commandContext, co
 }
 
 void Model::CreatePipeline() {
-    HRESULT result = S_FALSE;
     ComPtr<IDxcBlob> vsBlob;    
     ComPtr<IDxcBlob> psBlob;    
 
@@ -82,7 +81,7 @@ void Model::CreatePipeline() {
     {
 
         // デスクリプタレンジ
-        CD3DX12_DESCRIPTOR_RANGE descRangeSRV[int(RootParameter::kDescriptorRangeNum)];
+        CD3DX12_DESCRIPTOR_RANGE descRangeSRV[int(RootParameter::kDescriptorRangeNum)] = {};
         descRangeSRV[int(RootParameter::kTexture)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0); // t0 レジスタ
 
         // ルートパラメータ
@@ -191,7 +190,6 @@ void Model::CreatePipeline() {
 
 void Model::CreateForwardPipeline()
 {
-    HRESULT result = S_FALSE;
     ComPtr<IDxcBlob> vsBlob;
     ComPtr<IDxcBlob> psBlob;
 
@@ -209,7 +207,7 @@ void Model::CreateForwardPipeline()
     {
 
         // デスクリプタレンジ
-        CD3DX12_DESCRIPTOR_RANGE descRangeSRV[int(ForwardRootParameter::kDescriptorRangeNum)];
+        CD3DX12_DESCRIPTOR_RANGE descRangeSRV[int(ForwardRootParameter::kDescriptorRangeNum)] = {};
         descRangeSRV[int(ForwardRootParameter::kTexture)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0); // t0 レジスタ
         descRangeSRV[int(ForwardRootParameter::kDirectionalLights)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1);
         descRangeSRV[int(ForwardRootParameter::kPointLights)].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 2);

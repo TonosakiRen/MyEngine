@@ -9,6 +9,8 @@
 #include "Model/ModelManager.h"
 #include "Animation/SkinCluster.h"
 #include "Particle/DustParticle.h"
+#include "PlayerModel.h"
+#include "Light/LightManager.h"
 
 class PlayerBulletManager;
 class Player :
@@ -16,7 +18,39 @@ class Player :
 {
 public:
 
-    bool a = false;
+    enum ModelJoints {
+        HeadTop,
+        Head,
+
+        SpineTop,
+
+        RightShoulder,
+        RightArm,
+        RightForArm,
+        RightHand,
+
+        LeftShoulder,
+        LeftArm,
+        LeftForArm,
+        LeftHand,
+
+        SpineBottom,
+
+        RightUpLeg,
+        RightLeg,
+        RightFoot,
+
+        LeftUpLeg,
+        LeftLeg,
+        LeftFoot,
+
+        PartNum
+    };
+
+    struct JointWorldTransform {
+        const Matrix4x4* skeletonSpaceMatrix;
+        WorldTransform worldTransform;
+    };
 
     static const int fireNum_ = 40;
 
@@ -24,46 +58,44 @@ public:
     void Update(const ViewProjection& viewProjection);
     void Extrusion(Collider& otherCollider);
     void OnCollision();
+    void SetColor(const Vector4& color);
     void Draw();
     void Fire();
-    void Animate();
     void Move(const ViewProjection& viewProjection);
     void ReticleUpdate(const ViewProjection& viewProjection);
     const WorldTransform& GetWorldTransform() const {
         return worldTransform_;
     }
+    Collider& GetSphereCollider() {
+        return lightCollider_;
+    }
+    const Vector4& GetColor() {
+        return color_;
+    }
 public:
     Collider collider_;
 private:
     Input* input_;
+    PointLight* pointLight_ = nullptr;
     PlayerBulletManager* playerBulletManager_;
+    PlayerModel playerModel_;
     WorldTransform worldTransform3DReticle_;
     Quaternion inputQuaternion_;
     SpriteData sprite2DReticle_;
-    WorldTransform modelWorldTransform_;
-    GameObject rightHand_;
+
     Vector3 velocity_;
     Vector3 acceleration_;
     Vector3 modelSize_;
     Vector4 color_;
     Vector3 direction_;
-    float animationTime_ = 0.0f;
-    float useAnimationTime_ = 0.0f;
-    Animation animation_;
-    Skeleton skeleton_;
-    bool isAnimation_ = false;
-    bool isFire_ = false;
+    float colorT_ = 1.0f;
 
-
-
-    SkinCluster skinCluster_;
-    WorldTransform leftHandWorldTransform_;
-    WorldTransform leftHandModelWorldTransform_;
+   
     std::unique_ptr<DustParticle> fireParticle_;
 
-    WorldTransform rightHandWorldTransform_;
-
-    SpriteData spriteData_;
-
+    bool isGrowSphere_ = false;
+    Collider lightCollider_;
+    float lightSphereT_ = 0.0f;
+    float growSpeed = 0.01f;
 
 };

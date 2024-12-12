@@ -26,22 +26,22 @@ void WhiteParticle::Update() {
 
 	if (isEmit_) {
 		for (size_t i = 0; i < EmitNum_; i++) {
-			for (size_t i = 0; i < kParticleNum; i++) {
-				if (particles[i].isActive_ == false) {
-					particles[i].isActive_ = true;
+			for (size_t j = 0; j < kParticleNum; j++) {
+				if (particles[j].isActive == false) {
+					particles[j].isActive = true;
 
 					emitterWorldTransform_.Update();
 					emitBox_ = MakeOBB(emitterWorldTransform_.matWorld_);
 
 					if (emitterWorldTransform_.GetParent()) {
-						particles[i].direction_ = Normalize(Vector3{ Rand(minDirection_.x, maxDirection_.x) ,Rand(minDirection_.y,maxDirection_.y) ,Rand(minDirection_.z,maxDirection_.z) } *NormalizeMakeRotateMatrix(emitterWorldTransform_.GetParent()->matWorld_));
+						particles[j].direction = Normalize(Vector3{ Rand(minDirection_.x, maxDirection_.x) ,Rand(minDirection_.y,maxDirection_.y) ,Rand(minDirection_.z,maxDirection_.z) } *NormalizeMakeRotateMatrix(emitterWorldTransform_.GetParent()->matWorld_));
 					}
 					else {
-						particles[i].direction_ = Normalize(Vector3{ Rand(minDirection_.x, maxDirection_.x) ,Rand(minDirection_.y,maxDirection_.y) ,Rand(minDirection_.z,maxDirection_.z) });
+						particles[j].direction = Normalize(Vector3{ Rand(minDirection_.x, maxDirection_.x) ,Rand(minDirection_.y,maxDirection_.y) ,Rand(minDirection_.z,maxDirection_.z) });
 					}
-					particles[i].worldTransform_.translation_ = MakeRandVector3(emitBox_);
-					particles[i].worldTransform_.quaternion_ = IdentityQuaternion();
-					particles[i].worldTransform_.scale_ = emitterWorldTransform_.scale_;
+					particles[j].worldTransform.translation_ = MakeRandVector3(emitBox_);
+					particles[j].worldTransform.quaternion_ = IdentityQuaternion();
+					particles[j].worldTransform.scale_ = emitterWorldTransform_.scale_;
 					break;
 				}
 			}
@@ -50,13 +50,13 @@ void WhiteParticle::Update() {
 
 	for (size_t i = 0; i < kParticleNum; i++) {
 		float rotationSpeed = Radian(2.0f) * (float(i % 2) * 2.0f - 1.0f);
-		if (particles[i].isActive_ == true) {
-			particles[i].worldTransform_.quaternion_ *= MakeFromAngleAxis({ 0.0f,0.0f,1.0f }, rotationSpeed);
-			particles[i].worldTransform_.translation_ += particles[i].direction_ * speed_;
-			particles[i].worldTransform_.scale_ = particles[i].worldTransform_.scale_ - scaleSpeed_;
-			particles[i].worldTransform_.Update();
-			if (particles[i].worldTransform_.scale_.x <= 0.0f) {
-				particles[i].isActive_ = false;
+		if (particles[i].isActive == true) {
+			particles[i].worldTransform.quaternion_ *= MakeFromAngleAxis({ 0.0f,0.0f,1.0f }, rotationSpeed);
+			particles[i].worldTransform.translation_ += particles[i].direction * speed_;
+			particles[i].worldTransform.scale_ = particles[i].worldTransform.scale_ - scaleSpeed_;
+			particles[i].worldTransform.Update();
+			if (particles[i].worldTransform.scale_.x <= 0.0f) {
+				particles[i].isActive = false;
 			}
 		}
 
@@ -64,17 +64,17 @@ void WhiteParticle::Update() {
 
 }
 
-void WhiteParticle::Draw(uint32_t textureHandle)
+void WhiteParticle::Draw()
 {
 
 	emitterWorldTransform_.Update();
 
 	for (size_t i = 0; i < kParticleNum; i++)
 	{
-		if (particles[i].isActive_) {
+		if (particles[i].isActive) {
 			ParticleData::Data data;
-			data.matWorld = particles[i].worldTransform_.matWorld_;
-			data.worldInverseTranspose = Inverse(particles[i].worldTransform_.matWorld_);
+			data.matWorld = particles[i].worldTransform.matWorld_;
+			data.worldInverseTranspose = Inverse(particles[i].worldTransform.matWorld_);
 			particleData_->PushBackData(data);
 		}
 	}
