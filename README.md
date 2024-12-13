@@ -57,7 +57,8 @@ MeshShaderによるテッセレーションでパーティクルが床に落ち�
 * asiimp
 * ImGUI
 
+[![DebugBuild](https://github.com/TonosakiRen/MyEngine/actions/workflows/DebugBuild.yml/badge.svg)](https://github.com/TonosakiRen/MyEngine/actions/workflows/DebugBuild.yml)
 
-
+[![ReleaseBuild](https://github.com/TonosakiRen/MyEngine/actions/workflows/ReleaseBuild.yml/badge.svg)](https://github.com/TonosakiRen/MyEngine/actions/workflows/ReleaseBuild.yml)
 
   
