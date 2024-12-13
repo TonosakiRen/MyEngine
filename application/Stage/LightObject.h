@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file LightObject.h
+ * @brief ライトを持ったオブジェクト
+ */
 #include <memory>
 #include <vector>
 #include "GameComponent/GameObject.h"

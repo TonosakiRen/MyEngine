@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file MeshletEnvironmentMapModel.h
+ * @brief Meshletでの環境マップPipeline
+ */
 #include <Windows.h>
 #include <memory>
 #include <d3d12.h>

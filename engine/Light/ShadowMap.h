@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file ShadowMap.h
+ * @brief ShadowMapのPipeline
+ */
 #include <Windows.h>
 #include <memory>
 

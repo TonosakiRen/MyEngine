@@ -1,5 +1,8 @@
 #pragma once
-
+/**
+ * @file DepthBuffer.h
+ * @brief 深度用Buffer
+ */
 #include "GPUResource/PixelBuffer.h"
 
 #include "Graphics/DescriptorHandle.h"

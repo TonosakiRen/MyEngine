@@ -1,3 +1,7 @@
+/**
+ * @file ColorBuffer.cpp
+ * @brief 一枚絵用Buffer
+ */
 #include "GPUResource/ColorBuffer.h"
 
 #include "Graphics/DirectXCommon.h"

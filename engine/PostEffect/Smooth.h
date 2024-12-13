@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file Smooth.h
+ * @brief SmoothのPipeline
+ */
 #include <Windows.h>
 #include <memory>
 #include <vector>

@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file RainDrop.h
+ * @brief 雨粒
+ */
 #include "MyMath.h"
 #include "GameComponent/Collider.h"
 #include "GameComponent/GameObject.h"
@@ -24,19 +28,18 @@ public:
 private:
 	PointLight* pointLight_ = nullptr;
 	ExplodeParticle* explodeParticle_ = nullptr;
-	//collider
+
+	const float speed_ = 0.4f;
+	const float boundNum_ = 0.6f;
+	const float radius_ = 6.0f;
+	const float intensity_ = 3.0f;
+
 	Collider collider_;
-	//速度
-	float speed_ = 0.4f;
-	// デスフラグ
 	bool isActive_ = false;
 	bool isDrop_ = false;
 	Vector3 velocity_;
 	Vector3 acceleration_;
-	float boundNum_ = 0.6f;
-	//色
 	Vector4 color_;
-	//
 	uint32_t dropFrame_ = anActiveFrame_;
 
 };

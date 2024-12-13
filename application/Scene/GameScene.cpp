@@ -1,3 +1,7 @@
+/**
+ * @file GameScene.cpp
+ * @brief Sceneを走らせているクラス
+ */
 #include "Scene/GameScene.h"
 #include <imgui.h>
 #include <cassert>
@@ -28,8 +32,8 @@ void GameScene::Initialize() {
 	dxCommon_ = DirectXCommon::GetInstance();
 	input_ = Input::GetInstance();
 
-	Vector3 initializeCameraPos = { 0.0f,3.2f,-11.0f };
-	Vector3 initializeCameraRotate = { 0.06f,0.0f,0.0f };
+	const Vector3 initializeCameraPos = { 0.0f,3.2f,-11.0f };
+	const Vector3 initializeCameraRotate = { 0.06f,0.0f,0.0f };
 
 	debugCamera_ = std::make_unique<DebugCamera>();
 	debugCamera_->Initialize(initializeCameraPos, initializeCameraRotate);

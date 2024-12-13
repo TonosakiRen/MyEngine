@@ -1,3 +1,7 @@
+/**
+ * @file ByteAddressBuffer.cpp
+ * @brief Byte単位でアクセスるバッファー
+ */
 #pragma once
 #include "GPUResource/CopyBuffer.h"
 #include "Graphics/DescriptorHandle.h"

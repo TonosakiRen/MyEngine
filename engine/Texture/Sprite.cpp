@@ -1,3 +1,7 @@
+/**
+ * @file Sprite.cpp
+ * @brief Sprite描画用Pipeline
+ */
 #include "Texture/Sprite.h"
 #include "Texture/TextureManager.h"
 #include <cassert>

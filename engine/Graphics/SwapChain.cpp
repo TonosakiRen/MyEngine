@@ -1,3 +1,7 @@
+/**
+ * @file SwapChain.cpp
+ * @brief SwapChain構造体
+ */
 #include "Graphics/SwapChain.h"
 
 #include "Graphics/Helper.h"

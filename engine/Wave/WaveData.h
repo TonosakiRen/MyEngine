@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file WaveData.h
+ * @brief 波を発生させるデータ
+ */
 #include <Windows.h>
 
 #include "GPUResource/StructuredBuffer.h"
@@ -18,16 +22,14 @@ public:
 	WaveData(uint32_t waveNum);
 	void Initialize();
 
-	const WaveData::Data* GetData() const{
-		return data_;
-	}
-
-	const DescriptorHandle& GetGPUHandle() const { return structuredBuffer_.GetSRV(); }
-	
 	void Copy(const void* srcData, size_t copySize) { structuredBuffer_.Copy(srcData, copySize); }
 	template<class T>
 	void Copy(const T& srcData) { structuredBuffer_.Copy(&srcData, sizeof(srcData)); }
 
+	const DescriptorHandle& GetGPUHandle() const { return structuredBuffer_.GetSRV(); }
+	const WaveData::Data* GetData() const{
+		return data_;
+	}
 private:
 	StructuredBuffer structuredBuffer_;
 	Data* data_ = nullptr;

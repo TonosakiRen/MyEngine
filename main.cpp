@@ -1,3 +1,7 @@
+/**
+ * @file main.cpp
+ * @brief main関数
+ */
 #include "Framework/MyGame.h"
 #include "Framework/Framework.h"
 

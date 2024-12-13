@@ -1,3 +1,7 @@
+/**
+ * @file GameObjectManager.cpp
+ * @brief 外観Objectの配置用(現在)
+ */
 #include <json.hpp>
 #include <iostream>
 #include <fstream>

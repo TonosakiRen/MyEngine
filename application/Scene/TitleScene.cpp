@@ -1,3 +1,7 @@
+/**
+ * @file TitleScene.cpp
+ * @brief タイトルのシーン
+ */
 #include "Scene/TitleScene.h"
 #include "Texture/TextureManager.h"
 #include "GameComponent/GameObject.h"
@@ -29,10 +33,15 @@ void TitleScene::Finalize()
 
 void TitleScene::Update()
 {
+	//SPACE A を押したらGamePlaySceneへ
 	if (input_->TriggerKey(DIK_SPACE) || input_->TriggerButton(XINPUT_GAMEPAD_A) || input_->TriggerKey(DIK_A)) {
 		BaseScene* scene = new GamePlayScene();
 		sceneManager_->SetNextScene(scene);
 	}
+
+	// titleを上下させる
+	const float moveY = 4.0f;
+	const float moveValue = 0.03f;
 	if (titleT_ >= 0.5f) {
 		isTitleUp_ = false;
 	}
@@ -41,12 +50,12 @@ void TitleScene::Update()
 	}
 
 	if (isTitleUp_) {
-		titleT_ += 0.03f;
+		titleT_ += moveValue;
 	}
 	else {
-		titleT_ -= 0.03f;
+		titleT_ -= moveValue;
 	}
-	title_->GetWorldTransform()->translation_.y = 4.0f + titleT_;
+	title_->GetWorldTransform()->translation_.y = moveY + titleT_;
 
 	title_->UpdateMatrix();
 }

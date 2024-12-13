@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file DebugCamera.h
+ * @brief デバッグ用カメラ
+ */
 #include <memory>
 
 #include "GameComponent/ViewProjection.h"

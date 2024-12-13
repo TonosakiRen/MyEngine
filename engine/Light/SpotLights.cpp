@@ -1,3 +1,7 @@
+/**
+ * @file SpotLights.cpp
+ * @brief SpotLightsのPipeline構造体
+ */
 #include "Light/SpotLights.h"
 #include "Graphics/DirectXCommon.h"
 

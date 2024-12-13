@@ -1,3 +1,7 @@
+/**
+ * @file SkinCluster.cpp
+ * @brief Skinningをするためのモジュール
+ */
 #include "Animation/SkinCluster.h"
 
 #include "Graphics/Helper.h"

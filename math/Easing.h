@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file Easing.h
+ * @brief Easingの関数まとめ
+ */
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include "Mymath.h"
@@ -75,77 +79,20 @@ public:
 	static float OutBounce(float x);
 	static float InOutBounce(float x);
 
-	/// <summary>
-	/// イージング
-	/// </summary>
-	/// <param name="t">t</param>
-	/// <param name="start">スタート</param>
-	/// <param name="end">終わり</param>
-	/// <param name="speed">tのスピード</param>
-	/// <param name="mode">イージングモード</param>
-	/// <param name="isAdd">tを加算するか</param>
-	/// <returns></returns>
+	//Easing
 	static float easing(float& t, float start, float end, float speed, EasingMode easingMode, bool isAdd = true);
-
-	/// <summary>
-	/// イージングで数がほしいとき
-	/// </summary>
-	/// <param name="t">t</param>
-	/// <param name="start">スタート</param>
-	/// <param name="end">終わり</param>
-	/// <returns></returns>
 	static float easing(float t, float start, float end);
-
-	/// <summary>
-	/// イージングで数がほしいとき
-	/// </summary>
-	/// <param name="t">t</param>
-	/// <param name="start">スタート</param>
-	/// <param name="end">終わり</param>
-	/// <returns></returns>
 	static Vector2 easing(float t, Vector2 start, Vector2 end);
-
-	/// <summary>
-	/// イージングで数がほしいとき
-	/// </summary>
-	/// <param name="t">t</param>
-	/// <param name="start">スタート</param>
-	/// <param name="end">終わり</param>
-	/// <returns></returns>
 	static Vector3 easing(float t, Vector3 start, Vector3 end);
-
-	/// <summary>
-	/// イージング
-	/// </summary>
-	/// <param name="t">t</param>
-	/// <param name="start">スタート</param>
-	/// <param name="end">終わり</param>
-	/// <param name="speed">tのスピード</param>
-	/// <param name="mode">イージングモード</param>
-	/// <param name="isAdd">tを加算するか</param>
-	/// <returns></returns>
 	static Vector2 easing(float& t, Vector2 start, Vector2 end, float speed, EasingMode easingMode, bool isAdd = true);
-
-	/// <summary>
-	/// イージング
-	/// </summary>
-	/// <param name="t">t</param>
-	/// <param name="start">スタート</param>
-	/// <param name="end">終わり</param>
-	/// <param name="speed">tのスピード</param>
-	/// <param name="mode">イージングモード</param>
-	/// <param name="isAdd">tを加算するか</param>
-	/// <returns></returns>
 	static Vector3 easing(float& t, Vector3 start, Vector3 end, float speed, EasingMode easingMode, bool isAdd = true);
 
+	//Bezier
 	static Vector2 Bezier(const Vector2& p0, const Vector2& p1, const Vector2& p2, float& t, float speed, EasingMode easingMode, bool isAdd = true);
-
 	static Vector2 Bezier(const Vector2& p0, const Vector2& p1, const Vector2& p2, const Vector2& p3, float& t, float speed, EasingMode easingMode, bool isAdd = true);
-
 	static Vector3 Bezier(
 		const Vector3& p0, const Vector3& p1, const Vector3& p2, float& t, float speed,
 		EasingMode easingMode, bool isAdd = true);
-
 	static Vector3 Bezier(
 		const Vector3& p0, const Vector3& p1, const Vector3& p2, const Vector3& p3, float& t,
 		float speed, EasingMode easingMode, bool isAdd = true);

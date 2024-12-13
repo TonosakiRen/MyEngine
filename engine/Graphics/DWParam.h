@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file DWParam.h
+ * @brief FLOAT,UINT,INT に対応した変数
+ */
 #include <d3d12.h>
 #include <wrl/client.h>
 

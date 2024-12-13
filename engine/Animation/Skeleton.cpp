@@ -1,6 +1,6 @@
 /**
- * @file 
- * @brief 
+ * @file Skeleton.cpp
+ * @brief Skeleton構造体
  */
 #include "Animation/Skeleton.h"
 

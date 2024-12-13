@@ -1,3 +1,7 @@
+/**
+ * @file Voronoi.cpp
+ * @brief ボロノイテクスチャ用Pipeline
+ */
 #include "Sky/Voronoi.h"
 #include "Light/ShaderManager.h"
 #include "Graphics/CommandContext.h"

@@ -1,3 +1,7 @@
+/**
+ * @file GameObject.cpp
+ * @brief 描画されるGameObject
+ */
 #include "GameComponent/GameObject.h"
 
 #include "Model/ModelManager.h"

@@ -1,3 +1,7 @@
+/**
+ * @file ShadowSpotLights.cpp
+ * @brief ShadowSpotLights構造体
+ */
 #include "Light/ShadowSpotLights.h"
 #include "Graphics/DirectXCommon.h"
 void ShadowSpotLights::Initialize() {

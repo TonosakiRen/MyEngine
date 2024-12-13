@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file GameScene.h
+ * @brief Sceneを走らせているクラス
+ */
 #include "Graphics/DirectXCommon.h"
 #include "Model/Model.h"
 #include "Sky/Sky.h"

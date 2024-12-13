@@ -1,8 +1,13 @@
+/**
+ * @file SphereLights.cpp
+ * @brief sphereLight
+ */
 #include "Particle/SphereLights.h"
 #include "ImGuiManager.h"
 #include "Light/LightManager.h"
 #include "Draw/DrawManager.h"
 #include "Model/ModelManager.h"
+#include "Stage/Floor.h"
 #include <string>
 
 
@@ -17,6 +22,7 @@ void SphereLights::Initialize()
 	material_->enableLighting_ = false;
 	material_->Update();
 
+	//pointlightの割り当て初期化
 	for (int j = 0; j < kSphereNum; j++) {
 		for (int i = 0; i < PointLights::lightNum; i++) {
 			if (pointLights_->lights_[i].isActive == false) {
@@ -25,16 +31,16 @@ void SphereLights::Initialize()
 				spheres_[j].isActive_ = true;
 				spheres_[j].pointLightIndex_ = i;
 				spheres_[j].worldTransform_.scale_ = { 1.0f,1.0f,1.0f };
-				spheres_[j].worldTransform_.translation_ = { Rand(-20.0f, 20.0f),1.0f,Rand(-20.0f, 20.0f) };
+				spheres_[j].worldTransform_.translation_ = { Rand(-Floor::kFloorHalfSize, Floor::kFloorHalfSize),1.0f,Rand(-Floor::kFloorHalfSize, Floor::kFloorHalfSize) };
 				spheres_[j].worldTransform_.Update();
 				spheres_[j].color_ = color;
-				spheres_[j].intensity = 3.0f;
+				spheres_[j].intensity = intensity_;
 				pointLights_->lights_[i].isActive = true;
 				pointLights_->lights_[i].worldTransform.translation_ = { 0.0f,0.0f,0.0f };
 				pointLights_->lights_[i].worldTransform.SetParent(&spheres_[j].worldTransform_,false);
 				pointLights_->lights_[i].decay = 1.0f;
-				pointLights_->lights_[i].intensity = 3.0f;
-				pointLights_->lights_[i].radius = 6.0f;
+				pointLights_->lights_[i].intensity = intensity_;
+				pointLights_->lights_[i].radius = radius_;
 				pointLights_->lights_[i].color = color;
 				break;
 			}
@@ -44,6 +50,7 @@ void SphereLights::Initialize()
 
 void SphereLights::Emit(const Vector3& position,const Vector4& color)
 {
+	//出現
 	for (int j = 0; j < kSphereNum; j++) {
 		if (spheres_[j].isActive_ == false) {
 			for (int i = 0; i < PointLights::lightNum; i++) {
@@ -55,13 +62,13 @@ void SphereLights::Emit(const Vector3& position,const Vector4& color)
 					spheres_[j].worldTransform_.translation_ = position;
 					spheres_[j].worldTransform_.Update();
 					spheres_[j].color_ = color;
-					spheres_[j].intensity = 3.0f;
+					spheres_[j].intensity = intensity_;
 					pointLights_->lights_[i].isActive = true;
 					pointLights_->lights_[i].worldTransform.translation_ = { 0.0f,0.0f,0.0f };
 					pointLights_->lights_[i].worldTransform.SetParent(&spheres_[j].worldTransform_, false);
 					pointLights_->lights_[i].decay = 1.0f;
-					pointLights_->lights_[i].intensity = 3.0f;
-					pointLights_->lights_[i].radius = 6.0f;
+					pointLights_->lights_[i].intensity = intensity_;
+					pointLights_->lights_[i].radius = radius_;
 					pointLights_->lights_[i].color = color;
 					break;
 				}

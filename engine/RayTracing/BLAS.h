@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file BLAS.h
+ * @brief BLAS構造体
+ */
 #include "GPUResource/GPUResource.h"
 #include "GPUResource/CopyBuffer.h"
 #include "Graphics/CommandContext.h"

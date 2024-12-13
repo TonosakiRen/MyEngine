@@ -1,3 +1,7 @@
+/**
+ * @file PointLights.cpp
+ * @brief PointLights構造体
+ */
 #include "Light/PointLights.h"
 #include "Graphics/DirectXCommon.h"
 

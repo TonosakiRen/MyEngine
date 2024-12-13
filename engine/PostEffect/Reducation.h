@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file Reducation.h
+ * @brief 画像をタイリングして増やす
+ */
 #include <Windows.h>
 #include <memory>
 #include <vector>

@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file Player.h
+ * @brief player
+ */
 #include <memory>
 #include "GameComponent/GameObject.h"
 #include "Input.h"
@@ -75,6 +79,8 @@ public:
 public:
     Collider collider_;
 private:
+    const float growSpeed = 0.01f;
+
     Input* input_;
     PointLight* pointLight_ = nullptr;
     PlayerBulletManager* playerBulletManager_;
@@ -96,6 +102,5 @@ private:
     bool isGrowSphere_ = false;
     Collider lightCollider_;
     float lightSphereT_ = 0.0f;
-    float growSpeed = 0.01f;
 
 };

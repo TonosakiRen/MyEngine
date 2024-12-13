@@ -44,7 +44,7 @@ struct Animation {
 	std::map<std::string, NodeAnimation> nodeAnimations;
 };
 
-
+//keyFrameから時間で数値を算出
 inline Vector3 CalculateValue(const std::vector<KeyframeVector3>& keyframes, float time) {
 	assert(!keyframes.empty());
 	if (keyframes.size() == 1 || time <= keyframes[0].time) {
@@ -62,6 +62,7 @@ inline Vector3 CalculateValue(const std::vector<KeyframeVector3>& keyframes, flo
 	return (*keyframes.rbegin()).value;
 }
 
+//keyFrameから時間で数値を算出
 inline Quaternion CalculateValue(const std::vector<KeyframeQuaternion>& keyframes, float time) {
 	assert(!keyframes.empty());
 	if (keyframes.size() == 1 || time <= keyframes[0].time) {
@@ -82,6 +83,7 @@ inline Quaternion CalculateValue(const std::vector<KeyframeQuaternion>& keyframe
 class AnimationManager
 {
 public:
+	//Animationの数
 	static const size_t kNumAnimations = 256;
 
 	struct AnimationData {
@@ -89,12 +91,15 @@ public:
 		Animation animation;
 	};
 
+	//Animationのロード
 	static const Animation& Load(const std::string& fileName, const std::string& animationName);
 
 	static AnimationManager* GetInstance();
 
+	//Animationの適用
 	static void ApplyAnimation(Skeleton& skeleton, Animation& animation, float animationTime);
 
+	//Animationのラープ
 	static void LerpSkeleton(float t, Skeleton& skeleton, const Animation& fromAnimation, float fromAnimationTime, const Animation& toAnimation, float toAnimationTime);
 
 	void Finalize();

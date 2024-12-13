@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file PixelBuffer.h
+ * @brief Pixel用Buffer
+ */
 #include "GPUResource/GPUResource.h"
 
 #include <cstdint>

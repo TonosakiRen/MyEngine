@@ -1,3 +1,7 @@
+/**
+ * @file AreaLights.cpp
+ * @brief AreaLights構造体
+ */
 #include "Light/AreaLights.h"
 #include "Graphics/DirectXCommon.h"
 

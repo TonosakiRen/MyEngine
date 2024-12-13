@@ -1,3 +1,7 @@
+/**
+ * @file Smooth.cpp
+ * @brief SmoothのPipeline
+ */
 #include "PostEffect/Smooth.h"
 #include <DirectXTex.h>
 #include <d3dcompiler.h>

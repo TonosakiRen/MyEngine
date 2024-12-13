@@ -71,7 +71,7 @@ bool Input::ReleaseKey(BYTE keyNumber) {
 	return false;
 }
 
-Vector2 Input::GetMouseMove() {
+Vector2 Input::GetMousePosition() {
 	return { static_cast<float>(mouseState_.state.lX) ,static_cast<float>(mouseState_.state.lY) };
 }
 

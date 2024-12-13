@@ -1,3 +1,7 @@
+/**
+ * @file PlayerBulletManager.cpp
+ * @brief プレイヤーの弾管理
+ */
 #include "Player/PlayerBulletManager.h"
 #include "Model/ModelManager.h"
 
@@ -20,7 +24,7 @@ void PlayerBulletManager::Update()
 	playerBullets_.remove_if([&](std::unique_ptr<PlayerBullet>& playerBullet) {
 		if (playerBullet->IsDead()) {
 			if (playerBullet->GetWorldTransform()->translation_.y >= 0.0f) {
-				//explodeParticle_->SetIsEmit(true, MakeTranslation(playerBullet->GetWorldTransform()->matWorld_));
+				
 			}
 			return true;
 		}

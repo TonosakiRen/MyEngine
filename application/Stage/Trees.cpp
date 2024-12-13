@@ -1,3 +1,7 @@
+/**
+ * @file Trees.cpp
+ * @brief 木々
+ */
 #include "Stage/Trees.h"
 #include "Draw/DrawManager.h"
 #include "GameComponent/Loader.h"
@@ -10,6 +14,7 @@ void Trees::Initialize()
 	const float offset = Floor::kFloorHalfSize + 3.0f;
 	const float space = Floor::kFloorSize / (kTreeNum_ / 4.0f);
 
+	//木をステージの外側に均等に配置
 	for (int i = 0; i < kTreeNum_;i++) {
 		trees_[i].Initialize();
 		int quot = i / 4;

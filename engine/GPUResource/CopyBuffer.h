@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file CopyBuffer.h
+ * @brief コピー用buffer
+ */
 #include "GPUResource/GPUResource.h"
 
 class CopyBuffer : public GPUResource {

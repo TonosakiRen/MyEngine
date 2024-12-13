@@ -1,3 +1,7 @@
+/**
+ * @file PlayerModel.cpp
+ * @brief PlayerのModel
+ */
 #include "Player/PlayerModel.h"
 #include "ImGuiManager.h"
 #include "Player/PlayerBulletManager.h"
@@ -20,10 +24,9 @@ void PlayerModel::Initialize(WorldTransform& worldTransform)
 	uint32_t modelHandle = modelManager_->Load("walk.gltf");
 	modelHandle_ = modelHandle;
 	skeleton_.Create(modelManager_->GetRootNode(modelHandle));
-
 	skinCluster_.Create(skeleton_, modelHandle);
 	
-
+	//部位のWordTrasnform初期化
 	for (int i = 0;  JointWorldTransform & joint : jointWordTransforms_) {
 		joint.worldTransform.Initialize();
 		joint.worldTransform.SetParent(&worldTransform);
@@ -139,6 +142,8 @@ void PlayerModel::Draw() {
 
 void PlayerModel::AnimationUpdate()
 {
+
+	//Animation遷移
 	if (currentMoving_ != nextMoving_) {
 		animationTime_[nextMoving_] += 1.0f / 60.0f;
 		animationTime_[nextMoving_] = std::fmod(animationTime_[nextMoving_], animation_[nextMoving_].duration);

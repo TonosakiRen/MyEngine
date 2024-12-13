@@ -1,3 +1,7 @@
+/**
+ * @file Collider.cpp
+ * @brief 当たり判定を行う
+ */
 #include "GameComponent/Collider.h"
 
 #include "ImGuiManager.h"

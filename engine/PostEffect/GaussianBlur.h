@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file GaussianBlur.h
+ * @brief GaussianBlurのPipeline
+ */
 #include <stdint.h>
 #include "GPUResource/ColorBuffer.h"
 #include "GPUResource/UploadBuffer.h"
@@ -26,6 +30,7 @@ public:
 
 	void Initialize(ColorBuffer* originalTexture);
 	void Render(CommandContext& commandContext);
+	//ぼかし度合い更新
 	void UpdateWeightTable(float blurPower);
 
 	ColorBuffer& GetResult() { return verticalBlurTexture_; }

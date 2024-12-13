@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file WaveModel.h
+ * @brief 波が発生するモデル描画
+ */
 #include <Windows.h>
 #include <memory>
 #include <d3d12.h>

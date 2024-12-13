@@ -1,3 +1,7 @@
+/**
+ * @file Helper.cpp
+ * @brief 便利関数
+ */
 #include "Graphics/Helper.h"
 
 #include <format>

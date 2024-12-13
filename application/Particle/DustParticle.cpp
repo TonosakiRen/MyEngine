@@ -1,3 +1,7 @@
+/**
+ * @file DustParticle.h
+ * @brief 足元のパーティクル
+ */
 #include "Particle/DustParticle.h"
 #include "Draw/DrawManager.h"
 #include "ImGuiManager.h"
@@ -21,6 +25,7 @@ void DustParticle::Update() {
 
 	emitterWorldTransform_.Update();
 
+	//出現
 	if (isEmit_) {
 		for (size_t i = 0; i < EmitNum_; i++) {
 			for (size_t j = 0; j < kParticleNum; j++) {
@@ -41,6 +46,7 @@ void DustParticle::Update() {
 		}
 	}
 
+	//更新
 	for (size_t i = 0; i < kParticleNum; i++) {
 		float rotationSpeed = Radian(1.0f) * (float(i % 2) * 2.0f - 1.0f);
 		if (particles[i].isActive_ == true) {

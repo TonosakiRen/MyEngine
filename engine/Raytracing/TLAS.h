@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file TLAS.h
+ * @brief TLASの構造体
+ */
 #include "GPUResource/GPUResource.h"
 #include "GPUResource/UploadBuffer.h"
 #include "Graphics/CommandContext.h"

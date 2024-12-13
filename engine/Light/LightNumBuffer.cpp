@@ -1,3 +1,7 @@
+/**
+ * @file LightNumBuffer.h
+ * @brief Lightの数を管理
+ */
 #include "Light/LightNumBuffer.h"
 #include "Light/DirectionalLights.h"
 #include "Light/PointLights.h"

@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file Cellular.h
+ * @brief CellularノイズのPipeline
+ */
 #include <stdint.h>
 #include "GPUResource/ColorBuffer.h"
 #include "GPUResource/CubeColorBuffer.h"

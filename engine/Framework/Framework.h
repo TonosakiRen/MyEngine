@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file Framework.h
+ * @brief Frameworkを行う
+ */
 #include <memory>
 
 class WinApp;
@@ -12,6 +16,7 @@ public:
 	static uint32_t kFrame;
 	static uint32_t kFrameRemainder;
 
+	//Frameworkを走らせる
 	void Run();
 
 	virtual void Initialize();

@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file Sky.h
+ * @brief 空描画のPipeline
+ */
 #include <Windows.h>
 #include <memory>
 #include <d3d12.h>

@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file LightNumBuffer.h
+ * @brief Lightの数を管理
+ */
 #include "GPUResource/UploadBuffer.h"
 #include <stdint.h>
 class LightNumBuffer

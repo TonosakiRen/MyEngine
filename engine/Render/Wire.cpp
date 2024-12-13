@@ -1,3 +1,7 @@
+/**
+ * @file Wire.cpp
+ * @brief WireFrame描画を行うPipeline
+ */
 #include "Render/Wire.h"
 #include "Texture/TextureManager.h"
 #include "Model/ModelManager.h"

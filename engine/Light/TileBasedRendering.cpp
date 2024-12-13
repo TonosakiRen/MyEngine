@@ -1,3 +1,7 @@
+/**
+ * @file TileBasedRendering.h
+ * @brief TBR用Pipeline
+ */
 #include "Light/TileBasedRendering.h"
 #include "Graphics/WinApp.h"
 #include "Graphics/DirectXCommon.h"
@@ -39,7 +43,7 @@ void TileBasedRendering::Initialize()
 
 }
 
-void TileBasedRendering::ComputeUpdate(CommandContext& commandContext, const ViewProjection& viewProjection)
+void TileBasedRendering::Dispatch(CommandContext& commandContext, const ViewProjection& viewProjection)
 {
     //初期化
     if (viewProjection_ != &viewProjection) {

@@ -1,3 +1,7 @@
+/**
+ * @file DeferredRenderer.cpp
+ * @brief DeferredRendering用Pipeline
+ */
 #include "Light/DeferredRenderer.h"
 #include <Windows.h>
 #include "Graphics/DirectXCommon.h"

@@ -1,3 +1,7 @@
+/**
+ * @file DrawManager.cpp
+ * @brief DrawCallをまとめる
+ */
 #include "Draw/DrawManager.h"
 
 #include <DirectXTex.h>
@@ -105,12 +109,12 @@ void DrawManager::AllDraw(PipelineType pipelineType,const ViewProjection& viewPr
 		call();
 	}
 
-	meshletModelPipeline_->PreDraw(pipelineType, *commandContext_, viewProjection, *calling_->currentViewProjection, tileBasedRendering);
+	meshletModelPipeline_->PreDraw(pipelineType, *commandContext_, viewProjection, *calling_->currentViewProjection_, tileBasedRendering);
 	for (auto& call : calls[kMeshletModel]) {
 		call();
 	}
 
-	meshletEnvironmentMapPipeline_->PreDraw(pipelineType, *commandContext_, viewProjection, *calling_->currentViewProjection, tileBasedRendering);
+	meshletEnvironmentMapPipeline_->PreDraw(pipelineType, *commandContext_, viewProjection, *calling_->currentViewProjection_, tileBasedRendering);
 	for (auto& call : calls[kMeshletEnvironmentMap]) {
 		call();
 	}
@@ -125,7 +129,7 @@ void DrawManager::AllDraw(PipelineType pipelineType,const ViewProjection& viewPr
 		call();
 	}
 
-	waveModelPipeline_->PreDraw(pipelineType, *commandContext_, viewProjection, *calling_->currentViewProjection, tileBasedRendering);
+	waveModelPipeline_->PreDraw(pipelineType, *commandContext_, viewProjection, *calling_->currentViewProjection_, tileBasedRendering);
 	for (auto& call : calls[kWave]) {
 		call();
 	}
@@ -142,7 +146,7 @@ void DrawManager::AllDraw(PipelineType pipelineType,const ViewProjection& viewPr
 		call();
 	}
 
-	floorPipeline_->PreDraw(pipelineType ,*commandContext_, viewProjection, *calling_->currentViewProjection, tileBasedRendering, *lissajousCurve_.get());
+	floorPipeline_->PreDraw(pipelineType ,*commandContext_, viewProjection, *calling_->currentViewProjection_, tileBasedRendering, *lissajousCurve_.get());
 	for (auto& call : calls[kFloor]) {
 		call();
 	}
@@ -186,7 +190,7 @@ void DrawManager::ResetCalls()
 void DrawManager::DrawModel(const WorldTransform& worldTransform, const uint32_t modelHandle,const uint32_t textureHandle, const Material& material)
 {
 	drawCallNum_++;
-	if (calling_->isDraw(modelHandle,worldTransform)) {
+	if (calling_->IsDraw(modelHandle,worldTransform)) {
 		for (Mesh& mesh : modelManager_->GetModelData(modelHandle).meshes) {
 			raytracing_->AddInstanceDesc(mesh.blasBuffer_, worldTransform);
 		}
@@ -197,7 +201,7 @@ void DrawManager::DrawModel(const WorldTransform& worldTransform, const uint32_t
 void DrawManager::DrawModel(const WorldTransform& worldTransform, const uint32_t modelHandle, SkinCluster& skinCluster, const uint32_t textureHandle, const Material& material)
 {
 	drawCallNum_++;
-	if (calling_->isDraw(modelHandle, worldTransform)) {
+	if (calling_->IsDraw(modelHandle, worldTransform)) {
 		calls[kSkinning].push_back([&, modelHandle]() {skinningPipeline_->Dispatch(*commandContext_,modelHandle,skinCluster); });
 		calls[kModel].push_back([&, modelHandle, textureHandle]() {modelPipeline_->Draw(*commandContext_, modelHandle, worldTransform, skinCluster, material, textureHandle); });
 	}
@@ -206,7 +210,7 @@ void DrawManager::DrawModel(const WorldTransform& worldTransform, const uint32_t
 void DrawManager::DrawMeshletModel(const WorldTransform& worldTransform, const uint32_t modelHandle, const uint32_t textureHandle, const Material& material)
 {
 	drawCallNum_++;
-	if (calling_->isDraw(modelHandle, worldTransform)) {
+	if (calling_->IsDraw(modelHandle, worldTransform)) {
 		for (Mesh& mesh : modelManager_->GetModelData(modelHandle).meshes) {
 			raytracing_->AddInstanceDesc(mesh.blasBuffer_, worldTransform);
 		}
@@ -219,7 +223,7 @@ void DrawManager::DrawMeshletModel(const WorldTransform& worldTransform, const u
 void DrawManager::DrawMeshletModel(const WorldTransform& worldTransform, const uint32_t modelHandle, SkinCluster& skinCluster, const uint32_t textureHandle, const Material& material)
 {
 	drawCallNum_++;
-	if (calling_->isDraw(modelHandle, worldTransform)) {
+	if (calling_->IsDraw(modelHandle, worldTransform)) {
 		calls[kSkinning].push_back([&, modelHandle]() {skinningPipeline_->Dispatch(*commandContext_, modelHandle, skinCluster); });
 		calls[kMeshletModel].push_back([&, modelHandle, textureHandle]() {meshletModelPipeline_->Draw(*commandContext_, modelHandle, worldTransform, skinCluster, material, textureHandle); });
 	}
@@ -228,7 +232,7 @@ void DrawManager::DrawMeshletModel(const WorldTransform& worldTransform, const u
 void DrawManager::DrawEnvironmentMapMeshletModel(const WorldTransform& worldTransform, const uint32_t modelHandle, const uint32_t textureHandle, const Material& material)
 {
 	drawCallNum_++;
-	if (calling_->isDraw(modelHandle, worldTransform)) {
+	if (calling_->IsDraw(modelHandle, worldTransform)) {
 		for (Mesh& mesh : modelManager_->GetModelData(modelHandle).meshes) {
 			raytracing_->AddInstanceDesc(mesh.blasBuffer_, worldTransform);
 		}
@@ -239,7 +243,7 @@ void DrawManager::DrawEnvironmentMapMeshletModel(const WorldTransform& worldTran
 void DrawManager::DrawEnvironmentMapMeshletModel(const WorldTransform& worldTransform, const uint32_t modelHandle, SkinCluster& skinCluster, const uint32_t textureHandle, const Material& material)
 {
 	drawCallNum_++;
-	if (calling_->isDraw(modelHandle, worldTransform)) {
+	if (calling_->IsDraw(modelHandle, worldTransform)) {
 		calls[kSkinning].push_back([&, modelHandle]() {skinningPipeline_->Dispatch(*commandContext_, modelHandle, skinCluster); });
 		calls[kMeshletEnvironmentMap].push_back([&, modelHandle, textureHandle]() {meshletEnvironmentMapPipeline_->Draw(*commandContext_, modelHandle, worldTransform, skinCluster, material); });
 	}
@@ -301,7 +305,7 @@ void DrawManager::DrawSky(const WorldTransform& worldTransform)
 void DrawManager::DrawWaveModel(const WorldTransform& worldTransform, const WaveData& waveData, const WaveIndexData& waveIndexData, const uint32_t modelHandle, const uint32_t textureHandle, const Material& material)
 {
 	drawCallNum_++;
-	if (calling_->isDraw(modelHandle, worldTransform)) {
+	if (calling_->IsDraw(modelHandle, worldTransform)) {
 		for (Mesh& mesh : modelManager_->GetModelData(modelHandle).meshes) {
 			raytracing_->AddInstanceDesc(mesh.blasBuffer_, worldTransform);
 		}
@@ -312,7 +316,7 @@ void DrawManager::DrawWaveModel(const WorldTransform& worldTransform, const Wave
 void DrawManager::DrawWaveModel(const WorldTransform& worldTransform, const WaveData& waveData, const WaveIndexData& waveIndexData, const uint32_t modelHandle, SkinCluster& skinCluster, const uint32_t textureHandle, const Material& material)
 {
 	drawCallNum_++;
-	if (calling_->isDraw(modelHandle, worldTransform)) {
+	if (calling_->IsDraw(modelHandle, worldTransform)) {
 		calls[kSkinning].push_back([&, modelHandle]() {skinningPipeline_->Dispatch(*commandContext_, modelHandle, skinCluster); });
 		calls[kWave].push_back([&, modelHandle, textureHandle]() {waveModelPipeline_->Draw(*commandContext_, modelHandle, worldTransform, waveData, waveIndexData,skinCluster, material, textureHandle); });
 	}

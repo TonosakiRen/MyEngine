@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file Calling.h
+ * @brief カリングを行うClass
+ */
 #include <vector>
 #include <memory>
 #include <functional>
@@ -24,31 +28,24 @@ public:
         parameterNum
     };
 
+    //カリングのための情報
     struct CallingInformation {
         Matrix4x4 matWorld;
         Sphere sphere;
     };
 
-    struct ArgumentBuffer {
-        D3D12_DRAW_INDEXED_ARGUMENTS arguments;
-        D3D12_VERTEX_BUFFER_VIEW vertexBufferView;
-        D3D12_INDEX_BUFFER_VIEW indexBufferView;
-        WorldTransform::ConstBufferData worldTransform;
-        Material::ConstBufferData material;
-        
-    };
-
 	void Initialize();
 	void SetViewProjection(const ViewProjection* viewProjection) {
-		currentViewProjection = viewProjection;
+		currentViewProjection_ = viewProjection;
 	}
-	bool isDraw(const uint32_t modelHandle,const WorldTransform& worldTransform);
+    //カリングの
+	bool IsDraw(const uint32_t modelHandle,const WorldTransform& worldTransform);
 	uint32_t GetTileIndex();
 	bool IsFrustumSphereCollision(const Frustum& frustum,const Sphere& sphere);
 
     
-	ModelManager* modelManager = nullptr;
-	const ViewProjection* currentViewProjection = nullptr;
+	ModelManager* modelManager_ = nullptr;
+	const ViewProjection* currentViewProjection_ = nullptr;
 private:
 };
 

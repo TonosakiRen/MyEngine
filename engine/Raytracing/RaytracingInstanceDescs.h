@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file RaytracingInstanceDescs.h
+ * @brief RaytracingInstanceDescsの構造体
+ */
 #include "GPUResource/GPUResource.h"
 #include "GPUResource/UploadBuffer.h"
 #include "Graphics/CommandContext.h"

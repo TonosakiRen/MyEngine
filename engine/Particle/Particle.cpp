@@ -1,3 +1,7 @@
+/**
+ * @file Particle.cpp
+ * @brief ParticleのPipeline
+ */
 #include "Particle/Particle.h"
 #include "Light/ShaderManager.h"
 #include "Texture/TextureManager.h"

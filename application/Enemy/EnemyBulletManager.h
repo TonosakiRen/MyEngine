@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file EnemyBulletManager.h
+ * @brief 敵弾の管理
+ */
 #include <list>
 #include <memory>
 #include "Mymath.h"

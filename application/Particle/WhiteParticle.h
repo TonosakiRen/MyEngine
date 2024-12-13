@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file WhiteParticle.h
+ * @brief whiteParticle
+ */
 #include <memory>
 #include "Particle/ParticleData.h"
 #include "GameComponent/WorldTransform.h"
@@ -18,26 +22,20 @@ public:
 	void SetIsEmit(bool isEmit) {
 		isEmit_ = isEmit;
 	}
-	void SetSpeed(float speed) {
-		speed_ = speed;
-	}
-	void SetScaleSpeed(float scaleSpeed) {
-		scaleSpeed_ = scaleSpeed;
-	}
 	struct DeadLineParticle {
 		WorldTransform worldTransform;
 		Vector3 direction;
 		Vector3 velocity;
 		bool isActive;
 	};
-public:
+private:
+	const int EmitNum_ = 1;
+	const float speed_ = 0.05f;
+	const float scaleSpeed_ = 0.03f;
+
 	WorldTransform emitterWorldTransform_;
 	OBB emitBox_;
 	DeadLineParticle particles[kParticleNum];
-	int EmitNum_ = 1;
-private:
-	float speed_ = 0.05f;
-	float scaleSpeed_ = 0.03f;
 	bool isEmit_ = false;
 	std::unique_ptr<ParticleData> particleData_;
 	Vector3 minDirection_;

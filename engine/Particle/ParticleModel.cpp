@@ -1,3 +1,7 @@
+/**
+ * @file ParticleModel.cpp
+ * @brief ModelのParticleのPipeline
+ */
 #include "Particle/ParticleModel.h"
 #include "Light/ShaderManager.h"
 #include "Graphics/DirectXCommon.h"

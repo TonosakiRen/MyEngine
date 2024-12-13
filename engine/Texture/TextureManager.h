@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file TextureManager.h
+ * @brief Textureリソースを管理する
+ */
 
 #include <array>
 #include "Graphics/CommandContext.h"
@@ -22,20 +26,19 @@ public:
 		std::string name;
 	};
 
-	static uint32_t Load(const std::string& fileName);
-
-	static uint32_t LoadUv(const std::string& fileName, const std::string& filePass);
-
 	static TextureManager* GetInstance();
+	//読み込み
+	static uint32_t Load(const std::string& fileName);
+	static uint32_t LoadUv(const std::string& fileName, const std::string& filePass);
 
 	void Initialize(CommandContext& commandContext ,std::string directoryPath = "Resources/textures/");
 	void Finalize();
 
-	const D3D12_RESOURCE_DESC GetResoureDesc(const uint32_t textureHandle);
 
+	//DescriptorTableをセット
 	void SetDescriptorTable(CommandContext& commandList, const  UINT rootParamIndex, const  uint32_t textureHandle);
-
 	DescriptorHandle GetSRV(const std::string& fileName);
+	const D3D12_RESOURCE_DESC GetResoureDesc(const uint32_t textureHandle);
 
 private:
 	CommandContext* commandContext_ = nullptr;

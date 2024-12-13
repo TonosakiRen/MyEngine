@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file CommandSignature.h
+ * @brief ComputeShader用Signature
+ */
 
 #include <d3d12.h>
 #include <wrl/client.h>

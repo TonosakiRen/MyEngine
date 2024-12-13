@@ -1,3 +1,7 @@
+/**
+ * @file CommandQueue.cpp
+ * @brief CommandQueueをラップ
+ */
 #include "Graphics/CommandQueue.h"
 
 #include <Windows.h>

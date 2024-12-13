@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file MyMath.h
+ * @brief 数学構造体定義や演算子のオーバーロード
+ */
 #define _USE_MATH_DEFINES
 #include <cmath>
 #include <assert.h>

@@ -1,3 +1,7 @@
+/**
+ * @file SpriteData.cpp
+ * @brief Sprite描画用のデータ
+ */
 #include "Texture/SpriteData.h"
 #include "Texture/TextureManager.h"
 #include <cassert>

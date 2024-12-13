@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file SceneManager.h
+ * @brief Sceneの管理
+ */
 class BaseScene;
 class SceneManager
 {

@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file UploadBuffer.h
+ * @brief UploadHeap用Buffer
+ */
 #include "GPUResource/GPUResource.h"
 #include "Graphics/Helper.h"
 #include "Framework/Framework.h"

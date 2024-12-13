@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file Mushroom.h
+ * @brief キノコ
+ */
 #include <memory>
 #include <vector>
 #include "GameComponent/GameObject.h"
@@ -14,10 +18,11 @@ public:
     void Update();
     void SetColor(const Vector4& color);
 private:
+    const Vector4 initColor = { 0.2f,0.2f,1.0f,1.0f };
+
+    float intensityTSpeed_ = 0.01f;
     float colorT_ = 1.0f;
     bool isChangeColor_ = false;
     Vector4 color_ = { 0.2f,0.2f,1.0f,1.0f };
-    Vector4 initColor = { 0.2f,0.2f,1.0f,1.0f };
     float intensityT_ = 0.3f;
-    float intensityTSpeed_ = 0.01f;
 };

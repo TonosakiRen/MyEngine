@@ -1,3 +1,7 @@
+/**
+ * @file LightManager.cpp
+ * @brief LightをまとめているClass
+ */
 #include "Light/LightManager.h"
 #include "Graphics/DirectXCommon.h"
 

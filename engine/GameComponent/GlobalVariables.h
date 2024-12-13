@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file GlobalVariables.h
+ * @brief 調整する変数読み込み掃き出し
+ */
 #include <variant>
 #include <map>
 #include <string>

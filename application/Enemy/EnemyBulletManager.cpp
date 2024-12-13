@@ -1,3 +1,7 @@
+/**
+ * @file EnemyBulletManager.cpp
+ * @brief 敵弾の管理
+ */
 #include "Enemy/EnemyBulletManager.h"
 #include "Model/ModelManager.h"
 

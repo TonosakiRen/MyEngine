@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file WinApp.h
+ * @brief WindowsAPIラップ
+ */
 #include <Windows.h>
 #include <cstdint>
 
@@ -17,7 +21,9 @@ public:
 	static WinApp* GetInstance();
 	static LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 	void CreateGameWindow(const char* title = "DirextXGame");
+	//Messageを受け付け
 	bool ProcessMessage();
+	// ウィンドウクラスを登録解除
 	void TerminateGameWindow();
 	
 	HWND GetHwnd() const { return hwnd_; }

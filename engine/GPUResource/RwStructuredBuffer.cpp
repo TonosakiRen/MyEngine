@@ -1,3 +1,7 @@
+/**
+ * @file RwStructuredBuffer.cpp
+ * @brief read,write用StructuredBuffer
+ */
 #include "GPUResource/RwStructuredBuffer.h"
 
 #include <cassert>

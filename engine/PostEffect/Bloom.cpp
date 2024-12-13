@@ -1,3 +1,7 @@
+/**
+ * @file Bloom.h
+ * @brief BloomのPipeline
+ */
 #include "PostEffect/Bloom.h"
 
 #include "Light/ShaderManager.h"

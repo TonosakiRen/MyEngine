@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file Floor.h
+ * @brief 床
+ */
 #include "GameComponent/GameObject.h"
 #include "Wave/WaveIndexData.h"
 #include "WavePoints/WavePoints.h"

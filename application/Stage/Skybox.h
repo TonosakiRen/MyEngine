@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file Skybox.h
+ * @brief skybox
+ */
 #include "GameComponent/GameObject.h"
 class Skybox :
     public GameObject

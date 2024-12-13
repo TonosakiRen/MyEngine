@@ -1,3 +1,7 @@
+/**
+ * @file Material.cpp
+ * @brief Material
+ */
 #include "GameComponent/Material.h"
 #include <d3dx12.h>
 

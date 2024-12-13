@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file BufferManager.cpp
+ * @brief Bufferのrelease,createの管理
+ */
 #include <d3d12.h>
 #include <wrl/client.h>
 #include <array>
@@ -13,12 +17,14 @@ public:
 
 	static BufferManager* GetInstance();
 	void Finalize();
+	//resource作成
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateResource(uint32_t& index, const D3D12_HEAP_PROPERTIES* pHeapProperties,
 		D3D12_HEAP_FLAGS HeapFlags,
 		const D3D12_RESOURCE_DESC* pDesc,
 		D3D12_RESOURCE_STATES InitialResourceState,
 		const D3D12_CLEAR_VALUE* optimizedClearValue = nullptr);
-
+	
+	//resource割り当て
 	uint32_t AllocateResource(Microsoft::WRL::ComPtr<ID3D12Resource> resource) {
 
 		uint32_t index = 0;
@@ -37,7 +43,9 @@ public:
 		return index;
 	}
 
+	//releaseするresource
 	void ReleaseResource(uint32_t index, bool isMap = false);
+	//release
 	void ReleaseAllResource();
 
 private:

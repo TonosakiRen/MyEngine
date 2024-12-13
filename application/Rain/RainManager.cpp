@@ -1,3 +1,7 @@
+/**
+ * @file RainManager.h
+ * @brief 雨の管理
+ */
 #include "Enemy/Enemy.h"
 #include "RainManager.h"
 #include "Stage/Floor.h"
@@ -18,9 +22,9 @@ void RainManager::Initialize(ExplodeParticle* explodeParticle)
 void RainManager::Update()
 {
 	spawnFrame_++;
-
 	const uint32_t spawnInterval = 15;
 
+	//出現
 	if (spawnFrame_ >= spawnInterval) {
 		spawnFrame_ = 0;
 		PopRainDrop();
@@ -37,6 +41,7 @@ void RainManager::Update()
 
 void RainManager::PopRainDrop()
 {
+	//isActiveがfalseのものに割り当て
 	uint32_t modelHandle = ModelManager::Load("dodecahedron.obj");
 	Vector4 color  = HSVAtoRGBA(Rand(0.0f, 1.0f), 1.0f, 1.0f, 1.0f);
 	for (int i = 0; i < PointLights::lightNum; i++) {

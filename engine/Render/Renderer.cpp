@@ -1,3 +1,7 @@
+/**
+ * @file Renderer.h
+ * @brief Renderingを行う
+ */
 #include "Render/Renderer.h"
 
 #include "Light/ShaderManager.h"
@@ -135,7 +139,7 @@ void Renderer::BeginFrame()
 
 void Renderer::MainRender(ViewProjection& viewProjection) {
 
-    tileBasedRendering_->ComputeUpdate(commandContext_, viewProjection);
+    tileBasedRendering_->Dispatch(commandContext_, viewProjection);
     
     // メインカラーバッファをレンダ―ターゲットに
     commandContext_.TransitionResource(*colorBuffers_[kColor], D3D12_RESOURCE_STATE_RENDER_TARGET);

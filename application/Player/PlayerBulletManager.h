@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file PlayerBulletManager.h
+ * @brief プレイヤーの弾管理
+ */
 #include <list>
 #include <memory>
 #include <vector>

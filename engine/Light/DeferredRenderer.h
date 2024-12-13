@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file DeferredRenderer.h
+ * @brief DeferredRendering用Pipeline
+ */
 #include "Graphics/PipelineState.h"
 #include "Graphics/RootSignature.h"
 #include "GPUResource/GPUResource.h"

@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file LightManager.h
+ * @brief LightをまとめているClass
+ */
 #include "Mymath.h"
 #include <vector>
 #include <memory>

@@ -1,27 +1,27 @@
 #pragma once
+/**
+ * @file GamePlayScene.h
+ * @brief gamePlayのSceneクラス
+ */
 #include <memory>
 #include <list>
 #include "Scene/BaseScene.h"
 #include "MyMath.h"
 #include "Input.h"
 
-#include  "Stage/Skydome.h"
 #include  "Stage/Skybox.h"
-#include  "Stage/BoxArea.h"
 #include  "Stage/Floor.h"
 #include  "Stage/Cave.h"
 #include  "Player/Player.h"
 #include  "GameComponent/GameObject.h"
 #include  "Player/PlayerBulletManager.h"
 #include  "Particle/ExplodeParticle.h"
-#include  "Particle/WhiteParticle.h"
 #include  "Enemy/Enemy.h"
 #include  "Enemy/EnemyBulletManager.h"
 #include  "Particle/SphereLights.h"
 #include "GameComponent/GameObjectManager.h"
 #include "Stage/Trees.h"
 #include "Enemy/LineAttack.h"
-#include "Boss/Boss.h"
 #include "Stage/LightObjects.h"
 #include "Rain/RainManager.h"
 
@@ -44,8 +44,6 @@ private:
 private:
 	Input* input_;
 
-	std::unique_ptr<Skydome> skydome_;
-	std::unique_ptr<BoxArea> boxArea_;
 	std::unique_ptr<Skybox> skybox_;
 	std::unique_ptr<Floor> floor_;
 	std::unique_ptr<GameObject> sphere_;
@@ -57,8 +55,6 @@ private:
 
 	std::unique_ptr <ExplodeParticle> explodeParticle_;
 
-	std::unique_ptr<WhiteParticle> whiteParticle_;
-	
 	std::unique_ptr<LineAttack> lineAttack_;
 	
 	std::unique_ptr<RainManager> rainManager_;

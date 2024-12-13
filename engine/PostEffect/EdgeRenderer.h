@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file EdgeRenderer.h
+ * @brief EdgeのPipeline
+ */
 #include "Graphics/PipelineState.h"
 #include "Graphics/RootSignature.h"
 #include "GPUResource/GPUResource.h"

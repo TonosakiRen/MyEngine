@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file Enemy.h
+ * @brief 敵
+ */
 #include "MyMath.h"
 #include "GameComponent/Collider.h"
 #include "GameComponent/GameObject.h"

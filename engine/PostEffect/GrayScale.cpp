@@ -1,3 +1,7 @@
+/**
+ * @file GrayScale.cpp
+ * @brief GrayScaleのPipeline
+ */
 #include "PostEffect/GrayScale.h"
 #include <DirectXTex.h>
 #include <d3dcompiler.h>

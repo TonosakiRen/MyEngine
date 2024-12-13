@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file ColorBuffer.h
+ * @brief 一枚絵用Buffer
+ */
 #include "GPUResource/PixelBuffer.h"
 
 #include "Graphics/DescriptorHandle.h"

@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file PipelineState.h
+ * @brief Pipeline構造体
+ */
 #include <d3d12.h>
 #include <wrl/client.h>
 

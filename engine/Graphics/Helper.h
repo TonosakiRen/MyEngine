@@ -1,5 +1,8 @@
 #pragma once
-
+/**
+ * @file Helper.h
+ * @brief 便利関数
+ */
 #include <d3dx12.h>
 
 #include <winnt.h>

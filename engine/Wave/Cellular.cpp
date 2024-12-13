@@ -1,3 +1,7 @@
+/**
+ * @file Cellular.cpp
+ * @brief CellularノイズのPipeline
+ */
 #include "Wave/Cellular.h"
 #include "Light/ShaderManager.h"
 #include "Graphics/CommandContext.h"

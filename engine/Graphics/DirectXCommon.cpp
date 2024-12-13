@@ -1,3 +1,7 @@
+/**
+ * @file DirectXCommon.cpp
+ * @brief DirectXDeviceのラップ
+ */
 #include "Graphics/DirectXCommon.h"
 #include "GPUResource/BufferManager.h"
 

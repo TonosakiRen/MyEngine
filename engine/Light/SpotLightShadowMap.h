@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file SpotLightShadowMap.h
+ * @brief SpotLightShadowMapのPipeline
+ */
 #include <Windows.h>
 #include <memory>
 

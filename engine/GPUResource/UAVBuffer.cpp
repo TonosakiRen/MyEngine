@@ -1,3 +1,7 @@
+/**
+ * @file UAVBuffer.cpp
+ * @brief UAVBuffer
+ */
 #include "GPUResource/UAVBuffer.h"
 
 #include <cassert>

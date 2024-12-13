@@ -1,3 +1,7 @@
+/**
+ * @file CubeColorBuffer.cpp
+ * @brief CubeTexture用Buffer
+ */
 #include "GPUResource/CubeColorBuffer.h"
 
 #include "Graphics/DirectXCommon.h"

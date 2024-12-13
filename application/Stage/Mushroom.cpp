@@ -1,3 +1,8 @@
+/**
+ * @file Mushroom.cpp
+ * @brief キノコ
+ */
+
 #include "Stage/Mushroom.h"
 #include "Draw/DrawManager.h"
 #include "GameComponent/Loader.h"
@@ -11,12 +16,11 @@ void Mushroom::Initialize(const std::string& name, PointLight* pointLight, const
 
 void Mushroom::Update()
 {
+	const float maxIntensity_ = 20.0f;
+	const float colorAddValue = 0.02f;
 
-	if (colorT_ == 1.0f && isChangeColor_) {
-		isChangeColor_ = false;
-		colorT_ = 0.0f;
-		color_ = initColor;
-	}
+
+	//発光を増減させる
 	intensityT_ += intensityTSpeed_;
 	intensityT_ = clamp(intensityT_, 0.1f, 1.0f);
 	if (intensityT_ >= 1.0f) {
@@ -25,11 +29,19 @@ void Mushroom::Update()
 	if (intensityT_ <= 0.1f) {
 		intensityTSpeed_ *= -1.0f;
 	}
-	pointLight_->intensity = Easing::easing(intensityT_, 0.0f, 20.0f);
-	colorT_ += 0.02f;
+	pointLight_->intensity = Easing::easing(intensityT_, 0.0f, maxIntensity_);
+
+	//カラーが変更されていてtが1.0fになったら初期化
+	if (colorT_ == 1.0f && isChangeColor_) {
+		isChangeColor_ = false;
+		colorT_ = 0.0f;
+		color_ = initColor;
+	}
+	colorT_ += colorAddValue;
 	colorT_ = clamp(colorT_, 0.0f, 1.0f);
 	material_.color_ = Lerp(colorT_, material_.color_, color_);
 	pointLight_->color = material_.color_;
+
 	material_.Update();
 	LightObject::Update();
 }

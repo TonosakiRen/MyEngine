@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file Vignette.h
+ * @brief VignetteのPipeline
+ */
 #include <Windows.h>
 #include <memory>
 #include <vector>

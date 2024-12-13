@@ -1,3 +1,7 @@
+/**
+ * @file ShadowMap.cpp
+ * @brief ShadowMapのPipeline
+ */
 #include "Light/ShadowMap.h"
 #include "Texture/TextureManager.h"
 #include "Model/ModelManager.h"

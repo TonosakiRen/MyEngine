@@ -1,3 +1,7 @@
+/**
+ * @file Mushrooms.cpp
+ * @brief キノコ達
+ */
 #include "Stage/Mushrooms.h"
 #include "Draw/DrawManager.h"
 #include "Stage/Floor.h"
@@ -15,11 +19,16 @@ void Mushrooms::Initialize(const std::string& name,WorldTransform& parentWorldTr
 	data_ = std::make_unique<ParticleModelData>(kMushroomNum_);
 	data_->Initialize();
 
-	color_ = {0.2f,0.2f,1.0f,1.0f};
+	const Vector4 initColor = { 0.2f,0.2f,1.0f,1.0f };
+	const float intensity = 20.0f;
+	const float radius = 6.0f;
+
+	color_ = initColor;
 
 	std::vector<Transform> transfomrs;
 	Load::Transforms("mushroom.txt", transfomrs);
 
+	//キノコの初期化
 	for (int mushroomNum = 0; mushroomNum < kMushroomNum_; mushroomNum++) {
 		Vector3 position = { Rand(Vector3{-Floor::kFloorHalfSize,0.0f,Floor::kFloorHalfSize},Vector3{Floor::kFloorHalfSize,0.0f,Floor::kFloorSize}) };
 		float intensityT_ = Rand(0.0f, 1.0f);
@@ -31,8 +40,8 @@ void Mushrooms::Initialize(const std::string& name,WorldTransform& parentWorldTr
 				pointLights_->lights_[i].worldTransform.Reset();
 				pointLights_->lights_[i].worldTransform.SetParent(mushrooms[mushroomNum].GetWorldTransform(), false);
 				pointLights_->lights_[i].decay = 1.0f;
-				pointLights_->lights_[i].intensity = 20.0f;
-				pointLights_->lights_[i].radius = 6.0f;
+				pointLights_->lights_[i].intensity = intensity;
+				pointLights_->lights_[i].radius = radius;
 				pointLights_->lights_[i].color = color_;
 				break;
 			}

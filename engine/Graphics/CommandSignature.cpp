@@ -1,3 +1,8 @@
+#pragma once
+/**
+ * @file CommandSignature.cpp
+ * @brief ComputeShader用Signature
+ */
 #include "Graphics/CommandSignature.h"
 
 #include "Graphics/Helper.h"

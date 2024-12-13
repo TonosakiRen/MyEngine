@@ -1,5 +1,8 @@
 #pragma once
-
+/**
+ * @file Sprite.h
+ * @brief Sprite描画用Pipeline
+ */
 #include <Windows.h>
 #include <string>
 #include <wrl.h>

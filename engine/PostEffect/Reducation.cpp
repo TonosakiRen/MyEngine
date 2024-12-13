@@ -1,3 +1,7 @@
+/**
+ * @file Reducation.cpp
+ * @brief 画像をタイリングして増やす
+ */
 #include "PostEffect/Reducation.h"
 #include <DirectXTex.h>
 #include <d3dcompiler.h>

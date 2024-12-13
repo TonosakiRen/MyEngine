@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file Raytracing.h
+ * @brief RaytracingのPipeline
+ */
 #include <Windows.h>
 #include <memory>
 #include <d3d12.h>

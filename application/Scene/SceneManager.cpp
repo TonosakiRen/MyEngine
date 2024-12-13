@@ -1,3 +1,7 @@
+/**
+ * @file SceneManager.h
+ * @brief Sceneの管理
+ */
 #include "Scene/SceneManager.h"
 #include "Scene/BaseScene.h"
 #include "Render/Renderer.h"

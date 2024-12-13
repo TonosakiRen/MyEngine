@@ -1,3 +1,7 @@
+/**
+ * @file GaussianBlur.cpp
+ * @brief GaussianBlurのPipeline
+ */
 #include "PostEffect/GaussianBlur.h"
 #include "Light/ShaderManager.h"
 #include "Graphics/CommandContext.h"

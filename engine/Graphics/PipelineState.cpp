@@ -1,3 +1,7 @@
+/**
+ * @file PipelineState.cpp
+ * @brief Pipeline構造体
+ */
 #include "Graphics/PipelineState.h"
 
 #include "Graphics/DirectXCommon.h"

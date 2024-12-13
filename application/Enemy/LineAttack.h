@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file LineAttack.h
+ * @brief ライン上の攻撃
+ */
 #include "MyMath.h"
 #include "GameComponent/Collider.h"
 #include "GameComponent/GameObject.h"

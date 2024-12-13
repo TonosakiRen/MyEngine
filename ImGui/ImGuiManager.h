@@ -1,5 +1,8 @@
 #pragma once
-
+/**
+ * @file ImGuiManager.h
+ * @brief ImGuiライブラリをラップ
+ */
 #include "Graphics/WinApp.h"
 #include <imgui.h>
 class CommandContext;

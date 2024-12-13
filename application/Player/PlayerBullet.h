@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file PlayerBullet.h
+ * @brief playerBullet
+ */
 #include "Mymath.h"
 #include "GameComponent/WorldTransform.h"
 #include "GameComponent/Collider.h"
@@ -16,7 +20,6 @@ public:
 
 	bool IsDead() const { return isDead_; }
 	Collider& GetCollider() { return collider_; }
-private:
 
 private:
 	//Collider

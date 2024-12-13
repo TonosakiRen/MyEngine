@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file Cave.h
+ * @brief 洞窟
+ */
 #include "GameComponent/GameObject.h"
 #include "Stage/Mushrooms.h"
 class Cave :
@@ -15,6 +19,4 @@ public:
     }
 private:
     std::unique_ptr<Mushrooms> mushRooms_;
-    float size_ = 50.0f;
-    uint32_t textureHandle_ = 0;
 };

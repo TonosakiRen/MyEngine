@@ -1,3 +1,7 @@
+/**
+ * @file RaytracingInstanceDescs.cpp
+ * @brief RaytracingInstanceDescsの構造体
+ */
 #include "Raytracing/RaytracingInstanceDescs.h"
 
 #include <cassert>

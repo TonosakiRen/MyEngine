@@ -1,3 +1,7 @@
+/**
+ * @file RootSignature.cpp
+ * @brief RootSignature構造体
+ */
 #include "Graphics/RootSignature.h"
 
 #include "Graphics/Helper.h"

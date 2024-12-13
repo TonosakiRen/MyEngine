@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file PointLights.h
+ * @brief PointLights構造体
+ */
 #include <d3d12.h>
 #include "Mymath.h"
 #include "GPUResource/StructuredBuffer.h"

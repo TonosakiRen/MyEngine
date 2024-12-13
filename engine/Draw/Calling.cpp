@@ -12,16 +12,16 @@ using namespace Microsoft::WRL;
 
 void Calling::Initialize()
 {
-	modelManager = ModelManager::GetInstance();
+	modelManager_ = ModelManager::GetInstance();
 }
 
-bool Calling::isDraw(const uint32_t modelHandle,const WorldTransform& worldTransform)
+bool Calling::IsDraw(const uint32_t modelHandle,const WorldTransform& worldTransform)
 {
-	Sphere sphere = modelManager->GetModelSphere(modelHandle);
+	Sphere sphere = modelManager_->GetModelSphere(modelHandle);
 	sphere.center = sphere.center * worldTransform.matWorld_;
 	sphere.radius *= worldTransform.maxScale_;
 
-	Frustum frustum = currentViewProjection->GetWorldFrustum();
+	Frustum frustum = currentViewProjection_->GetWorldFrustum();
 
 	return(IsFrustumSphereCollision(frustum,sphere));
 }

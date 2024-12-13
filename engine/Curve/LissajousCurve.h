@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file LissajousCurve.h
+ * @brief LissajousCurveを生成
+ */
 #include <Windows.h>
 #include <array>
 

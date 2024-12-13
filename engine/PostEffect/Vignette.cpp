@@ -1,3 +1,7 @@
+/**
+ * @file Vignette.cpp
+ * @brief VignetteのPipeline
+ */
 #include "PostEffect/Vignette.h"
 #include <DirectXTex.h>
 #include <d3dcompiler.h>

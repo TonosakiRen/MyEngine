@@ -1,3 +1,7 @@
+/**
+ * @file DefaultStructuredBuffer.h
+ * @brief DefaultHeap用StructuredBuffer
+ */
 #include "GPUResource/DefaultStructuredBuffer.h"
 
 #include <cassert>

@@ -182,7 +182,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="application\Boss\Boss.cpp" />
     <ClCompile Include="application\Camera\Camera.cpp" />
     <ClCompile Include="application\Enemy\Enemy.cpp" />
     <ClCompile Include="application\Enemy\EnemyBullet.cpp" />
@@ -203,13 +202,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\Scene\GameScene.cpp" />
     <ClCompile Include="application\Scene\SceneManager.cpp" />
     <ClCompile Include="application\Scene\TitleScene.cpp" />
-    <ClCompile Include="application\Stage\BoxArea.cpp" />
     <ClCompile Include="application\Stage\Cave.cpp" />
     <ClCompile Include="application\Stage\Floor.cpp" />
     <ClCompile Include="application\Stage\Mushroom.cpp" />
     <ClCompile Include="application\Stage\Mushrooms.cpp" />
     <ClCompile Include="application\Stage\Skybox.cpp" />
-    <ClCompile Include="application\Stage\Skydome.cpp" />
     <ClCompile Include="application\Stage\LightObject.cpp" />
     <ClCompile Include="application\Stage\LightObjects.cpp" />
     <ClCompile Include="application\Stage\Tree.cpp" />
@@ -319,7 +316,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="application\Boss\Boss.h" />
     <ClInclude Include="application\Camera\Camera.h" />
     <ClInclude Include="application\Enemy\Enemy.h" />
     <ClInclude Include="application\Enemy\EnemyBullet.h" />
@@ -340,13 +336,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\Scene\GameScene.h" />
     <ClInclude Include="application\Scene\SceneManager.h" />
     <ClInclude Include="application\Scene\TitleScene.h" />
-    <ClInclude Include="application\Stage\BoxArea.h" />
     <ClInclude Include="application\Stage\Cave.h" />
     <ClInclude Include="application\Stage\Floor.h" />
     <ClInclude Include="application\Stage\Mushroom.h" />
     <ClInclude Include="application\Stage\Mushrooms.h" />
     <ClInclude Include="application\Stage\Skybox.h" />
-    <ClInclude Include="application\Stage\Skydome.h" />
     <ClInclude Include="application\Stage\LightObject.h" />
     <ClInclude Include="application\Stage\LightObjects.h" />
     <ClInclude Include="application\Stage\Tree.h" />

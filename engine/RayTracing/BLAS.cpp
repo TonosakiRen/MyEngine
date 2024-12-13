@@ -1,4 +1,8 @@
 #include "Raytracing/BLAS.h"
+/**
+ * @file BLAS.cpp
+ * @brief BLAS構造体
+ */
 
 #include <cassert>
 #include "Graphics/DirectXCommon.h"

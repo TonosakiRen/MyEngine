@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file CubeColorBuffer.h
+ * @brief CubeTexture用Buffer
+ */
 #include "GPUResource/PixelBuffer.h"
 
 #include "Graphics/DescriptorHandle.h"

@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file SwapChain.h
+ * @brief SwapChain構造体
+ */
 
 #include <d3d12.h>
 #include <dxgi1_6.h>
@@ -16,7 +20,9 @@ public:
     static const uint32_t kNumBuffers = 2;
 
     void Create(HWND hWnd);
+    //書き込み終わったBufferと入れ替え
     void SwapBackBuffer();
+    //Bufferを画面に表示
     void Present();
 
     ColorBuffer& GetColorBuffer() { return *buffers_[currentBufferIndex_]; }

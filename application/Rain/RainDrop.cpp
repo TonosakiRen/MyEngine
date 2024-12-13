@@ -1,3 +1,7 @@
+/**
+ * @file RainDrop.cpp
+ * @brief 雨粒
+ */
 #include "Rain/RainDrop.h"
 #include "Model/ModelManager.h"
 #include "Stage/Floor.h"
@@ -14,15 +18,16 @@ void RainDrop::Initialize(uint32_t modelHandle,PointLight* pointLight, ExplodePa
 	collider_.Initialize(&worldTransform_, "rainDrop", modelHandle);
 	acceleration_ = { 0.0f,-0.01f,0.0f };
 	modelSize = ModelManager::GetInstance()->GetModelSize(modelHandle_);
-	color_ = color;
 
+	//ポイントライト初期化
+	color_ = color;
 	pointLight->isActive = true;
 	pointLight->worldTransform.Reset();
 	pointLight->worldTransform.translation_ = { 0.0f,0.0f,0.0f };
 	pointLight->worldTransform.SetParent(&worldTransform_, false);
 	pointLight->decay = 1.0f;
-	pointLight->intensity = 3.0f;
-	pointLight->radius = 6.0f;
+	pointLight->intensity = intensity_;
+	pointLight->radius = radius_;
 	pointLight->color = color;
 
 	pointLight_ = pointLight;
@@ -44,10 +49,11 @@ void RainDrop::Finalize()
 
 void RainDrop::Update()
 {
-
+	//落下
 	velocity_ += acceleration_;
 	worldTransform_.translation_ += velocity_;
 
+	//落下したら埋まる、パーティクル出現
 	if (worldTransform_.translation_.y < 0.0f) {
 		
 		if (!isDrop_) {
@@ -58,13 +64,15 @@ void RainDrop::Update()
 		velocity_.y = 0.0f;
 	}
 
+	//徐々に小さく
 	if (isDrop_) {
 		dropFrame_--;
 		float t = float(dropFrame_) / float(anActiveFrame_);
-		pointLight_->intensity = 3.0f * t;
+		pointLight_->intensity = intensity_ * t;
 		worldTransform_.scale_ = {1.0f * t,1.0f * t,1.0f * t};
 	}
 
+	//消える
 	if (dropFrame_ == 0) {
 		Finalize();
 	}

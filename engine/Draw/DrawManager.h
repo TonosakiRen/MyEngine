@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file DrawManager.h
+ * @brief DrawCallをまとめる
+ */
 #include <vector>
 #include <memory>
 #include <functional>
@@ -59,6 +63,7 @@ public:
 
 	static DrawManager* GetInstance();
 
+	//DrawCall
 	void DrawModel(const WorldTransform& worldTransform, const uint32_t modelHandle = 0,const uint32_t textureHandle = 0, const Material& material = *defaultMaterial_.get());
 	void DrawModel(const WorldTransform& worldTransform, const uint32_t modelHandle, SkinCluster& skinCluster, const uint32_t textureHandle = 0, const Material& material = *defaultMaterial_.get());
 	void DrawMeshletModel(const WorldTransform& worldTransform, const uint32_t modelHandle = 0, const uint32_t textureHandle = 0, const Material& material = *defaultMaterial_.get());
@@ -76,16 +81,19 @@ public:
 	void DrawWaveModel(const WorldTransform& worldTransform, const WaveData& waveData, const WaveIndexData& waveIndexData, const uint32_t modelHandle = 0, const uint32_t textureHandle = 0, const Material& material = *defaultMaterial_.get());
 	void DrawWaveModel(const WorldTransform& worldTransform, const WaveData& waveData, const WaveIndexData& waveIndexData, const uint32_t modelHandle, SkinCluster& skinCluster, const uint32_t textureHandle = 0, const Material& material = *defaultMaterial_.get());
 	void DrawFloor(const WorldTransform& worldTransform, const WaveData& waveData, const WaveIndexData& waveIndexData, const uint32_t modelHandle = 0);
-
+	
+	//カリングするViewProjectionのセッター
 	void SetCallingViewProjection(const ViewProjection& viewProjection) { calling_->SetViewProjection(&viewProjection); }
 private:
 
 	void Initialize(CommandContext& CommandContext);
 	void Finalize();
+	//DrawCall実行
 	void AllDraw(PipelineType pipelineType,const ViewProjection& viewProjection,const TileBasedRendering& tileBasedRendering);
 	void PostSpriteDraw();
 	void ShadowDraw();
 	void ShadowSpotLightDraw();
+	//DrawCallReset
 	void ResetCalls();
 
 private:

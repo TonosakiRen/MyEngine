@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file ViewProjection.cpp
+ * @brief ViewProjection
+ */
 #include <d3d12.h>
 #include "Mymath.h"
 #include <numbers>
@@ -7,6 +11,7 @@
 class ViewProjection {
 public:
 
+	//Debugカメラを使うか使わないか
 	static bool isUseDebugCamera;
 
 	struct ConstBufferData {
@@ -21,12 +26,14 @@ public:
 		Plane plane[6];
 	};
 
+	//Debugカメラを使うか使わないか
 	static void SwitchIsUseDebugCamera();
 
 	void Initialize();
 	void Update();
 	void Draw();
 
+	//カメラシェイク
 	bool Shake(Vector3 shakeValue, int& frame);
 
 	D3D12_GPU_VIRTUAL_ADDRESS GetGPUVirtualAddress() const {

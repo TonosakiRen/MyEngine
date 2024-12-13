@@ -1,3 +1,7 @@
+/**
+ * @file TextureManager.cpp
+ * @brief Textureリソースを管理する
+ */
 #include "Texture/TextureManager.h"
 #include <DirectXTex.h>
 #include <cassert>

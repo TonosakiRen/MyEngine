@@ -1,3 +1,7 @@
+/**
+ * @file WaveData.h
+ * @brief 波を発生させるデータ
+ */
 #include "Wave/WaveData.h"
 #include "Particle/Particle.h"
 #include "Light/ShaderManager.h"

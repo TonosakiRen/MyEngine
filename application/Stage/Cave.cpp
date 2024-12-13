@@ -1,3 +1,8 @@
+/**
+ * @file Cave.cpp
+ * @brief 洞窟
+ */
+
 #include "Stage/Cave.h"
 #include "Texture/TextureManager.h"
 #include "ImGuiManager.h"
@@ -7,8 +12,8 @@ void Cave::Initialize()
 {
 	GameObject::Initialize("cave.obj");
 	material_.Update();
-	worldTransform_.translation_.y = 9.04f;
-	worldTransform_.translation_.z = 102.6f;
+	const Vector3 position = { 0.0f,9.04f,102.6f };
+	worldTransform_.translation_ = position;
 	mushRooms_ = std::make_unique<Mushrooms>();
 	mushRooms_->Initialize("mushroom.obj", worldTransform_);
 

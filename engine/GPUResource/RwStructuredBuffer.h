@@ -1,3 +1,7 @@
+/**
+ * @file RwStructuredBuffer.h
+ * @brief read,write用StructuredBuffer
+ */
 #pragma once
 #include "GPUResource/GPUResource.h"
 #include "GPUResource/DefaultBuffer.h"

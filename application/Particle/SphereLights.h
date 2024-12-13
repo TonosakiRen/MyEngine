@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file SphereLights.h
+ * @brief sphereLight
+ */
 #include "Particle/ParticleModelData.h"
 #include "GameComponent/WorldTransform.h"
 #include "GameComponent/Material.h"
@@ -20,12 +24,14 @@ public:
 		float intensity;
 		bool isActive_;
 	};
-public:
+private:
 	std::array<Sphere, kSphereNum> spheres_;
 	std::unique_ptr<ParticleModelData> particle_;
 	std::unique_ptr<Material> material_;
-	PointLights* pointLights_;
+	const float intensity_ = 3.0f;
+	const float radius_ = 6.0f;
+	PointLights* pointLights_ = nullptr;
 	uint32_t activeNum_ = 0;
-private:
+
 };
 

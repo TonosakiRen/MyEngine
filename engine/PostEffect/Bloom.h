@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file Bloom.h
+ * @brief BloomのPipeline
+ */
 #include "PostEffect/GaussianBlur.h"
 #include "GPUResource/UploadBuffer.h"
 
@@ -18,7 +22,9 @@ public:
     void Initialize(ColorBuffer* originalTexture);
     void Render(CommandContext& commandContext, ColorBuffer* originalTexture, uint32_t level = kMaxLevel);
 
+    //しきい値セット
     void SetThreshold(float threshold) { threshold_ = threshold; }
+    //とがり値セット
     void SetKnee(float knee) { knee_ = knee; }
 
 

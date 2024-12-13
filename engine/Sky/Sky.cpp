@@ -1,3 +1,7 @@
+/**
+ * @file Sky.cpp
+ * @brief 空描画のPipeline
+ */
 #include "Sky/Sky.h"
 #include "Texture/TextureManager.h"
 #include "Model/ModelManager.h"

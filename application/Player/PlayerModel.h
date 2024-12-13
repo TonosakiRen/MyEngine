@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file PlayerModel.h
+ * @brief PlayerのModel
+ */
 #include <memory>
 #include "GameComponent/GameObject.h"
 #include "Input.h"
@@ -57,6 +61,7 @@ public:
     void Update();
     void Draw();
 
+    //動きをセットする
     void SetMoving(Moving moving) {
         if (transitionAnimationT_ == 0.0f) {
             nextMoving_ = moving;

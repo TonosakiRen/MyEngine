@@ -1,5 +1,8 @@
 #include "Animation/Skinning.h"
-
+/**
+ * @file Skinning.cpp
+ * @brief Skinningをするためのpipeline
+ */
 #include <array>
 
 #include "Texture/TextureManager.h"

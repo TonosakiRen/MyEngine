@@ -1,3 +1,7 @@
+/**
+ * @file ByteAddressBuffer.cpp
+ * @brief Byte単位でアクセスるバッファー
+ */
 #include "GPUResource/ByteAddressBuffer.h"
 #include <assert.h>
 #include "Graphics/DirectXCommon.h"

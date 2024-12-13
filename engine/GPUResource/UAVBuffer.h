@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file UAVBuffer.h
+ * @brief UAVBuffer
+ */
 #include "GPUResource/GPUResource.h"
 
 

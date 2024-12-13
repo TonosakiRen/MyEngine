@@ -1,3 +1,7 @@
+/**
+ * @file LineAttack.cpp
+ * @brief ライン上の攻撃
+ */
 #include "Enemy/LineAttack.h"
 #include "Enemy/EnemyBulletManager.h"
 #include "Player/Player.h"
@@ -16,11 +20,18 @@ void LineAttack::Initialize()
 
 void LineAttack::Update()
 {
+	const float move = 0.2f;
+	const Vector4 color = { 0.7f,0.7f,1.0f,1.0f };
+	const float attackStartFrame = 40;
+	const float attackEndFrame = 60;
+	const float growHeight = -3.5f;
+	const float scaleSpeed = 0.5f;
+
 	if (isEmit_) {
 		if (lightLength_ <= Floor::kFloorSize * 2.0f) {
-			lightLength_ += 0.2f;
+			lightLength_ += move;
 		}
-		lightManager_->areaLights_->lights_[0].color = { 0.7f,0.7f,1.0f };
+		lightManager_->areaLights_->lights_[0].color = color;
 		lightManager_->areaLights_->lights_[0].isActive = true;
 		Segment segment;
 		if (isBox_ == false) {
@@ -38,7 +49,7 @@ void LineAttack::Update()
 			std::unique_ptr<Box> box;
 			box = std::make_unique<Box>();
 			box->worldTransform_.Initialize();
-			box->worldTransform_.translation_ = { -Floor::kFloorHalfSize + lightLength_,-3.5f, 0.0f};
+			box->worldTransform_.translation_ = { -Floor::kFloorHalfSize + lightLength_,growHeight, 0.0f};
 			box->direction_ = Normalize(Vector3{0.0f,Rand(0.8f,1.0f),Rand(-0.2f,0.2f) });
 			box->worldTransform_.quaternion_ = MakeFromTwoVector({ 0.0f,1.0f,0.0f }, box->direction_);
 			box->worldTransform_.scale_ = { 1.0f,1.0f,1.0f };
@@ -51,14 +62,14 @@ void LineAttack::Update()
 
 	for (auto& box : boxs_) {
 		box->attackStartFrame_++;
-		if (box->attackStartFrame_ >= 40 && box->worldTransform_.scale_.y <= scale_ && box->endFrame_ == 0) {
-			box->worldTransform_.scale_.y += 0.5f;
+		if (box->attackStartFrame_ >= attackStartFrame && box->worldTransform_.scale_.y <= scale_ && box->endFrame_ == 0) {
+			box->worldTransform_.scale_.y += scaleSpeed;
 			box->worldTransform_.translation_ += box->direction_ * Rand(0.2f,0.6f);
 		}
-		else if (box->attackStartFrame_ >= 40) {
+		else if (box->attackStartFrame_ >= attackStartFrame) {
 			box->endFrame_++;
-			if (box->endFrame_ >= 60) {
-				box->worldTransform_.scale_.y -= 0.5f;
+			if (box->endFrame_ >= attackEndFrame) {
+				box->worldTransform_.scale_.y -= scaleSpeed;
 				box->worldTransform_.translation_ += box->direction_ * Rand(-0.2f, -0.6f);
 				if (box->worldTransform_.scale_.y <= 0.1f) {
 					box->isActive_ = false;

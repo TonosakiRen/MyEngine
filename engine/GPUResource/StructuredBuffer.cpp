@@ -1,3 +1,7 @@
+/**
+ * @file StructuredBuffer.cpp
+ * @brief StructuredBuffer
+ */
 #include "GPUResource/StructuredBuffer.h"
 #include "GPUResource/BufferManager.h"
 #include "Graphics/DirectXCommon.h"

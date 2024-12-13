@@ -1,3 +1,7 @@
+/**
+ * @file EdgeRenderer.cpp
+ * @brief EdgeのPipeline
+ */
 #include "PostEffect/EdgeRenderer.h"
 #include <Windows.h>
 #include "Graphics/DirectXCommon.h"

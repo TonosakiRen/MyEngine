@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file DefaultStructuredBuffer.h
+ * @brief DefaultHeap用StructuredBuffer
+ */
 #include "GPUResource/GPUResource.h"
 #include "GPUResource/DefaultBuffer.h"
 #include "Graphics/DescriptorHandle.h"

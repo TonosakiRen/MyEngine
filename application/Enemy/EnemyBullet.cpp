@@ -1,3 +1,7 @@
+/**
+ * @file EnemyBullet.cpp
+ * @brief 敵弾
+ */
 #include "Enemy/EnemyBullet.h"
 #include "Model/ModelManager.h"
 #include "Stage/Floor.h"
@@ -33,5 +37,6 @@ void EnemyBullet::OnCollision()
 
 void EnemyBullet::Draw()
 {
-	GameObject::Draw({ 0.7f,0.0f,0.0f,1.0f });
+	const Vector4 color = { 0.4f,0.4f,0.4f,1.0f };
+	GameObject::Draw(color);
 }

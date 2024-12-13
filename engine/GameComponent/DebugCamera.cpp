@@ -1,3 +1,7 @@
+/**
+ * @file DebugCamera.h
+ * @brief デバッグ用カメラ
+ */
 #include "GameComponent/DebugCamera.h"
 
 #include "Input.h"
@@ -25,7 +29,7 @@ void DebugCamera::DebugMode()
 {
     Input* input = Input::GetInstance();
 
-    Vector2 mouseMove = input->GetMouseMove();
+    Vector2 mouseMove = input->GetMousePosition();
     float wheel = input->GetWheel();
 
 
@@ -41,6 +45,7 @@ void DebugCamera::DebugMode()
     Quaternion debugMoveQuaternion{};
     Vector3 rotation{};
 
+    //回転移動受付
     if (input->IsPressMouse(1)) {
         float rot = static_cast<float>(M_PI / 180.0f);
         debugRotation_.x += rot * mouseMove.y * 0.1f;

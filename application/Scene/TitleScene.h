@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file TitleScene.h
+ * @brief タイトルのシーン
+ */
 #include "Scene/BaseScene.h"
 #include <memory>
 

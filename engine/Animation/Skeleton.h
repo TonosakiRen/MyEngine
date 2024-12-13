@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file Skeleton.h
+ * @brief Skeleton構造体
+ */
 #include <span>
 #include <array>
 #include <unordered_map>
@@ -31,6 +35,7 @@ class Skeleton {
 public:
 
 	void Create(const Node& rootNode);
+	void Update();
 
 	const Joint& GetJoint(std::string name) {
 		int32_t index = 0;
@@ -43,9 +48,6 @@ public:
 	std::vector<Joint>& GetAllJoint() {
 		return joints_;
 	}
-
-	void Update();
-
 	void SetParent(WorldTransform* parent) {
 		parent_ = parent;
 	};

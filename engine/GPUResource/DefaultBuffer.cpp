@@ -1,3 +1,7 @@
+/**
+ * @file DefaultBuffer.cpp
+ * @brief DefaultHeap用Buffer
+ */
 #include "GPUResource/DefaultBuffer.h"
 
 #include <cassert>

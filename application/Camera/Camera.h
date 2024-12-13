@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file Camera.h
+ * @brief カメラ構造体
+ */
 #include "GameComponent/ViewProjection.h"
 #include <memory>
 class Camera :

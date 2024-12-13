@@ -1,3 +1,7 @@
+/**
+ * @file GamePlayScene.cpp
+ * @brief gamePlayのSceneクラス
+ */
 #include "Scene/GamePlayScene.h"
 #include "Scene/GameScene.h"
 
@@ -9,9 +13,6 @@ const Player* GamePlayScene::player = nullptr;
 
 void GamePlayScene::Initialize()
 {
-	skydome_ = std::make_unique<Skydome>();
-	skydome_->Initialize("skydome.obj");
-	skydome_->Update();
 
 	floor_ = std::make_unique<Floor>();
 	floor_->Initialize("floor.obj",GameScene::wavePoints);
@@ -22,18 +23,11 @@ void GamePlayScene::Initialize()
 	sphere_->SetScale({ 1.0f,1.0f,1.0f });
 	sphere_->UpdateMatrix();
 
-	boxArea_ = std::make_unique<BoxArea>();
-	boxArea_->Initialize("box1x1Inverse.obj");
-
 	skybox_ = std::make_unique<Skybox>();
 	skybox_->Initialize("box1x1Inverse.obj");
 
 	explodeParticle_ = std::make_unique<ExplodeParticle>();
 	explodeParticle_->Initialize(floor_.get(), GameScene::wavePoints);
-
-	whiteParticle_ = std::make_unique<WhiteParticle>();
-	whiteParticle_->SetIsEmit(true);
-	whiteParticle_->Initialize(Vector3{ -1.0f,-1.0f,-1.0f }, Vector3{ 1.0f,1.0f,1.0f });
 
 	playerBulletManager_ = std::make_unique<PlayerBulletManager>();
 	playerBulletManager_->Initialize(explodeParticle_.get());
@@ -72,8 +66,6 @@ void GamePlayScene::Finalize()
 void GamePlayScene::Update()
 {
 
-	boxArea_->Update();
-
 	skybox_->Update();
 
 	trees_->Update();
@@ -99,19 +91,6 @@ void GamePlayScene::Update()
 	explodeParticle_->Update();
 
 	cave_->Update();
-
-
-
-#ifdef _DEBUG
-	//パーティクル
-	ImGui::Begin("Game");
-	if (ImGui::BeginMenu("Particle")) {
-		ImGui::DragFloat3("emitterPos", &whiteParticle_->emitterWorldTransform_.translation_.x, 0.01f);
-		ImGui::EndMenu();
-	}
-	ImGui::End();
-#endif
-	whiteParticle_->Update();
 
 	rainManager_->Update();
 	

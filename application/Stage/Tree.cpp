@@ -1,3 +1,7 @@
+/**
+ * @file Tree.cpp
+ * @brief 木
+ */
 #include "Stage/Tree.h"
 #include "Draw/DrawManager.h"
 #include "GameComponent/Loader.h"
@@ -6,32 +10,35 @@ void Tree::Initialize()
 {
 
 	GameObject::Initialize("tree.obj");
-
-
 	std::vector<Vector3> positions;
 	Load::Positions("treeGrass.txt", positions);
+
+	const Vector3 color = ColorCodeToVector3(0x84331F);
+	material_.color_ = { color.x,color.y,color.z,1.0f };
+	material_.Update();
+
+	const float leafScale = 0.2f;
+	const float scale = 5.0f;
+
+	//葉っぱのworldTransformを初期化
 	for (Vector3 position : positions) {
 		WorldTransform w{};
 		w.SetParent(&worldTransform_, false);
-		w.scale_ = { 0.2f,0.2f,0.2f };
+		w.scale_ = { leafScale,leafScale,leafScale };
 		w.translation_ = position;
 		w.Update();
 		grassTransforms_.push_back(w);
 	}
 
+	worldTransform_.scale_ = {scale,scale,scale };
+
 	grassesData_ = std::make_unique<ParticleModelData>(uint32_t(grassTransforms_.size()));
 	grassesData_->Initialize();
-
-	worldTransform_.scale_ = {5.0f,5.0f,5.0f };
-
-	Vector3 color = ColorCodeToVector3(0x84331F);
-	material_.color_ = { color.x,color.y,color.z,1.0f };
-	material_.Update();
 
 	grassMaterial_ = std::make_unique<Material>();
 	//color = ColorCodeToVector3(0x40BA8D);
 	grassMaterial_->Initialize();
-	grassMaterial_->color_ = { 1.0f,1.0f,1.0f,1.0f };
+	grassMaterial_->color_;
 	grassMaterial_->Update();
 }
 

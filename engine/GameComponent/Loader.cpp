@@ -1,3 +1,7 @@
+/**
+ * @file Load.h
+ * @brief fileから読み込み
+ */
 #include "GameComponent/Loader.h"
 
 #include <iostream>

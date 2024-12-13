@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file Material.h
+ * @brief Material
+ */
 #include <d3d12.h>
 #include "Mymath.h"
 #include "GPUResource/UploadBuffer.h"

@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file MyGame.h
+ * @brief Gameの更新描画を行う
+ */
 #include "Framework/Framework.h"
 
 class Renderer;

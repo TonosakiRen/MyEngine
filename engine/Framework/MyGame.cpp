@@ -1,3 +1,7 @@
+/**
+ * @file MyGame.h
+ * @brief Gameの更新描画を行う
+ */
 #include "Framework/MyGame.h"
 
 #include "Texture/TextureManager.h"

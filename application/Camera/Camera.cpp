@@ -1,3 +1,7 @@
+/**
+ * @file Camera.cpp
+ * @brief カメラ構造体
+ */
 #include "Camera/Camera.h"
 #include "Input.h"
 #include "ImGuiManager.h"

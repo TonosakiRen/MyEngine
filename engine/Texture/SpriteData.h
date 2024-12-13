@@ -1,5 +1,8 @@
 #pragma once
-
+/**
+ * @file SpriteData.h
+ * @brief Sprite描画用のデータ
+ */
 #include <Windows.h>
 #include <string>
 #include <wrl.h>
@@ -29,6 +32,7 @@ public:
 
 	void SetTextureHandle(uint32_t textureHandle);
 	uint32_t GetTextureHandle() { return textureHandle_; }
+	//頂点データ更新
 	void TransferVertices();
 
 public:

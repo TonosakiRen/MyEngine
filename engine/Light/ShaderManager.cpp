@@ -1,3 +1,7 @@
+/**
+ * @file ShaderManager.cpp
+ * @brief Shaderコンパイルなど行う
+ */
 #include "Light/ShaderManager.h"
 
 #include <cassert>

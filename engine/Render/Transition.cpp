@@ -1,3 +1,7 @@
+/**
+ * @file Transition.cpp
+ * @brief Transitionを行うPipeline
+ */
 #include "Render/Transition.h"
 #include <DirectXTex.h>
 #include <d3dcompiler.h>

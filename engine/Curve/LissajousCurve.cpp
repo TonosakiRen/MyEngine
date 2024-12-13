@@ -1,3 +1,7 @@
+/**
+ * @file LissajousCurve.cpp
+ * @brief LissajousCurveを生成
+ */
 #include "Curve/LissajousCurve.h"
 #include "Particle/Particle.h"
 #include "Light/ShaderManager.h"

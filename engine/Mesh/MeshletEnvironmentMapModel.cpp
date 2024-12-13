@@ -1,3 +1,7 @@
+/**
+ * @file MeshletEnvironmentMapModel.cpp
+ * @brief Meshletでの環境マップPipeline
+ */
 #include "Mesh/MeshletEnvironmentMapModel.h"
 #include "Texture/TextureManager.h"
 #include "Model/ModelManager.h"

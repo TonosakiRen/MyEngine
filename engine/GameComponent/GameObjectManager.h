@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file GameObjectManager.h
+ * @brief 外観Objectの配置用(現在)
+ */
 #include <string>
 #include <vector>
 

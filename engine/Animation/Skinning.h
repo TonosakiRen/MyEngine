@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file Skinning.cpp
+ * @brief SkinningをするためのPipeline
+ */
 #include <Windows.h>
 #include <memory>
 #include <d3d12.h>
@@ -33,9 +37,12 @@ public:
 	void Initialize();
 	void Finalize();
 
+	//Dispatch準備
 	void PreDispatch(CommandContext& commandContext);
+	//Dispatch
 	void Dispatch(CommandContext& commandContext, const uint32_t modelHandle, SkinCluster& skinCluster);
 private: 
+	//Pipeline作成
 	void CreatePipeline();
 private:
 	std::unique_ptr<RootSignature> rootSignature_;

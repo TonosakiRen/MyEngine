@@ -98,12 +98,6 @@
     <Filter Include="Game\Camera">
       <UniqueIdentifier>{10f1e74c-cd11-4f70-b064-fff5fd01c917}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\Compute">
-      <UniqueIdentifier>{fafbb1c1-6999-4efa-8cff-36af6ee36859}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\Boss">
-      <UniqueIdentifier>{0214d10a-425b-41e4-b3f4-d1be7618f2bd}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Engine\Draw">
       <UniqueIdentifier>{4117657c-d136-48f4-b988-5c1b47d35590}</UniqueIdentifier>
     </Filter>
@@ -284,9 +278,6 @@
       <Filter>Engine\Light</Filter>
     </ClCompile>
     <ClCompile Include="engine\Light\PointLights.cpp">
-      <Filter>Engine\Light</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\Light\ShaderManager.cpp">
       <Filter>Engine\Light</Filter>
     </ClCompile>
     <ClCompile Include="engine\Light\ShadowMap.cpp">
@@ -475,16 +466,10 @@
     <ClCompile Include="application\Scene\TitleScene.cpp">
       <Filter>Game\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="application\Stage\BoxArea.cpp">
-      <Filter>Game\Stage</Filter>
-    </ClCompile>
     <ClCompile Include="application\Stage\Floor.cpp">
       <Filter>Game\Stage</Filter>
     </ClCompile>
     <ClCompile Include="application\Stage\Skybox.cpp">
-      <Filter>Game\Stage</Filter>
-    </ClCompile>
-    <ClCompile Include="application\Stage\Skydome.cpp">
       <Filter>Game\Stage</Filter>
     </ClCompile>
     <ClCompile Include="application\Stage\Tree.cpp">
@@ -495,9 +480,6 @@
     </ClCompile>
     <ClCompile Include="application\WavePoints\WavePoints.cpp">
       <Filter>Game\WavePoints</Filter>
-    </ClCompile>
-    <ClCompile Include="application\Boss\Boss.cpp">
-      <Filter>Game\Boss</Filter>
     </ClCompile>
     <ClCompile Include="engine\RayTracing\RaytracingInstanceDescs.cpp">
       <Filter>Engine\Raytracing</Filter>
@@ -528,6 +510,9 @@
     </ClCompile>
     <ClCompile Include="application\Stage\Mushrooms.cpp">
       <Filter>Game\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\Light\ShaderManager.cpp">
+      <Filter>Engine\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -697,9 +682,6 @@
       <Filter>Engine\Light</Filter>
     </ClInclude>
     <ClInclude Include="engine\Light\PointLights.h">
-      <Filter>Engine\Light</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\Light\ShaderManager.h">
       <Filter>Engine\Light</Filter>
     </ClInclude>
     <ClInclude Include="engine\Light\ShadowMap.h">
@@ -888,16 +870,10 @@
     <ClInclude Include="application\Scene\TitleScene.h">
       <Filter>Game\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="application\Stage\BoxArea.h">
-      <Filter>Game\Stage</Filter>
-    </ClInclude>
     <ClInclude Include="application\Stage\Floor.h">
       <Filter>Game\Stage</Filter>
     </ClInclude>
     <ClInclude Include="application\Stage\Skybox.h">
-      <Filter>Game\Stage</Filter>
-    </ClInclude>
-    <ClInclude Include="application\Stage\Skydome.h">
       <Filter>Game\Stage</Filter>
     </ClInclude>
     <ClInclude Include="application\Stage\Tree.h">
@@ -908,9 +884,6 @@
     </ClInclude>
     <ClInclude Include="application\WavePoints\WavePoints.h">
       <Filter>Game\WavePoints</Filter>
-    </ClInclude>
-    <ClInclude Include="application\Boss\Boss.h">
-      <Filter>Game\Boss</Filter>
     </ClInclude>
     <ClInclude Include="engine\RayTracing\RaytracingInstanceDescs.h">
       <Filter>Engine\Raytracing</Filter>
@@ -941,6 +914,9 @@
     </ClInclude>
     <ClInclude Include="application\Stage\Mushrooms.h">
       <Filter>Game\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Light\ShaderManager.h">
+      <Filter>Engine\Graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

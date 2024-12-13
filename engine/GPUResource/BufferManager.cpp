@@ -1,3 +1,7 @@
+/**
+ * @file BufferManager.cpp
+ * @brief Bufferのrelease,createの管理
+ */
 #include "GPUResource/BufferManager.h"
 
 #include <algorithm>

@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file Mushrooms.h
+ * @brief キノコ達
+ */
 #include <memory>
 #include <vector>
 #include "GameComponent/GameObject.h"

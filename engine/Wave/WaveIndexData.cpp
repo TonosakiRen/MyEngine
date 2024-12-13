@@ -1,3 +1,7 @@
+/**
+ * @file WaveIndexData.cpp
+ * @brief 波を発生させるデータのIndexのデータ
+ */
 #include "Wave/WaveIndexData.h"
 #include "ImGuiManager.h"
 

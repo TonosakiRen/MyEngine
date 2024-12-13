@@ -1,3 +1,7 @@
+/**
+ * @file Model.cpp
+ * @brief 描画Pipeline
+ */
 #include "Model/Model.h"
 #include "Texture/TextureManager.h"
 #include "Model/ModelManager.h"

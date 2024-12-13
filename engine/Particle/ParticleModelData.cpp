@@ -1,3 +1,7 @@
+/**
+ * @file ParticleModelData.cpp
+ * @brief ParticleModelのためのBuffer
+ */
 #include "Particle/ParticleModelData.h"
 #include "Light/ShaderManager.h"
 #include "Render/Renderer.h"

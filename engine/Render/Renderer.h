@@ -1,5 +1,8 @@
 #pragma once
-
+/**
+ * @file Renderer.h
+ * @brief Renderingを行う
+ */
 #include "Graphics/DirectXCommon.h"
 #include "Graphics/SwapChain.h"
 #include "Graphics/CommandContext.h"

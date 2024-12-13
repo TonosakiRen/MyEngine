@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file ParticleModelData.h
+ * @brief ParticleModelのためのBuffer
+ */
 #include <Windows.h>
 
 #include "GPUResource/StructuredBuffer.h"
@@ -19,7 +23,9 @@ public:
 
 	ParticleModelData(uint32_t particleNum);
 	void Initialize();
+	//Dataを追加
 	void PushBackData(const Data& data);
+	//Dataをリセット
 	void Reset();
 
 	const DescriptorHandle& GetGPUHandle() const { return structuredBuffer_->GetSRV(); }

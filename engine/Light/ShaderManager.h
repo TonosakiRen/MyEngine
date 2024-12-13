@@ -1,5 +1,8 @@
 #pragma once
-
+/**
+ * @file ShaderManager.h
+ * @brief Shaderコンパイルなど行う
+ */
 #include <d3d12.h>
 #include <dxcapi.h>
 #include <wrl/client.h>

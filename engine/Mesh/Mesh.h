@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file Mesh.h
+ * @brief Mesh構造体
+ */
 #include <string>
 #include "Mymath.h"
 #include "GPUResource/UploadBuffer.h"

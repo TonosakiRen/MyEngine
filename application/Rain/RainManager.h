@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file RainManager.h
+ * @brief 雨の管理
+ */
 #include "MyMath.h"
 #include "Rain/RainDrop.h"
 #include "Light/LightManager.h"

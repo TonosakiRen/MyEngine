@@ -1,3 +1,7 @@
+/**
+ * @file DirectionalLights.cpp
+ * @brief DirectionalLights構造体
+ */
 #include "Light/DirectionalLights.h"
 #include "Graphics/DirectXCommon.h"
 

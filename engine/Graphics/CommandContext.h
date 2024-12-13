@@ -1,5 +1,8 @@
 #pragma once
-
+/**
+ * @file CommandContext.h
+ * @brief CommandListをラップ
+ */
 #include <d3d12.h>
 #include <d3dx12.h>
 #include <wrl/client.h>

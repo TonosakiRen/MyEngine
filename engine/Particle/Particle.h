@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file Particle.h
+ * @brief ParticleのPipeline
+ */
 #include <Windows.h>
 #include <memory>
 #include <vector>

@@ -1,5 +1,8 @@
 #pragma once
-
+/**
+ * @file CommandQueue.h
+ * @brief CommandQueueをラップ
+ */
 #include <d3d12.h>
 #include <wrl/client.h>
 

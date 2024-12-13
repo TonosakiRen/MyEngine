@@ -1,3 +1,7 @@
+/**
+ * @file GPUResource.cpp
+ * @brief GPUResource
+ */
 #include "GPUResource/GPUResource.h"
 #include "GPUResource/BufferManager.h"
 #include <assert.h>

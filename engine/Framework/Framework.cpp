@@ -1,3 +1,7 @@
+/**
+ * @file Framework.h
+ * @brief Frameworkを行う
+ */
 #include "Framework/Framework.h"
 
 #include "Input.h"

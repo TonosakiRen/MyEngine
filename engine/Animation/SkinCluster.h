@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file SkinCluster.h
+ * @brief Skinningをするためのモジュール
+ */
 #include <vector>
 #include <span>
 #include <array>

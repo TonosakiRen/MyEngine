@@ -1,4 +1,9 @@
 #pragma once
+/**
+ * @file GrayScale.h
+ * @brief GrayScaleのPipeline
+ */
+
 #include <Windows.h>
 #include <memory>
 #include <vector>

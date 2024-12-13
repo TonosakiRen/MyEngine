@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file EnemyBullet.h
+ * @brief 敵弾
+ */
 #include "Mymath.h"
 #include "GameComponent/WorldTransform.h"
 #include "GameComponent/Collider.h"

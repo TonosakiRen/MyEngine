@@ -1,3 +1,7 @@
+/**
+ * @file Player.h
+ * @brief player
+ */
 #include "Player/Player.h"
 #include "ImGuiManager.h"
 #include "Player/PlayerBulletManager.h"
@@ -30,8 +34,8 @@ void Player::Initialize(const std::string name, PlayerBulletManager* playerBulle
 	playerModel_.SetMoving(PlayerModel::kStand);
 	playerModel_.Update();
 	
-	color_ = { 1.0f,1.0f,1.0f,1.0f };
 	PointLights* pointLights = LightManager::GetInstance()->pointLights_.get();
+	//PointLightの初期か
 	for (int i = 0; i < PointLights::lightNum; i++) {
 		if (pointLights->lights_[i].isActive == false) {
 			pointLight_ = &pointLights->lights_[i];
@@ -58,6 +62,7 @@ void Player::Update(const ViewProjection& viewProjection)
 	ReticleUpdate(viewProjection);
 	Fire();
 
+	//光の当たり判定球が膨張していたら
 	if (isGrowSphere_) {
 		lightSphereT_ += growSpeed;
 		lightSphereT_ = clamp(lightSphereT_, 0.0f, 1.0f);
@@ -82,10 +87,12 @@ void Player::Update(const ViewProjection& viewProjection)
 	ImGui::End();
 #endif
 
+	//色を1.0fまで遷移
 	colorT_ += 0.02f;
 	colorT_ = clamp(colorT_, 0.0f, 1.0f);
 	material_.color_ = Lerp(colorT_, material_.color_, color_);
 	pointLight_->color = material_.color_;
+
 	material_.Update();
 	worldTransform_.Update();
 	worldTransform3DReticle_.Update();
@@ -124,15 +131,6 @@ void Player::Draw() {
 void Player::Fire()
 {
 	if (input_->TriggerButton(XINPUT_GAMEPAD_RIGHT_SHOULDER) || input_->TriggerKey(DIK_SPACE) || input_->TriggerButton(XINPUT_GAMEPAD_B) || input_->TriggerButton(XINPUT_GAMEPAD_A)) {
-		/*Vector3 position = MakeTranslation(worldTransform_.matWorld_);
-		Vector3 direction;
-		if (input_->PushRightTrigger()) {
-			direction = Normalize(worldTransform3DReticle_.translation_ - MakeTranslation(worldTransform_.matWorld_));
-		}
-		else {
-			direction = Normalize(direction_);
-		}
-		playerBulletManager_->PopPlayerBullet(position, direction);*/
 		isGrowSphere_ = true;
 	}
 }
@@ -172,6 +170,7 @@ void Player::Move(const ViewProjection& viewProjection)
 	Quaternion yq = MakeYAxisFromQuaternion(viewProjection.GetQuaternion());
 	move = move * yq;
 
+	//移動していたら
 	if (move.x != 0.0f || move.y != 0.0f || move.z != 0.0f) {
 		direction_ = Normalize(move);
 		inputQuaternion_ = MakeLookRotation(direction_);
@@ -179,10 +178,12 @@ void Player::Move(const ViewProjection& viewProjection)
 		playerModel_.SetMoving(PlayerModel::kWalk);
 	}
 
+	//ジャンプ
 	if (input_->TriggerKey(DIK_SPACE) || input_->TriggerButton(XINPUT_GAMEPAD_A)) {
 		//velocity_.y = 0.3f;
 	}
 
+	//移動し制限、速度加速度加算
 	velocity_.y = clamp(velocity_.y, -0.5f, 200.0f);
 	velocity_ += acceleration_;
 	worldTransform_.translation_ += velocity_;

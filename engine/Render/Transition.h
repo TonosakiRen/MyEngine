@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file Transition.h
+ * @brief Transitionを行うPipeline
+ */
 #include <Windows.h>
 #include <memory>
 #include <vector>
@@ -30,11 +34,9 @@ public:
 	void StartTransition() {
 		isTransition_ = true;
 	};
-
 	bool GetIsNextScene() {
 		return isNextScene_;
 	}
-
 private:
 	void CreatePipeline();
 private:

@@ -1,5 +1,8 @@
 #pragma once
-
+/**
+ * @file GPUResource.h
+ * @brief GPUResource
+ */
 #include <d3d12.h>
 #include <wrl/client.h>
 
@@ -12,6 +15,13 @@ class GPUResource {
 public:
     ~GPUResource();
 
+    //Resource作成
+    void CreateResource(
+        const std::wstring& name,
+        const D3D12_HEAP_PROPERTIES& heapProperties,
+        const D3D12_RESOURCE_DESC& desc,
+        D3D12_RESOURCE_STATES initState = D3D12_RESOURCE_STATE_COMMON);
+
     operator ID3D12Resource* () const { return resource_.Get(); }
 
     ID3D12Resource* operator->() { return resource_.Get(); }
@@ -20,12 +30,6 @@ public:
     ID3D12Resource** GetAddressOf() { return &resource_; }
 
     D3D12_GPU_VIRTUAL_ADDRESS GetGPUVirtualAddress() const { return resource_->GetGPUVirtualAddress(); }
-
-    void CreateResource(
-        const std::wstring& name,
-        const D3D12_HEAP_PROPERTIES& heapProperties,
-        const D3D12_RESOURCE_DESC& desc,
-        D3D12_RESOURCE_STATES initState = D3D12_RESOURCE_STATE_COMMON);
 
     void SetName(const std::wstring& name) {
         resource_->SetName(name.c_str());

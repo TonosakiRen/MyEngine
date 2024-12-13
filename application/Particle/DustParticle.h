@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file DustParticle.h
+ * @brief 足元のパーティクル
+ */
 #include <memory>
 #include "Particle/ParticleModelData.h"
 #include "GameComponent/WorldTransform.h"

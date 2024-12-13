@@ -1,3 +1,7 @@
+/**
+ * @file SpotLightShadowMap.h
+ * @brief SpotLightShadowMapのPipeline
+ */
 #include "Light/SpotLightShadowMap.h"
 #include "Texture/TextureManager.h"
 #include "Model/ModelManager.h"

@@ -1,3 +1,7 @@
+/**
+ * @file WaveModel.cpp
+ * @brief 波が発生するモデル描画
+ */
 #include "Wave/WaveModel.h"
 #include "Texture/TextureManager.h"
 #include "Model/ModelManager.h"

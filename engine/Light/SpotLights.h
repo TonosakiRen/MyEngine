@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file SpotLights.h
+ * @brief SpotLightsのPipeline構造体
+ */
 #include <d3d12.h>
 #include "Mymath.h"
 #include "GPUResource/StructuredBuffer.h"

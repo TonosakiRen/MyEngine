@@ -1,3 +1,7 @@
+/**
+ * @file LightObject.cpp
+ * @brief ライトを持ったオブジェクト
+ */
 #include "Stage/LightObject.h"
 #include "Draw/DrawManager.h"
 #include "GameComponent/Loader.h"

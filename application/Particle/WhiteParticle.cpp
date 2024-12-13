@@ -1,3 +1,7 @@
+/**
+ * @file WhiteParticle.cpp
+ * @brief whiteParticle
+ */
 #include "Particle/WhiteParticle.h"
 #include "ImGuiManager.h"
 #include "Draw/DrawManager.h"
@@ -24,6 +28,7 @@ void WhiteParticle::Initialize(Vector3 minDirection, Vector3 maxDirection)
 void WhiteParticle::Update() {
 
 
+	//出現
 	if (isEmit_) {
 		for (size_t i = 0; i < EmitNum_; i++) {
 			for (size_t j = 0; j < kParticleNum; j++) {
@@ -48,6 +53,7 @@ void WhiteParticle::Update() {
 		}
 	}
 
+	//更新
 	for (size_t i = 0; i < kParticleNum; i++) {
 		float rotationSpeed = Radian(2.0f) * (float(i % 2) * 2.0f - 1.0f);
 		if (particles[i].isActive == true) {

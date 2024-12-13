@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file WavePoints.h
+ * @brief 波の発生ポイント達
+ */
 #include <memory>
 #include "Wave/WaveData.h"
 #include "GameComponent/WorldTransform.h"
@@ -19,13 +23,10 @@ public:
 	void Update();
 	void Draw();
 
-	const WaveData* GetWaveData() const { return waveData_.get(); }
-
-	const Point* GetPoints() const { return points; }
-
 	uint32_t EmitPoint(const Vector3& pos);
-	
-	
+
+	const WaveData* GetWaveData() const { return waveData_.get(); }
+	const Point* GetPoints() const { return points; }
 private:
 	Point points[kWavePointNum];
 	std::unique_ptr<WaveData> waveData_;

@@ -1,3 +1,7 @@
+/**
+ * @file WavePoints.cpp
+ * @brief 波の発生ポイント達
+ */
 #include "WavePoints/WavePoints.h"
 #include "ImGuiManager.h"
 #include "Draw/DrawManager.h"
@@ -16,10 +20,13 @@ void WavePoints::Initialize()
 
 void WavePoints::Update() {
 	
+	const float waveDownSpeed = 0.01f;
+
+	//tの値を減産
 	for (size_t i = 0; i < kWavePointNum; i++)
 	{
 		if (points[i].t_ >= 0.0f) {
-			points[i].t_ -= 0.01f;
+			points[i].t_ -= waveDownSpeed;
 		}
 		points[i].t_ = std::clamp(points[i].t_, 0.0f, 1.0f);
 	}
@@ -45,6 +52,7 @@ void WavePoints::Draw()
 
 uint32_t WavePoints::EmitPoint(const Vector3& pos)
 {
+	//tが0.0f以下のwavePointに割り当て
 	for (uint32_t i = 0; i < kWavePointNum; i++)
 	{
 		if (points[i].t_ <= 0.0f) {

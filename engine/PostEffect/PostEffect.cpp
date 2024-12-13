@@ -1,3 +1,7 @@
+/**
+ * @file PostEffect.cpp
+ * @brief PostEffectのPipeline
+ */
 #include "PostEffect/PostEffect.h"
 #include <DirectXTex.h>
 #include <d3dcompiler.h>

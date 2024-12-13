@@ -1,3 +1,7 @@
+/**
+ * @file TLAS.h
+ * @brief TLASの構造体
+ */
 #include "Raytracing/TLAS.h"
 
 #include <cassert>

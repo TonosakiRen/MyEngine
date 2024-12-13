@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file DefaultBuffer.h
+ * @brief DefaultHeap用Buffer
+ */
 #include "GPUResource/GPUResource.h"
 #include "GPUResource/CopyBuffer.h"
 #include "Graphics/CommandContext.h"

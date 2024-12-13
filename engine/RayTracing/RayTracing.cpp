@@ -1,3 +1,7 @@
+/**
+ * @file Raytracing.cpp
+ * @brief RaytracingのPipeline
+ */
 #include "Raytracing/Raytracing.h"
 #include "Texture/TextureManager.h"
 #include "Model/ModelManager.h"

@@ -1,3 +1,7 @@
+/**
+ * @file PixelBuffer.cpp
+ * @brief Pixel用Buffer
+ */
 #include "GPUResource/PixelBuffer.h"
 
 #include <d3dx12.h>

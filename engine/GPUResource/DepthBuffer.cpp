@@ -1,3 +1,7 @@
+/**
+ * @file DepthBuffer.cpp
+ * @brief 深度用Buffer
+ */
 #include "GPUResource/DepthBuffer.h"
 
 #include "Graphics/DirectXCommon.h"

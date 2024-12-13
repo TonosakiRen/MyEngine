@@ -1,3 +1,7 @@
+/**
+ * @file UploadBuffer.h
+ * @brief UploadHeap用Buffer
+ */
 #include "GPUResource/UploadBuffer.h"
 
 #include <cassert>

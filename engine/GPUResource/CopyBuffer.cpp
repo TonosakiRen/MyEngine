@@ -1,3 +1,7 @@
+/**
+ * @file CopyBuffer.cpp
+ * @brief コピー用buffer
+ */
 #include "GPUResource/CopyBuffer.h"
 
 #include <cassert>

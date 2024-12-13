@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file StructuredBuffer.h
+ * @brief StructuredBuffer
+ */
 #include "GPUResource/UploadBuffer.h"
 #include "Graphics/DescriptorHandle.h"
 #include "Framework/Framework.h"

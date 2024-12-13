@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file AreaLights.h
+ * @brief AreaLights構造体
+ */
 #include <d3d12.h>
 #include "Mymath.h"
 #include "GPUResource/StructuredBuffer.h"
@@ -18,10 +22,7 @@ class AreaLights
 {
 public:
 
-	//4の倍数
 	static const uint32_t  lightNum = 1;
-
-	
 
 	struct ConstBufferData {
 		Vector4 color = { 1.0f, 1.0f, 1.0f,1.0f };

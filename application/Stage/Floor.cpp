@@ -1,3 +1,8 @@
+/**
+ * @file Floor.cpp
+ * @brief 床
+ */
+
 #include "Stage/Floor.h"
 #include "Texture/TextureManager.h"
 #include "ImGuiManager.h"
@@ -24,9 +29,10 @@ void Floor::Update()
 {
 	worldTransform_.Update();
 	const WavePoints::Point* points = wavePoints_->GetPoints();
-	for (auto it = waveIndexData_.index_.begin(); it != waveIndexData_.index_.end();) {
+	//波のtが0.0f以下のものをindexから削除
+	for (auto it = waveIndexData_.GetIndex().begin(); it != waveIndexData_.GetIndex().end();) {
 		if (points[*it].t_ <= 0) {
-			it = waveIndexData_.index_.erase(it);
+			it = waveIndexData_.GetIndex().erase(it);
 		}
 		else {
 			++it;

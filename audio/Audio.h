@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file Audio.h
+ * @brief Audioを扱う
+ */
 #include <xaudio2.h>
 #include <wrl.h>
 #include <fstream>

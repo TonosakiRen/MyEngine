@@ -27,14 +27,8 @@ void ModelManager::CreateMeshes(ModelData& modelData)
 
 	std::string directoryPath = "Resources/models/" + n + "/";
 
-	//debug
-	//directoryPath = "Resources/models/box1x1/";
-
 	Assimp::Importer importer;
 	std::string filePath = directoryPath + modelData.name;
-
-	//debug
-	//filePath = directoryPath + "box1x1.obj";
 
 	const aiScene* scene = importer.ReadFile(filePath.c_str(), aiProcess_FlipWindingOrder | aiProcess_FlipUVs);
 	assert(scene->HasMeshes());

@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file Voronoi.h
+ * @brief ボロノイテクスチャ用Pipeline
+ */
 #include <stdint.h>
 #include "GPUResource/ColorBuffer.h"
 #include "GPUResource/CubeColorBuffer.h"

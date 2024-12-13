@@ -1,3 +1,7 @@
+/**
+ * @file GlobalVariables.cpp
+ * @brief 調整する変数読み込み掃き出し
+ */
 #include "GameComponent/GlobalVariables.h"
 
 #include <json.hpp>

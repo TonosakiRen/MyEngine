@@ -1,3 +1,7 @@
+/**
+ * @file DescriptorHandle.h
+ * @brief DescriptorHeapのHandle
+ */
 #include "Graphics/DescriptorHeap.h"
 
 #include <cassert>

@@ -1,3 +1,7 @@
+/**
+ * @file Easing.cpp
+ * @brief Easingの関数まとめ
+ */
 #include "Easing.h"
 #include <algorithm>
 

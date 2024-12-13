@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * @file TileBasedRendering.h
+ * @brief TBR用Pipeline
+ */
 #include <vector>
 #include "Graphics/PipelineState.h"
 #include "Graphics/RootSignature.h"
@@ -22,7 +26,7 @@ public:
 	static const uint32_t kMaxInTilePointLight = 128;
 
 	void Initialize();
-	void ComputeUpdate(CommandContext& commandContext, const ViewProjection& viewProjection);
+	void Dispatch(CommandContext& commandContext, const ViewProjection& viewProjection);
 
 	const DescriptorHandle& GetTileInformationGPUHandle() const {
 		return rwTilesInformation_.GetUAV();

@@ -1,3 +1,7 @@
+/**
+ * @file Enemy.cpp
+ * @brief 敵
+ */
 #include "Enemy/Enemy.h"
 #include "Enemy/EnemyBulletManager.h"
 #include "Player/Player.h"
@@ -48,7 +52,8 @@ void Enemy::OnCollision()
 
 void Enemy::Draw()
 {
-	GameObject::Draw({ 0.4f,0.4f,0.4f,1.0f });
+	const Vector4 color = { 0.4f,0.4f,0.4f,1.0f };
+	GameObject::Draw(color);
 }
 
 void Enemy::Fire()

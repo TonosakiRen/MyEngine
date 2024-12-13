@@ -1,3 +1,7 @@
+/**
+ * @file FloorRenderer.cpp
+ * @brief Floorを描画するPipeline
+ */
 #include "Wave/FloorRenderer.h"
 #include "Texture/TextureManager.h"
 #include "Model/ModelManager.h"

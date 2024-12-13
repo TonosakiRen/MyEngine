@@ -1,4 +1,9 @@
 #pragma once
+/**
+ * @file GameObject.h
+ * @brief 描画されるGameObject
+ */
+
 #include <string>
 
 #include "GameComponent/ViewProjection.h"

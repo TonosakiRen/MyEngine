@@ -1,3 +1,7 @@
+/**
+ * @file WinApp.cpp
+ * @brief WindowsAPIラップ
+ */
 #include "Graphics/WinApp.h"
 #include <string>
 #include <imgui.h>
