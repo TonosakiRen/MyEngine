@@ -31,21 +31,23 @@ public:
 
     D3D12_GPU_VIRTUAL_ADDRESS GetGPUVirtualAddress() const { return resource_->GetGPUVirtualAddress(); }
 
+    //RESROUCE_STATESのセット
+    void SetState(const D3D12_RESOURCE_STATES state) {
+        state_ = state;
+    }
+    //voidポインタにMapする関数
+    HRESULT Map(void* cpuData) {
+        return(resource_->Map(0, nullptr, &cpuData));
+    }
+    //resrouceManagerのindex取得
+    uint32_t GetIndex() {
+        return index_;
+    }
     void SetName(const std::wstring& name) {
         resource_->SetName(name.c_str());
         name_ = name;
     }
-    void SetState(const D3D12_RESOURCE_STATES state) {
-        state_ = state;
-    }
 
-    HRESULT Map(void* cpuData) {
-        return(resource_->Map(0, nullptr, &cpuData));
-    }
-
-    uint32_t GetIndex() {
-        return index_;
-    }
 
   
 

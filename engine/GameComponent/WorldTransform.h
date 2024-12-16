@@ -30,6 +30,7 @@ public:
 		constBuffer_.Copy(matWorld_);
 	}
 
+	//親子付け
 	void SetParent(WorldTransform* parent,bool applyLocalSpace = true) {
 		if (applyLocalSpace) {
 			if (parent != parent_) {

@@ -35,10 +35,11 @@ public:
     };
 
 	void Initialize();
+    //カリングするViewProjectionのセット
 	void SetViewProjection(const ViewProjection* viewProjection) {
 		currentViewProjection_ = viewProjection;
 	}
-    //カリングの
+    //描画するかしないかの判定する関数
 	bool IsDraw(const uint32_t modelHandle,const WorldTransform& worldTransform);
 	uint32_t GetTileIndex();
 	bool IsFrustumSphereCollision(const Frustum& frustum,const Sphere& sphere);

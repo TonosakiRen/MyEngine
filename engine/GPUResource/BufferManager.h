@@ -43,7 +43,7 @@ public:
 		return index;
 	}
 
-	//releaseするresource
+	//releaseするresourceを登録
 	void ReleaseResource(uint32_t index, bool isMap = false);
 	//release
 	void ReleaseAllResource();

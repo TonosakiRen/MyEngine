@@ -14,6 +14,7 @@ class GameObjectManager
 public:
 	
 	static GameObjectManager* GetInstance();
+	//Gameobjectのロード
 	void Load();
 	void Finalize();
 
