@@ -26,8 +26,10 @@ public:
 	static const uint32_t kMaxInTilePointLight = 128;
 
 	void Initialize();
+	//実行
 	void Dispatch(CommandContext& commandContext, const ViewProjection& viewProjection);
 
+	//Getter
 	const DescriptorHandle& GetTileInformationGPUHandle() const {
 		return rwTilesInformation_.GetUAV();
 	}

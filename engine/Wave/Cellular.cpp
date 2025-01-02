@@ -17,7 +17,7 @@ Cellular::Cellular()
 
 void Cellular::Initialize(uint32_t tileWidthNum)
 {
-    InitializeGraphicsPipeline();
+    CreatePipeline();
 
     uint32_t width = 1024;
 
@@ -79,7 +79,7 @@ void Cellular::Finalize()
     cellularTexture_.reset();
 }
 
-void Cellular::InitializeGraphicsPipeline()
+void Cellular::CreatePipeline()
 {
     ComPtr<IDxcBlob> vsBlob;
     ComPtr<IDxcBlob> psBlob;

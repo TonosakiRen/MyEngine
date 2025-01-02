@@ -26,6 +26,7 @@ public:
 	template<class T>
 	void Copy(const T& srcData) { structuredBuffer_.Copy(&srcData, sizeof(srcData)); }
 
+	//Getter
 	const DescriptorHandle& GetGPUHandle() const { return structuredBuffer_.GetSRV(); }
 	const WaveData::Data* GetData() const{
 		return data_;

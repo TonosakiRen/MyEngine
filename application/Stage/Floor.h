@@ -17,6 +17,7 @@ public:
     void Initialize(const std::string name, WavePoints* wavePoints);
     void Update();
     void Draw();
+public:
     WaveIndexData waveIndexData_;
 private:
     uint32_t textureHandle_ = 0;

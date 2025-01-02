@@ -36,16 +36,29 @@ public:
 	//カメラシェイク
 	bool Shake(Vector3 shakeValue, int& frame);
 
+	//Setter
+	void SetFarZ(float farZ) {
+		farZ_ = farZ;
+	}
+	void SetTranslation(const Vector3& translation) {
+		translation_ = translation;
+	}
+
+	void SetQuaternion(const Vector3& euler) {
+		quaternion_ = MakeFromEulerAngle(euler);
+	}
+
+	void SetQuaternion(const Quaternion& quaternion) {
+		quaternion_ = quaternion;
+	}
+
+	//Getter
 	D3D12_GPU_VIRTUAL_ADDRESS GetGPUVirtualAddress() const {
 		return constBuffer_.GetGPUVirtualAddress();
 	}
 
 	D3D12_GPU_VIRTUAL_ADDRESS GetFrustumGPUVirtualAddress() const {
 		return frustumBuffer_.GetGPUVirtualAddress();
-	}
-
-	void SetFarZ(float farZ) {
-		farZ_ = farZ;
 	}
 
 	const Matrix4x4 GetMatView() const {
@@ -76,17 +89,6 @@ public:
 		return worldMatrix_;
 	}
 
-	void SetTranslation(const Vector3& translation) {
-		translation_ = translation;
-	}
-
-	void SetQuaternion(const Vector3& euler) {
-		quaternion_ = MakeFromEulerAngle(euler);
-	}
-
-	void SetQuaternion(const Quaternion& quaternion) {
-		quaternion_ = quaternion;
-	}
 
 protected:
 	Vector3 translation_ = { 0.0f, 7.0f, -27.0f };

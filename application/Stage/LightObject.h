@@ -16,7 +16,9 @@ public:
     void Initialize(const std::string& name, PointLight* pointLight, const Vector4& color, const Vector3& scale, const Quaternion& quaternion, const Vector3& position);
     void Update();
 
+    //Setter
     void SetColor(const Vector4& color);
+    //Getter
     Collider& GetCollider() { return collider_; }
 protected:
     Collider collider_;

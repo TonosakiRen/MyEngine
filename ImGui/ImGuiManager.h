@@ -12,7 +12,9 @@ public:
 	static ImGuiManager* GetInstance();
 	void Initialize(WinApp* winApp);
 	void Finalize();
+	//Frame開始処理
 	void Begin();
+	//DrawCall
 	void Draw(CommandContext& commandContext);
 
 private:

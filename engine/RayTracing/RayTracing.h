@@ -35,11 +35,13 @@ public:
 
 	void Initialize();
 	void Update(CommandContext& commandContext);
+	//InstanceDescを追加
 	void AddInstanceDesc(const BLAS& blas, const WorldTransform& worldTransform);
 	void AddInstanceDesc(const BLAS& blas, const Matrix4x4& matrix);
 	void Finalize();
 
 private:
+	//pipline生成
 	void CreatePipeline();
 private:
 	std::unique_ptr<TLAS> tras_;

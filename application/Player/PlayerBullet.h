@@ -18,6 +18,7 @@ public:
 	void OnCollision();
 	void Draw();
 
+	//Getter
 	bool IsDead() const { return isDead_; }
 	Collider& GetCollider() { return collider_; }
 

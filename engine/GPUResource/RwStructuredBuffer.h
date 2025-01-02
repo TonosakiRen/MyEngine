@@ -15,8 +15,8 @@ public:
 
     void Create(const std::wstring& name, size_t bufferSize, UINT numElements);
 
+    //Getter
     size_t GetBufferSize() const { return bufferSize_; }
-
     const DescriptorHandle& GetUAV() const {
         return uavHandle_;
     }

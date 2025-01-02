@@ -14,9 +14,10 @@ class SphereLights
 public:
 	static const uint32_t kSphereNum = 64;
 	void Initialize();
-	void Emit(const Vector3& position, const Vector4& color);
 	void Update();
 	void Draw();
+	//パーティクル発生
+	void Emit(const Vector3& position, const Vector4& color);
 	struct Sphere {
 		WorldTransform worldTransform_{};
 		Vector4 color_;

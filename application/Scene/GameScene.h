@@ -30,10 +30,10 @@ public:
 	void Update();
 	void Draw();
 
+	//Getter
 	ViewProjection& GetViewProjection() {
 		return *currentViewProjection;
 	}
-
 	ViewProjection& GetGameViewProjection() {
 		return *camera_;
 	}

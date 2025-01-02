@@ -29,6 +29,7 @@ public:
 	static TextureManager* GetInstance();
 	//読み込み
 	static uint32_t Load(const std::string& fileName);
+	//UV読み込み
 	static uint32_t LoadUv(const std::string& fileName, const std::string& filePass);
 
 	void Initialize(CommandContext& commandContext ,std::string directoryPath = "Resources/textures/");
@@ -37,6 +38,7 @@ public:
 
 	//DescriptorTableをセット
 	void SetDescriptorTable(CommandContext& commandList, const  UINT rootParamIndex, const  uint32_t textureHandle);
+	//Getter
 	DescriptorHandle GetSRV(const std::string& fileName);
 	const D3D12_RESOURCE_DESC GetResoureDesc(const uint32_t textureHandle);
 

@@ -19,11 +19,13 @@ public:
     template<class T>
     void Copy(const T& srcData, CommandContext& commandContext) { Copy(&srcData, sizeof(srcData), commandContext); }
 
+    //Setter
+    void SetZero();
+    //Getter
     size_t GetBufferSize() const { return bufferSize_; }
     void* GetCPUData() const { return cpuData_; }
 
-    void SetZero();
-
+    //Copy用Bufferを解放
     void DestroyCopyBuffer();
 
 protected:

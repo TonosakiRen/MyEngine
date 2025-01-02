@@ -16,9 +16,10 @@ class Mushrooms
 public:
     static const uint32_t kMushroomNum_ = 82;
     void Initialize(const std::string& name,WorldTransform& parentWorldTransform);
-    void ChangeColorSphere(Collider& collider, const Vector4& color);
     void Update();
     void Draw();
+    //当たり判定、当たっていたら色を変える
+    void ChangeColorSphere(Collider& collider, const Vector4& color);
 private:
     std::array<Mushroom, kMushroomNum_> mushrooms;
     std::unique_ptr<ParticleModelData> data_;

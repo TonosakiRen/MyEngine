@@ -18,10 +18,11 @@ public:
     template<class T>
     void Copy(const T& srcData) const { CopyResourceCopy(&srcData, sizeof(srcData)); }
 
+    //データに0をセット
+    void SetZero();
+    //Getter
     size_t GetBufferSize() const { return bufferSize_; }
     void* GetCPUData() const { return cpuData_; }
-
-    void SetZero();
 
 protected:
 

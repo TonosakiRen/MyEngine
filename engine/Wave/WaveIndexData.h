@@ -17,10 +17,10 @@ public:
 	void Initialize();
 	void Update();
 
+	//Getter
 	const DescriptorHandle& GetGPUHandle() const {
 		return waveIndexBuffer_.GetSRV();
 	}
-
 	std::vector<uint32_t>& GetIndex() {
 		return index_;
 	}

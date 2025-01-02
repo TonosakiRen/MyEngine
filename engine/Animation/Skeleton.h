@@ -37,6 +37,7 @@ public:
 	void Create(const Node& rootNode);
 	void Update();
 
+	//Getter
 	const Joint& GetJoint(std::string name) {
 		int32_t index = 0;
 		if (jointMap_.find(name) != jointMap_.end()) {
@@ -44,14 +45,16 @@ public:
 		}
 		return joints_[index];
 	}
-
 	std::vector<Joint>& GetAllJoint() {
 		return joints_;
 	}
+	//Setter
 	void SetParent(WorldTransform* parent) {
 		parent_ = parent;
 	};
 
+private:
+	//jointを生成
 	int32_t CreateJoint(const Node& node, const std::optional<int32_t>& parent, std::vector<Joint>& joints);
 
 	int32_t root_; //RootJointのIndex

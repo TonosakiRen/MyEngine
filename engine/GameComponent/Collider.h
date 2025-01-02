@@ -30,7 +30,9 @@ public:
 	void MatrixUpdate();
 	void Draw();
 
+	//OBBの当たり判定
 	bool ObbCollision(const OBB& obb1, const OBB& obb2);
+	//OBBの当たり判定(押し出し軸と押し出し距離の参照)
 	bool ObbCollision(const OBB& obb1, const OBB& obb2, Vector3& minAxis, float& minOverlap);
 
 public:

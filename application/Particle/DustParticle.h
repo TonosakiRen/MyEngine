@@ -15,6 +15,7 @@ public:
 	void Initialize(Vector3 minDirection, Vector3 maxDirection);
 	void Update();
 	void Draw();
+	//Setter
 	void SetDirection(Vector3 minDirection, Vector3 maxDirection) {
 		minDirection_ = minDirection;
 		maxDirection_ = maxDirection;

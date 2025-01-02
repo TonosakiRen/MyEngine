@@ -10,6 +10,7 @@
 
 class PixelBuffer : public GPUResource {
 public:
+    //Getter
     uint32_t GetWidth() const { return width_; }
     uint32_t GetHeight() const { return height_; }
     uint32_t GetArraySize() const { return arraySize_; }

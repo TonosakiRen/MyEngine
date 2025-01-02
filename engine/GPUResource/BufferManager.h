@@ -17,6 +17,7 @@ public:
 
 	static BufferManager* GetInstance();
 	void Finalize();
+
 	//resource作成
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateResource(uint32_t& index, const D3D12_HEAP_PROPERTIES* pHeapProperties,
 		D3D12_HEAP_FLAGS HeapFlags,

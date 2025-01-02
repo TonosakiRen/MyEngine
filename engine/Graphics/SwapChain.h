@@ -25,6 +25,7 @@ public:
     //Bufferを画面に表示
     void Present();
 
+    //Getter
     ColorBuffer& GetColorBuffer() { return *buffers_[currentBufferIndex_]; }
     const ColorBuffer& GetColorBuffer() const { return *buffers_[currentBufferIndex_]; }
     uint32_t GetBufferIndex() const { return currentBufferIndex_; }

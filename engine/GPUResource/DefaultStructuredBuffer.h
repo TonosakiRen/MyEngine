@@ -12,6 +12,7 @@ public:
 
     void Create(const std::wstring& name, size_t bufferSize, UINT numElements);
 
+    //Getter
     const DescriptorHandle& GetSRV() const {
         return srvHandle_;
     }

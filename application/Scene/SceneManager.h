@@ -13,11 +13,11 @@ public:
 	void Finalize();
 
 	void Update();
-
 	void Draw();
 
+	//Setter
 	void SetNextScene(BaseScene* nextScene) { nextScene_ = nextScene; };
-
+	//Getter
 	void* GetNextScene() const{
 		return nextScene_;
 	}

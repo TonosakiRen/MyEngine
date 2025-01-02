@@ -13,7 +13,7 @@ public:
     void Initialize();
     void Update();
     void Draw();
-
+    //Getter
     std::unique_ptr < Mushrooms>& GetMushrooms() {
         return mushRooms_;
     }

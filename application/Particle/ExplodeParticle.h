@@ -19,6 +19,7 @@ public:
 	void Update();
 	void Draw();
 
+	//Setter
 	void SetIsEmit(bool isEmit) {
 		isEmit_ = isEmit;
 	}

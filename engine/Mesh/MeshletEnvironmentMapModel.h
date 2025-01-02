@@ -82,8 +82,9 @@ public:
 
 	void Initialize(Sky& sky);
 	void Finalize();
+	//DrawCall実行前処理
 	void PreDraw(PipelineType pipelineType, CommandContext& commandContext, const ViewProjection& viewProjection , const ViewProjection& cullingViewProjection,const TileBasedRendering& tileBasedRendering);
-
+	//DrawCall
 	void Draw(CommandContext& commandContext, uint32_t modelHandle, const WorldTransform& worldTransform, const Material& material);
 	void Draw(CommandContext& commandContext, uint32_t modelHandle, const WorldTransform& worldTransform, SkinCluster& skinCluster, const Material& material);
 private: 

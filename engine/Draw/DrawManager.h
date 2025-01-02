@@ -63,7 +63,7 @@ public:
 
 	static DrawManager* GetInstance();
 
-	//DrawCall
+	//各パイプラインDrawCall
 	void DrawModel(const WorldTransform& worldTransform, const uint32_t modelHandle = 0,const uint32_t textureHandle = 0, const Material& material = *defaultMaterial_.get());
 	void DrawModel(const WorldTransform& worldTransform, const uint32_t modelHandle, SkinCluster& skinCluster, const uint32_t textureHandle = 0, const Material& material = *defaultMaterial_.get());
 	void DrawMeshletModel(const WorldTransform& worldTransform, const uint32_t modelHandle = 0, const uint32_t textureHandle = 0, const Material& material = *defaultMaterial_.get());
@@ -88,11 +88,16 @@ private:
 
 	void Initialize(CommandContext& CommandContext);
 	void Finalize();
-	//DrawCall実行
+
+	//すべてのDrawCall実行
 	void AllDraw(PipelineType pipelineType,const ViewProjection& viewProjection,const TileBasedRendering& tileBasedRendering);
+	//背景画像DrawCall実行
 	void PostSpriteDraw();
+	//影DrawCall
 	void ShadowDraw();
+	//SpotLight影DrawCall
 	void ShadowSpotLightDraw();
+
 	//DrawCallReset
 	void ResetCalls();
 

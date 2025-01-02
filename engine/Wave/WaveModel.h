@@ -87,12 +87,15 @@ public:
 
 	void Initialize();
 	void Finalize();
+	//DrawCall前処理
 	void PreDraw(PipelineType pipelineType, CommandContext& commandContext, const ViewProjection& viewProjection , const ViewProjection& cullingViewProjection, const TileBasedRendering& tileBasedRendering);
 
 	void Draw(CommandContext& commandContext, uint32_t modelHandle, const WorldTransform& worldTransform,const WaveData& waveData, const WaveIndexData& waveIndexData, const Material& material,const uint32_t textureHandle = 0);
 	void Draw(CommandContext& commandContext, uint32_t modelHandle, const WorldTransform& worldTransform, const WaveData& waveData, const WaveIndexData& waveIndexData, SkinCluster& skinCluster, const Material& material, const uint32_t textureHandle = 0);
 private: 
+	//pipeline生成
 	void CreatePipeline();
+	//ForwardRendering用pipeline生成
 	void CreateForwardPipeline();
 private:
 	std::unique_ptr<RootSignature> rootSignature_[kPipelineNum];

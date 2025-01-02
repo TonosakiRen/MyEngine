@@ -35,18 +35,17 @@ public:
     };
 
 	void Initialize();
+    //描画するかしないかの判定する関数
+	bool IsDraw(const uint32_t modelHandle,const WorldTransform& worldTransform);
     //カリングするViewProjectionのセット
 	void SetViewProjection(const ViewProjection* viewProjection) {
 		currentViewProjection_ = viewProjection;
 	}
-    //描画するかしないかの判定する関数
-	bool IsDraw(const uint32_t modelHandle,const WorldTransform& worldTransform);
-	uint32_t GetTileIndex();
+private:
+    //視錐台と球の当たり判定
 	bool IsFrustumSphereCollision(const Frustum& frustum,const Sphere& sphere);
 
-    
 	ModelManager* modelManager_ = nullptr;
 	const ViewProjection* currentViewProjection_ = nullptr;
-private:
 };
 

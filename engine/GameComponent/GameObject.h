@@ -25,10 +25,20 @@ public:
 	void Initialize(const std::string name);
 	void Initialize(uint32_t modelHandle);
 	void Initialize();
+	//Matrix更新
 	void UpdateMatrix();
+	//マテリアル更新
 	void UpdateMaterial(Vector4 color = { 1.0f,1.0f,1.0f,1.0f });
 	void Draw(Vector4 color = { 1.0f,1.0f,1.0f,1.0f });
 
+	//Getter
+	WorldTransform* GetWorldTransform() {
+		return &worldTransform_;
+	}
+	uint32_t GetModelHandle() const {
+		return modelHandle_;
+	}
+	//Setter
 	void SetEnableLighting(bool enableLighting) {
 		material_.enableLighting_ = enableLighting;
 	}
@@ -40,12 +50,6 @@ public:
 	}
 	void SetPosition(Vector3 position) {
 		worldTransform_.translation_ = position;
-	}
-	WorldTransform* GetWorldTransform() {
-		return &worldTransform_;
-	}
-	uint32_t GetModelHandle() const {
-		return modelHandle_;
 	}
 	void SetModelHandle(const uint32_t modelHandle) {
 		modelHandle_ = modelHandle;

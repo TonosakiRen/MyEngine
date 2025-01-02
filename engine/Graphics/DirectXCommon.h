@@ -27,15 +27,14 @@ public:
 
 	static DirectXCommon* GetInstance();
 	void Initialize();
-	void Shutdown();
+	void Finalize();
 
 	//DescriptorHeapにDescriptorを割り当て
 	DescriptorHandle AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE type);
 
+	//Getter
 	ID3D12Device5* GetDevice() { return device_.Get(); }
-
 	CommandQueue& GetCommandQueue() { return *commandQueue_.get(); }
-
 	DescriptorHeap& GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE type) { return *descriptorHeaps_[type]; }
 
 private:
@@ -46,6 +45,7 @@ private:
 	std::unique_ptr <DescriptorHeap> descriptorHeaps_[D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES];
 
 private:
+	//Device生成
 	void CreateDevice();
 };
 

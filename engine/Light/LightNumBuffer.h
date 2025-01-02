@@ -18,7 +18,7 @@ public:
 		uint32_t shadowSpotLightNum;
 		uint32_t maxInTilePointLight;
 	};
-
+	//Getter
 	D3D12_GPU_VIRTUAL_ADDRESS GetGPUVirtualAddress() const {
 		return lightNumBuffer_.GetGPUVirtualAddress();
 	}

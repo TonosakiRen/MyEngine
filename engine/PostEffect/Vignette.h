@@ -33,6 +33,7 @@ public:
 	void Draw(ColorBuffer& originalBuffer,ColorBuffer& tmpBuffer, CommandContext& commandContext);
 
 private:
+	//pipeline生成
 	void CreatePipeline(ColorBuffer& orignalBuffer);
 private:
 	RootSignature rootSignature_;

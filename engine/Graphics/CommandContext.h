@@ -23,89 +23,98 @@ class CommandContext
 {
 public:
     void Create();
+    void Finalize();
+
+    //DescritproHeapをセット
     void SetDescriptorHeap();
-
+    //Frame開始処理
     void Start();
-
-    void ShutDown();
-
+    //Frame終了処理
     void Close();
+    //CommandList,CommandAllocaterをReset
     void Reset();
-
+    //RESOURCE_STATE変更
     void TransitionResource(GPUResource& resource, D3D12_RESOURCE_STATES newState);
+    //RESOURCE_STATE変更を実行
     void FlushResourceBarriers();
-
+    //BufferのCopy
     void CopyBuffer(GPUResource& dest, GPUResource& src);
+    //BufferのCopy,byte数,offset指定
     void CopyBufferRegion(GPUResource& dest, size_t destOffset, GPUResource& src, size_t srcOffset, size_t numBytes);
 
+    //各オブジェクトをセット
     void SetPipelineState(const PipelineState& pipelineState);
     void SetGraphicsRootSignature(const RootSignature& rootSignature);
     void SetComputeRootSignature(const RootSignature& rootSignature);
-
-    void ClearColor(ColorBuffer& target);
-    void ClearColor(ColorBuffer& target, float clearColor[4]);
-    void ClearColor(CubeColorBuffer& target);
-    void ClearColor(CubeColorBuffer& target, float clearColor[4]);
-    void CopyCubeBuffer(CubeColorBuffer& dest, CubeColorBuffer& src, uint32_t srcIndex = 0);
-    void CopyCubeBuffer(CubeColorBuffer& dest, ColorBuffer& src);
-    void ClearDepth(DepthBuffer& target);
-    void ClearDepth(DepthBuffer& target, float clearValue);
-
     void SetRenderTargets(UINT numRTVs, const D3D12_CPU_DESCRIPTOR_HANDLE rtvs[]);
     void SetRenderTargets(UINT numRTVs, const D3D12_CPU_DESCRIPTOR_HANDLE rtvs[], D3D12_CPU_DESCRIPTOR_HANDLE dsv);
     void SetRenderTarget(const D3D12_CPU_DESCRIPTOR_HANDLE rtv) { SetRenderTargets(1, &rtv); }
     void SetRenderTarget(const D3D12_CPU_DESCRIPTOR_HANDLE rtv, D3D12_CPU_DESCRIPTOR_HANDLE dsv) { SetRenderTargets(1, &rtv, dsv); }
-
     void SetDepthStencil(D3D12_CPU_DESCRIPTOR_HANDLE dsv);
-
     void SetViewport(const D3D12_VIEWPORT& viewport);
     void SetViewport(FLOAT x, FLOAT y, FLOAT w, FLOAT h, FLOAT minDepth = 0.0f, FLOAT maxDepth = 1.0f);
     void SetScissorRect(const D3D12_RECT& rect);
     void SetScissorRect(UINT left, UINT top, UINT right, UINT bottom);
     void SetViewportAndScissorRect(const D3D12_VIEWPORT& viewport, const D3D12_RECT& rect);
     void SetViewportAndScissorRect(UINT x, UINT y, UINT w, UINT h);
-
     void SetPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY topology);
-
     void SetConstantArray(UINT rootIndex, UINT numConstants, const void* constants);
     void SetConstant(UINT rootIndex, UINT offset, DWParam value);
     void SetConstants(UINT rootIndex, DWParam x);
     void SetConstants(UINT rootIndex, DWParam x, DWParam y);
     void SetConstants(UINT rootIndex, DWParam x, DWParam y, DWParam z);
     void SetConstants(UINT rootIndex, DWParam x, DWParam y, DWParam z, DWParam w);
-
     void SetComputeConstantArray(UINT rootIndex, UINT numConstants, const void* constants);
     void SetComputeConstant(UINT rootIndex, UINT offset, DWParam value);
     void SetComputeConstants(UINT rootIndex, DWParam x);
     void SetComputeConstants(UINT rootIndex, DWParam x, DWParam y);
     void SetComputeConstants(UINT rootIndex, DWParam x, DWParam y, DWParam z);
     void SetComputeConstants(UINT rootIndex, DWParam x, DWParam y, DWParam z, DWParam w);
-
     void SetConstantBuffer(UINT rootIndex, D3D12_GPU_VIRTUAL_ADDRESS address);
     void SetComputeConstantBuffer(UINT rootIndex, D3D12_GPU_VIRTUAL_ADDRESS address);
     void SetComputeUAVBuffer(UINT rootIndex, D3D12_GPU_VIRTUAL_ADDRESS address);
     void SetDescriptorTable(UINT rootIndex, D3D12_GPU_DESCRIPTOR_HANDLE baseDescriptor);
     void SetComputeDescriptorTable(UINT rootIndex, D3D12_GPU_DESCRIPTOR_HANDLE baseDescriptor);
-
     void SetVertexBuffer(UINT slot, const D3D12_VERTEX_BUFFER_VIEW& vbv);
     void SetVertexBuffer(UINT slot, UINT numViews, const D3D12_VERTEX_BUFFER_VIEW vbvs[]);
     void SetIndexBuffer(const D3D12_INDEX_BUFFER_VIEW& ibv);
 
+    //Bufferを特定の色でクリア
+    void ClearColor(ColorBuffer& target);
+    void ClearColor(ColorBuffer& target, float clearColor[4]);
+    void ClearColor(CubeColorBuffer& target);
+    void ClearColor(CubeColorBuffer& target, float clearColor[4]);
+    //Depthをクリア
+    void ClearDepth(DepthBuffer& target);
+    void ClearDepth(DepthBuffer& target, float clearValue);
+
+    //CubeTexture用Copy
+    void CopyCubeBuffer(CubeColorBuffer& dest, CubeColorBuffer& src, uint32_t srcIndex = 0);
+    void CopyCubeBuffer(CubeColorBuffer& dest, ColorBuffer& src);
+
+    //UAVBarrierをはる
     void UAVBarrier(GPUResource& resource);
     void UAVBarrier(ID3D12Resource& resource);
 
+    //Dispatch行う
     void Dispatch(uint32_t x,uint32_t y,uint32_t z);
+    //MeshShaderのDispatch行う
     void DispatchMesh(uint32_t x, uint32_t y, uint32_t z);
 
+    //DrawCall
     void Draw(UINT vertexCount, UINT vertexStartOffset = 0);
+    //IndexBufferを使ったDrawCall
     void DrawIndexed(UINT indexCount, UINT startIndexLocation = 0, INT baseVertexLocation = 0);
+    //InscancingのDrawCall
     void DrawInstanced(UINT vertexCountPerInstance, UINT instanceCount, UINT startVertexLocation = 0, UINT startInstanceLocation = 0);
+    //InscancingのIndexBufferを使ったDrawCall
     void DrawIndexedInstanced(UINT indexCountPerInstance, UINT instanceCount, UINT startIndexLocation = 0, INT baseVertexLocation = 0, UINT startInstanceLocation = 0);
 
+    //ExcuteIndirectの実行
     void ExecuteIndirect(ID3D12CommandSignature* commandSignature, UINT maxCommandCount, ID3D12Resource* argumentBuffer, UINT64 argumentBufferOffset, ID3D12Resource* countBuffer, UINT64 countBufferOffset);
-
+    //RaytracingAccelerationStructureをビルド
     void BuildRaytracingAccelerationStructure(const D3D12_BUILD_RAYTRACING_ACCELERATION_STRUCTURE_DESC& asDesc);
-
+    
     operator ID3D12GraphicsCommandList6* () const { return currentCommandList_; }
     
 private:

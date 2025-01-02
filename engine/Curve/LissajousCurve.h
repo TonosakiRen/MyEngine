@@ -18,7 +18,8 @@ public:
 
 	void Initialize();
 	void Update();
-
+	
+	//Getter
 	const DescriptorHandle& GetGPUHandle() const { return structuredBuffer_.GetSRV(); }
 
 private:

@@ -14,9 +14,10 @@ public:
     static const uint32_t kMaxDescNum_ = 8192;
 
     void Create();
-    void AddDesc(D3D12_RAYTRACING_INSTANCE_DESC& desc);
     void Update();
-
+    //InstanceDescを追加
+    void AddDesc(D3D12_RAYTRACING_INSTANCE_DESC& desc);
+    //Getter
     uint32_t GetInstanceNum() const { return instanceNum_; }
     D3D12_GPU_VIRTUAL_ADDRESS GetGPUVirtualAddress() const{
         return descsBuffer_.GetGPUVirtualAddress();

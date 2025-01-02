@@ -29,13 +29,16 @@ public:
 	static uint32_t gbInstanceCount;
 
 	void Initialize(ColorBuffer* originalTexture);
+	//描画
 	void Render(CommandContext& commandContext);
 	//ぼかし度合い更新
 	void UpdateWeightTable(float blurPower);
 
+	//結果のGetter
 	ColorBuffer& GetResult() { return verticalBlurTexture_; }
 private:
-	void InitializeGraphicsPipeline();
+	//pipeline生成
+	void CreatePipeline();
 private:
 	static ID3D12GraphicsCommandList* sCommandList;
 	std::unique_ptr<RootSignature> sRootSignature;

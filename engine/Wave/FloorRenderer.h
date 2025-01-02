@@ -88,12 +88,15 @@ public:
 
 	void Initialize(CommandContext& commnadContext);
 	void Finalize();
+	//Drawcall前処理
 	void PreDraw(PipelineType pipelineType, CommandContext& commandContext, const ViewProjection& viewProjection, const ViewProjection& cullingViewProjection,const TileBasedRendering& tileBasedRendering,const LissajousCurve& lissajousCurve);
 
 	void Draw(CommandContext& commandContext, uint32_t modelHandle,const WorldTransform& worldTransform, const WaveData& waveData, const WaveIndexData& waveIndexData);
 
 private: 
+	//pipeline生成
 	void CreatePipeline();
+	//ForwardRendering用pipeline生成
 	void CreateForwardPipeline();
 private:
 	std::unique_ptr<RootSignature> rootSignature_[kPipelineNum];

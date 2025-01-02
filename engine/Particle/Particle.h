@@ -68,15 +68,18 @@ public:
 
 	void Initialize();
 	void Finalize();
+	//DrawCall実行前処理
 	void PreDraw(PipelineType pipelineType, CommandContext& commandContext, const ViewProjection& viewProjection,const TileBasedRendering& tileBasedRendering);
-
+	//DrawCall
 	void Draw(CommandContext& commandContext, ParticleData& bufferData, const Material& material , const uint32_t textureHadle = 0);
-	void CreateMesh();
-	void CreatePipeline();
-	void CreateForwardPipeline();
 
 private:
-
+	//Mesh生成
+	void CreateMesh();
+	//pipeline生成
+	void CreatePipeline();
+	//ForwardRendering用Pipeline生成
+	void CreateForwardPipeline();
 private:
 	std::unique_ptr<RootSignature> rootSignature_[kPipelineNum];
 	std::unique_ptr<PipelineState> pipelineState_[kPipelineNum];

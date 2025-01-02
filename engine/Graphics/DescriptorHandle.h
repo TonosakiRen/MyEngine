@@ -14,13 +14,15 @@ class DescriptorHandle {
 public:
     operator D3D12_CPU_DESCRIPTOR_HANDLE() const { return cpu_; }
     operator D3D12_GPU_DESCRIPTOR_HANDLE() const { return gpu_; }
-
+    //GPUのデータへのポインタを持っているか
     bool IsShaderVisible() const { return gpu_.ptr != 0; }
+    //CPUのデータへのポインタを持っている騎亜
     bool IsNull() const { return cpu_.ptr == 0; }
 
+    //Getter
     const D3D12_CPU_DESCRIPTOR_HANDLE& GetCpuHandle() const { return cpu_; }
     const D3D12_GPU_DESCRIPTOR_HANDLE& GetGpuHandle() const { return gpu_; }
-
+    //DescriptorHeapのindex取得
     const uint32_t& GetIndex() const { return index_; }
 private:
     D3D12_CPU_DESCRIPTOR_HANDLE cpu_ = D3D12_CPU_DESCRIPTOR_HANDLE_NULL;

@@ -30,12 +30,13 @@ public:
 	void Initialize(ColorBuffer& orinalBuffer);
 
 	void Draw(ColorBuffer& originalBuffer, CommandContext& commandContext);
-
+	//結果のGetter
 	ColorBuffer& GetResult() {
 		return resultBuffer_;
 	}
 
 private:
+	//pipeline生成
 	void CreatePipeline();
 private:
 	RootSignature rootSignature_;

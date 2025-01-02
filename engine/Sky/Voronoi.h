@@ -39,9 +39,11 @@ public:
 	void Initialize(uint32_t pointNum, CommandContext& commandContext);
 	void Render(CommandContext& commandContext);
 
+	//Getter
 	ColorBuffer& GetResult() { return voronoiTexture_; }
 private:
-	void InitializeGraphicsPipeline();
+	//pipeline生成
+	void CreatePipeline();
 private:
 	std::unique_ptr<RootSignature> sRootSignature;
 	std::unique_ptr<PipelineState> sPipelineState;

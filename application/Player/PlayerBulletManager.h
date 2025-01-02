@@ -14,9 +14,11 @@ class PlayerBulletManager
 public:
 	void Initialize(ExplodeParticle* explodeParticle);
 	void Update();
-	void PopPlayerBullet(Vector3 position, Vector3 direction);
 	void Draw();
 
+	//弾発射
+	void PopPlayerBullet(Vector3 position, Vector3 direction);
+	//Getter
 	std::list<std::unique_ptr<PlayerBullet>>& GetPlayerBullets() {
 		return playerBullets_;
 	}

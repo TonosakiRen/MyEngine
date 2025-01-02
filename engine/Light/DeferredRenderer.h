@@ -50,9 +50,11 @@ public:
 	};
 
 	void Initialize(ColorBuffer* originalTexture, ColorBuffer* normalTexture, ColorBuffer* materialTexture, DepthBuffer* depthTexture);
+	//描画
 	void Render(CommandContext& commandContext, ColorBuffer* originalBuffer_, ViewProjection& viewProjection, TileBasedRendering& tileBasedRendering);
 
 private:
+	//pipeline生成
 	void CreatePipeline();
 private:
 	PipelineState pipelineState_;

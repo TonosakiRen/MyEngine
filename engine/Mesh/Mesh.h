@@ -25,7 +25,7 @@ public:
 	};
 
 
-
+	//Getter
 	const D3D12_INDEX_BUFFER_VIEW* GetIbView() const {
 		return &ibView_;
 	}
@@ -41,7 +41,6 @@ public:
 	const std::vector<VertexData>& GetVerticies() const {
 		return vertices_;
 	}
-
 	const DescriptorHandle& GetVerticesSRV() const { return vertexBuffer_.GetSRV(); }
 
 public:

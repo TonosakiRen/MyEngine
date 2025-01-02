@@ -31,12 +31,14 @@ public:
 	};
 
 	void Initialize(uint32_t tileWidthNum);
+	//描画
 	void Render(CommandContext& commandContext);
 	void Finalize();
-
+	//Getter
 	ColorBuffer& GetResult() { return *cellularTexture_.get(); }
 private:
-	void InitializeGraphicsPipeline();
+	//pipeline生成
+	void CreatePipeline();
 private:
 	std::unique_ptr<RootSignature> sRootSignature;
 	std::unique_ptr<PipelineState> sPipelineState;

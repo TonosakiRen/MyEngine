@@ -21,6 +21,7 @@ public:
 	void Initialize();
 	void Update();
 
+	//Getter
 	D3D12_GPU_VIRTUAL_ADDRESS GetGPUVirtualAddress() const {
 		return constBuffer_.GetGPUVirtualAddress();
 	}

@@ -121,11 +121,11 @@ void Transition::Draw(ColorBuffer& resultBuffer, const DescriptorHandle& texture
 		else {
 			if (!isNextScene_) {
 				t_ += speed_;
-				t_ = clamp(t_, 0.0f, 1.0f);
+				t_ = Clamp(t_, 0.0f, 1.0f);
 			}
 			else {
 				t_ -= speed_;
-				t_ = clamp(t_, 0.0f, 1.0f);
+				t_ = Clamp(t_, 0.0f, 1.0f);
 			}
 		}
 

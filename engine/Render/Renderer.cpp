@@ -327,7 +327,7 @@ void Renderer::EndRender()
     
 }
 
-void Renderer::Shutdown() {
+void Renderer::Finalize() {
 
 
     CommandQueue& commandQueue = graphics_->GetCommandQueue();
@@ -369,9 +369,9 @@ void Renderer::Shutdown() {
     swapChain_.reset();
 
     drawManager_->Finalize();
-    commandContext_.ShutDown();
+    commandContext_.Finalize();
 
-    graphics_->Shutdown();
+    graphics_->Finalize();
     ImGuiManager_->Finalize();
 
     bufferManager_->Finalize();

@@ -14,12 +14,15 @@ public:
     //SwapChain用Create関数
     void CreateFromSwapChain(const std::wstring& name, ID3D12Resource* resource, uint32_t index);
 
+    //Setter
     void SetClearColor(const float* clearColor);
+    //Getter
     const float* GetClearColor() const { return clearColor_; }
     const DescriptorHandle& GetSRV() const { return srvHandle_; }
     const DescriptorHandle& GetRTV() const { return rtvHandle_; }
 
 private:
+    //Viewを生成
     void CreateViews();
 
     float clearColor_[4]{ 0.0f,0.0f,0.0f,0.0f };

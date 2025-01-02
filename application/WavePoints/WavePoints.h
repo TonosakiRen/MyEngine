@@ -23,8 +23,9 @@ public:
 	void Update();
 	void Draw();
 
+	//point出現
 	uint32_t EmitPoint(const Vector3& pos);
-
+	//Getter
 	const WaveData* GetWaveData() const { return waveData_.get(); }
 	const Point* GetPoints() const { return points; }
 private:

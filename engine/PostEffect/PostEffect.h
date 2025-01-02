@@ -36,6 +36,7 @@ public:
 	void Draw(DescriptorHandle srvHandle, ID3D12GraphicsCommandList* sCommandList);
 
 private:
+	//pipeline生成
 	void CreatePipeline();
 private:
 	RootSignature rootSignature_;

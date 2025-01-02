@@ -30,10 +30,12 @@ public:
 
 	void Initialize(uint32_t textureHandle = 0, Vector2 position = {0.0f,0.0f}, Vector4 color = {1.0f, 1.0f, 1.0f, 1.0f}, Vector2 anchorpoint = {0.5f, 0.5f}, bool isFlipX = false, bool isFlipY = false);
 
-	void SetTextureHandle(uint32_t textureHandle);
-	uint32_t GetTextureHandle() { return textureHandle_; }
 	//頂点データ更新
 	void TransferVertices();
+	//Setter
+	void SetTextureHandle(uint32_t textureHandle);
+	//Getter
+	uint32_t GetTextureHandle() { return textureHandle_; }
 
 public:
 

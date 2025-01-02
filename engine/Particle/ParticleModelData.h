@@ -27,7 +27,7 @@ public:
 	void PushBackData(const Data& data);
 	//Dataをリセット
 	void Reset();
-
+	//Getter
 	const DescriptorHandle& GetGPUHandle() const { return structuredBuffer_->GetSRV(); }
 	const uint32_t GetDataNum() const { return dataNum_; }
 	const Data* GetData() const { return data_; }

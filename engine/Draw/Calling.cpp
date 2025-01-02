@@ -26,11 +26,6 @@ bool Calling::IsDraw(const uint32_t modelHandle,const WorldTransform& worldTrans
 	return(IsFrustumSphereCollision(frustum,sphere));
 }
 
-uint32_t Calling::GetTileIndex()
-{
-	return 0;
-}
-
 bool Calling::IsFrustumSphereCollision(const Frustum& frustum, const Sphere& sphere)
 {
 	//平面の法線と内積をとる

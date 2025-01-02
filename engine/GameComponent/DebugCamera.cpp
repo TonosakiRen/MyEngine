@@ -62,7 +62,7 @@ void DebugCamera::DebugMode()
         Vector3 cameraZ = GetZAxis(rotMat) * (static_cast<float>(wheel / 120) * 0.5f);
         translation_ += cameraZ;
         //orthographicValue_ -= static_cast<float>(wheel / 120) * 0.01f;
-        orthographicValue_ = clamp(orthographicValue_, 0.01f, FLT_MAX);
+        orthographicValue_ = Clamp(orthographicValue_, 0.01f, FLT_MAX);
     }
 
     quaternion_ = MakeFromEulerAngle(debugRotation_);

@@ -17,6 +17,7 @@ public:
 	void Initialize(ExplodeParticle* explodeParticle);
 	void Update();
 	void Draw();
+	//Getter
 	std::array<RainDrop, rainDropNum_>& GetRainDrop() {
 		return rainDrops_;
 	}

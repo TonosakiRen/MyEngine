@@ -34,6 +34,7 @@ public:
     void Create(const Skeleton& skeleton,const uint32_t modelHandle);
     void Update();
     
+    //Getter
     RwStructuredBuffer& GetSkinnedVertices(){ return skinnedVertices_; }
     const DescriptorHandle& GetPaletteResourceSRV() const { return paletteResource_.GetSRV(); }
     const DescriptorHandle& GetInfluencesSRV() const { return influences_.GetSRV(); }

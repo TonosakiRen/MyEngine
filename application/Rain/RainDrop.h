@@ -21,6 +21,7 @@ public:
 	void Update();
 	void OnCollision();
 
+	//Getter
 	bool IsActive() const { return isActive_; }
 	Collider& GetCollider() { return collider_; }
 	const Vector4& GetColor() { return color_; }

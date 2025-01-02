@@ -27,7 +27,7 @@ void GaussianBlur::Initialize(ColorBuffer* originalTexture)
 {
     assert(originalTexture);
 
-    InitializeGraphicsPipeline();
+    CreatePipeline();
 
     originalTexture_ = originalTexture;
     horizontalBlurTexture_.Create(L"horizontalBlurTexture",
@@ -78,7 +78,7 @@ void GaussianBlur::Render(CommandContext& commandContext)
     commandContext.TransitionResource(verticalBlurTexture_, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 }
 
-void GaussianBlur::InitializeGraphicsPipeline()
+void GaussianBlur::CreatePipeline()
 {
     ComPtr<IDxcBlob> horizontalVsBlob;
     ComPtr<IDxcBlob> verticalVsBlob;

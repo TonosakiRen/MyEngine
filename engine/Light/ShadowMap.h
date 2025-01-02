@@ -28,11 +28,13 @@ public:
 
 	void Initialize();
 	void Finalize();
+	//DrawCall実行前処理
 	void PreDraw(CommandContext& commandContext, DirectionalLights& directionalLights);
-
+	//DrawCall
 	void Draw(CommandContext& commandContext, uint32_t modelHandle, const WorldTransform& worldTransform);
 
 private:
+	//pipeline生成
 	void CreatePipeline();
 private:
 	std::unique_ptr<RootSignature> rootSignature_;

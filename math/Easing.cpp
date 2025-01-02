@@ -19,7 +19,7 @@ float Easing::easing(float& t, float start, float end, float speed, EasingMode e
 	if (isAdd == true) {
 		t += speed;
 	}
-	t = clamp(t, 0.0f, 1.0f);
+	t = Clamp(t, 0.0f, 1.0f);
 
 	return((1.0f - easingFunction[easingMode](t)) * start + easingFunction[easingMode](t) * end);
 }
@@ -48,7 +48,7 @@ Vector2 Easing::easing(float& t, Vector2 start, Vector2 end, float speed, Easing
 	if (isAdd == true) {
 		t += speed;
 	}
-	t = clamp(t, 0.0f, 1.0f);
+	t = Clamp(t, 0.0f, 1.0f);
 	return{ ((1.0f - easingFunction[easingMode](t)) * start.x + easingFunction[easingMode](t) * end.x) ,((1.0f - easingFunction[easingMode](t)) * start.y + easingFunction[easingMode](t) * end.y) };
 }
 
@@ -56,7 +56,7 @@ Vector3 Easing::easing(float& t, Vector3 start, Vector3 end, float speed, Easing
 	if (isAdd == true) {
 		t += speed;
 	}
-	t = clamp(t, 0.0f, 1.0f);
+	t = Clamp(t, 0.0f, 1.0f);
 	return{ ((1.0f - easingFunction[easingMode](t)) * start.x + easingFunction[easingMode](t) * end.x) ,((1.0f - easingFunction[easingMode](t)) * start.y + easingFunction[easingMode](t) * end.y),((1.0f - easingFunction[easingMode](t)) * start.z + easingFunction[easingMode](t) * end.z) };
 }
 
@@ -64,7 +64,7 @@ Vector2 Easing::Bezier(const Vector2& p0, const Vector2& p1, const Vector2& p2, 
 	if (isAdd == true) {
 		t += speed;
 	}
-	t = clamp(t, 0.0f, 1.0f);
+	t = Clamp(t, 0.0f, 1.0f);
 	Vector2 tmp0 = easing(t, p0, p1, 0.0f, easingMode, false);
 	Vector2 tmp1 = easing(t, p1, p2, 0.0f, easingMode, false);
 	Vector2 tmp = easing(t, tmp0, tmp1, 0.0f, easingMode, false);
@@ -76,7 +76,7 @@ Vector2 Easing::Bezier(const Vector2& p0, const Vector2& p1, const Vector2& p2, 
 	if (isAdd) {
 		t += speed;
 	}
-	t = clamp(t, 0.0f, 1.0f);
+	t = Clamp(t, 0.0f, 1.0f);
 	Vector2 tmp0 = easing(t, p0, p1, 0.0f, easingMode, false);
 	Vector2 tmp1 = easing(t, p1, p2, 0.0f, easingMode, false);
 	Vector2 tmp2 = easing(t, p2, p3, 0.0f, easingMode, false);

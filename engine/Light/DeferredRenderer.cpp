@@ -53,7 +53,7 @@ void DeferredRenderer::Render(CommandContext& commandContext, ColorBuffer* origi
 	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kSpotLights), lightManager->spotLights_->structureBuffer_.GetSRV());
 	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kShadowSpotLights), lightManager->shadowSpotLights_->structureBuffer_.GetSRV());
 
-	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::k2DTextures), DirectXCommon::GetInstance()->GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV).GetDiscriptorStartHandle());
+	commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::k2DTextures), DirectXCommon::GetInstance()->GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV).GetDescriptorStartHandle());
 
 	commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kViewProjection), viewProjection.GetGPUVirtualAddress());
 	commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kLightNum), lightManager->lightNumBuffer_->GetGPUVirtualAddress());

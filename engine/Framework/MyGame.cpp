@@ -53,7 +53,7 @@ void MyGame::Finalize()
 	textureManager->Finalize();
 	lightManager_->Finalize();
 	gameObjectManager->Finalize();
-	renderer->Shutdown();
+	renderer->Finalize();
 	bufferManager->Finalize();
 
 	delete gameScene;

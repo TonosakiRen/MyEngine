@@ -14,14 +14,20 @@ public:
     ~CommandQueue();
 
     void Create();
+
+    //ComandList実行
     void Excute(ID3D12GraphicsCommandList* commandList);
+    //GPUからのSignal受信
     void Signal();
+    //GPUの処理を待つ
     void WaitForGPU();
+    //FPS固定
     void UpdateFixFPS();
 
     operator ID3D12CommandQueue* () const { return commandQueue_.Get(); }
 
 private:
+    //object解放
     void Destroy();
 
     Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue_;

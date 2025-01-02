@@ -32,6 +32,7 @@ public:
 
 	void Initialize();
 	void Finalize();
+	//Drawcall実行前処理
 	void PreDraw(CommandContext& commandContext);
 
 	void Draw(CommandContext& commandContext, SpriteData& spriteData);

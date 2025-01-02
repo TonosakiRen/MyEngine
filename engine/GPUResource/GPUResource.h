@@ -22,14 +22,11 @@ public:
         const D3D12_RESOURCE_DESC& desc,
         D3D12_RESOURCE_STATES initState = D3D12_RESOURCE_STATE_COMMON);
 
+    //ポインタ渡しのオーバーロード
     operator ID3D12Resource* () const { return resource_.Get(); }
-
     ID3D12Resource* operator->() { return resource_.Get(); }
     const ID3D12Resource* operator->() const { resource_; }
 
-    ID3D12Resource** GetAddressOf() { return &resource_; }
-
-    D3D12_GPU_VIRTUAL_ADDRESS GetGPUVirtualAddress() const { return resource_->GetGPUVirtualAddress(); }
 
     //RESROUCE_STATESのセット
     void SetState(const D3D12_RESOURCE_STATES state) {
@@ -43,14 +40,15 @@ public:
     uint32_t GetIndex() {
         return index_;
     }
+    //名前のセット
     void SetName(const std::wstring& name) {
         resource_->SetName(name.c_str());
         name_ = name;
     }
 
-
-  
-
+    //Getter
+    ID3D12Resource** GetAddressOf() { return &resource_; }
+    D3D12_GPU_VIRTUAL_ADDRESS GetGPUVirtualAddress() const { return resource_->GetGPUVirtualAddress(); }
 protected:
     Microsoft::WRL::ComPtr<ID3D12Resource> resource_ = nullptr;
     D3D12_RESOURCE_STATES state_ = D3D12_RESOURCE_STATE_COMMON;

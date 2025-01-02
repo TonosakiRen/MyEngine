@@ -57,35 +57,37 @@ public:
 
 
     void Initialize();
+    void Finalize();
+
+    //frame開始処理
     void BeginFrame();
-
+    //gameSceneの描画
     void MainRender(ViewProjection& viewProjection);
-
+    //main描画の終わった後の描画
     void DeferredRender(ViewProjection& viewProjection);
+    //影描画
     void ShadowMapRender();
+    //スポットライト影描画
     void SpotLightShadowMapRender();
-
+    //UI描画
     void UIRender();
+    //残りの描画
     void EndRender();
-    void Shutdown();
-
-    SwapChain& GetSwapChain() { return *swapChain_; }
-    CommandContext& GetCommandContext() { return commandContext_; }
-
+    //MainのDepthをクリア
+    void ClearMainDepthBuffer() { commandContext_.ClearDepth(*mainDepthBuffer_); }
+    //遷移開始
     void StartTransition() {
         transition_->StartTransition();
     };
 
+    //Getter
     bool GetIsNextScene() {
         return transition_->GetIsNextScene();
     }
-
+    SwapChain& GetSwapChain() { return *swapChain_; }
+    CommandContext& GetCommandContext() { return commandContext_; }
     DXGI_FORMAT GetRTVFormat(RenderTargetType rtvType) { return colorBuffers_[static_cast<uint32_t>(rtvType)]->GetFormat(); }
     DXGI_FORMAT GetDSVFormat() { return mainDepthBuffer_->GetFormat(); }
-
-    void ClearMainDepthBuffer() { commandContext_.ClearDepth(*mainDepthBuffer_); }
-
-
     static RenderingMode GetRenderingMode() {
         return renderingMode;
     }

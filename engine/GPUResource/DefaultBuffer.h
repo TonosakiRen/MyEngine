@@ -18,8 +18,9 @@ public:
     template<class T>
     void Copy(const T& srcData, CommandContext& commandContext) { Copy(&srcData, sizeof(srcData), commandContext); }
 
+    //Copy専用Bufferを解放
     void DestroyCopyBuffer();
-
+    //Getter
     size_t GetBufferSize() const { return bufferSize_; }
 
 protected:

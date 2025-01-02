@@ -20,6 +20,7 @@ public:
     static const uint32_t kMaxLevel = 4;
 
     void Initialize(ColorBuffer* originalTexture);
+    //描画
     void Render(CommandContext& commandContext, ColorBuffer* originalTexture, uint32_t level = kMaxLevel);
 
     //しきい値セット
@@ -27,7 +28,7 @@ public:
     //とがり値セット
     void SetKnee(float knee) { knee_ = knee; }
 
-
+    //Getter
     ColorBuffer& GetLuminanceTexture() { return luminanceTexture_; }
 
 private:

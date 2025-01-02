@@ -60,13 +60,14 @@ public:
 
     void Initialize(const std::string name,PlayerBulletManager* playerBulletManager);
     void Update(const ViewProjection& viewProjection);
-    void Extrusion(Collider& otherCollider);
-    void OnCollision();
-    void SetColor(const Vector4& color);
     void Draw();
-    void Fire();
-    void Move(const ViewProjection& viewProjection);
-    void ReticleUpdate(const ViewProjection& viewProjection);
+    //押し出し当たり判定
+    void Extrusion(Collider& otherCollider);
+    //当たり判定
+    void OnCollision();
+    //Setter
+    void SetColor(const Vector4& color);
+    //Getter
     const WorldTransform& GetWorldTransform() const {
         return worldTransform_;
     }
@@ -78,6 +79,13 @@ public:
     }
 public:
     Collider collider_;
+private:
+    //弾発射
+    void Fire();
+    //動き
+    void Move(const ViewProjection& viewProjection);
+    //レティクルアップデート
+    void ReticleUpdate(const ViewProjection& viewProjection);
 private:
     const float growSpeed = 0.01f;
 
@@ -103,4 +111,5 @@ private:
     Collider lightCollider_;
     float lightSphereT_ = 0.0f;
 
+    SpriteData spriteData_;
 };

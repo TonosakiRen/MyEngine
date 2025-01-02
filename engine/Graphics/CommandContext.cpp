@@ -51,7 +51,7 @@ void CommandContext::Start()
     pipelineState_ = nullptr;
 }
 
-void CommandContext::ShutDown()
+void CommandContext::Finalize()
 {
     commandAllocator_[0].Reset();
     commandAllocator_[1].Reset();

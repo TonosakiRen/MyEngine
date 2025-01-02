@@ -28,16 +28,18 @@ public:
 	};
 
 	void Initialize(ColorBuffer& resultBuffer);
-
 	void Draw(ColorBuffer& resultBuffer, const DescriptorHandle& textureBuffer, CommandContext& commandContext);
 
+	//遷移開始
 	void StartTransition() {
 		isTransition_ = true;
 	};
+	//遷移できたか
 	bool GetIsNextScene() {
 		return isNextScene_;
 	}
 private:
+	//pipeline生成
 	void CreatePipeline();
 private:
 	RootSignature rootSignature_;

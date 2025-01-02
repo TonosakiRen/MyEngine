@@ -18,7 +18,7 @@ Voronoi::Voronoi()
 void Voronoi::Initialize(uint32_t pointNum,CommandContext& commandContext)
 {
 
-    InitializeGraphicsPipeline();
+    CreatePipeline();
 
     voronoiTexture_.Create(L"voronoiTexture", 1024, 1024, DXGI_FORMAT_R32G32B32A32_FLOAT);
 
@@ -76,7 +76,7 @@ void Voronoi::Render(CommandContext& commandContext)
     commandContext.TransitionResource(voronoiTexture_, D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
 }
 
-void Voronoi::InitializeGraphicsPipeline()
+void Voronoi::CreatePipeline()
 {
     ComPtr<IDxcBlob> vsBlob;
     ComPtr<IDxcBlob> psBlob;

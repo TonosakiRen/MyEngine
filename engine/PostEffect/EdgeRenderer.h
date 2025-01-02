@@ -35,9 +35,11 @@ public:
 		Vector2 uv;
 	};
 	void Initialize(ColorBuffer* colorTexture,ColorBuffer* normalTexture, DepthBuffer* depthTexture);
+	//描画
 	void Render(CommandContext& commandContext, ColorBuffer& tmpBuffer, ColorBuffer* originalTexture);
 
 private:
+	//pipeline生成
 	void CreatePipeline();
 private:
 	PipelineState edgePipelineState_;

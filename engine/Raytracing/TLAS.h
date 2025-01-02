@@ -14,6 +14,7 @@ public:
 
     void Create(const std::wstring& name);
     void Build(CommandContext& commandContext, const RaytracingInstanceDescs& descs);
+    //Getter
     size_t GetBufferSize() const { return bufferSize_; }
 
 protected:

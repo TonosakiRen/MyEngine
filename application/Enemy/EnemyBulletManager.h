@@ -16,9 +16,12 @@ public:
 
 	void Initialize(ExplodeParticle* explodeParticle);
 	void Update();
-	void PopEnemyBullet(Vector3 position,Vector3 direction);
 	void Draw();
 
+	//弾スポーン
+	void PopEnemyBullet(Vector3 position,Vector3 direction);
+
+	//Getter
 	std::list<std::unique_ptr<EnemyBullet>>& GetEnemyBullets() {
 		return enemyBullets_;
 	}

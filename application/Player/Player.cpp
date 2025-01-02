@@ -52,6 +52,12 @@ void Player::Initialize(const std::string name, PlayerBulletManager* playerBulle
 	}
 
 	lightCollider_.Initialize(&worldTransform_, name, modelHandle_);
+
+	spriteData_.Initialize(TextureManager::Load("ozi.dds"));
+	spriteData_.size_.x = 400.0f;
+	spriteData_.size_.y = 300.0f;
+	spriteData_.position_ = { 400.0f,300.0f };
+
 }
 
 void Player::Update(const ViewProjection& viewProjection)
@@ -65,7 +71,7 @@ void Player::Update(const ViewProjection& viewProjection)
 	//光の当たり判定球が膨張していたら
 	if (isGrowSphere_) {
 		lightSphereT_ += growSpeed;
-		lightSphereT_ = clamp(lightSphereT_, 0.0f, 1.0f);
+		lightSphereT_ = Clamp(lightSphereT_, 0.0f, 1.0f);
 		const float maxScale = 400.0f;
 		lightCollider_.worldTransform_.scale_ = { (maxScale * lightSphereT_),(maxScale * lightSphereT_), (maxScale * lightSphereT_) };
 		if (lightSphereT_ >= 1.0f) {
@@ -89,7 +95,7 @@ void Player::Update(const ViewProjection& viewProjection)
 
 	//色を1.0fまで遷移
 	colorT_ += 0.02f;
-	colorT_ = clamp(colorT_, 0.0f, 1.0f);
+	colorT_ = Clamp(colorT_, 0.0f, 1.0f);
 	material_.color_ = Lerp(colorT_, material_.color_, color_);
 	pointLight_->color = material_.color_;
 
@@ -126,6 +132,8 @@ void Player::Draw() {
 	}
 	playerModel_.Draw();
 	collider_.Draw();
+	DrawManager::GetInstance()->DrawPostSprite(spriteData_);
+
 }
 
 void Player::Fire()
@@ -184,14 +192,14 @@ void Player::Move(const ViewProjection& viewProjection)
 	}
 
 	//移動し制限、速度加速度加算
-	velocity_.y = clamp(velocity_.y, -0.5f, 200.0f);
+	velocity_.y = Clamp(velocity_.y, -0.5f, 200.0f);
 	velocity_ += acceleration_;
 	worldTransform_.translation_ += velocity_;
 	
 	worldTransform_.translation_ += move;
-	worldTransform_.translation_.x = clamp(worldTransform_.translation_.x , -Floor::kFloorHalfSize + modelSize_.x / 2.0f , Floor::kFloorHalfSize - modelSize_.x / 2.0f);
-	worldTransform_.translation_.y = clamp(worldTransform_.translation_.y,0.0f, FLT_MAX);
-	worldTransform_.translation_.z = clamp(worldTransform_.translation_.z, -Floor::kFloorHalfSize + modelSize_.z / 2.0f, FLT_MAX);
+	worldTransform_.translation_.x = Clamp(worldTransform_.translation_.x , -Floor::kFloorHalfSize + modelSize_.x / 2.0f , Floor::kFloorHalfSize - modelSize_.x / 2.0f);
+	worldTransform_.translation_.y = Clamp(worldTransform_.translation_.y,0.0f, FLT_MAX);
+	worldTransform_.translation_.z = Clamp(worldTransform_.translation_.z, -Floor::kFloorHalfSize + modelSize_.z / 2.0f, FLT_MAX);
 }
 
 void Player::ReticleUpdate(const ViewProjection& viewProjection)

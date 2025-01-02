@@ -19,13 +19,16 @@ public:
 
 public:
 	static WinApp* GetInstance();
+	//WindowsProc関数
 	static LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
+	//Window生成
 	void CreateGameWindow(const char* title = "DirextXGame");
 	//Messageを受け付け
 	bool ProcessMessage();
 	// ウィンドウクラスを登録解除
 	void TerminateGameWindow();
 	
+	//Getter
 	HWND GetHwnd() const { return hwnd_; }
 	HINSTANCE GetHInstance() const { return wndClass_.hInstance; }
 private: 

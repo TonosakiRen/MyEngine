@@ -36,8 +36,10 @@ public:
 
 	void Initialize();
 	static void Finalize();
+	//WireDraw
 	void AllDraw(CommandContext& commandContext, const ViewProjection& viewProjection);
 
+	//WireFrameDrawcall
 	static void Draw(const std::vector<Vector3>& vertices);
 	static void Draw(const Vector3& start, const Vector3& end);
 	static void Draw(const Skeleton& skeleton, const WorldTransform& worldTransform);
@@ -46,6 +48,7 @@ public:
 	static void Draw(const Sphere& sphere, const WorldTransform& worldTransform);
 
 private: 
+	//pipeline生成
 	void CreatePipeline();
 public:
 	

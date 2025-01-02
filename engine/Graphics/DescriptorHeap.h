@@ -26,7 +26,8 @@ public:
 
     operator ID3D12DescriptorHeap* () const { return descriptorHeap_.Get(); }
 
-    DescriptorHandle GetDiscriptorHandle(uint32_t index) {
+    //DescriptorのGetter
+    DescriptorHandle GetDescriptorHandle(uint32_t index) {
         DescriptorHandle handle;
         handle.cpu_ = CD3DX12_CPU_DESCRIPTOR_HANDLE(
             descriptorStart_, index,
@@ -34,8 +35,7 @@ public:
 
         return handle;
     }
-
-    DescriptorHandle GetDiscriptorStartHandle() {
+    DescriptorHandle GetDescriptorStartHandle() {
         return descriptorStart_;
     }
 

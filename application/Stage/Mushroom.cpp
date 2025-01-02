@@ -22,7 +22,7 @@ void Mushroom::Update()
 
 	//発光を増減させる
 	intensityT_ += intensityTSpeed_;
-	intensityT_ = clamp(intensityT_, 0.1f, 1.0f);
+	intensityT_ = Clamp(intensityT_, 0.1f, 1.0f);
 	if (intensityT_ >= 1.0f) {
 		intensityTSpeed_ *= -1.0f;
 	}
@@ -38,7 +38,7 @@ void Mushroom::Update()
 		color_ = initColor;
 	}
 	colorT_ += colorAddValue;
-	colorT_ = clamp(colorT_, 0.0f, 1.0f);
+	colorT_ = Clamp(colorT_, 0.0f, 1.0f);
 	material_.color_ = Lerp(colorT_, material_.color_, color_);
 	pointLight_->color = material_.color_;
 

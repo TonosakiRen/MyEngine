@@ -39,6 +39,7 @@ public:
 	static const Player* player;
 
 private:
+	//すべての当たり判定
 	void CheckAllCollision();
 
 private:

@@ -41,7 +41,7 @@ void DirectXCommon::Initialize() {
 
 }
 
-void DirectXCommon::Shutdown()
+void DirectXCommon::Finalize()
 {
 	commandQueue_->Signal();
 	commandQueue_->WaitForGPU();

@@ -35,7 +35,7 @@ private:
     ShaderManager() = default;
     ShaderManager(const ShaderManager&) = delete;
     ShaderManager& operator=(const ShaderManager&) = delete;
-
+    //ShaderCompile
     Microsoft::WRL::ComPtr<IDxcBlob> Compile(const std::wstring& path, const std::wstring& profile);
 
     Microsoft::WRL::ComPtr<IDxcUtils> utils_;

@@ -25,7 +25,8 @@ public:
 	void Update();
 	void Update(Matrix4x4 localMatrix);
 	void Update(uint32_t modelIndex);
-
+	
+	//バッファーアップデート
 	void ConstUpdate() {
 		constBuffer_.Copy(matWorld_);
 	}
@@ -62,12 +63,16 @@ public:
 			parent_ = parent;
 		}
 	}
+
+	//Setter
 	void SetIsScaleParent(bool isScaleParent) {
 		isScaleParent_ = isScaleParent;
 	}
 	void SetIsRotateParent(bool isRotateParent) {
 		isRotateParent_ = isRotateParent;
 	}
+
+	//Getter
 	WorldTransform* GetParent() {
 		return parent_;
 	}

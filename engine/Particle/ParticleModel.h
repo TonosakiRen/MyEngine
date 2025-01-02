@@ -68,13 +68,16 @@ public:
 
 	void Initialize();
 	void Finalize();
+	//DrawCall実行前処理
 	void PreDraw(PipelineType pipelineType, CommandContext& commandContext, const ViewProjection& viewProjection,const TileBasedRendering& tileBasedRendering);
-
+	//DrawCall
 	void Draw(CommandContext& commandContext, ParticleModelData& bufferData, const Material& material, uint32_t modelHandle = 0);
 
 	
 private:
+	//pipeline生成
 	void CreatePipeline();
+	//ForwardRendering用Pipeline生成
 	void CreateForwardPipeline();
 private:
 	std::unique_ptr<RootSignature> rootSignature_[kPipelineNum];

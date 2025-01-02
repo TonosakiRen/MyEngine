@@ -38,15 +38,19 @@ public:
 
 	void Initialize(CommandContext& commnadContext);
 	void Finalize();
+	//Drawcall描画前処理
 	void PreDraw(CommandContext& commandContext, const ViewProjection& viewProjection);
-
+	//Drawcall
 	void Draw(CommandContext& commandContext,const WorldTransform& worldTransform);
 
+	//Getter
 	CubeColorBuffer& GetStarTexture() { return starTexture_; }
 	const Vector4& GetTopColor() { return topHSVA_; }
 	const Vector4& GetBottomColor() { return bottomHSVA_; }
 private: 
+	//pipeline生成
 	void CreatePipeline();
+	//mesh生成
 	void CreateMesh(CommandContext& commnadContext);
 private:
 	std::unique_ptr<RootSignature> rootSignature_;

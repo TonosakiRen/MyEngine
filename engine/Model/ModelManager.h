@@ -57,6 +57,7 @@ public:
 
 	static ModelManager* GetInstance();
 
+	//Node読み込み
 	static Node ReadNode(aiNode* node);
 
 	void Initialize(CommandContext& commandContext_);
@@ -65,10 +66,11 @@ public:
 	void DrawInstanced(CommandContext& commandContext, const  uint32_t modelHandle);
 	void DrawInstanced(CommandContext& commandContext, const uint32_t modelHandle, const UINT textureRootParamterIndex, const uint32_t textureHandle = 0);
 	void DrawInstanced(CommandContext& commandContext, const  uint32_t modelHandle, UINT textureRootParamterIndex, DescriptorHandle descriptorHandle);
-	void DrawInstancing(CommandContext& commandContext, const  uint32_t modelHandle, UINT instancingNum, UINT textureRootParamterIndex);
 	void DrawInstanced(CommandContext& commandContext, const uint32_t modelHandle, SkinCluster& skincluster, const UINT textureRootParamterIndex, const uint32_t textureHandle = 0);
+	//Instancing用DrawCall
+	void DrawInstancing(CommandContext& commandContext, const  uint32_t modelHandle, UINT instancingNum, UINT textureRootParamterIndex);
 
-
+	//Getter
 	const Vector3& GetModelSize(const uint32_t modelHandle);
 	const Vector3& GetModelCenter (const uint32_t modelHandle);
 	const Sphere& GetModelSphere(const uint32_t modelHandle);
@@ -81,7 +83,9 @@ private:
 	ModelManager(const ModelManager&) = delete;
 	ModelManager& operator=(const ModelManager&) = delete;
 
+	//Mesh生成
 	void CreateMeshes(ModelData& modelIndex);
+	//fileからロード
 	uint32_t LoadInternal(const std::string& fileName);
 
 	std::unique_ptr<std::array<ModelData, kNumModels>> models_;
