@@ -6,7 +6,6 @@
 #include "Framework/Framework.h"
 
 class Renderer;
-class GameScene;
 class TextureManager;
 class ModelManager;
 class SceneManager;
@@ -24,7 +23,6 @@ public:
 	void Draw() override;
 public:
 	
-	GameScene* gameScene = nullptr;
 	Renderer* renderer = nullptr;
 	BufferManager* bufferManager = nullptr;
 	TextureManager* textureManager = nullptr;

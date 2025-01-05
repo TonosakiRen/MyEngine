@@ -23,7 +23,7 @@ void TitleScene::Initialize()
 	pushSpace_ = std::make_unique<SpriteData>();
 	pushSpace_->Initialize(TextureManager::Load("pushSpace.png"), { WinApp::kWindowWidth / 2.0f,WinApp::kWindowHeight / 2.0f + 300.0f });
 
-	GameScene::currentViewProjection->SetTranslation({0.0f,4.5f,-8.0f});
+	BaseScene::currentViewProjection->SetTranslation({0.0f,4.5f,-8.0f});
 }
 
 void TitleScene::Finalize()

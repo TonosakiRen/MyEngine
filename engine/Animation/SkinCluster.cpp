@@ -8,7 +8,7 @@
 #include "Graphics/DirectXCommon.h"
 #include "Model/ModelManager.h"
 
-void SkinCluster::Create(const Skeleton& skeleton, const uint32_t modelHandle) {
+void SkinCluster::Create(Skeleton& skeleton, const uint32_t modelHandle) {
 
     skeleton_ = &skeleton;
     const ModelData& modelData = ModelManager::GetInstance()->GetModelData(modelHandle);
@@ -24,12 +24,12 @@ void SkinCluster::Create(const Skeleton& skeleton, const uint32_t modelHandle) {
     influenceBufferView_.SizeInBytes = UINT(sizeof(VertexInfluence) * modelData.meshes[0].GetVerticies().size());
     influenceBufferView_.StrideInBytes = sizeof(VertexInfluence);
 
-    inverseBindPoseMatrices_.resize(skeleton.joints_.size());
+    inverseBindPoseMatrices_.resize(skeleton.GetAllJoint().size());
     std::generate(inverseBindPoseMatrices_.begin(), inverseBindPoseMatrices_.end(), MakeIdentity4x4);
 
     for (const auto& jointWeight : modelData.skinClusterData) {
-        auto it = skeleton.jointMap_.find(jointWeight.first);
-        if (it == skeleton.jointMap_.end()) {
+        auto it = skeleton.GetJointMap().find(jointWeight.first);
+        if (it == skeleton.GetJointMap().end()) {
             continue;
         }
 
@@ -64,9 +64,9 @@ void SkinCluster::Update()
 {
     WellForGPU* mappedPalette = static_cast<WellForGPU*>(paletteResource_.GetCPUData());
 
-    for (size_t jointIndex = 0; jointIndex < skeleton_->joints_.size(); ++jointIndex) {
+    for (size_t jointIndex = 0; jointIndex < skeleton_->GetAllJoint().size(); ++jointIndex) {
         assert(jointIndex < inverseBindPoseMatrices_.size());
-        mappedPalette[jointIndex].skeletonSpaceMatrix = inverseBindPoseMatrices_[jointIndex] * skeleton_->joints_[jointIndex].skeletonSpaceMatrix;
+        mappedPalette[jointIndex].skeletonSpaceMatrix = inverseBindPoseMatrices_[jointIndex] * skeleton_->GetAllJoint()[jointIndex].skeletonSpaceMatrix;
         mappedPalette[jointIndex].skeletonSpaceInverseTransposeMatrix = Transpose(Inverse(mappedPalette[jointIndex].skeletonSpaceMatrix));
         mappedPalette[jointIndex].skeletonSpaceMatrix = mappedPalette[jointIndex].skeletonSpaceMatrix;
     }

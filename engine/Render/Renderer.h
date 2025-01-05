@@ -61,20 +61,9 @@ public:
 
     //frame開始処理
     void BeginFrame();
-    //gameSceneの描画
-    void MainRender(ViewProjection& viewProjection);
-    //main描画の終わった後の描画
-    void DeferredRender(ViewProjection& viewProjection);
-    //影描画
-    void ShadowMapRender();
-    //スポットライト影描画
-    void SpotLightShadowMapRender();
-    //UI描画
-    void UIRender();
-    //残りの描画
-    void EndRender();
-    //MainのDepthをクリア
-    void ClearMainDepthBuffer() { commandContext_.ClearDepth(*mainDepthBuffer_); }
+    //描画
+    void Render(ViewProjection& viewProjection);
+    
     //遷移開始
     void StartTransition() {
         transition_->StartTransition();
@@ -91,7 +80,19 @@ public:
     static RenderingMode GetRenderingMode() {
         return renderingMode;
     }
-
+private:
+    //gameSceneの描画
+    void MainRender(ViewProjection& viewProjection);
+    //main描画の終わった後の描画
+    void DeferredRender(ViewProjection& viewProjection);
+    //影描画
+    void ShadowMapRender();
+    //スポットライト影描画
+    void SpotLightShadowMapRender();
+    //UI描画
+    void UIRender();
+    //残りの描画
+    void EndRender();
 private:
     Renderer() = default;
     Renderer(const Renderer&) = delete;

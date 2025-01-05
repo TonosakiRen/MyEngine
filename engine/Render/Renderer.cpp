@@ -137,6 +137,16 @@ void Renderer::BeginFrame()
     imguiManager->Begin();
 }
 
+void Renderer::Render(ViewProjection& viewProjection)
+{
+    MainRender(viewProjection);
+    DeferredRender(viewProjection);
+    ShadowMapRender();   
+    SpotLightShadowMapRender();
+    UIRender();
+    EndRender();
+}
+
 void Renderer::MainRender(ViewProjection& viewProjection) {
 
     tileBasedRendering_->Dispatch(commandContext_, viewProjection);

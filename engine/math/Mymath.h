@@ -1599,7 +1599,7 @@ inline float Dot(const Quaternion& lhs, const Quaternion& rhs) noexcept {
 	return lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z + lhs.w * rhs.w;
 }
 //線形補間
-inline Quaternion Lerp(float t, const Quaternion& start, const Quaternion& eOrthonormalnd) noexcept {
+inline Quaternion Lerp(float t, const Quaternion& start, const Quaternion& end) noexcept {
 	return Quaternion{
 		start.x + t * (end.x - start.x),
 		start.y + t * (end.y - start.y),

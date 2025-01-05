@@ -90,7 +90,7 @@ AnimationManager* AnimationManager::GetInstance() {
 
 void AnimationManager::ApplyAnimation(Skeleton& skeleton, Animation& animation, float animationTime)
 {
-	for (Joint& joint : skeleton.joints_) {
+	for (Joint& joint : skeleton.GetAllJoint()) {
 		// 対称のJointのAnimationがあれば、値の適用を行う。下記のif文はC+;17から可能になった初期化付きif文。
 		if (auto it = animation.nodeAnimations.find(joint.name); it != animation.nodeAnimations.end()) {
 			const NodeAnimation& rootNodeAnimation = (*it).second;
@@ -103,7 +103,7 @@ void AnimationManager::ApplyAnimation(Skeleton& skeleton, Animation& animation, 
 
 void AnimationManager::LerpSkeleton(float t,Skeleton& skeleton, const Animation& fromAnimation, float fromAnimationTime, const Animation& toAnimation, float toAnimationTime)
 {
-	for (Joint& joint : skeleton.joints_) {
+	for (Joint& joint : skeleton.GetAllJoint()) {
 		auto fromIt = fromAnimation.nodeAnimations.find(joint.name);
 		auto toIt = toAnimation.nodeAnimations.find(joint.name);
 		if (fromIt != fromAnimation.nodeAnimations.end() && toIt != toAnimation.nodeAnimations.end()) {

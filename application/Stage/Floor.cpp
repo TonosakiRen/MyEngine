@@ -7,7 +7,7 @@
 #include "Texture/TextureManager.h"
 #include "ImGuiManager.h"
 #include "Draw/DrawManager.h"
-#include "Scene/GameScene.h"
+#include "Scene/BaseScene.h"
 
 const float Floor::kFloorSize = 50.0f;
 const float  Floor::kFloorHalfSize = Floor::kFloorSize / 2.0f;
@@ -43,7 +43,7 @@ void Floor::Update()
 
 void Floor::Draw()
 {
-	DrawManager::GetInstance()->DrawFloor(worldTransform_, *GameScene::wavePoints->GetWaveData(), waveIndexData_, modelHandle_);
+	DrawManager::GetInstance()->DrawFloor(worldTransform_, *BaseScene::wavePoints->GetWaveData(), waveIndexData_, modelHandle_);
 
 }
 

@@ -13,6 +13,10 @@
 #include "GameComponent/GameObjectManager.h"
 #include "Light/LightManager.h"
 #include "GPUResource/BufferManager.h"
+#include "Scene/GamePlayScene.h"
+#include "Scene/SceneManager.h"
+#include "audio/Audio.h"
+#include "ImGui/ImGuiManager.h"
 
 
 void MyGame::Initialize()
@@ -36,13 +40,11 @@ void MyGame::Initialize()
 	lightManager_->Initialize();
 
 	sceneManager = SceneManager::GetInstance();
+	BaseScene::StaticInitialize();
+	BaseScene* scene = new GamePlayScene();
+	sceneManager->SetNextScene(scene);
 
 	gameObjectManager = GameObjectManager::GetInstance();
-#pragma endregion 変数
-
-	// ゲームシーンの初期化
-	gameScene = new GameScene();
-	gameScene->Initialize();
 }
 
 void MyGame::Finalize()
@@ -55,10 +57,6 @@ void MyGame::Finalize()
 	gameObjectManager->Finalize();
 	renderer->Finalize();
 	bufferManager->Finalize();
-
-	delete gameScene;
-
-
 }
 
 void MyGame::Update()
@@ -71,30 +69,47 @@ void MyGame::Update()
 	audio->Update();
 
 	// ゲームシーンの毎フレーム処理
-	gameScene->Update();
+	sceneManager->Update();
 	if (sceneManager->GetNextScene()) {
 		renderer->StartTransition();
 	};
+
+	//Light
+	{
+#ifdef USE_IMGUI
+		ImGui::Begin("Game");
+		if (ImGui::BeginMenu("DirectionalLight")) {
+			ImGui::DragFloat3("lightDirection", &lightManager_->directionalLights_->lights_[0].direction.x, 0.01f);
+			ImGui::DragFloat3("lightPosition", &lightManager_->directionalLights_->lights_[0].position.x, 1.0f);
+			ImGui::DragFloat4("lightColor", &lightManager_->directionalLights_->lights_[0].color.x, 1.0f, 0.0f, 255.0f);
+			ImGui::DragFloat("intensity", &lightManager_->directionalLights_->lights_[0].intensity, 0.01f, 0.0f);
+			ImGui::EndMenu();
+		}
+#endif
+		lightManager_->directionalLights_->lights_[0].direction = Normalize(lightManager_->directionalLights_->lights_[0].direction);
+
+#ifdef USE_IMGUI
+		if (ImGui::BeginMenu("areaLights")) {
+			ImGui::DragFloat3("origin", &lightManager_->areaLights_->lights_[0].segment.origin.x);
+			ImGui::DragFloat3("diff", &lightManager_->areaLights_->lights_[0].segment.diff.x);
+			ImGui::DragFloat3("lightColor", &lightManager_->areaLights_->lights_[0].color.x, 1.0f, 0.0f, 255.0f);
+			ImGui::DragFloat("intensity", &lightManager_->areaLights_->lights_[0].intensity, 0.01f, 0.0f);
+			ImGui::DragFloat("range", &lightManager_->areaLights_->lights_[0].range, 0.01f, 0.0f);
+			ImGui::DragFloat("decay", &lightManager_->areaLights_->lights_[0].decay, 0.01f, 0.0f);
+			ImGui::EndMenu();
+		};
+		ImGui::End();
+
+#endif
+
+	}
+	lightManager_->Update();
 
 }
 
 void MyGame::Draw()
 {
-	// 描画開始
+	sceneManager->Draw();
 
-	gameScene->Draw();
-
-	renderer->ShadowMapRender();
-
-	renderer->SpotLightShadowMapRender();
-
-	renderer->MainRender(gameScene->GetViewProjection());
-
-	renderer->DeferredRender(gameScene->GetViewProjection());
-
-	renderer->UIRender();
-
-	renderer->EndRender();
-
-	
+	renderer->Render(*BaseScene::currentViewProjection);
 }

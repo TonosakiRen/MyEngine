@@ -45,15 +45,18 @@ public:
 		}
 		return joints_[index];
 	}
-	std::vector<Joint>& GetAllJoint() {
+	std::vector<Joint>& GetAllJoint(){
 		return joints_;
+	}
+	std::unordered_map<std::string, int32_t>& GetJointMap(){
+		return jointMap_;
 	}
 	//Setter
 	void SetParent(WorldTransform* parent) {
 		parent_ = parent;
 	};
 
-private:
+public:
 	//jointを生成
 	int32_t CreateJoint(const Node& node, const std::optional<int32_t>& parent, std::vector<Joint>& joints);
 

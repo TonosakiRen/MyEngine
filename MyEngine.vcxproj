@@ -58,17 +58,17 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir)externals\imgui;$(SolutionDir)externals\DirectXTex;$(SolutionDir)externals\assimp\include;$(SolutionDir)externals\DirectXMesh;$(SolutionDir)externals\nlohmann;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)engine\externals\imgui;$(SolutionDir)engine\externals\DirectXTex;$(SolutionDir)engine\externals\assimp\include;$(SolutionDir)engine\externals\DirectXMesh;$(SolutionDir)engine\externals\nlohmann;$(SolutionDir)engine\math;$(SolutionDir)engine\audio;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)\Generated\Outputs\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\Generated\Obj\$(ProjectName)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(SolutionDir)externals\imgui;$(SolutionDir)externals\DirectXTex;$(SolutionDir)externals\assimp\include;$(SolutionDir)externals\DirectXMesh;$(SolutionDir)externals\nlohmann;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)engine\externals\imgui;$(SolutionDir)engine\externals\DirectXTex;$(SolutionDir)engine\externals\assimp\include;$(SolutionDir)engine\externals\DirectXMesh;$(SolutionDir)engine\externals\nlohmann;$(SolutionDir)engine\math;$(SolutionDir)engine\audio;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)\Generated\Outputs\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\Generated\Obj\$(ProjectName)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Demo|x64'">
-    <IncludePath>$(SolutionDir)externals\imgui;$(SolutionDir)externals\DirectXTex;$(SolutionDir)externals\assimp\include;$(SolutionDir)externals\DirectXMesh;$(SolutionDir)externals\nlohmann;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)engine\externals\imgui;$(SolutionDir)engine\externals\DirectXTex;$(SolutionDir)engine\externals\assimp\include;$(SolutionDir)engine\externals\DirectXMesh;$(SolutionDir)engine\externals\nlohmann;$(SolutionDir)engine\math;$(SolutionDir)engine\audio;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)\Generated\Outputs\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\Generated\Obj\$(ProjectName)\$(Configuration)\</IntDir>
   </PropertyGroup>
@@ -81,7 +81,7 @@
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(ProjectDir)application;$(ProjectDir)audio;$(ProjectDir)engine;$(ProjectDir)engine\Input;$(ProjectDir)ImGui;$(ProjectDir)math;$(ProjectDir)external\assimp\include;$(ProjectDir)audio;$(ProjectDir)engine;$(ProjectDir)engine\Input;$(ProjectDir)ImGui;$(ProjectDir)math;$(ProjectDir)externals\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)application;$(ProjectDir)engine\audio;$(ProjectDir)engine;$(ProjectDir)engine\Input;$(ProjectDir)engine\ImGui;$(ProjectDir)engine\math;$(ProjectDir)engine\externals\assimp\include;$(ProjectDir)engine\externals\assimp\lib</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <DisableSpecificWarnings>26495;%(DisableSpecificWarnings)</DisableSpecificWarnings>
@@ -89,7 +89,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(ProjectDir)externals\assimp\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)engine\externals\assimp\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>assimp-vc143-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
@@ -116,7 +116,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(ProjectDir)application;$(ProjectDir)audio;$(ProjectDir)engine;$(ProjectDir)engine\Input;$(ProjectDir)ImGui;$(ProjectDir)math;$(ProjectDir)external\assimp\include;$(ProjectDir)application\WavePoints;$(ProjectDir)application\Stage;$(ProjectDir)application\Scene;$(ProjectDir)application\Player;$(ProjectDir)application\Particle;$(ProjectDir)application\Enemy;$(ProjectDir)application\Compute;$(ProjectDir)application\Camera;$(ProjectDir)audio;$(ProjectDir)engine;$(ProjectDir)engine\Animation;$(ProjectDir)engine\Framework;$(ProjectDir)engine\Input;$(ProjectDir)engine\Render;$(ProjectDir)engine\Texture;$(ProjectDir)engine\Draw;$(ProjectDir)engine\Model;$(ProjectDir)engine\Sky;$(ProjectDir)engine\Wave;$(ProjectDir)engine\RayTracing;$(ProjectDir)engine\PostEffect;$(ProjectDir)engine\Particle;$(ProjectDir)engine\Mesh;$(ProjectDir)engine\Light;$(ProjectDir)engine\Graphics;$(ProjectDir)engine\GPUResource;$(ProjectDir)engine\GameComponent;$(ProjectDir)ImGui;$(ProjectDir)math;$(ProjectDir)externals\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)application;$(ProjectDir)engine\audio;$(ProjectDir)engine;$(ProjectDir)engine\Input;$(ProjectDir)engine\ImGui;$(ProjectDir)engine\math;$(ProjectDir)engine\externals\assimp\include;$(ProjectDir)engine\externals\assimp\lib</AdditionalIncludeDirectories>
       <Optimization>MinSpace</Optimization>
       <TreatWarningAsError>true</TreatWarningAsError>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -127,7 +127,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(ProjectDir)externals\assimp\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)engine\externals\assimp\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>assimp-vc143-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
@@ -154,7 +154,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(ProjectDir)application;$(ProjectDir)audio;$(ProjectDir)engine;$(ProjectDir)engine\Input;$(ProjectDir)ImGui;$(ProjectDir)math;$(ProjectDir)external\assimp\include;$(ProjectDir)application\WavePoints;$(ProjectDir)application\Stage;$(ProjectDir)application\Scene;$(ProjectDir)application\Player;$(ProjectDir)application\Particle;$(ProjectDir)application\Enemy;$(ProjectDir)application\Compute;$(ProjectDir)application\Camera;$(ProjectDir)audio;$(ProjectDir)engine;$(ProjectDir)engine\Animation;$(ProjectDir)engine\Framework;$(ProjectDir)engine\Input;$(ProjectDir)engine\Render;$(ProjectDir)engine\Texture;$(ProjectDir)engine\Draw;$(ProjectDir)engine\Model;$(ProjectDir)engine\Sky;$(ProjectDir)engine\Wave;$(ProjectDir)engine\RayTracing;$(ProjectDir)engine\PostEffect;$(ProjectDir)engine\Particle;$(ProjectDir)engine\Mesh;$(ProjectDir)engine\Light;$(ProjectDir)engine\Graphics;$(ProjectDir)engine\GPUResource;$(ProjectDir)engine\GameComponent;$(ProjectDir)ImGui;$(ProjectDir)math;$(ProjectDir)externals\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)application;$(ProjectDir)engine\audio;$(ProjectDir)engine;$(ProjectDir)engine\Input;$(ProjectDir)engine\ImGui;$(ProjectDir)engine\math;$(ProjectDir)engine\externals\assimp\include;$(ProjectDir)engine\externals\assimp\lib</AdditionalIncludeDirectories>
       <Optimization>MinSpace</Optimization>
       <TreatWarningAsError>true</TreatWarningAsError>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -212,14 +212,21 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\Stage\Tree.cpp" />
     <ClCompile Include="application\Stage\Trees.cpp" />
     <ClCompile Include="application\WavePoints\WavePoints.cpp" />
-    <ClCompile Include="audio\Audio.cpp" />
     <ClCompile Include="engine\Animation\AnimationManager.cpp" />
     <ClCompile Include="engine\Animation\Skeleton.cpp" />
     <ClCompile Include="engine\Animation\SkinCluster.cpp" />
     <ClCompile Include="engine\Animation\Skinning.cpp" />
+    <ClCompile Include="engine\audio\Audio.cpp" />
     <ClCompile Include="engine\Curve\LissajousCurve.cpp" />
     <ClCompile Include="engine\Draw\Calling.cpp" />
     <ClCompile Include="engine\Draw\DrawManager.cpp" />
+    <ClCompile Include="engine\externals\imgui\imgui.cpp" />
+    <ClCompile Include="engine\externals\imgui\imgui_demo.cpp" />
+    <ClCompile Include="engine\externals\imgui\imgui_draw.cpp" />
+    <ClCompile Include="engine\externals\imgui\imgui_impl_dx12.cpp" />
+    <ClCompile Include="engine\externals\imgui\imgui_impl_win32.cpp" />
+    <ClCompile Include="engine\externals\imgui\imgui_tables.cpp" />
+    <ClCompile Include="engine\externals\imgui\imgui_widgets.cpp" />
     <ClCompile Include="engine\Framework\Framework.cpp" />
     <ClCompile Include="engine\Framework\MyGame.cpp" />
     <ClCompile Include="engine\GameComponent\Collider.cpp" />
@@ -256,6 +263,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\Graphics\RootSignature.cpp" />
     <ClCompile Include="engine\Graphics\SwapChain.cpp" />
     <ClCompile Include="engine\Graphics\WinApp.cpp" />
+    <ClCompile Include="engine\ImGui\ImGuiManager.cpp" />
     <ClCompile Include="engine\Input\Input.cpp" />
     <ClCompile Include="engine\Light\AreaLights.cpp" />
     <ClCompile Include="engine\Light\DeferredRenderer.cpp" />
@@ -269,6 +277,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\Light\SpotLights.cpp" />
     <ClCompile Include="engine\Light\SpotLightShadowMap.cpp" />
     <ClCompile Include="engine\Light\TileBasedRendering.cpp" />
+    <ClCompile Include="engine\math\Easing.cpp" />
     <ClCompile Include="engine\Mesh\Mesh.cpp" />
     <ClCompile Include="engine\Mesh\MeshletEnvironmentMapModel.cpp" />
     <ClCompile Include="engine\Mesh\MeshletModel.cpp" />
@@ -304,15 +313,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\Wave\WaveData.cpp" />
     <ClCompile Include="engine\Wave\WaveIndexData.cpp" />
     <ClCompile Include="engine\Wave\WaveModel.cpp" />
-    <ClCompile Include="ImGui\ImGuiManager.cpp" />
-    <ClCompile Include="math\Easing.cpp" />
-    <ClCompile Include="externals\imgui\imgui.cpp" />
-    <ClCompile Include="externals\imgui\imgui_demo.cpp" />
-    <ClCompile Include="externals\imgui\imgui_draw.cpp" />
-    <ClCompile Include="externals\imgui\imgui_impl_dx12.cpp" />
-    <ClCompile Include="externals\imgui\imgui_impl_win32.cpp" />
-    <ClCompile Include="externals\imgui\imgui_tables.cpp" />
-    <ClCompile Include="externals\imgui\imgui_widgets.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -346,14 +346,22 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\Stage\Tree.h" />
     <ClInclude Include="application\Stage\Trees.h" />
     <ClInclude Include="application\WavePoints\WavePoints.h" />
-    <ClInclude Include="audio\Audio.h" />
     <ClInclude Include="engine\Animation\AnimationManager.h" />
     <ClInclude Include="engine\Animation\Skeleton.h" />
     <ClInclude Include="engine\Animation\SkinCluster.h" />
     <ClInclude Include="engine\Animation\Skinning.h" />
+    <ClInclude Include="engine\audio\Audio.h" />
     <ClInclude Include="engine\Curve\LissajousCurve.h" />
     <ClInclude Include="engine\Draw\Calling.h" />
     <ClInclude Include="engine\Draw\DrawManager.h" />
+    <ClInclude Include="engine\externals\imgui\imconfig.h" />
+    <ClInclude Include="engine\externals\imgui\imgui.h" />
+    <ClInclude Include="engine\externals\imgui\imgui_impl_dx12.h" />
+    <ClInclude Include="engine\externals\imgui\imgui_impl_win32.h" />
+    <ClInclude Include="engine\externals\imgui\imgui_internal.h" />
+    <ClInclude Include="engine\externals\imgui\imstb_rectpack.h" />
+    <ClInclude Include="engine\externals\imgui\imstb_textedit.h" />
+    <ClInclude Include="engine\externals\imgui\imstb_truetype.h" />
     <ClInclude Include="engine\Framework\Framework.h" />
     <ClInclude Include="engine\Framework\MyGame.h" />
     <ClInclude Include="engine\GameComponent\Collider.h" />
@@ -391,6 +399,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\Graphics\RootSignature.h" />
     <ClInclude Include="engine\Graphics\SwapChain.h" />
     <ClInclude Include="engine\Graphics\WinApp.h" />
+    <ClInclude Include="engine\ImGui\ImGuiManager.h" />
     <ClInclude Include="engine\Input\Input.h" />
     <ClInclude Include="engine\Light\AreaLights.h" />
     <ClInclude Include="engine\Light\DeferredRenderer.h" />
@@ -404,6 +413,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\Light\SpotLights.h" />
     <ClInclude Include="engine\Light\SpotLightShadowMap.h" />
     <ClInclude Include="engine\Light\TileBasedRendering.h" />
+    <ClInclude Include="engine\math\Easing.h" />
+    <ClInclude Include="engine\math\Mymath.h" />
     <ClInclude Include="engine\Mesh\Mesh.h" />
     <ClInclude Include="engine\Mesh\MeshletEnvironmentMapModel.h" />
     <ClInclude Include="engine\Mesh\MeshletModel.h" />
@@ -439,17 +450,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\Wave\WaveData.h" />
     <ClInclude Include="engine\Wave\WaveIndexData.h" />
     <ClInclude Include="engine\Wave\WaveModel.h" />
-    <ClInclude Include="ImGui\ImGuiManager.h" />
-    <ClInclude Include="math\Easing.h" />
-    <ClInclude Include="externals\imgui\imconfig.h" />
-    <ClInclude Include="externals\imgui\imgui.h" />
-    <ClInclude Include="externals\imgui\imgui_impl_dx12.h" />
-    <ClInclude Include="externals\imgui\imgui_impl_win32.h" />
-    <ClInclude Include="externals\imgui\imgui_internal.h" />
-    <ClInclude Include="externals\imgui\imstb_rectpack.h" />
-    <ClInclude Include="externals\imgui\imstb_textedit.h" />
-    <ClInclude Include="externals\imgui\imstb_truetype.h" />
-    <ClInclude Include="math\Mymath.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\CellularPS.hlsl">
@@ -734,14 +734,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="externals\DirectXMesh\DirectXMesh_Desktop_2022_Win10.vcxproj">
-      <Project>{6857f086-f6fe-4150-9ed7-7446f1c1c220}</Project>
-    </ProjectReference>
-    <ProjectReference Include="externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">
-      <Project>{371b9fa9-4c90-4ac6-a123-aced756d6c77}</Project>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <ResourceCompile Include="MyEngine.rc" />
   </ItemGroup>
   <ItemGroup>
@@ -755,6 +747,17 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Demo|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="engine\externals\imgui\LICENSE.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="engine\externals\DirectXMesh\DirectXMesh_Desktop_2022_Win10.vcxproj">
+      <Project>{6857f086-f6fe-4150-9ed7-7446f1c1c220}</Project>
+    </ProjectReference>
+    <ProjectReference Include="engine\externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">
+      <Project>{371b9fa9-4c90-4ac6-a123-aced756d6c77}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -58,7 +58,7 @@ public:
 
     static const int fireNum_ = 40;
 
-    void Initialize(const std::string name,PlayerBulletManager* playerBulletManager);
+    void Initialize(const std::string name);
     void Update(const ViewProjection& viewProjection);
     void Draw();
     //押し出し当たり判定
@@ -67,6 +67,9 @@ public:
     void OnCollision();
     //Setter
     void SetColor(const Vector4& color);
+    void SetBulletManager(PlayerBulletManager* playerBulletManager) {
+        playerBulletManager_ = playerBulletManager;
+    }
     //Getter
     const WorldTransform& GetWorldTransform() const {
         return worldTransform_;

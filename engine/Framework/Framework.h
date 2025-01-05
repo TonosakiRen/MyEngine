@@ -24,6 +24,7 @@ public:
 	virtual void Update();
 	virtual void Draw() = 0;
 
+	//Getter
 	virtual bool IsEndRequest() { return endRequest_; }
 	virtual ~Framework() = default;
 

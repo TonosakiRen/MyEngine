@@ -13,11 +13,10 @@
 #include "Stage/Floor.h"
 
 
-void Player::Initialize(const std::string name, PlayerBulletManager* playerBulletManager)
+void Player::Initialize(const std::string name)
 {
 	GameObject::Initialize(name);
 	material_.Update();
-	playerBulletManager_ = playerBulletManager;
 	input_ = Input::GetInstance();
 	modelSize_ = modelManager->GetModelSize(modelHandle_);
 	Vector3 modelCenter = modelManager->GetModelCenter(modelHandle_);

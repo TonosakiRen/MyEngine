@@ -36,8 +36,6 @@ public:
 
     void Draw() override;
 
-	static const Player* player;
-
 private:
 	//すべての当たり判定
 	void CheckAllCollision();
@@ -49,8 +47,6 @@ private:
 	std::unique_ptr<Floor> floor_;
 	std::unique_ptr<GameObject> sphere_;
 	std::unique_ptr < Trees> trees_;
-
-	std::unique_ptr<Player> player_;
 	//PlayerBullets
 	std::unique_ptr<PlayerBulletManager> playerBulletManager_;
 
@@ -63,6 +59,5 @@ private:
 	std::unique_ptr<Cave> cave_;
 
 	std::vector<std::unique_ptr<GameObject>>* gameObjects_;
-	int i = 0;
 };
 

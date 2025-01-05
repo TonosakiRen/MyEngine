@@ -38,7 +38,7 @@ void DebugCamera::DebugMode()
     ImGui::DragFloat3("translation", &translation_.x, 0.01f);
     ImGui::DragFloat3("rotation", &debugRotation_.x, 0.01f);
     ImGui::DragFloat("orthographicValue_", &orthographicValue_, 0.01f);
-    orthographicValue_ = clamp(orthographicValue_, 0.01f, FLT_MAX);
+    orthographicValue_ = std::clamp(orthographicValue_, 0.01f, FLT_MAX);
     ImGui::End();
 #endif // _DEBUG
 

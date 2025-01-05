@@ -14,11 +14,13 @@ void SceneManager::Finalize()
 {
 	scene_->Finalize();
 	delete scene_;
+	BaseScene::StaticFinalize();
 }
 
 void SceneManager::Update()
 {
 
+	BaseScene::CommonUpdate();
 	if (nextScene_) {
 
 		if (!scene_) {
@@ -36,7 +38,6 @@ void SceneManager::Update()
 
 			scene_ = nextScene_;
 			nextScene_ = nullptr;
-
 			scene_->SetSceneManager(this);
 
 			scene_->Initialize();

@@ -9,13 +9,11 @@
 #include "ImGuiManager.h"
 #include "GameComponent/GameObjectManager.h"
 
-const Player* GamePlayScene::player = nullptr;
-
 void GamePlayScene::Initialize()
 {
 
 	floor_ = std::make_unique<Floor>();
-	floor_->Initialize("floor.obj",GameScene::wavePoints);
+	floor_->Initialize("floor.obj",BaseScene::wavePoints);
 
 	sphere_ = std::make_unique<GameObject>();
 	sphere_->Initialize("sphere.obj");
@@ -27,15 +25,12 @@ void GamePlayScene::Initialize()
 	skybox_->Initialize("box1x1Inverse.obj");
 
 	explodeParticle_ = std::make_unique<ExplodeParticle>();
-	explodeParticle_->Initialize(floor_.get(), GameScene::wavePoints);
+	explodeParticle_->Initialize(floor_.get(), BaseScene::wavePoints);
 
 	playerBulletManager_ = std::make_unique<PlayerBulletManager>();
 	playerBulletManager_->Initialize(explodeParticle_.get());
 
-	player_ = std::make_unique<Player>();
-	player_->Initialize("walk.gltf", playerBulletManager_.get());
-	player = player_.get();
-
+	player_->SetBulletManager(playerBulletManager_.get());
 
 	GameObjectManager::GetInstance()->Load();
 	gameObjects_ = &GameObjectManager::GetInstance()->gameObjects_;
@@ -70,7 +65,7 @@ void GamePlayScene::Update()
 
 	trees_->Update();
 
-	player_->Update(*GameScene::currentViewProjection);
+	player_->Update(*BaseScene::currentViewProjection);
 
 
 	floor_->Update();

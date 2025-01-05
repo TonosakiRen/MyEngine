@@ -109,12 +109,12 @@ void DrawManager::AllDraw(PipelineType pipelineType,const ViewProjection& viewPr
 		call();
 	}
 
-	meshletModelPipeline_->PreDraw(pipelineType, *commandContext_, viewProjection, *calling_->currentViewProjection_, tileBasedRendering);
+	meshletModelPipeline_->PreDraw(pipelineType, *commandContext_, viewProjection, *calling_->GetCurrentViewProjection(), tileBasedRendering);
 	for (auto& call : calls[kMeshletModel]) {
 		call();
 	}
 
-	meshletEnvironmentMapPipeline_->PreDraw(pipelineType, *commandContext_, viewProjection, *calling_->currentViewProjection_, tileBasedRendering);
+	meshletEnvironmentMapPipeline_->PreDraw(pipelineType, *commandContext_, viewProjection, *calling_->GetCurrentViewProjection(), tileBasedRendering);
 	for (auto& call : calls[kMeshletEnvironmentMap]) {
 		call();
 	}
@@ -129,7 +129,7 @@ void DrawManager::AllDraw(PipelineType pipelineType,const ViewProjection& viewPr
 		call();
 	}
 
-	waveModelPipeline_->PreDraw(pipelineType, *commandContext_, viewProjection, *calling_->currentViewProjection_, tileBasedRendering);
+	waveModelPipeline_->PreDraw(pipelineType, *commandContext_, viewProjection, *calling_->GetCurrentViewProjection(), tileBasedRendering);
 	for (auto& call : calls[kWave]) {
 		call();
 	}
@@ -146,7 +146,7 @@ void DrawManager::AllDraw(PipelineType pipelineType,const ViewProjection& viewPr
 		call();
 	}
 
-	floorPipeline_->PreDraw(pipelineType ,*commandContext_, viewProjection, *calling_->currentViewProjection_, tileBasedRendering, *lissajousCurve_.get());
+	floorPipeline_->PreDraw(pipelineType ,*commandContext_, viewProjection, *calling_->GetCurrentViewProjection(), tileBasedRendering, *lissajousCurve_.get());
 	for (auto& call : calls[kFloor]) {
 		call();
 	}

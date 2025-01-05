@@ -31,7 +31,7 @@ struct SkinningInformation {
 class SkinCluster {
 public:
     
-    void Create(const Skeleton& skeleton,const uint32_t modelHandle);
+    void Create(Skeleton& skeleton,const uint32_t modelHandle);
     void Update();
     
     //Getter
@@ -57,5 +57,5 @@ private:
     UploadBuffer skinningInformation_;
     
 
-    const Skeleton* skeleton_ = nullptr;
+    Skeleton* skeleton_ = nullptr;
 };
