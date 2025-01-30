@@ -16,7 +16,6 @@ void Cave::Initialize()
 	worldTransform_.translation_ = position;
 	mushRooms_ = std::make_unique<Mushrooms>();
 	mushRooms_->Initialize("mushroom.obj", worldTransform_);
-
 }
 
 void Cave::Update()
@@ -28,7 +27,7 @@ void Cave::Update()
 void Cave::Draw()
 {
 	mushRooms_->Draw();
-	DrawManager::GetInstance()->DrawMeshletModel(worldTransform_,modelHandle_);
+	Engine::DrawManager::GetInstance()->DrawGlitchMeshletModel(worldTransform_,modelHandle_);
 }
 
 

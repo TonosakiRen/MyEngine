@@ -14,7 +14,7 @@ void EnemyBullet::Initialize(Vector3 position, Vector3 direction,uint32_t modelH
 	worldTransform_.Update();
 	collider_.Initialize(&worldTransform_, "enemyBullet", modelHandle);
 	direction_ = direction;
-	modelSize = ModelManager::GetInstance()->GetModelSize(modelHandle_);
+	modelSize = Engine::ModelManager::GetInstance()->GetModelSize(modelHandle_);
 	isDead_ = false;
 }
 

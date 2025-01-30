@@ -342,14 +342,14 @@ void ParticleModel::Draw(CommandContext& commandContext, ParticleModelData& buff
 
         commandContext.SetConstantBuffer(static_cast<UINT>(ForwardRootParameter::kMaterial), material.GetGPUVirtualAddress());
 
-        ModelManager::GetInstance()->DrawInstancing(commandContext, modelHandle, static_cast<UINT>(bufferData.GetDataNum()), static_cast<UINT>(ForwardRootParameter::kTexture));
+        Engine::ModelManager::GetInstance()->DrawInstancing(commandContext, modelHandle, static_cast<UINT>(bufferData.GetDataNum()), static_cast<UINT>(ForwardRootParameter::kTexture));
         break;
     case Renderer::kDeferred:
         commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kParticleData), bufferData.GetGPUHandle());
 
         commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kMaterial), material.GetGPUVirtualAddress());
 
-        ModelManager::GetInstance()->DrawInstancing(commandContext, modelHandle, static_cast<UINT>(bufferData.GetDataNum()), static_cast<UINT>(RootParameter::kTexture));
+        Engine::ModelManager::GetInstance()->DrawInstancing(commandContext, modelHandle, static_cast<UINT>(bufferData.GetDataNum()), static_cast<UINT>(RootParameter::kTexture));
         break;
     default:
         break;

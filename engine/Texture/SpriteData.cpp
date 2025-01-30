@@ -15,7 +15,7 @@ void SpriteData::Initialize(uint32_t textureHandle, Vector2 position, Vector4 co
 
 	Vector2 size = { 100.0f, 100.0f };
 
-	const D3D12_RESOURCE_DESC& resDesc = TextureManager::GetInstance()->GetResoureDesc(textureHandle);
+	const D3D12_RESOURCE_DESC& resDesc = Engine::TextureManager::GetInstance()->GetResoureDesc(textureHandle);
 	size = { (float)resDesc.Width, (float)resDesc.Height };
 
 	position_ = position;
@@ -28,7 +28,7 @@ void SpriteData::Initialize(uint32_t textureHandle, Vector2 position, Vector4 co
 	isFlipY_ = isFlipY;
 	texSize_ = size;
 
-	resourceDesc_ = TextureManager::GetInstance()->GetResoureDesc(textureHandle_);
+	resourceDesc_ = Engine::TextureManager::GetInstance()->GetResoureDesc(textureHandle_);
 
 	UINT bufferSize = sizeof(VertexData) * 4;
 
@@ -52,7 +52,7 @@ void SpriteData::Initialize(uint32_t textureHandle, Vector2 position, Vector4 co
 
 void SpriteData::SetTextureHandle(uint32_t textureHandle) {
 	textureHandle_ = textureHandle;
-	resourceDesc_ = TextureManager::GetInstance()->GetResoureDesc(textureHandle_);
+	resourceDesc_ = Engine::TextureManager::GetInstance()->GetResoureDesc(textureHandle_);
 }
 
 

@@ -12,7 +12,7 @@ using namespace Microsoft::WRL;
 
 void Calling::Initialize()
 {
-	modelManager_ = ModelManager::GetInstance();
+	modelManager_ = Engine::ModelManager::GetInstance();
 }
 
 bool Calling::IsDraw(const uint32_t modelHandle,const WorldTransform& worldTransform)

@@ -65,5 +65,5 @@ void LightObjects::Draw()
 		}
 	}
 
-	DrawManager::GetInstance()->DrawParticleModel(*data_, ModelManager::GetInstance()->Load("sphere.obj"), *material_);
+	Engine::DrawManager::GetInstance()->DrawParticleModel(*data_, Engine::ModelManager::GetInstance()->Load("sphere.obj"), *material_);
 }

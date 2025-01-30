@@ -21,41 +21,6 @@ class Player :
     public GameObject
 {
 public:
-
-    enum ModelJoints {
-        HeadTop,
-        Head,
-
-        SpineTop,
-
-        RightShoulder,
-        RightArm,
-        RightForArm,
-        RightHand,
-
-        LeftShoulder,
-        LeftArm,
-        LeftForArm,
-        LeftHand,
-
-        SpineBottom,
-
-        RightUpLeg,
-        RightLeg,
-        RightFoot,
-
-        LeftUpLeg,
-        LeftLeg,
-        LeftFoot,
-
-        PartNum
-    };
-
-    struct JointWorldTransform {
-        const Matrix4x4* skeletonSpaceMatrix;
-        WorldTransform worldTransform;
-    };
-
     static const int fireNum_ = 40;
 
     void Initialize(const std::string name);
@@ -92,7 +57,7 @@ private:
 private:
     const float growSpeed = 0.01f;
 
-    Input* input_;
+    Engine::Input* input_;
     PointLight* pointLight_ = nullptr;
     PlayerBulletManager* playerBulletManager_;
     PlayerModel playerModel_;

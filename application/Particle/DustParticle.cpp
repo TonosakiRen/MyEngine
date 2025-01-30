@@ -77,5 +77,5 @@ void DustParticle::Draw()
 		}
 	}
 
-	DrawManager::GetInstance()->DrawParticleModel(*particleData_,0, material_);
+	Engine::DrawManager::GetInstance()->DrawParticleModel(*particleData_,0, material_);
 }

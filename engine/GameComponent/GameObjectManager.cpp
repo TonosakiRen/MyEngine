@@ -68,7 +68,7 @@ void GameObjectManager::Load()
 
 			//file_nameでモデルをロード
 			if (object.contains("file_name")) {
-				gameObject.SetModelHandle(ModelManager::GetInstance()->ModelManager::Load(object["file_name"]));
+				gameObject.SetModelHandle(Engine::ModelManager::GetInstance()->ModelManager::Load(object["file_name"]));
 			}
 
 			// トランスフォームのパラメータ読み込み
@@ -90,6 +90,11 @@ void GameObjectManager::Load()
 			worldTransform.scale_.x = (float)transform["scaling"][0];
 			worldTransform.scale_.y = (float)transform["scaling"][2];
 			worldTransform.scale_.z = (float)transform["scaling"][1];
+
+			if (object["disable"].contains("disabled")) {
+				//有効無効フラグ
+				gameObject.disable_ = object["disabled"].get<bool>();
+			}
 
 			// TODO: オブジェクト捜査を再起関数にまとめ、再起呼出で枝を走査する
 			if (object.contains("children")) {

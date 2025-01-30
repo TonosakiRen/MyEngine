@@ -44,8 +44,8 @@ void Collider::Initialize(WorldTransform* objectWorldTransform, const std::strin
 {
 	worldTransform_.Initialize();
 	worldTransform_.SetParent(objectWorldTransform,false);
-	worldTransform_.scale_ = ModelManager::GetInstance()->GetModelSize(modelHandle);
-	worldTransform_.translation_ = ModelManager::GetInstance()->GetModelCenter(modelHandle);
+	worldTransform_.scale_ = Engine::ModelManager::GetInstance()->GetModelSize(modelHandle);
+	worldTransform_.translation_ = Engine::ModelManager::GetInstance()->GetModelCenter(modelHandle);
 	name_ = name;
 }
 
@@ -229,7 +229,7 @@ void Collider::Draw()
 
 	if (isDrawCollider) {
 		MatrixUpdate();
-		DrawManager::GetInstance()->DrawModel(worldTransform_);
+		Engine::DrawManager::GetInstance()->DrawModel(worldTransform_);
 	}
 
 }

@@ -13,7 +13,7 @@ void PlayerBullet::Initialize(Vector3 position, Vector3 direction,uint32_t model
 	worldTransform_.Update();
 	collider_.Initialize(&worldTransform_, "playerBullet", modelHandle);
 
-	modelSize = ModelManager::GetInstance()->GetModelSize(modelHandle_);
+	modelSize = Engine::ModelManager::GetInstance()->GetModelSize(modelHandle_);
 	direction_ = direction;
 }
 

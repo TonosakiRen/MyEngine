@@ -4,10 +4,10 @@
  * @brief Gameの更新描画を行う
  */
 #include "Framework/Framework.h"
+#include "Texture/TextureManager.h"
+#include "Model/ModelManager.h"
 
 class Renderer;
-class TextureManager;
-class ModelManager;
 class SceneManager;
 class GameObjectManager;
 class LightManager;
@@ -25,8 +25,8 @@ public:
 	
 	Renderer* renderer = nullptr;
 	BufferManager* bufferManager = nullptr;
-	TextureManager* textureManager = nullptr;
-	ModelManager* modelManager = nullptr;
+	Engine::TextureManager* textureManager = nullptr;
+	Engine::ModelManager* modelManager = nullptr;
 	SceneManager* sceneManager = nullptr;
 	GameObjectManager* gameObjectManager = nullptr;
 	LightManager* lightManager_ = nullptr;

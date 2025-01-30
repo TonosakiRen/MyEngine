@@ -8,9 +8,13 @@
 #include "GameComponent/Loader.h"
 #include "Easing.h"
 
-void Mushroom::Initialize(const std::string& name, PointLight* pointLight, const Vector4& color,const float intensityT ,const Vector3& scale, const Quaternion& quaternion, const Vector3& position)
+void Mushroom::Initialize(const std::string& name,WorldTransform* parentWorldTransform, PointLight* pointLight, const Vector4& color,const float intensityT ,const Vector3& scale, const Quaternion& quaternion, const Vector3& position)
 {
 	LightObject::Initialize(name,pointLight, color,scale, quaternion, position);
+	worldTransform_.SetParent(parentWorldTransform, false);
+	worldTransform_.translation_ = position;
+	worldTransform_.quaternion_ = quaternion;
+	//mushroomParticle_.Initialize(worldTransform_);
 	intensityT_ = intensityT;
 }
 
@@ -42,8 +46,18 @@ void Mushroom::Update()
 	material_.color_ = Lerp(colorT_, material_.color_, color_);
 	pointLight_->color = material_.color_;
 
+	//ParticleUpdate
+	//mushroomParticle_.SetColor(color_);
+	//mushroomParticle_.Update();
+
 	material_.Update();
 	LightObject::Update();
+}
+
+void Mushroom::PushDataParticle(std::unique_ptr<ParticleData>& particleData)
+{
+	particleData;
+	//mushroomParticle_.PushDataParticle(particleData);
 }
 
 void Mushroom::SetColor(const Vector4& color)

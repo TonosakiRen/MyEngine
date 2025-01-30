@@ -10,18 +10,17 @@
 #include "Input.h"
 #include "Scene/GamePlayScene.h"
 #include "Scene/SceneManager.h"
-#include "Scene/GameScene.h"
 #include "Draw/DrawManager.h"
 void TitleScene::Initialize()
 {
-	input_ = Input::GetInstance();
+	input_ = Engine::Input::GetInstance();
 
 	title_ = std::make_unique<GameObject>();
 	title_->Initialize("title.obj");
 	title_->GetWorldTransform()->translation_ = { 0.0f,3.0f,0.0f };
 	title_->UpdateMatrix();
 	pushSpace_ = std::make_unique<SpriteData>();
-	pushSpace_->Initialize(TextureManager::Load("pushSpace.png"), { WinApp::kWindowWidth / 2.0f,WinApp::kWindowHeight / 2.0f + 300.0f });
+	pushSpace_->Initialize(Engine::TextureManager::Load("pushSpace.png"), { WinApp::kWindowWidth / 2.0f,WinApp::kWindowHeight / 2.0f + 300.0f });
 
 	BaseScene::currentViewProjection->SetTranslation({0.0f,4.5f,-8.0f});
 }
@@ -63,5 +62,5 @@ void TitleScene::Update()
 void TitleScene::Draw()
 {
 	title_->Draw();
-	DrawManager::GetInstance()->DrawPostSprite(*pushSpace_);
+	Engine::DrawManager::GetInstance()->DrawPostSprite(*pushSpace_);
 }

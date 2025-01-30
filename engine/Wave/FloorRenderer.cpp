@@ -424,7 +424,7 @@ void FloorRenderer::CreateForwardPipeline()
 void FloorRenderer::Draw(CommandContext& commandContext, uint32_t modelHandle, const WorldTransform& worldTransform, const WaveData& waveData, const WaveIndexData& waveIndexData) {
 
 
-    const ModelData& modelItem = ModelManager::GetInstance()->ModelManager::GetModelData(modelHandle);
+    const ModelData& modelItem = Engine::ModelManager::GetInstance()->ModelManager::GetModelData(modelHandle);
 
     // CBVをセット（ワールド行列）
     switch (Renderer::GetRenderingMode())

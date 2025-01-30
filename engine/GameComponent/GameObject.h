@@ -17,9 +17,10 @@
 
 class GameObject
 {
+	friend class GameObjectManager;
 public:
-	static ModelManager* modelManager;
-	static AnimationManager* animationManager;
+	static Engine::ModelManager* modelManager;
+	static Engine::AnimationManager* animationManager;
 
 
 	void Initialize(const std::string name);
@@ -55,6 +56,7 @@ public:
 		modelHandle_ = modelHandle;
 	}
 protected:
+	bool disable_ = false;
 	uint32_t modelHandle_;
 	WorldTransform worldTransform_;
 	Material material_;

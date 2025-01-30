@@ -4,10 +4,7 @@
  */
 #include "Framework/MyGame.h"
 
-#include "Texture/TextureManager.h"
-#include "Model/ModelManager.h"
 #include <Windows.h>
-#include "Scene/GameScene.h"
 #include "Light/ShaderManager.h"
 #include "Render/Renderer.h"
 #include "GameComponent/GameObjectManager.h"
@@ -28,11 +25,11 @@ void MyGame::Initialize()
 	bufferManager = BufferManager::GetInstance();
 
 	// テクスチャマネージャの初期化
-	textureManager = TextureManager::GetInstance();
+	textureManager = Engine::TextureManager::GetInstance();
 	textureManager->Initialize(renderer->GetCommandContext());
 	textureManager->Load("white1x1.png");
 
-	modelManager = ModelManager::GetInstance();
+	modelManager = Engine::ModelManager::GetInstance();
 	modelManager->Initialize(renderer->GetCommandContext());
 	modelManager->Load("box1x1.obj");
 

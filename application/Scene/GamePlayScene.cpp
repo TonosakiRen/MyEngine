@@ -3,7 +3,6 @@
  * @brief gamePlayのSceneクラス
  */
 #include "Scene/GamePlayScene.h"
-#include "Scene/GameScene.h"
 
 #include "Model/ModelManager.h"
 #include "ImGuiManager.h"
@@ -45,7 +44,7 @@ void GamePlayScene::Initialize()
 	lineAttack_ = std::make_unique<LineAttack>();
 	lineAttack_->Initialize();
 
-	input_ = Input::GetInstance();
+	input_ = Engine::Input::GetInstance();
 
 	rainManager_ = std::make_unique<RainManager>();
 	rainManager_->Initialize(explodeParticle_.get());

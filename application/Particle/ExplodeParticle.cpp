@@ -19,7 +19,7 @@ void ExplodeParticle::Initialize(Floor* floor, WavePoints* wavePoints)
 	const float emitScale = 0.8f;
 	emitterWorldTransform_.scale_ = { emitScale,emitScale,emitScale };
 	emitterWorldTransform_.Update();
-	modelHandle_ = ModelManager::GetInstance()->Load("dodecahedron.obj");
+	modelHandle_ = Engine::ModelManager::GetInstance()->Load("dodecahedron.obj");
 }
 
 void ExplodeParticle::Update() {
@@ -116,5 +116,5 @@ void ExplodeParticle::Draw()
 		}
 	}
 
-	DrawManager::GetInstance()->DrawParticleModel(*particle_, modelHandle_);
+	Engine::DrawManager::GetInstance()->DrawParticleModel(*particle_, modelHandle_);
 }

@@ -41,7 +41,7 @@ private:
 	void CheckAllCollision();
 
 private:
-	Input* input_;
+	Engine::Input* input_;
 
 	std::unique_ptr<Skybox> skybox_;
 	std::unique_ptr<Floor> floor_;

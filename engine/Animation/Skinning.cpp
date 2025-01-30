@@ -74,7 +74,7 @@ void Skinning::CreatePipeline()
 void Skinning::Dispatch(CommandContext& commandContext, const uint32_t modelHandle,SkinCluster& skinCluster)
 {
 
-    ModelManager* modelManager = ModelManager::GetInstance();
+    Engine::ModelManager* modelManager = Engine::ModelManager::GetInstance();
     commandContext.TransitionResource(skinCluster.GetSkinnedVertices(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
     commandContext.SetComputeDescriptorTable(static_cast<UINT>(RootParameter::kMatrixPalette), skinCluster.GetPaletteResourceSRV());
     commandContext.SetComputeDescriptorTable(static_cast<UINT>(RootParameter::kInputVertices), modelManager->GetModelData(modelHandle).meshes[0].GetVerticesSRV());

@@ -9,7 +9,7 @@ void PlayerBulletManager::Initialize(ExplodeParticle* explodeParticle)
 {
 	explodeParticle_ = explodeParticle;
 	playerBullets_.clear();
-	modelHandle_ = ModelManager::Load("sphere.obj");
+	modelHandle_ = Engine::ModelManager::Load("sphere.obj");
 }
 
 void PlayerBulletManager::Update()

@@ -19,7 +19,7 @@ void Floor::Initialize(const std::string name,WavePoints* wavePoints)
 	material_.Update();
 	worldTransform_.scale_ = { kFloorSize, kFloorSize, kFloorSize };
 	worldTransform_.Update();
-	textureHandle_ = TextureManager::Load("floorTile.png");
+	textureHandle_ = Engine::TextureManager::Load("floorTile.png");
 
 	waveIndexData_.Initialize();
 	wavePoints_ = wavePoints;
@@ -43,7 +43,7 @@ void Floor::Update()
 
 void Floor::Draw()
 {
-	DrawManager::GetInstance()->DrawFloor(worldTransform_, *BaseScene::wavePoints->GetWaveData(), waveIndexData_, modelHandle_);
+	Engine::DrawManager::GetInstance()->DrawFloor(worldTransform_, *BaseScene::wavePoints->GetWaveData(), waveIndexData_, modelHandle_);
 
 }
 

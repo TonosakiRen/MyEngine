@@ -21,7 +21,7 @@ void Camera::Initialize(Vector3 position, Quaternion quaternion)
 
 void Camera::Update(Vector3 playerPos)
 {
-	Input* input = Input::GetInstance();
+	Engine::Input* input = Engine::Input::GetInstance();
 	const float rotateSpeed = 0.0000035f / (2.0f * float(M_PI));
 
 	// gamePadが有効なら

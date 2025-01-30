@@ -27,7 +27,7 @@ void DebugCamera::Update()
 
 void DebugCamera::DebugMode()
 {
-    Input* input = Input::GetInstance();
+    Engine::Input* input = Engine::Input::GetInstance();
 
     Vector2 mouseMove = input->GetMousePosition();
     float wheel = input->GetWheel();

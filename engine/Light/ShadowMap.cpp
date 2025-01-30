@@ -118,7 +118,7 @@ void ShadowMap::Draw(CommandContext& commandContext, uint32_t modelHandle, const
     for (int i = 0; i < DirectionalLights::lightNum; i++) {
         commandContext.SetDepthStencil(directionalLights_->lights_[i].shadowMap_.GetDSV());
         commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kDirectionalLight), directionalLights_->lights_[i].constBuffer_.GetGPUVirtualAddress());
-        ModelManager::GetInstance()->DrawInstanced(commandContext, modelHandle);
+        Engine::ModelManager::GetInstance()->DrawInstanced(commandContext, modelHandle);
     }
 }
 

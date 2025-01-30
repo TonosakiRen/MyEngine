@@ -42,7 +42,7 @@ void RainManager::Update()
 void RainManager::PopRainDrop()
 {
 	//isActiveがfalseのものに割り当て
-	uint32_t modelHandle = ModelManager::Load("dodecahedron.obj");
+	uint32_t modelHandle = Engine::ModelManager::Load("dodecahedron.obj");
 	Vector4 color  = HSVAtoRGBA(Rand(0.0f, 1.0f), 1.0f, 1.0f, 1.0f);
 	for (int i = 0; i < PointLights::lightNum; i++) {
 		if (pointLights_->lights_[i].isActive == false) {
@@ -72,5 +72,5 @@ void RainManager::Draw()
 		}
 	}
 
-	DrawManager::GetInstance()->DrawParticleModel(*particle_, ModelManager::GetInstance()->Load("dodecahedron.obj"), *material_.get());
+	Engine::DrawManager::GetInstance()->DrawParticleModel(*particle_, Engine::ModelManager::GetInstance()->Load("dodecahedron.obj"), *material_.get());
 }

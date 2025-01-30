@@ -28,7 +28,7 @@ void BaseScene::StaticInitialize()
 	camera_ = std::make_unique<Camera>();
 	camera_->Initialize(initializeCameraPos, MakeFromEulerAngle(initializeCameraRotate));
 
-	DrawManager::GetInstance()->SetCallingViewProjection(*camera_);
+	Engine::DrawManager::GetInstance()->SetCallingViewProjection(*camera_);
 
 	wavePoints_ = std::make_unique<WavePoints>();
 	wavePoints_->Initialize();

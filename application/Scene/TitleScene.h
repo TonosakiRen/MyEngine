@@ -7,7 +7,9 @@
 #include <memory>
 
 #include "Texture/SpriteData.h"
-class Input;
+namespace Engine {
+	class Input;
+}
 class GameObject;
 class TitleScene :
     public BaseScene
@@ -17,7 +19,7 @@ class TitleScene :
 	void Update() override;
 	void Draw() override;
 private:
-	Input* input_ = nullptr;
+	Engine::Input* input_ = nullptr;
 	std::unique_ptr<GameObject> title_;
 	float titleT_;
 	bool isTitleUp_ = false;

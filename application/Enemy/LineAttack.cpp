@@ -105,7 +105,7 @@ void LineAttack::Update()
 
 void LineAttack::Draw()
 {
-	DrawManager* drawManager_ = DrawManager::GetInstance();
+	Engine::DrawManager* drawManager_ = Engine::DrawManager::GetInstance();
 	for (auto& box : boxs_) {
 		drawManager_->DrawModel(box->worldTransform_);
 	}

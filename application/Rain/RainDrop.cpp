@@ -17,7 +17,7 @@ void RainDrop::Initialize(uint32_t modelHandle,PointLight* pointLight, ExplodePa
 
 	collider_.Initialize(&worldTransform_, "rainDrop", modelHandle);
 	acceleration_ = { 0.0f,-0.01f,0.0f };
-	modelSize = ModelManager::GetInstance()->GetModelSize(modelHandle_);
+	modelSize = Engine::ModelManager::GetInstance()->GetModelSize(modelHandle_);
 
 	//ポイントライト初期化
 	color_ = color;

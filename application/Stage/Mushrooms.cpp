@@ -7,17 +7,27 @@
 #include "Stage/Floor.h"
 #include "ImGuiManager.h"
 #include "GameComponent/Loader.h"
+#include "Texture/TextureManager.h"
+
+Mushrooms::Mushrooms()
+{
+	//particleData_ = std::make_unique<ParticleData>(kMushroomParticleNum);
+}
 
 void Mushrooms::Initialize(const std::string& name,WorldTransform& parentWorldTransform)
 {
+	
 	pointLights_ = LightManager::GetInstance()->pointLights_.get();
-	modelHandle_ = ModelManager::Load(name);
+	modelHandle_ = Engine::ModelManager::Load(name);
 	material_ = std::make_unique<Material>();
 	material_->Initialize();
 	material_->intensity_ = 2.0f;
 	material_->Update();
 	data_ = std::make_unique<ParticleModelData>(kMushroomNum_);
 	data_->Initialize();
+	//particleData_->Initialize();
+
+	particleTextureHandle_ = Engine::TextureManager::GetInstance()->Load("particle.png");
 
 	const Vector4 initColor = { 0.2f,0.2f,1.0f,1.0f };
 	const float intensity = 20.0f;
@@ -25,8 +35,8 @@ void Mushrooms::Initialize(const std::string& name,WorldTransform& parentWorldTr
 
 	color_ = initColor;
 
-	std::vector<Transform> transfomrs;
-	Load::Transforms("mushroom.txt", transfomrs);
+	std::vector<Transform> transforms;
+	Load::Transforms("mushroom.txt", transforms);
 
 	//キノコの初期化
 	for (int mushroomNum = 0; mushroomNum < kMushroomNum_; mushroomNum++) {
@@ -34,8 +44,9 @@ void Mushrooms::Initialize(const std::string& name,WorldTransform& parentWorldTr
 		float intensityT_ = Rand(0.0f, 1.0f);
 		for (int i = 0; i < PointLights::lightNum; i++) {
 			if (pointLights_->lights_[i].isActive == false) {
-				mushrooms[mushroomNum].GetWorldTransform()->SetParent(&parentWorldTransform,false);
-				mushrooms[mushroomNum].Initialize(name, &pointLights_->lights_[i], color_, intensityT_, transfomrs[mushroomNum].scale, MakeFromEulerAngle(Vector3{ Radian(transfomrs[mushroomNum].rotate.x + 90.0f),Radian(transfomrs[mushroomNum].rotate.y),Radian(transfomrs[mushroomNum].rotate.z )}), transfomrs[mushroomNum].translate);
+				mushrooms[mushroomNum].Initialize(name, &parentWorldTransform,&pointLights_->lights_[i], color_, intensityT_, transforms[mushroomNum].scale,
+				MakeFromEulerAngle(Vector3{ Radian(transforms[mushroomNum].rotate.x),Radian(transforms[mushroomNum].rotate.y),Radian(transforms[mushroomNum].rotate.z) }),
+				transforms[mushroomNum].translate);
 				pointLights_->lights_[i].isActive = true;
 				pointLights_->lights_[i].worldTransform.Reset();
 				pointLights_->lights_[i].worldTransform.SetParent(mushrooms[mushroomNum].GetWorldTransform(), false);
@@ -82,7 +93,11 @@ void Mushrooms::Draw()
 			data.color = mushrooms[i].material_.color_;
 			data_->PushBackData(data);
 		}
+
+		//mushrooms[i].PushDataParticle(particleData_);
+
+		//DrawManager::GetInstance()->DrawParticle(*particleData_, particleTextureHandle_, mushrooms[i].material_);
 	}
 
-	DrawManager::GetInstance()->DrawParticleModel(*data_, modelHandle_, *material_);
+	Engine::DrawManager::GetInstance()->DrawParticleModel(*data_, modelHandle_, *material_);
 }

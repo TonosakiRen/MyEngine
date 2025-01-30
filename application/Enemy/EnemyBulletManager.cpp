@@ -9,7 +9,7 @@ void EnemyBulletManager::Initialize(ExplodeParticle* explodeParticle)
 {
 	explodeParticle_ = explodeParticle;
 	enemyBullets_.clear();
-	modelHandle_ = ModelManager::Load("sphere.obj");
+	modelHandle_ = Engine::ModelManager::Load("sphere.obj");
 }
 
 void EnemyBulletManager::Update()

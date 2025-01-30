@@ -4,7 +4,7 @@
  */
 #include "GameComponent/WorldTransform.h"
 #include "Model/ModelManager.h"
-ModelManager* modelManager_ = ModelManager::GetInstance();
+Engine::ModelManager* modelManager_ = Engine::ModelManager::GetInstance();
 
 void WorldTransform::Initialize(bool srtChange) {
     parent_ = nullptr;

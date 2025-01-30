@@ -80,41 +80,45 @@ inline Quaternion CalculateValue(const std::vector<KeyframeQuaternion>& keyframe
 	return (*keyframes.rbegin()).value;
 }
 
-class AnimationManager
-{
-public:
-	//Animationの数
-	static const size_t kNumAnimations = 256;
+namespace Engine {
 
-	struct AnimationData {
-		std::string name;
-		Animation animation;
+	class AnimationManager
+	{
+	public:
+		//Animationの数
+		static const size_t kNumAnimations = 256;
+
+		struct AnimationData {
+			std::string name;
+			Animation animation;
+		};
+
+		//Animationのロード
+		static const Animation& Load(const std::string& fileName, const std::string& animationName);
+
+		static AnimationManager* GetInstance();
+
+		//Animationの適用
+		static void ApplyAnimation(Skeleton& skeleton, Animation& animation, float animationTime);
+
+		//Animationのラープ
+		static void LerpSkeleton(float t, Skeleton& skeleton, const Animation& fromAnimation, float fromAnimationTime, const Animation& toAnimation, float toAnimationTime);
+
+		void Finalize();
+	private:
+		AnimationManager() = default;
+		~AnimationManager() = default;
+		AnimationManager(const AnimationManager&) = delete;
+		AnimationManager& operator=(const AnimationManager&) = delete;
+
+		std::unique_ptr<std::array<AnimationData, kNumAnimations>> animations_;
+		uint32_t useAnimationCount_ = 0;
+
+		const Animation& LoadInternal(const std::string& fileName, const std::string& animationName);
+
+		void CreateAnimations(const std::string& fileName, AnimationData& modelIndex,const std::string& animationName);
+
 	};
 
-	//Animationのロード
-	static const Animation& Load(const std::string& fileName, const std::string& animationName);
-
-	static AnimationManager* GetInstance();
-
-	//Animationの適用
-	static void ApplyAnimation(Skeleton& skeleton, Animation& animation, float animationTime);
-
-	//Animationのラープ
-	static void LerpSkeleton(float t, Skeleton& skeleton, const Animation& fromAnimation, float fromAnimationTime, const Animation& toAnimation, float toAnimationTime);
-
-	void Finalize();
-private:
-	AnimationManager() = default;
-	~AnimationManager() = default;
-	AnimationManager(const AnimationManager&) = delete;
-	AnimationManager& operator=(const AnimationManager&) = delete;
-
-	std::unique_ptr<std::array<AnimationData, kNumAnimations>> animations_;
-	uint32_t useAnimationCount_ = 0;
-
-	const Animation& LoadInternal(const std::string& fileName, const std::string& animationName);
-
-	void CreateAnimations(const std::string& fileName, AnimationData& modelIndex,const std::string& animationName);
-
-};
+}
 

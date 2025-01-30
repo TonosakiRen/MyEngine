@@ -88,7 +88,7 @@ void Renderer::Initialize() {
 
 
     //ドローマネージャー
-    drawManager_ = DrawManager::GetInstance();
+    drawManager_ = Engine::DrawManager::GetInstance();
     drawManager_->Initialize(commandContext_);
 
     lightManager_ = LightManager::GetInstance();
@@ -127,6 +127,10 @@ void Renderer::Initialize() {
 
     smooth_ = std::make_unique<Smooth>();
     smooth_->Initialize(*resultBuffer_);
+
+    glitchEffect_ = std::make_unique<GlitchEffect>();
+    glitchEffect_->Initialize(*resultBuffer_);
+
 }
 
 void Renderer::BeginFrame()
@@ -235,6 +239,7 @@ void Renderer::DeferredRender(ViewProjection& viewProjection)
         ImGui::Checkbox("HSVFilter", &isHSVFilter);
         ImGui::Checkbox("vignette", &isVignette_);
         ImGui::Checkbox("smooth", &isSmooth_);
+        ImGui::Checkbox("glitchEffect", &isGlitchEffect);
         ImGui::EndMenu();
     }
 #endif
@@ -256,6 +261,11 @@ void Renderer::DeferredRender(ViewProjection& viewProjection)
     if (isHSVFilter) {
         hsvFilter_->Draw(*resultBuffer_.get(), *tmpBuffer_.get(), commandContext_);
     }
+    if (isGlitchEffect) {
+         glitchEffect_->Draw(*resultBuffer_.get(), *tmpBuffer_.get(), commandContext_);
+    }
+
+
     ImGui::End();
 
     commandContext_.TransitionResource(*resultBuffer_, D3D12_RESOURCE_STATE_RENDER_TARGET);
@@ -299,7 +309,7 @@ void Renderer::UIRender()
 void Renderer::EndRender()
 {
 
-    transition_->Draw(*resultBuffer_, TextureManager::GetInstance()->GetSRV("white1x1.png"), commandContext_);
+    transition_->Draw(*resultBuffer_, Engine::TextureManager::GetInstance()->GetSRV("white1x1.png"), commandContext_);
     commandContext_.TransitionResource(*resultBuffer_, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
     commandContext_.SetViewportAndScissorRect(0, 0, resultBuffer_->GetWidth(), resultBuffer_->GetHeight());

@@ -20,14 +20,17 @@
 #include "Render/Wire.h"
 #include "PostEffect/Smooth.h"
 #include "PostEffect/HSVFilter.h"
+#include "PostEffect/GlitchEffect.h"
 
 class ViewProjection;
 class DirectionalLights;
 class ShadowSpotLights;
-class DrawManager;
 class LightManager;
 class ImGuiManager;
 class BufferManager;
+namespace Engine {
+    class DrawManager;
+}
 
 class Renderer
 {
@@ -101,7 +104,7 @@ private:
     static RenderingMode renderingMode;
 
     DirectXCommon* graphics_ = nullptr;
-    DrawManager* drawManager_ = nullptr;
+    Engine::DrawManager* drawManager_ = nullptr;
     LightManager* lightManager_ = nullptr;
     ImGuiManager* ImGuiManager_ = nullptr;
     BufferManager* bufferManager_ = nullptr;
@@ -123,9 +126,11 @@ private:
     std::unique_ptr<EdgeRenderer> edgeRenderer_;
     std::unique_ptr<Bloom> bloom_;
     std::unique_ptr<GrayScale> grayScale_;
-    std::unique_ptr < HSVFilter> hsvFilter_;
+    std::unique_ptr <HSVFilter> hsvFilter_;
     std::unique_ptr<Vignette> vignette_;
     std::unique_ptr<Smooth> smooth_;
+    std::unique_ptr<GlitchEffect> glitchEffect_;
+
 
     bool isEdge_ = false;
     bool isBloom_ = true;
@@ -133,6 +138,7 @@ private:
     bool isGrayScale_ = false;
     bool isVignette_ = false;
     bool isSmooth_ = false;
+    bool isGlitchEffect = true;
 
     std::unique_ptr<TileBasedRendering> tileBasedRendering_;
 

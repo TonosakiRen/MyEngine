@@ -403,7 +403,7 @@ void Particle::Draw(CommandContext& commandContext, ParticleData& bufferData, co
         commandContext.SetDescriptorTable(static_cast<UINT>(ForwardRootParameter::kParticleData), bufferData.GetGPUHandle());
         commandContext.SetConstantBuffer(static_cast<UINT>(ForwardRootParameter::kMaterial), material.GetGPUVirtualAddress());
 
-        TextureManager::GetInstance()->SetDescriptorTable(commandContext, static_cast<UINT>(ForwardRootParameter::kTexture), textureHandle);
+        Engine::TextureManager::GetInstance()->SetDescriptorTable(commandContext, static_cast<UINT>(ForwardRootParameter::kTexture), textureHandle);
 
         commandContext.DrawIndexedInstanced(static_cast<UINT>(indices_.size()), static_cast<UINT>(bufferData.GetDataNum()), 0, 0, 0);
         break;
@@ -411,7 +411,7 @@ void Particle::Draw(CommandContext& commandContext, ParticleData& bufferData, co
         commandContext.SetDescriptorTable(static_cast<UINT>(RootParameter::kParticleData), bufferData.GetGPUHandle());
         commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kMaterial), material.GetGPUVirtualAddress());
 
-        TextureManager::GetInstance()->SetDescriptorTable(commandContext, static_cast<UINT>(RootParameter::kTexture), textureHandle);
+        Engine::TextureManager::GetInstance()->SetDescriptorTable(commandContext, static_cast<UINT>(RootParameter::kTexture), textureHandle);
 
         commandContext.DrawIndexedInstanced(static_cast<UINT>(indices_.size()), static_cast<UINT>(bufferData.GetDataNum()), 0, 0, 0);
         break;

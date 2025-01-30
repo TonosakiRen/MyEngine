@@ -11,7 +11,7 @@
 void SkinCluster::Create(Skeleton& skeleton, const uint32_t modelHandle) {
 
     skeleton_ = &skeleton;
-    const ModelData& modelData = ModelManager::GetInstance()->GetModelData(modelHandle);
+    const ModelData& modelData = Engine::ModelManager::GetInstance()->GetModelData(modelHandle);
 
     paletteResource_.Create(L"paletteResource", sizeof(WellForGPU), UINT(modelData.meshes[0].GetVerticies().size()));
 

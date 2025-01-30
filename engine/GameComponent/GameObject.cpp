@@ -6,14 +6,13 @@
 
 #include "Model/ModelManager.h"
 #include "Draw/DrawManager.h"
-#include "Scene/GameScene.h"
 
-ModelManager* GameObject::modelManager = ModelManager::GetInstance();
-AnimationManager* GameObject::animationManager = AnimationManager::GetInstance();
+Engine::ModelManager* GameObject::modelManager = Engine::ModelManager::GetInstance();
+Engine::AnimationManager* GameObject::animationManager = Engine::AnimationManager::GetInstance();
 
 void GameObject::Initialize(const std::string name)
 {
-	modelHandle_ = ModelManager::Load(name);
+	modelHandle_ = Engine::ModelManager::Load(name);
 	worldTransform_.Initialize();
 	material_.Initialize();
 }
@@ -42,7 +41,7 @@ void GameObject::Draw(Vector4 color)
 {
 	material_.color_ = color;
 	material_.Update();
-	DrawManager::GetInstance()->DrawModel(worldTransform_,modelHandle_,0, material_);
+	Engine::DrawManager::GetInstance()->DrawModel(worldTransform_,modelHandle_,0, material_);
 }
 
 void GameObject::UpdateMaterial(Vector4 color)

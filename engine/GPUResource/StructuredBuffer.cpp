@@ -18,7 +18,7 @@ void StructuredBuffer::Create(const std::wstring& name, size_t bufferSize , UINT
     HRESULT result = S_FALSE;
 
 
-    auto desc = CD3DX12_RESOURCE_DESC::Buffer(Helper::AlignUp(sizeINB * 2,256));
+    auto desc = CD3DX12_RESOURCE_DESC::Buffer(Helper::AlignUp(sizeINB * 2, 256));
     auto heapProps = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
 
     resource_ = BufferManager::GetInstance()->CreateResource(

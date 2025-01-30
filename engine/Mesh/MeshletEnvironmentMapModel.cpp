@@ -363,7 +363,7 @@ void MeshletEnvironmentMapModel::CreateForwardPipeline()
 
 void MeshletEnvironmentMapModel::Draw(CommandContext& commandContext, uint32_t modelHandle, const WorldTransform& worldTransform, const Material& material) {
 
-    const ModelData& modelItem = ModelManager::GetInstance()->ModelManager::GetModelData(modelHandle);
+    const ModelData& modelItem = Engine::ModelManager::GetInstance()->ModelManager::GetModelData(modelHandle);
 
     // CBVをセット（マテリアル）
     switch (Renderer::GetRenderingMode())
@@ -419,7 +419,7 @@ void MeshletEnvironmentMapModel::Draw(CommandContext& commandContext, uint32_t m
 
 void MeshletEnvironmentMapModel::Draw(CommandContext& commandContext, uint32_t modelHandle, const WorldTransform& worldTransform, SkinCluster& skinCluster, const Material& material)
 {
-    const ModelData& modelItem = ModelManager::GetInstance()->ModelManager::GetModelData(modelHandle);
+    const ModelData& modelItem = Engine::ModelManager::GetInstance()->ModelManager::GetModelData(modelHandle);
 
     // CBVをセット（マテリアル）
     switch (Renderer::GetRenderingMode())

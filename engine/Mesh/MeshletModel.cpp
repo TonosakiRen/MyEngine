@@ -350,7 +350,7 @@ void MeshletModel::CreateForwardPipeline()
 
 void MeshletModel::Draw(CommandContext& commandContext, uint32_t modelHandle, const WorldTransform& worldTransform, const Material& material,const uint32_t textureHandle) {
 
-    const ModelData& modelItem = ModelManager::GetInstance()->ModelManager::GetModelData(modelHandle);
+    const ModelData& modelItem = Engine::ModelManager::GetInstance()->ModelManager::GetModelData(modelHandle);
 
     // CBVをセット（マテリアル）
     switch (Renderer::GetRenderingMode())
@@ -365,10 +365,10 @@ void MeshletModel::Draw(CommandContext& commandContext, uint32_t modelHandle, co
         for (const auto& mesh : modelItem.meshes) {
             // srvセット
             if (mesh.GetUv() != 0) {
-                TextureManager::GetInstance()->SetDescriptorTable(commandContext, UINT(ForwardRootParameter::kTexture), mesh.GetUv());
+                Engine::TextureManager::GetInstance()->SetDescriptorTable(commandContext, UINT(ForwardRootParameter::kTexture), mesh.GetUv());
             }
             else {
-                TextureManager::GetInstance()->SetDescriptorTable(commandContext, UINT(ForwardRootParameter::kTexture), textureHandle);
+                Engine::TextureManager::GetInstance()->SetDescriptorTable(commandContext, UINT(ForwardRootParameter::kTexture), textureHandle);
             }
 
             //頂点セット
@@ -394,10 +394,10 @@ void MeshletModel::Draw(CommandContext& commandContext, uint32_t modelHandle, co
         for (const auto& mesh : modelItem.meshes) {
             // srvセット
             if (mesh.GetUv() != 0) {
-                TextureManager::GetInstance()->SetDescriptorTable(commandContext, UINT(RootParameter::kTexture), mesh.GetUv());
+               Engine::TextureManager::GetInstance()->SetDescriptorTable(commandContext, UINT(RootParameter::kTexture), mesh.GetUv());
             }
             else {
-                TextureManager::GetInstance()->SetDescriptorTable(commandContext, UINT(RootParameter::kTexture), textureHandle);
+                Engine::TextureManager::GetInstance()->SetDescriptorTable(commandContext, UINT(RootParameter::kTexture), textureHandle);
             }
 
             //頂点セット
@@ -420,7 +420,7 @@ void MeshletModel::Draw(CommandContext& commandContext, uint32_t modelHandle, co
 
 void MeshletModel::Draw(CommandContext& commandContext, uint32_t modelHandle, const WorldTransform& worldTransform, SkinCluster& skinCluster, const Material& material, const uint32_t textureHandle)
 {
-    const ModelData& modelItem = ModelManager::GetInstance()->ModelManager::GetModelData(modelHandle);
+    const ModelData& modelItem = Engine::ModelManager::GetInstance()->ModelManager::GetModelData(modelHandle);
 
     // CBVをセット（マテリアル）
     switch (Renderer::GetRenderingMode())
@@ -435,10 +435,10 @@ void MeshletModel::Draw(CommandContext& commandContext, uint32_t modelHandle, co
         for (const auto& mesh : modelItem.meshes) {
             // srvセット
             if (mesh.GetUv() != 0) {
-                TextureManager::GetInstance()->SetDescriptorTable(commandContext, UINT(ForwardRootParameter::kTexture), mesh.GetUv());
+                Engine::TextureManager::GetInstance()->SetDescriptorTable(commandContext, UINT(ForwardRootParameter::kTexture), mesh.GetUv());
             }
             else {
-                TextureManager::GetInstance()->SetDescriptorTable(commandContext, UINT(ForwardRootParameter::kTexture), textureHandle);
+                Engine::TextureManager::GetInstance()->SetDescriptorTable(commandContext, UINT(ForwardRootParameter::kTexture), textureHandle);
             }
 
             //頂点セット
@@ -466,10 +466,10 @@ void MeshletModel::Draw(CommandContext& commandContext, uint32_t modelHandle, co
         for (const auto& mesh : modelItem.meshes) {
             // srvセット
             if (mesh.GetUv() != 0) {
-                TextureManager::GetInstance()->SetDescriptorTable(commandContext, UINT(RootParameter::kTexture), mesh.GetUv());
+                Engine::TextureManager::GetInstance()->SetDescriptorTable(commandContext, UINT(RootParameter::kTexture), mesh.GetUv());
             }
             else {
-                TextureManager::GetInstance()->SetDescriptorTable(commandContext, UINT(RootParameter::kTexture), textureHandle);
+                Engine::TextureManager::GetInstance()->SetDescriptorTable(commandContext, UINT(RootParameter::kTexture), textureHandle);
             }
 
             //頂点セット

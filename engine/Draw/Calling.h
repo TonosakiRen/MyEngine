@@ -49,7 +49,7 @@ private:
     //視錐台と球の当たり判定
 	bool IsFrustumSphereCollision(const Frustum& frustum,const Sphere& sphere);
 
-	ModelManager* modelManager_ = nullptr;
+    Engine::ModelManager* modelManager_ = nullptr;
 	const ViewProjection* currentViewProjection_ = nullptr;
 };
 

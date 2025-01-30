@@ -15,44 +15,10 @@ class PlayerModel
 {
 public:
 
-    enum ModelJoints {
-        HeadTop,
-        Head,
-
-        SpineTop,
-
-        RightShoulder,
-        RightArm,
-        RightForArm,
-        RightHand,
-
-        LeftShoulder,
-        LeftArm,
-        LeftForArm,
-        LeftHand,
-
-        SpineBottom,
-
-        RightUpLeg,
-        RightLeg,
-        RightFoot,
-
-        LeftUpLeg,
-        LeftLeg,
-        LeftFoot,
-
-        PartNum
-    };
-
     enum Moving {
         kWalk,
         kStand,
         kMovingNum
-    };
-
-    struct JointWorldTransform {
-        const Matrix4x4* skeletonSpaceMatrix;
-        WorldTransform worldTransform;
     };
 
     static const int fireNum_ = 40;
@@ -72,8 +38,8 @@ private:
     //Animation更新
     void AnimationUpdate();
 
-    AnimationManager* animationManager_ = nullptr;
-    ModelManager* modelManager_ = nullptr;
+    Engine::AnimationManager* animationManager_ = nullptr;
+    Engine::ModelManager* modelManager_ = nullptr;
     Moving currentMoving_ = kWalk;
     Moving nextMoving_ = kWalk;
     float animationTime_[kMovingNum];
@@ -85,6 +51,4 @@ private:
 
     WorldTransform* playerWorldTransform_ = nullptr;
     uint32_t modelHandle_ = 0;
-    std::array<JointWorldTransform, PartNum> jointWordTransforms_;
-    std::array<JointWorldTransform, PartNum> partsWordTransform_;
 };

@@ -405,6 +405,11 @@ inline Vector3 CubicBezierCurve(float t, const Vector3& p0, const Vector3& p1, c
 }
 //Y消去
 inline Vector3 LoseY(Vector3 loseY) { return Vector3{ loseY.x, 0.0f, loseY.z }; }
+//球からランダムな位置生成
+inline Vector3 MakeRandVector3(const Sphere& sphere) {
+	Vector3 randomVector = Normalize(Vector3{ Rand(-1.0f,1.0f),Rand(-1.0f,1.0f) ,Rand(-1.0f,1.0f) });
+	return randomVector + sphere.center;
+}
 
 #pragma endregion
 #pragma region	Vector4

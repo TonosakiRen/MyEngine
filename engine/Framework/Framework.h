@@ -4,10 +4,10 @@
  * @brief Frameworkを行う
  */
 #include <memory>
+#include "audio/Audio.h"
+#include "Input/Input.h"
 
 class WinApp;
-class Input;
-class Audio;
 class SceneManager;
 class Framework
 {
@@ -32,7 +32,7 @@ public:
 public:
 
 	WinApp* win = nullptr;
-	Input* input = nullptr;
-	Audio* audio = nullptr;
+	Engine::Input* input = nullptr;
+	Engine::Audio* audio = nullptr;
 };
 

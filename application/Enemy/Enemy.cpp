@@ -18,7 +18,7 @@ void Enemy::Initialize(uint32_t modelHandle,Vector3 position, EnemyBulletManager
 	worldTransform_.Update();
 	collider_.Initialize(&worldTransform_,"enemy", modelHandle);
 	direction_ = direction;
-	modelSize = ModelManager::GetInstance()->GetModelSize(modelHandle_);
+	modelSize = Engine::ModelManager::GetInstance()->GetModelSize(modelHandle_);
 	enemyBulletManager_ = enemyBulletManager;
 	player_ = player;
 }

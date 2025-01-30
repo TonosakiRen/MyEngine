@@ -4,8 +4,6 @@
  */
 #include "Framework/Framework.h"
 
-#include "Input.h"
-#include "Audio.h"
 #include "Graphics/WinApp.h"
 #include "Scene/SceneManager.h"
 bool Framework::endRequest_ = false;
@@ -40,10 +38,10 @@ void Framework::Initialize()
 	win = WinApp::GetInstance();
 	win->CreateGameWindow();
 
-	input = Input::GetInstance();
+	input = Engine::Input::GetInstance();
 	input->Initialize(win->GetHInstance(), win->GetHwnd());
 
-	audio = Audio::GetInstance();
+	audio = Engine::Audio::GetInstance();
 	audio->Initialize();
 }
 

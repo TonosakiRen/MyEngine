@@ -9,22 +9,22 @@
 #include "Audio.h"
 #include "Render/Wire.h"
 #include "Draw/DrawManager.h"
-#include "Scene/GameScene.h"
 #include "Stage/Floor.h"
+#include "Mesh/GlitchMeshletModel.h"
 
 
 void Player::Initialize(const std::string name)
 {
 	GameObject::Initialize(name);
 	material_.Update();
-	input_ = Input::GetInstance();
+	input_ = Engine::Input::GetInstance();
 	modelSize_ = modelManager->GetModelSize(modelHandle_);
 	Vector3 modelCenter = modelManager->GetModelCenter(modelHandle_);
 	collider_.Initialize(&worldTransform_, name,modelHandle_);
 
 	velocity_ = { 0.0f,0.0f,0.0f };
 	acceleration_ = { 0.0f,-0.05f,0.0f };
-	uint32_t handle = TextureManager::Load("reticle.png");
+	uint32_t handle = Engine::TextureManager::Load("reticle.png");
 	sprite2DReticle_.Initialize(handle, { 0.0f,0.0f });
 	worldTransform3DReticle_.Initialize();
 	direction_ = { 0.0f,0.0f,1.0f };
@@ -51,12 +51,6 @@ void Player::Initialize(const std::string name)
 	}
 
 	lightCollider_.Initialize(&worldTransform_, name, modelHandle_);
-
-	spriteData_.Initialize(TextureManager::Load("ozi.dds"));
-	spriteData_.size_.x = 400.0f;
-	spriteData_.size_.y = 300.0f;
-	spriteData_.position_ = { 400.0f,300.0f };
-
 }
 
 void Player::Update(const ViewProjection& viewProjection)
@@ -80,6 +74,7 @@ void Player::Update(const ViewProjection& viewProjection)
 		}
 	}
 
+	GlitchMeshletModel::t = lightSphereT_;
 
 #ifdef _DEBUG
 	ImGui::Begin("Game");
@@ -127,12 +122,10 @@ void Player::SetColor(const Vector4& color)
 
 void Player::Draw() {
 	if (input_->PushRightTrigger()) {
-		DrawManager::GetInstance()->DrawPostSprite(sprite2DReticle_);
+		Engine::DrawManager::GetInstance()->DrawPostSprite(sprite2DReticle_);
 	}
 	playerModel_.Draw();
 	collider_.Draw();
-	DrawManager::GetInstance()->DrawPostSprite(spriteData_);
-
 }
 
 void Player::Fire()

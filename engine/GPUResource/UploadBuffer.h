@@ -24,7 +24,9 @@ public:
 
     //Getter
     size_t GetBufferSize() const { return bufferSize_; }
-    void* GetCPUData() const { return static_cast<char*>(cpuData_) + (Framework::kFrameRemainder * bufferSize_); }
+    void* GetCPUData() const { 
+        size_t offset = Framework::kFrameRemainder * bufferSize_;
+        return static_cast<char*>(cpuData_) + offset; }
     D3D12_GPU_VIRTUAL_ADDRESS GetGPUVirtualAddress() const { 
         size_t offset = Framework::kFrameRemainder * Helper::AlignUp(bufferSize_, 256);
         return resource_->GetGPUVirtualAddress() + static_cast<D3D12_GPU_VIRTUAL_ADDRESS>(offset);

@@ -118,7 +118,7 @@ void SpotLightShadowMap::Draw(CommandContext& commandContext, uint32_t modelHand
     for (int i = 0; i < ShadowSpotLights::lightNum; i++) {
         commandContext.SetDepthStencil(shadowSpotLights_->lights_[i].shadowMap_.GetDSV());
         commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kShadowSpotLight), shadowSpotLights_->lights_[i].constBuffer_.GetGPUVirtualAddress());
-        ModelManager::GetInstance()->DrawInstanced(commandContext, modelHandle);
+       Engine:: ModelManager::GetInstance()->DrawInstanced(commandContext, modelHandle);
     }
 }
 

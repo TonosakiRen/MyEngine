@@ -350,7 +350,7 @@ void Model::Draw(CommandContext& commandContext, uint32_t modelHandle, const Wor
         // CBVをセット（マテリアル）
         commandContext.SetConstantBuffer(static_cast<UINT>(ForwardRootParameter::kMaterial), material.GetGPUVirtualAddress());
 
-        ModelManager::GetInstance()->DrawInstanced(commandContext, modelHandle, static_cast<UINT>(RootParameter::kTexture), textureHandle);
+        Engine::ModelManager::GetInstance()->DrawInstanced(commandContext, modelHandle, static_cast<UINT>(RootParameter::kTexture), textureHandle);
         break;
     case Renderer::kDeferred:
         // CBVをセット（ワールド行列）
@@ -359,7 +359,7 @@ void Model::Draw(CommandContext& commandContext, uint32_t modelHandle, const Wor
         // CBVをセット（マテリアル）
         commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kMaterial), material.GetGPUVirtualAddress());
 
-        ModelManager::GetInstance()->DrawInstanced(commandContext, modelHandle, static_cast<UINT>(RootParameter::kTexture), textureHandle);
+        Engine::ModelManager::GetInstance()->DrawInstanced(commandContext, modelHandle, static_cast<UINT>(RootParameter::kTexture), textureHandle);
         break;
     default:
         break;
@@ -378,7 +378,7 @@ void Model::Draw(CommandContext& commandContext, uint32_t modelHandle, const Wor
         // CBVをセット（マテリアル）
         commandContext.SetConstantBuffer(static_cast<UINT>(ForwardRootParameter::kMaterial), material.GetGPUVirtualAddress());
 
-        ModelManager::GetInstance()->DrawInstanced(commandContext, modelHandle, skinCluster, static_cast<UINT>(RootParameter::kTexture), textureHandle);
+        Engine::ModelManager::GetInstance()->DrawInstanced(commandContext, modelHandle, skinCluster, static_cast<UINT>(RootParameter::kTexture), textureHandle);
         break;
     case Renderer::kDeferred:
         // CBVをセット（ワールド行列）
@@ -387,7 +387,7 @@ void Model::Draw(CommandContext& commandContext, uint32_t modelHandle, const Wor
         // CBVをセット（マテリアル）
         commandContext.SetConstantBuffer(static_cast<UINT>(RootParameter::kMaterial), material.GetGPUVirtualAddress());
 
-        ModelManager::GetInstance()->DrawInstanced(commandContext, modelHandle, skinCluster, static_cast<UINT>(RootParameter::kTexture), textureHandle);
+        Engine::ModelManager::GetInstance()->DrawInstanced(commandContext, modelHandle, skinCluster, static_cast<UINT>(RootParameter::kTexture), textureHandle);
         break;
     default:
         break;

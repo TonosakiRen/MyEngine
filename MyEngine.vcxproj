@@ -189,6 +189,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\Enemy\LineAttack.cpp" />
     <ClCompile Include="application\Particle\DustParticle.cpp" />
     <ClCompile Include="application\Particle\ExplodeParticle.cpp" />
+    <ClCompile Include="application\Particle\MushroomParticle.cpp" />
     <ClCompile Include="application\Particle\SphereLights.cpp" />
     <ClCompile Include="application\Particle\WhiteParticle.cpp" />
     <ClCompile Include="application\Player\Player.cpp" />
@@ -199,7 +200,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\Rain\RainManager.cpp" />
     <ClCompile Include="application\Scene\BaseScene.cpp" />
     <ClCompile Include="application\Scene\GamePlayScene.cpp" />
-    <ClCompile Include="application\Scene\GameScene.cpp" />
     <ClCompile Include="application\Scene\SceneManager.cpp" />
     <ClCompile Include="application\Scene\TitleScene.cpp" />
     <ClCompile Include="application\Stage\Cave.cpp" />
@@ -238,6 +238,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\GameComponent\Material.cpp" />
     <ClCompile Include="engine\GameComponent\ViewProjection.cpp" />
     <ClCompile Include="engine\GameComponent\WorldTransform.cpp" />
+    <ClCompile Include="engine\Glitch\BlockNoise.cpp" />
     <ClCompile Include="engine\GPUResource\BufferManager.cpp" />
     <ClCompile Include="engine\GPUResource\ByteAddressBuffer.cpp" />
     <ClCompile Include="engine\GPUResource\ColorBuffer.cpp" />
@@ -278,6 +279,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\Light\SpotLightShadowMap.cpp" />
     <ClCompile Include="engine\Light\TileBasedRendering.cpp" />
     <ClCompile Include="engine\math\Easing.cpp" />
+    <ClCompile Include="engine\Mesh\GlitchMeshletModel.cpp" />
     <ClCompile Include="engine\Mesh\Mesh.cpp" />
     <ClCompile Include="engine\Mesh\MeshletEnvironmentMapModel.cpp" />
     <ClCompile Include="engine\Mesh\MeshletModel.cpp" />
@@ -290,6 +292,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\PostEffect\Bloom.cpp" />
     <ClCompile Include="engine\PostEffect\EdgeRenderer.cpp" />
     <ClCompile Include="engine\PostEffect\GaussianBlur.cpp" />
+    <ClCompile Include="engine\PostEffect\GlitchEffect.cpp" />
     <ClCompile Include="engine\PostEffect\GrayScale.cpp" />
     <ClCompile Include="engine\PostEffect\HSVFilter.cpp" />
     <ClCompile Include="engine\PostEffect\PostEffect.cpp" />
@@ -323,6 +326,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\Enemy\LineAttack.h" />
     <ClInclude Include="application\Particle\DustParticle.h" />
     <ClInclude Include="application\Particle\ExplodeParticle.h" />
+    <ClInclude Include="application\Particle\MushroomParticle.h" />
     <ClInclude Include="application\Particle\SphereLights.h" />
     <ClInclude Include="application\Particle\WhiteParticle.h" />
     <ClInclude Include="application\Player\Player.h" />
@@ -333,7 +337,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\Rain\RainManager.h" />
     <ClInclude Include="application\Scene\BaseScene.h" />
     <ClInclude Include="application\Scene\GamePlayScene.h" />
-    <ClInclude Include="application\Scene\GameScene.h" />
     <ClInclude Include="application\Scene\SceneManager.h" />
     <ClInclude Include="application\Scene\TitleScene.h" />
     <ClInclude Include="application\Stage\Cave.h" />
@@ -373,6 +376,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\GameComponent\Material.h" />
     <ClInclude Include="engine\GameComponent\ViewProjection.h" />
     <ClInclude Include="engine\GameComponent\WorldTransform.h" />
+    <ClInclude Include="engine\Glitch\BlockNoise.h" />
     <ClInclude Include="engine\GPUResource\BufferManager.h" />
     <ClInclude Include="engine\GPUResource\ByteAddressBuffer.h" />
     <ClInclude Include="engine\GPUResource\ColorBuffer.h" />
@@ -415,6 +419,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\Light\TileBasedRendering.h" />
     <ClInclude Include="engine\math\Easing.h" />
     <ClInclude Include="engine\math\Mymath.h" />
+    <ClInclude Include="engine\Mesh\GlitchMeshletModel.h" />
     <ClInclude Include="engine\Mesh\Mesh.h" />
     <ClInclude Include="engine\Mesh\MeshletEnvironmentMapModel.h" />
     <ClInclude Include="engine\Mesh\MeshletModel.h" />
@@ -427,6 +432,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\PostEffect\Bloom.h" />
     <ClInclude Include="engine\PostEffect\EdgeRenderer.h" />
     <ClInclude Include="engine\PostEffect\GaussianBlur.h" />
+    <ClInclude Include="engine\PostEffect\GlitchEffect.h" />
     <ClInclude Include="engine\PostEffect\GrayScale.h" />
     <ClInclude Include="engine\PostEffect\HSVFilter.h" />
     <ClInclude Include="engine\PostEffect\PostEffect.h" />
@@ -452,6 +458,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\Wave\WaveModel.h" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="Resources\shaders\BlockNoisePS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
     <FxCompile Include="Resources\shaders\CellularPS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Demo|x64'">true</ExcludedFromBuild>
@@ -471,6 +480,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Demo|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\forwardPlus\GlitchMeshPS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="Resources\shaders\forwardPlus\MeshEnvironmentMapPS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
@@ -501,6 +513,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Demo|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\GlitchEffectPS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="Resources\shaders\HSVFilterPS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>

@@ -85,5 +85,5 @@ void WhiteParticle::Draw()
 		}
 	}
 
-	DrawManager::GetInstance()->DrawParticle(*particleData_,0, material_);
+	Engine::DrawManager::GetInstance()->DrawParticle(*particleData_,0, material_);
 }

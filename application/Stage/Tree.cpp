@@ -64,6 +64,6 @@ void Tree::Draw()
 		
 	}
 
-	DrawManager::GetInstance()->DrawParticleModel(*grassesData_, ModelManager::GetInstance()->Load("box1x1.obj"), *grassMaterial_);
-	DrawManager::GetInstance()->DrawModel(worldTransform_,modelHandle_,0,material_);
+	Engine::DrawManager::GetInstance()->DrawParticleModel(*grassesData_, Engine::ModelManager::GetInstance()->Load("box1x1.obj"), *grassMaterial_);
+	Engine::DrawManager::GetInstance()->DrawModel(worldTransform_,modelHandle_,0,material_);
 }

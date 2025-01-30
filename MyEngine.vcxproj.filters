@@ -59,9 +59,6 @@
     <Filter Include="Engine\Animation">
       <UniqueIdentifier>{49f097c0-c68c-4793-a54b-3b5dc154bdc0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\Particle">
-      <UniqueIdentifier>{1820220b-483d-485b-968f-ded23a5732e3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Engine\Mesh">
       <UniqueIdentifier>{f818dff0-656e-45f0-9f8e-f479f1eaac69}</UniqueIdentifier>
     </Filter>
@@ -92,14 +89,8 @@
     <Filter Include="Game\Camera">
       <UniqueIdentifier>{10f1e74c-cd11-4f70-b064-fff5fd01c917}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\Draw">
-      <UniqueIdentifier>{4117657c-d136-48f4-b988-5c1b47d35590}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Engine\Wave">
       <UniqueIdentifier>{f835e169-236a-42e5-9a7d-56d2028452e5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Engine\Curve">
-      <UniqueIdentifier>{73e0be86-3752-4605-a8e9-e0917b422807}</UniqueIdentifier>
     </Filter>
     <Filter Include="shaders\Compute">
       <UniqueIdentifier>{4c86af85-f1e3-4f9b-8085-7aec3f9fd0dc}</UniqueIdentifier>
@@ -112,6 +103,18 @@
     </Filter>
     <Filter Include="Engine\ImGui">
       <UniqueIdentifier>{69196633-8f96-47c0-b3c4-f1ac473e12a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Curve">
+      <UniqueIdentifier>{73e0be86-3752-4605-a8e9-e0917b422807}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Draw">
+      <UniqueIdentifier>{4117657c-d136-48f4-b988-5c1b47d35590}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Glitch">
+      <UniqueIdentifier>{63bad7fc-ca6e-43e6-aab2-25f3948ea48b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Particle">
+      <UniqueIdentifier>{1820220b-483d-485b-968f-ded23a5732e3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -424,9 +427,6 @@
     <ClCompile Include="application\Scene\GamePlayScene.cpp">
       <Filter>Game\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="application\Scene\GameScene.cpp">
-      <Filter>Game\Scene</Filter>
-    </ClCompile>
     <ClCompile Include="application\Scene\SceneManager.cpp">
       <Filter>Game\Scene</Filter>
     </ClCompile>
@@ -510,6 +510,18 @@
     </ClCompile>
     <ClCompile Include="engine\externals\imgui\imgui_widgets.cpp">
       <Filter>Engine\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="application\Particle\MushroomParticle.cpp">
+      <Filter>Game\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\Glitch\BlockNoise.cpp">
+      <Filter>Engine\Glitch</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\PostEffect\GlitchEffect.cpp">
+      <Filter>Engine\PostEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\Mesh\GlitchMeshletModel.cpp">
+      <Filter>Engine\Mesh</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -771,9 +783,6 @@
     <ClInclude Include="engine\GameComponent\GameObject.h">
       <Filter>Engine\GameComponent</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Input\Input.h">
-      <Filter>Engine\Input</Filter>
-    </ClInclude>
     <ClInclude Include="engine\Framework\Framework.h">
       <Filter>Engine\Framework</Filter>
     </ClInclude>
@@ -820,9 +829,6 @@
       <Filter>Game\Scene</Filter>
     </ClInclude>
     <ClInclude Include="application\Scene\GamePlayScene.h">
-      <Filter>Game\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="application\Scene\GameScene.h">
       <Filter>Game\Scene</Filter>
     </ClInclude>
     <ClInclude Include="application\Scene\SceneManager.h">
@@ -914,6 +920,21 @@
     </ClInclude>
     <ClInclude Include="engine\externals\imgui\imstb_truetype.h">
       <Filter>Engine\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Particle\MushroomParticle.h">
+      <Filter>Game\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Glitch\BlockNoise.h">
+      <Filter>Engine\Glitch</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\PostEffect\GlitchEffect.h">
+      <Filter>Engine\PostEffect</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Mesh\GlitchMeshletModel.h">
+      <Filter>Engine\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Input\Input.h">
+      <Filter>Engine\Input</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1083,6 +1104,15 @@
       <Filter>shaders\FPlus</Filter>
     </FxCompile>
     <FxCompile Include="Resources\shaders\forwardPlus\WavePS.hlsl">
+      <Filter>shaders\FPlus</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\BlockNoisePS.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\GlitchEffectPS.hlsl">
+      <Filter>shaders\PostEffect</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\forwardPlus\GlitchMeshPS.hlsl">
       <Filter>shaders\FPlus</Filter>
     </FxCompile>
   </ItemGroup>

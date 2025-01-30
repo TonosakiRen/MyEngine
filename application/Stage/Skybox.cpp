@@ -21,5 +21,5 @@ void Skybox::Update()
 
 void Skybox::Draw()
 {
-	DrawManager::GetInstance()->DrawSky(worldTransform_);
+	Engine::DrawManager::GetInstance()->DrawSky(worldTransform_);
 }
