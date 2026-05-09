@@ -9,7 +9,7 @@
 #include "Render/Wire.h"
 
 
-bool ViewProjection::isUseDebugCamera = false;
+bool ViewProjection::isUseDebugCamera = true;
 
 void ViewProjection::SwitchIsUseDebugCamera()
 {

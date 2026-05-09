@@ -1,5 +1,5 @@
-#define RTWidth 1280
-#define RTHeight 720
+#define RTWidth 1980
+#define RTHeight 1080
 #define ambient 0.001f
 
 struct TBRInformation {
@@ -204,7 +204,7 @@ float32_t3 AreaLightLighting(AreaLight areaLight ,float32_t3 worldPos,float32_t3
 
 int32_t GetTileInformationIndex(float32_t2 pixelPos,TileNum tileNum){
 
-	float32_t2 texSize = float32_t2(1280,720);
+	float32_t2 texSize = float32_t2(1980,1080);
 
 	float32_t tileWidth = texSize.x * rcp(tileNum.width);
 

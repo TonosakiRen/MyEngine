@@ -138,8 +138,9 @@ private:
     bool isGrayScale_ = false;
     bool isVignette_ = false;
     bool isSmooth_ = false;
-    bool isGlitchEffect = true;
-
+    public:
+    static bool isGlitchEffect;
+    private:
     std::unique_ptr<TileBasedRendering> tileBasedRendering_;
 
     std::unique_ptr<Transition> transition_;

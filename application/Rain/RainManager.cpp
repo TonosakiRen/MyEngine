@@ -22,7 +22,7 @@ void RainManager::Initialize(ExplodeParticle* explodeParticle)
 void RainManager::Update()
 {
 	spawnFrame_++;
-	const uint32_t spawnInterval = 15;
+	const uint32_t spawnInterval = 12;
 
 	//出現
 	if (spawnFrame_ >= spawnInterval) {
@@ -48,7 +48,7 @@ void RainManager::PopRainDrop()
 		if (pointLights_->lights_[i].isActive == false) {
 			for (int j = 0; j < rainDropNum_; j++) {
 				if (!rainDrops_[j].isActive_) {
-					rainDrops_[j].Initialize(modelHandle, &pointLights_->lights_[i],explodeParticle_, {Rand(-Floor::kFloorHalfSize,Floor::kFloorHalfSize),20.0f,Rand(-Floor::kFloorHalfSize,Floor::kFloorHalfSize)}, color);
+					rainDrops_[j].Initialize(modelHandle, &pointLights_->lights_[i],explodeParticle_, {Rand(-Floor::kFloorHalfSize,Floor::kFloorHalfSize),30.0f,Rand(-Floor::kFloorHalfSize,Floor::kFloorHalfSize)}, color);
 					break;
 				}
 			}

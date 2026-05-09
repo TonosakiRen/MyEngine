@@ -16,6 +16,7 @@
 #include  "GameComponent/GameObject.h"
 #include  "Player/PlayerBulletManager.h"
 #include  "Particle/ExplodeParticle.h"
+#include "Particle/TreeLights.h"
 #include  "Enemy/Enemy.h"
 #include  "Enemy/EnemyBulletManager.h"
 #include  "Particle/SphereLights.h"
@@ -59,5 +60,9 @@ private:
 	std::unique_ptr<Cave> cave_;
 
 	std::vector<std::unique_ptr<GameObject>>* gameObjects_;
+
+	std::unique_ptr<SphereLights> sphereLigts_;
+
+	std::unique_ptr<TreeLights> treeLights_;
 };
 

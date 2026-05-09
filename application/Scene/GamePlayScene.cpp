@@ -51,6 +51,12 @@ void GamePlayScene::Initialize()
 
 	cave_ = std::make_unique<Cave>();
 	cave_->Initialize();
+
+	sphereLigts_ = std::make_unique<SphereLights>();
+	sphereLigts_->Initialize();
+
+	treeLights_ = std::make_unique<TreeLights>();
+	treeLights_->Initialize();
 }
 
 void GamePlayScene::Finalize()
@@ -64,13 +70,16 @@ void GamePlayScene::Update()
 
 	trees_->Update();
 
+	treeLights_->Update();
+
 	player_->Update(*BaseScene::currentViewProjection);
 
+	sphereLigts_->Update();
 
 	floor_->Update();
 
 	if (!lineAttack_->GetIsEmit()) {
-		//lineAttack_->Emit();
+		lineAttack_->Emit();
 	}
 
 	lineAttack_->Update();
@@ -107,6 +116,7 @@ void GamePlayScene::Draw()
 
 	player_->Draw();
 
+	sphereLigts_->Draw();
 
 	lineAttack_->Draw();
 	explodeParticle_->Draw();
@@ -120,6 +130,7 @@ void GamePlayScene::Draw()
 	floor_->Draw();
 
 	rainManager_->Draw();
+
 }
 
 void GamePlayScene::CheckAllCollision()

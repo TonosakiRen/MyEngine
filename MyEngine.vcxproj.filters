@@ -523,6 +523,9 @@
     <ClCompile Include="engine\Mesh\GlitchMeshletModel.cpp">
       <Filter>Engine\Mesh</Filter>
     </ClCompile>
+    <ClCompile Include="application\Particle\TreeLights.cpp">
+      <Filter>Game\Particle</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\Animation\AnimationManager.h">
@@ -935,6 +938,9 @@
     </ClInclude>
     <ClInclude Include="engine\Input\Input.h">
       <Filter>Engine\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Particle\TreeLights.h">
+      <Filter>Game\Particle</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

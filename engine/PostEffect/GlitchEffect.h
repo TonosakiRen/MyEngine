@@ -39,8 +39,8 @@ private:
 	RootSignature rootSignature_;
 	PipelineState pipelineState_;
 
-	float intensity_ = 0.2f;
-	float speed_ = 10.0f;
+	float intensity_ = 0.001f;
+	float speed_ = 0.0005f;
 	float scale_ = 30.0f;
 
 };

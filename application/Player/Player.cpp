@@ -121,11 +121,11 @@ void Player::SetColor(const Vector4& color)
 }
 
 void Player::Draw() {
-	if (input_->PushRightTrigger()) {
+	/*if (input_->PushRightTrigger()) {
 		Engine::DrawManager::GetInstance()->DrawPostSprite(sprite2DReticle_);
 	}
 	playerModel_.Draw();
-	collider_.Draw();
+	collider_.Draw();*/
 }
 
 void Player::Fire()

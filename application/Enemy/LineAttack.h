@@ -29,7 +29,7 @@ public:
 	void Draw();
 
 	//Getter
-	void IsEmit() { isEmit_ = true; };
+	void Emit() { isEmit_ = true; };
 	bool GetIsEmit() { return isEmit_; }
 private:
 	LightManager* lightManager_ = nullptr;

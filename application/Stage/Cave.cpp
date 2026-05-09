@@ -7,7 +7,7 @@
 #include "Texture/TextureManager.h"
 #include "ImGuiManager.h"
 #include "Draw/DrawManager.h"
-
+#include "Render/Renderer.h"
 void Cave::Initialize()
 {
 	GameObject::Initialize("cave.obj");
@@ -27,7 +27,12 @@ void Cave::Update()
 void Cave::Draw()
 {
 	mushRooms_->Draw();
-	Engine::DrawManager::GetInstance()->DrawGlitchMeshletModel(worldTransform_,modelHandle_);
+	if (Renderer::isGlitchEffect) {
+		Engine::DrawManager::GetInstance()->DrawGlitchMeshletModel(worldTransform_,modelHandle_);
+	}
+	else {
+		Engine::DrawManager::GetInstance()->DrawMeshletModel(worldTransform_, modelHandle_);
+	}
 }
 
 

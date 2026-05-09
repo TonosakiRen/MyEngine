@@ -20,6 +20,7 @@
 #include "GPUResource/BufferManager.h"
 
 Renderer::RenderingMode Renderer::renderingMode = Renderer::kForward;
+bool Renderer::isGlitchEffect = true;
 
 Renderer* Renderer::GetInstance() {
     static Renderer instance;
